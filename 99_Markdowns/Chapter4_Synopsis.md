@@ -1,4 +1,4 @@
-# SEQUENTIAL COMPONENT DATA ARCHITECTURES (STRINGS, LISTS, AND TUPLES)
+# Sequential component data architectures (strings, lists, and tuples)
 
 ## 3.1 Text Encoding Systems, Lexical Escape Maps, and Character Representation
 

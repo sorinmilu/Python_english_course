@@ -4,7 +4,7 @@
     "title": "Python Course Synopsis",
     "description": "Hierarchical course outline for tree display, drag-and-drop reorder, and Markdown/LaTeX export. Nodes use preorder-stable string ids \"1\"..\"N\" only; headings in exported Markdown are unnumbered.",
     "source_dir": "99_Markdowns",
-    "generated_at": "2026-05-26T23:43:00+00:00",
+    "generated_at": "2026-05-26T23:48:08+00:00",
     "latex_heading_levels": [
       "chapter",
       "section",
@@ -25,7 +25,7 @@
       "level": 1
     },
     {
-      "title": "PROGRAMMING PARADIGMS AND ENVIRONMENT SETUP",
+      "title": "Programming paradigms and environment setup",
       "paragraphs": [],
       "items": [],
       "metadata": {},
@@ -850,7 +850,7 @@
       "level": 1
     },
     {
-      "title": "THE PYTHON MEMORY MODEL, VARIABLES, AND SCALAR DATA TYPES",
+      "title": "The python memory model, variables, and scalar data types",
       "paragraphs": [],
       "items": [],
       "metadata": {},
@@ -1407,7 +1407,7 @@
       "level": 1
     },
     {
-      "title": "SEQUENTIAL COMPONENT DATA ARCHITECTURES (STRINGS, LISTS, AND TUPLES)",
+      "title": "Sequential component data architectures (strings, lists, and tuples)",
       "paragraphs": [],
       "items": [],
       "metadata": {},
@@ -1852,7 +1852,7 @@
       "level": 1
     },
     {
-      "title": "CONTROL FLOW GRAPHS, LAZY SEQUENCES, AND EXCEPTION ROUTING",
+      "title": "Control flow graphs, lazy sequences, and exception routing",
       "paragraphs": [],
       "items": [],
       "metadata": {},
@@ -2388,7 +2388,7 @@
       "level": 1
     },
     {
-      "title": "HASH-BASED COLLECTIONS AND ASSOCIATIVE MAPPINGS",
+      "title": "Hash-based collections and associative mappings",
       "paragraphs": [],
       "items": [],
       "metadata": {},
@@ -2796,7 +2796,7 @@
       "level": 1
     },
     {
-      "title": "FUNCTION EXECUTION MECHANICS, LEXICAL SCOPES, AND ADVANCED CONTROL ARCHITECTURE",
+      "title": "Function execution mechanics, lexical scopes, and advanced control architecture",
       "paragraphs": [],
       "items": [],
       "metadata": {},

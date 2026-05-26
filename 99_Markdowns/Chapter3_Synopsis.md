@@ -1,4 +1,4 @@
-# THE PYTHON MEMORY MODEL, VARIABLES, AND SCALAR DATA TYPES
+# The python memory model, variables, and scalar data types
 
 ## 2.1 CPython Memory Management Dynamics and Object Topologies
 

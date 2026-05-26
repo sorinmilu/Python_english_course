@@ -1,4 +1,4 @@
-# HASH-BASED COLLECTIONS AND ASSOCIATIVE MAPPINGS
+# Hash-based collections and associative mappings
 
 ## 5.1 Unordered Unique Domains: The Set Architecture (`set`)
 

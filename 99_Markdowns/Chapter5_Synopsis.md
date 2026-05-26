@@ -1,4 +1,4 @@
-# CONTROL FLOW GRAPHS, LAZY SEQUENCES, AND EXCEPTION ROUTING
+# Control flow graphs, lazy sequences, and exception routing
 
 ## 4.1 Code Block Syntax and Indentation Semantics
 

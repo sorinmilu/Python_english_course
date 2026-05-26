@@ -1,4 +1,4 @@
-# FUNCTION EXECUTION MECHANICS, LEXICAL SCOPES, AND ADVANCED CONTROL ARCHITECTURE
+# Function execution mechanics, lexical scopes, and advanced control architecture
 
 ## 6.1 Anatomy and Definition of Functions
 

@@ -1,4 +1,4 @@
-# PROGRAMMING PARADIGMS AND ENVIRONMENT SETUP
+# Programming paradigms and environment setup
 
 ## 1.1 Operating Systems, Programs, and Process Mechanics
 
@@ -19,7 +19,6 @@
 ##### 1.1.2.4.1 Target Machine Architecture Mapping and ISA Instruction / Assembly Emission
 ##### 1.1.2.4.2 The Assembler Layer and Relocatable Machine Object File Generation (`.o` / `.obj` Format)
 #### 1.1.2.5 The Static Linking Phase: Symbol Resolution, External Relocations, and Executable Binary Composition
-
 
 
 ### 1.1.3 Program Loading and Execution Mechanics
