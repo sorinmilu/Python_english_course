@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontSize: { xxs: ["11px", "1.2"] },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    <script defer src="/static/app.js?v=28"></script>
+  </head>
+  <body class="bg-neutral-100 text-neutral-900 min-h-screen">
+    <header class="border-b border-neutral-300 bg-white px-2 py-1 flex items-center gap-2 flex-wrap">
+      <span class="font-semibold text-xxs">Project Manager</span>
+      <span id="projectRoot" class="text-xxs text-neutral-500 mono truncate max-w-[40vw]"></span>
+      <nav class="flex items-center gap-1">
+        <button
+          id="tabMainBtn"
+          type="button"
+          class="px-2 py-0.5 rounded text-xxs border border-neutral-400 bg-neutral-800 text-white"
+        >
+          Main
+        </button>
+        <button
+          id="tabProofBtn"
+          type="button"
+          class="px-2 py-0.5 rounded text-xxs border border-neutral-300 bg-white"
+        >
+          Proofreading
+        </button>
+        <button
+          id="tabParagraphStyleBtn"
+          type="button"
+          class="px-2 py-0.5 rounded text-xxs border border-neutral-300 bg-white"
+        >
+          Paragraph style
+        </button>
+        <button
+          id="tabSynopsisBtn"
+          type="button"
+          class="px-2 py-0.5 rounded text-xxs border border-neutral-300 bg-white"
+        >
+          Course synopsis
+        </button>
+      </nav>
+      <button
+        id="reloadBtn"
+        type="button"
+        class="ml-auto px-2 py-0.5 rounded text-xxs border border-neutral-300 bg-white"
+      >
+        Reload
+      </button>
+    </header>
+
+    <p id="errorBox" class="hidden text-red-700 px-2 py-1 text-xxs"></p>
+
+    <main
+      id="tabPanelMain"
+      class="grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+    >
+      <section class="space-y-2 min-w-0 overflow-auto pr-1">
+        <div class="panel">
+          <div class="panel-title">Web Tools</div>
+          <div class="space-y-1" id="toolsPanel"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Project Generation</div>
+          <div class="flex flex-wrap gap-1 mb-2">
+            <button class="btn-primary" type="button" data-action="generate_project">
+              Generate project
+            </button>
+            <select id="pdfCompressionLevel" class="compact-select" title="PDF compression level">
+              <option value="screen">screen</option>
+              <option value="ebook" selected>ebook</option>
+              <option value="printer">printer</option>
+              <option value="prepress">prepress</option>
+            </select>
+            <button id="compressPdfBtn" class="btn-primary" type="button" disabled>
+              Compress PDF
+            </button>
+            <span id="compressPdfState" class="text-xxs text-neutral-500"></span>
+          </div>
+          <div class="text-xxs">
+            <a
+              id="pdfLink"
+              class="link disabled"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              >main_document_processed.pdf</a
+            >
+            <span id="pdfState" class="text-neutral-500 ml-1"></span>
+          </div>
+          <div class="flex flex-wrap gap-1 mt-1">
+            <button id="latexSourceBtn" class="btn-secondary" type="button" disabled>
+              latex source
+            </button>
+            <button id="bibtexSourceBtn" class="btn-secondary" type="button" disabled>
+              bibtex source
+            </button>
+            <button id="structureBtn" class="btn-secondary" type="button" disabled>
+              document tree
+            </button>
+            <button id="bibtexErrorsBtn" class="btn-secondary" type="button" disabled>
+              bibtex errors
+            </button>
+            <button id="listFiguresBtn" class="btn-secondary" type="button" disabled>
+              list of figures
+            </button>
+            <button id="listTablesBtn" class="btn-secondary" type="button" disabled>
+              list of tables
+            </button>
+          </div>
+          <div class="mt-2 text-xxs text-neutral-600 mono break-all" id="buildPath"></div>
+        </div>
+      </section>
+
+      <section class="panel min-w-0 min-h-0 flex flex-col">
+        <div class="flex items-center gap-2 mb-1">
+          <div class="panel-title mb-0">Status</div>
+          <button
+            id="clearBtn"
+            type="button"
+            class="ml-auto px-2 py-0.5 rounded text-xxs border border-neutral-300 bg-white"
+          >
+            Clear
+          </button>
+        </div>
+        <div id="runsPanel" class="space-y-1 overflow-auto min-h-0 flex-1"></div>
+      </section>
+    </main>
+
+    <div
+      id="tabPanelProof"
+      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      aria-labelledby="tabProofBtn"
+    >
+      <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
+        <div class="panel-title shrink-0">content.tex tree (project JSON folders)</div>
+        <div id="proofTree" class="text-xxs overflow-auto flex-1 min-h-0 proof-tree-scroll"></div>
+      </section>
+      <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
+        <div class="flex items-center gap-2 shrink-0 mb-1">
+          <span class="panel-title mb-0">Suggested changes</span>
+          <span id="proofSessionPath" class="text-xxs text-neutral-500 mono truncate flex-1 min-w-0"></span>
+        </div>
+        <div class="proof-suggested-body flex flex-1 min-h-0 flex-col overflow-hidden">
+          <div
+            id="proofStatsSummary"
+            class="proof-stats-summary text-xxs text-neutral-700 mb-2 shrink-0 hidden border border-neutral-200 rounded bg-neutral-50 px-2 py-1.5 leading-snug"
+            role="status"
+          ></div>
+          <div id="proofCardsWrap" class="flex-1 overflow-auto min-h-0 space-y-2"></div>
+          <div
+            id="proofSuggestedBusy"
+            class="source-busy-overlay hidden"
+            aria-hidden="true"
+            aria-live="polite"
+          >
+            <div class="source-busy-inner">
+              <div class="source-busy-spinner" aria-hidden="true"></div>
+              <div id="proofSuggestedBusyHint" class="source-busy-hint" role="status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div
+      id="tabPanelParagraphStyle"
+      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      aria-labelledby="tabParagraphStyleBtn"
+    >
+      <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
+        <div class="panel-title shrink-0">content.tex tree (Paragraph style)</div>
+        <div id="styleTree" class="text-xxs overflow-auto flex-1 min-h-0 proof-tree-scroll"></div>
+      </section>
+      <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
+        <div class="flex items-center gap-2 shrink-0 mb-1">
+          <span class="panel-title mb-0">Suggested changes</span>
+          <span id="styleSessionPath" class="text-xxs text-neutral-500 mono truncate flex-1 min-w-0"></span>
+        </div>
+        <div class="proof-suggested-body flex flex-1 min-h-0 flex-col overflow-hidden">
+          <div
+            id="styleStatsSummary"
+            class="proof-stats-summary text-xxs text-neutral-700 mb-2 shrink-0 hidden border border-neutral-200 rounded bg-neutral-50 px-2 py-1.5 leading-snug"
+            role="status"
+          ></div>
+          <div id="styleCardsWrap" class="flex-1 overflow-auto min-h-0 space-y-2"></div>
+          <div
+            id="styleSuggestedBusy"
+            class="source-busy-overlay hidden"
+            aria-hidden="true"
+            aria-live="polite"
+          >
+            <div class="source-busy-inner">
+              <div class="source-busy-spinner" aria-hidden="true"></div>
+              <div id="styleSuggestedBusyHint" class="source-busy-hint" role="status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div
+      id="tabPanelSynopsis"
+      class="hidden p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      aria-labelledby="tabSynopsisBtn"
+    >
+      <div class="panel min-w-0 min-h-0 flex flex-col overflow-hidden relative h-full">
+        <div class="flex flex-wrap items-center gap-2 shrink-0 mb-1">
+          <span class="panel-title mb-0">Course synopsis</span>
+          <span id="synopsisPathHint" class="text-xxs text-neutral-500 mono truncate flex-1 min-w-0"></span>
+          <span id="synopsisSaveState" class="synopsis-save-state text-xxs text-neutral-500"></span>
+          <button id="synopsisMarkdownBtn" type="button" class="btn-secondary" title="Export expanded branches to 99_Markdowns/full_content.md">
+            Markdown
+          </button>
+          <button id="synopsisReloadBtn" type="button" class="btn-secondary">Reload</button>
+        </div>
+        <div
+          id="synopsisFoldToolbar"
+          class="synopsis-fold-toolbar flex flex-wrap items-center gap-x-3 gap-y-1 shrink-0 mb-1 text-xxs"
+          role="toolbar"
+          aria-label="Fold outline by heading level"
+        >
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-neutral-600 font-medium">Expand</span>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="expand"
+              data-synopsis-fold-level="chapter"
+              title="Expand every chapter branch"
+            >
+              Chapters
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="expand"
+              data-synopsis-fold-level="section"
+              title="Expand every section branch"
+            >
+              Sections
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="expand"
+              data-synopsis-fold-level="subsection"
+              title="Expand every subsection branch"
+            >
+              Subsections
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="expand"
+              data-synopsis-fold-level="subsubsection"
+              title="Expand every subsubsection branch"
+            >
+              Subsubsections
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-1">
+            <span class="text-neutral-600 font-medium">Collapse</span>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="collapse"
+              data-synopsis-fold-level="chapter"
+              title="Collapse every chapter branch"
+            >
+              Chapters
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="collapse"
+              data-synopsis-fold-level="section"
+              title="Collapse every section branch"
+            >
+              Sections
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="collapse"
+              data-synopsis-fold-level="subsection"
+              title="Collapse every subsection branch"
+            >
+              Subsections
+            </button>
+            <button
+              type="button"
+              class="synopsis-fold-bulk btn-secondary px-1.5 py-0"
+              data-synopsis-fold-action="collapse"
+              data-synopsis-fold-level="subsubsection"
+              title="Collapse every subsubsection branch"
+            >
+              Subsubsections
+            </button>
+          </div>
+        </div>
+        <p class="text-xxs text-neutral-500 shrink-0 mb-1 leading-snug">
+          Drag headings to reorder; order is saved to disk automatically. Regenerating with
+          <span class="mono">build_course_synopsis.py</span> overwrites manual changes.
+          <strong>Markdown</strong> exports the current tree to
+          <span class="mono">99_Markdowns/full_content.md</span> (next to the repo that contains this
+          config&apos;s <span class="mono">03_Scripts</span> folder), including only branches that are
+          <em>expanded</em> in this session (collapsed subtrees are omitted).
+        </p>
+        <div class="synopsis-tree-shell relative flex-1 min-h-0 overflow-hidden flex flex-col">
+          <div
+            id="synopsisTree"
+            class="structure-viewer synopsis-tree-region flex-1 overflow-auto flex flex-col min-h-0 text-xxs"
+          ></div>
+          <div
+            id="synopsisBusy"
+            class="source-busy-overlay hidden"
+            aria-hidden="true"
+            aria-live="polite"
+          >
+            <div class="source-busy-inner">
+              <div class="source-busy-spinner" aria-hidden="true"></div>
+              <div id="synopsisBusyHint" class="source-busy-hint" role="status">Saving…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sourceModal" class="source-modal hidden" aria-hidden="true">
+      <div id="sourceDialogBox" class="source-dialog" role="dialog" aria-modal="true" aria-labelledby="sourceTitle">
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div id="sourceTitle" class="font-semibold text-xxs">Source</div>
+            <div id="sourcePath" class="text-xxs text-neutral-500 mono truncate"></div>
+          </div>
+          <button id="sourceCloseBtn" class="btn-secondary ml-auto" type="button">close</button>
+        </div>
+        <div class="source-dialog-body">
+          <div class="source-toolbar">
+            <input
+              id="sourceSearch"
+              class="source-search mono"
+              type="search"
+              placeholder="Search source..."
+              autocomplete="off"
+            />
+            <span id="sourceSearchState" class="text-xxs text-neutral-500"></span>
+            <button
+              id="sourceWordWrapBtn"
+              type="button"
+              class="btn-secondary whitespace-nowrap hidden"
+              aria-pressed="false"
+              aria-label="Toggle word wrap for long LaTeX lines"
+            >
+              Word wrap
+            </button>
+            <div class="source-toolbar-jump ml-auto flex items-center gap-1 flex-shrink-0">
+              <label for="sourceJumpLine" class="text-xxs text-neutral-600 whitespace-nowrap">Line</label>
+              <input
+                id="sourceJumpLine"
+                class="source-jump-line mono"
+                type="text"
+                inputmode="numeric"
+                placeholder="#"
+                aria-label="Go to line number"
+                autocomplete="off"
+              />
+              <button id="sourceJumpBtn" type="button" class="btn-secondary whitespace-nowrap">Go</button>
+            </div>
+          </div>
+          <div id="sourceSplitWrap" class="source-split-wrap">
+            <div id="sourceSplit" class="source-split">
+              <div class="source-col source-col-main">
+                <div id="sourceViewerScroll" class="source-viewer-scroll">
+                  <pre id="sourceViewer" class="source-viewer mono"><code></code></pre>
+                </div>
+              </div>
+              <div id="bibtexRefsCol" class="source-col source-col-refs hidden">
+                <div class="refs-toolbar">
+                  <input
+                    id="refsSearch"
+                    class="source-search mono"
+                    type="search"
+                    placeholder="Search keys, paths, lines..."
+                    autocomplete="off"
+                  />
+                  <span id="refsSearchState" class="text-xxs text-neutral-500"></span>
+                </div>
+                <div id="bibtexRefsViewer" class="refs-viewer"></div>
+              </div>
+            </div>
+          </div>
+          <div id="sourceModalBusy" class="source-busy-overlay hidden" aria-hidden="true">
+            <div class="source-busy-inner">
+              <div class="source-busy-spinner" aria-hidden="true"></div>
+              <div id="sourceModalBusyHint" class="source-busy-hint" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="structureModal" class="source-modal hidden" aria-hidden="true">
+      <div class="source-dialog" role="dialog" aria-modal="true" aria-labelledby="structureTitle">
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div id="structureTitle" class="font-semibold text-xxs">Document Structure</div>
+            <div id="structurePath" class="text-xxs text-neutral-500 mono truncate"></div>
+          </div>
+          <button id="structureCloseBtn" class="btn-secondary ml-auto" type="button">close</button>
+        </div>
+        <div class="source-toolbar">
+          <input
+            id="structureSearch"
+            class="source-search mono"
+            type="search"
+            placeholder="Search headings, labels, captions..."
+            autocomplete="off"
+          />
+          <span id="structureSearchState" class="text-xxs text-neutral-500"></span>
+        </div>
+        <div id="structureViewer" class="structure-viewer"></div>
+      </div>
+    </div>
+
+    <div id="floatInventoryModal" class="source-modal hidden" aria-hidden="true">
+      <div class="source-dialog" role="dialog" aria-modal="true" aria-labelledby="floatInventoryTitle">
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div id="floatInventoryTitle" class="font-semibold text-xxs">List of figures</div>
+            <div id="floatInventoryRoot" class="text-xxs text-neutral-500 mono truncate"></div>
+          </div>
+          <button id="floatInventoryCloseBtn" class="btn-secondary ml-auto" type="button">close</button>
+        </div>
+        <div class="source-toolbar">
+          <input
+            id="floatInventorySearch"
+            class="source-search mono"
+            type="search"
+            placeholder="Filter path, caption, label, environment..."
+            autocomplete="off"
+          />
+          <span id="floatInventorySearchState" class="text-xxs text-neutral-500"></span>
+        </div>
+        <div id="floatInventoryViewer" class="structure-viewer"></div>
+      </div>
+    </div>
+
+    <div id="proofFileModal" class="source-modal hidden" aria-hidden="true">
+      <div class="source-dialog source-dialog-proof" role="dialog" aria-modal="true">
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div class="font-semibold text-xxs">content.tex</div>
+            <div id="proofFilePath" class="text-xxs text-neutral-500 mono truncate"></div>
+          </div>
+          <button id="proofFileCloseBtn" class="btn-secondary ml-auto shrink-0" type="button">close</button>
+        </div>
+        <div class="proof-file-toolbar flex flex-wrap items-center gap-1 pb-2 border-b border-neutral-200">
+          <button id="proofFileReloadBtn" class="btn-secondary" type="button">Reload</button>
+          <label class="text-xxs text-neutral-600">Model</label>
+          <select id="proofFileModel" class="compact-select proof-model-select"></select>
+          <button id="proofFileAnalyzeBtn" class="btn-primary" type="button">Analyze with ChatGPT</button>
+        </div>
+        <pre id="proofFileViewer" class="source-viewer mono mt-2 text-xxs max-h-[60vh] overflow-auto"><code></code></pre>
+      </div>
+    </div>
+
+    <div id="proofApiErrorModal" class="source-modal hidden" aria-hidden="true">
+      <div
+        class="source-dialog source-dialog-proof"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="proofApiErrorTitle"
+      >
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div id="proofApiErrorTitle" class="font-semibold text-xxs">Proofreading analyze failed</div>
+            <div id="proofApiErrorSubtitle" class="text-xxs text-neutral-500 mono"></div>
+          </div>
+          <button
+            id="proofApiErrorCloseBtn"
+            type="button"
+            class="btn-secondary ml-auto shrink-0"
+          >
+            close
+          </button>
+        </div>
+        <pre
+          id="proofApiErrorBody"
+          class="text-xxs mono m-0 max-h-[70vh] overflow-auto rounded border border-neutral-200 bg-neutral-50 p-2 text-neutral-900 whitespace-pre-wrap break-words"
+        ></pre>
+      </div>
+    </div>
+  </body>
+</html>

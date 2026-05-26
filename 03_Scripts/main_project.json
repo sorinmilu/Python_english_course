@@ -1,0 +1,27 @@
+{
+    "root_dir": "/home/sorin/WORK/Faculty/PhD/Doctorat/Referate-Doctorat/Referat_1/",
+    "initial_project_structure": {
+        "relative_path": "../00_CONTENT",
+        "course_synopsis": "course_synopsis.json"
+    },
+    "inspected_folders": [
+      "00_CONTENT/00_Introduction/"
+    ],
+    "temp_dir": "build/temp",
+    "papers_dir": "05_Papers",
+    "templates": "templates",
+    "papers_port": 8080,
+    "template_files": {
+      "image_template": "image_template.tex",
+      "figure_template": "figure_template.tex",
+      "input_template": "input_template.tex"
+    },
+    "latex_root": "02_latex",
+    "main_latex_file": "main_document.tex",
+    "main_placeholder": "%<<<INSERT_CONTENT>>>",
+    "bibliography_file": "references.bib",
+    "final_bibliography_file": "full_references.bib",
+    "copy_to_build" : "build_packages"
+    }
+  
+  

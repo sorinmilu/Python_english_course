@@ -1,0 +1,74 @@
+---
+description: WSL2 environment and command/path rules for this repository
+alwaysApply: true
+---
+
+# WSL2 Environment Rules
+
+These rules are binding for this repository.
+
+## Shell and operating environment
+
+- Use WSL2 / bash only for commands suggested to the user.
+- Do not suggest PowerShell commands.
+- Do not suggest `cmd.exe` commands.
+- Do not suggest Windows batch syntax.
+- If a tool, IDE, or metadata shows Windows-style paths, still write commands and paths for WSL/bash.
+
+## Path style
+
+Use repo-relative paths first.
+
+If an absolute path is needed, use POSIX paths. The root of the project can be expressed as follows: 
+
+Good:
+
+```text
+/home/sorin/WORK/Faculty/Teaching/00_UTILS/Python_english_course/
+/mnt/c/Users/sorin/00_S_WORK/WORK/Faculty/Teaching/00_UTILS/Python_english_course/.cursor\rules\wsl-environment.mdc
+
+```
+
+Never use Windows drive/backslash paths in chat or generated instructions.
+
+Bad:
+
+```text
+C:\Users\...
+D:\...
+methods\straight_woody\variants\base
+```
+
+If a rule conflicts with Windows path metadata from the IDE, these rules win.
+
+## Python and pip commands
+
+For every Python, pip, pytest, or script execution command in this repository, use the project conda environment first:
+
+```bash
+conda activate python312 && python ...
+```
+
+Examples:
+
+```bash
+conda activate python312 && python manager_scripts/create_method_template.py --method straight_woody --variant base --dry-run
+```
+
+```bash
+conda activate python312 && python methods/straight_woody/variants/base/stdexec.py --mode train --config methods/straight_woody/variants/base/configs/train_TotalText_debug_cpu.json --project-root . --device cpu --dry-run
+```
+
+```bash
+conda activate python312 && python -m pytest
+```
+
+Do not give bare `python ...`, `pip ...`, or `pytest ...` commands for this project unless explicitly instructed otherwise.
+
+## Command style
+
+Prefer direct, reproducible commands.
+
+Avoid GUI/click instructions unless explicitly requested.
+
+Keep commands bash-compatible.
