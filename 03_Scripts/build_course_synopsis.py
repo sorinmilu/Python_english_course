@@ -23,6 +23,9 @@ ATX_NUMBERED_HEADING_RE = re.compile(
 )
 SUBSECTION_HEADING_RE = re.compile(r"^\*\s+\*\*(\d+(?:\.\d+)+)\s*(.+)\*\*")
 BULLET_HEADING_RE = re.compile(r"^(\s+)\*\s+(\d+(?:\.\d+)+)\s+(.+)$")
+# Plain ATX `# Title` used as chapter heading when `# CHAPTER n:` is absent (see Chapter2+ files).
+# Allow optional whitespace after `#` (#Title and # Title); exclude `##` via negative lookahead.
+PLAIN_ATX_H1_RE = re.compile(r"^#(?!\#)\s*(.+)$")
 
 CHAPTER_FILES = [
     "Chapter1_Synopsis.md",
@@ -94,10 +97,9 @@ def _clean_atx_title(raw: str) -> str:
     return t.strip()
 
 
-def _infer_placeholder_chapter(path: Path) -> dict[str, Any]:
-    """When a file has no '# CHAPTER …' line, root the outline at a synthetic chapter ``1``."""
-    title_guess = path.stem.replace("_", " ").replace("-", " ")
-    return make_outline_node(outline="1", title=title_guess or "Chapter")
+def _infer_placeholder_chapter() -> dict[str, Any]:
+    """When parsing needs a chapter root before any title is known (no H1/`# CHAPTER` yet)."""
+    return make_outline_node(outline="1", title="Chapter")
 
 
 def parse_chapter_file(path: Path) -> dict[str, Any] | None:
@@ -108,7 +110,7 @@ def parse_chapter_file(path: Path) -> dict[str, Any] | None:
     def ensure_chapter() -> None:
         nonlocal chapter, stack
         if chapter is None:
-            chapter = _infer_placeholder_chapter(path)
+            chapter = _infer_placeholder_chapter()
             stack = [chapter]
 
     def attach_by_outline_depth(node: dict[str, Any]) -> None:
@@ -134,6 +136,13 @@ def parse_chapter_file(path: Path) -> dict[str, Any] | None:
         if match:
             number, title = match.group(1), match.group(2)
             chapter = make_outline_node(outline=number, title=title)
+            stack = [chapter]
+            continue
+
+        match = PLAIN_ATX_H1_RE.match(line)
+        if match and chapter is None:
+            title_raw = _clean_atx_title(match.group(1))
+            chapter = make_outline_node(outline="1", title=title_raw)
             stack = [chapter]
             continue
 
@@ -188,7 +197,6 @@ def build_synopsis(repo_root: Path) -> dict[str, Any]:
                 '"1".."N" only; headings in exported Markdown are unnumbered.'
             ),
             "source_dir": "99_Markdowns",
-            "source_files": CHAPTER_FILES,
             "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
             "latex_heading_levels": list(HEADING_LEVELS.keys()),
         },

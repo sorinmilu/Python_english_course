@@ -2,18 +2,9 @@
   "schema_version": "2.0",
   "meta": {
     "title": "Python Course Synopsis",
-    "description": "Hierarchical course outline for tree display, drag-and-drop reorder, and Markdown/LaTeX export. Nodes use preorder-stable string ids \"1\"..\"N\" only; positional outline numbers appear in exported Markdown from sibling order.",
+    "description": "Hierarchical course outline for tree display, drag-and-drop reorder, and Markdown/LaTeX export. Nodes use preorder-stable string ids \"1\"..\"N\" only; headings in exported Markdown are unnumbered.",
     "source_dir": "99_Markdowns",
-    "source_files": [
-      "Chapter1_Synopsis.md",
-      "Chapter2_Synopsis.md",
-      "Chapter3_Synopsis.md",
-      "Chapter4_Synopsis.md",
-      "Chapter5_synopsis.md",
-      "Chapter6_synopsis.md",
-      "Chapter7_synopsis.md"
-    ],
-    "generated_at": "2026-05-26T22:40:27+00:00",
+    "generated_at": "2026-05-26T23:43:00+00:00",
     "latex_heading_levels": [
       "chapter",
       "section",
@@ -637,32 +628,33 @@
           "id": "47",
           "type": "section",
           "level": 2
-        },
+        }
+      ],
+      "id": "2",
+      "type": "chapter",
+      "level": 1
+    },
+    {
+      "title": "Introduction to the Python Language Architecture",
+      "paragraphs": [],
+      "items": [],
+      "metadata": {},
+      "data": {},
+      "children": [
         {
-          "title": "Introduction to the Python Language Architecture",
+          "title": "Historical Context and Design Evolution",
           "paragraphs": [],
           "items": [],
           "metadata": {},
           "data": {},
           "children": [
             {
-              "title": "Historical Context and Design Evolution",
+              "title": "Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989–1991)",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
-                {
-                  "title": "Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989–1991)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "58",
-                  "type": "subsubsection",
-                  "level": 4
-                },
                 {
                   "title": "The Core Philosophy: Analyzing structural semantics via \"The Zen of Python\" (PEP 20 rules)",
                   "paragraphs": [],
@@ -686,7 +678,7 @@
                   "level": 4
                 }
               ],
-              "id": "57",
+              "id": "58",
               "type": "subsection",
               "level": 3
             },
@@ -848,238 +840,12 @@
               "level": 3
             }
           ],
-          "id": "56",
+          "id": "57",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "2",
-      "type": "chapter",
-      "level": 1
-    },
-    {
-      "title": "Chapter2 Synopsis",
-      "paragraphs": [],
-      "items": [],
-      "metadata": {},
-      "data": {},
-      "children": [
-        {
-          "title": "Introduction to the Python Language Architecture",
-          "paragraphs": [],
-          "items": [],
-          "metadata": {},
-          "data": {},
-          "children": [
-            {
-              "title": "Historical Context and Design Evolution",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989–1991)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "78",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "The Core Philosophy: Analyzing structural semantics via \"The Zen of Python\" (PEP 20 rules)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "79",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Metrics of Global Growth: Enterprise Framework Scaling, Scientific and Research Adoption Drivers, and Ecosystem Architecture",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "80",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "77",
-              "type": "subsection",
-              "level": 3
-            },
-            {
-              "title": "The CPython Reference Implementation Engine",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "The Concrete Internal C Structure of the CPython Runtime",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "82",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Parsing and Compiling to Abstract Virtual Machine Instructions: Converting `.py` Source Code Files into In-Memory Bytecode and `.pyc` Marshaled Disk Artifacts",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "83",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "The CPython Interpreter Loop: Evaluating Virtual Opcodes inside the Main Evaluation Engine Loop (`ceval.c`)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "84",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "81",
-              "type": "subsection",
-              "level": 3
-            },
-            {
-              "title": "Comparative Syntax and Language Paradigm Divergence",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "Visual Evaluation: Code Architecture Metrics of Python vs. Static Structural Bracket-Based Languages",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "86",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Architectural Case Study: High-Level Python Managed Code Realities vs. Pure Bare-Metal Procedural C Coding",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "87",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Code Block Architecture: Previewing the Move from Explicit Block Tokens (`{}`) to Syntactic Indentation and Whitespace Lexer Level Invariants",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "88",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "85",
-              "type": "subsection",
-              "level": 3
-            },
-            {
-              "title": "Data Type Architecture and Runtime Type Systems",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "Classifying Type Systems: Static vs. Dynamic Variable Typing, Strong vs. Weak Enforcement Boundaries",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "90",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Python's Type Boundary: Dynamic Variable Namespaces with Strong Runtime Type Constraint Verification",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "91",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "The Unified CPython Object Framework: Analyzing the \"Everything is an Object\" Concept via the Base C Structure `PyObject` Layout",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "92",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Memory Storage Classifications: Built-in Single Value Scalars vs. Composite Pointer Collections",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "93",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Object Interfaces: Introduction to Operator Overloading, Internal Slots, and Protocol Dunder Methods (`__repr__`, `__init__`)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "94",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "89",
-              "type": "subsection",
-              "level": 3
-            }
-          ],
-          "id": "76",
-          "type": "section",
-          "level": 2
-        }
-      ],
-      "id": "75",
+      "id": "56",
       "type": "chapter",
       "level": 1
     },
@@ -1091,133 +857,133 @@
       "data": {},
       "children": [
         {
-          "title": "CPython Memory Management Dynamics",
+          "title": "CPython Memory Management Dynamics and Object Topologies",
           "paragraphs": [],
           "items": [],
           "metadata": {},
           "data": {},
           "children": [
             {
-              "title": "The Unified Object Model",
+              "title": "The Base Object Framework",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "The Realization of the \"Everything is an Object\" Paradigm",
+                  "title": "The Realization of the \"Everything is an Object\" Paradigm: Unifying Functions, Types, and Primitives as First-Class Heap Entities",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "98",
+                  "id": "78",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Underlying C Representation: Introduction to the `PyObject` Structure",
+                  "title": "Underlying C Representation: Unpacking the `PyObject` Base Struct (Reference Count Tracker `ob_refcnt` and Type Object Pointer `ob_type`)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "99",
+                  "id": "79",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "97",
+              "id": "77",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "The Heap Subsystem",
+              "title": "The Heap Subsystem and Object Allocation",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "The Global Runtime Allocation Arena",
+                  "title": "The Managed Runtime Allocation Arena: PyMalloc and Private Heap Segmentation Subsystems",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "101",
+                  "id": "81",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Explicit Dynamic Instantiation (Analogous to C `malloc()` Execution)",
+                  "title": "Explicit Dynamic Instantiation: Analyzing Instance Generation on the Heap (The CPython Analogue to C `malloc()`)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "102",
+                  "id": "82",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Object Persistence and Dereferencing Realities",
+                  "title": "Object Persistence Invariants: Reference Counting Foundations and Automated Slot Reclamation Realities",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "103",
+                  "id": "83",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "100",
+              "id": "80",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "The Stack Subsystem",
+              "title": "The Stack Subsystem and Reference Storage",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "High-Speed Thread Execution Scopes",
+                  "title": "High-Speed Virtual Machine Thread Execution Scopes and Evaluation Stacks",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "105",
+                  "id": "85",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Storage Restrictions: Isolating References and Pointers to Heap Locations",
+                  "title": "Storage Restrictions: Isolating Local Variable Scope References and Object Pointers to Heap Locations",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "106",
+                  "id": "86",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Lifecycle Transitions of Stack Frame Scopes",
+                  "title": "Lifecycle Transitions: Frame Destruction, Stack Pointer Offsets, and Unwinding Call Scopes",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "107",
+                  "id": "87",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "104",
+              "id": "84",
               "type": "subsection",
               "level": 3
             },
@@ -1229,45 +995,45 @@
               "data": {},
               "children": [
                 {
-                  "title": "Identity Verification: Memory Address Tracking via the `id()` Function",
+                  "title": "Identity Verification: Memory Address Tracking via the `id()` Function and Native Pointer Disambiguation",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "109",
+                  "id": "89",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Dynamic Metadata Analysis: Runtime Type Extraction via `type()`",
+                  "title": "Dynamic Metadata Analysis: Runtime Type Descriptor Extraction via the `type()` Framework",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "110",
+                  "id": "90",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Address Aliasing: Binding Multiple Stack Pointers to an Identical Heap Node (`a = b`)",
+                  "title": "The Variable-as-Label Paradigm Shift: Address Aliasing and Binding Multiple Stack Names to an Identical Heap Instance (`a = b`)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "111",
+                  "id": "91",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "108",
+              "id": "88",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "96",
+          "id": "76",
           "type": "section",
           "level": 2
         },
@@ -1286,51 +1052,51 @@
               "data": {},
               "children": [
                 {
-                  "title": "Digit Restrictions: Prohibiting Leading Numerical Character Tokens",
+                  "title": "Digit Restrictions: Prohibiting Leading Numerical Character Tokens at the Tokenizer Phase",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "114",
+                  "id": "94",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Valid Character Domains: Alphanumeric Boundaries and Underscore (`_`) Packaging",
+                  "title": "Valid Character Domains: Alphanumeric Boundaries, Character Sets, and Underscore (`_`) Packaging",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "115",
+                  "id": "95",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Reserved Keyword Collisions (System-Imposed Protections for `def`, `class`, `import`, etc.)",
+                  "title": "Reserved Keyword Collisions: System-Imposed Lexical Protections for Statement Keywords (`def`, `class`, `import`)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "116",
+                  "id": "96",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Case Sensitivity Matrix: Execution Separation of Distinct Variable Registers",
+                  "title": "Case Sensitivity Matrix: Execution Isolation of Distinct Identifier Registers Inside Local Name Dictionaries",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "117",
+                  "id": "97",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "113",
+              "id": "93",
               "type": "subsection",
               "level": 3
             },
@@ -1342,34 +1108,34 @@
               "data": {},
               "children": [
                 {
-                  "title": "Alignment with the PEP 8 Style Guide Standards",
+                  "title": "Alignment with the PEP 8 Style Guide Engineering Standards",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "119",
+                  "id": "99",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Semantic Readable Conventions: Variable Implementations using lowercase `snake_case`",
+                  "title": "Semantic Readable Conventions: Variable Implementations using Lowercase `snake_case`",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "120",
+                  "id": "100",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "118",
+              "id": "98",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "112",
+          "id": "92",
           "type": "section",
           "level": 2
         },
@@ -1381,154 +1147,154 @@
           "data": {},
           "children": [
             {
-              "title": "The Integer Representation (`int`)",
+              "title": "The Integer Representation Architecture (`int`)",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "Arbitrary-Precision Math: Eliminating System Integer Overflow Pitfalls",
+                  "title": "Arbitrary-Precision Math Engine: Eliminating System Integer Overflow and Modulo Boundaries",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "123",
+                  "id": "103",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Dynamic Bit Scaling: Automatic Allocation Upgrades for High-Magnitude Values",
+                  "title": "Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation Upgrades for High-Magnitude Arbitrary Values",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "124",
+                  "id": "104",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "122",
+              "id": "102",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "The Floating-Point Representation (`float`)",
+              "title": "The Floating-Point Representation Architecture (`float`)",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "Architectural Realities: The IEEE 754 Double-Precision Binary Standard",
+                  "title": "Architectural Realities: The Direct Mapping of Python Floats to C Doubles via the IEEE 754 Double-Precision Binary Standard",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "126",
+                  "id": "106",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Machine Epsilon and Precision Loss: The Pitfalls of Representing Base-10 Fractions in Base-2 Memory",
+                  "title": "Machine Epsilon and Precision Loss: The Algorithmic Pitfalls of Representing Base-10 Fractions in Base-2 Memory Buffers",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "127",
+                  "id": "107",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "125",
+              "id": "105",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "The Complex Representation (`complex`)",
+              "title": "The Complex Representation Architecture (`complex`)",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "Language-Native Integration via the Imaginary Component `j` Literal",
+                  "title": "Language-Native Integration via the Mathematical Imaginary Component `j` Literal",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "129",
+                  "id": "109",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Segment Access Mechanisms: Isomorphic Extraction of `.real` and `.imag` Attributes",
+                  "title": "Segment Access Mechanisms: Isomorphic Extraction of `.real` and `.imag` Underlying Float Properties",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "130",
+                  "id": "110",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "128",
+              "id": "108",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "Numerical Operator Architecture",
+              "title": "Numerical Operator Architecture and Precedence Graphs",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
               "children": [
                 {
-                  "title": "Standard Arithmetic: Addition (`+`), Subtraction (`-`), and Multiplication (`*`)",
+                  "title": "Standard Arithmetic: Addition (`+`), Subtraction (`-`), and Multiplication (`*`) Operator Allocation",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "132",
+                  "id": "112",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Division Divergence: Real/Float Division (`/`) vs. Floor/Integer Division (`//`)",
+                  "title": "Division Divergence: Exact Float Division (`/`) vs. Truncating Floor/Integer Division (`//`)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "133",
+                  "id": "113",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Modular Math (`%`) and Exponentiation (`**`) Mechanics",
+                  "title": "Modular Math (`%`) and Exponentiation (`**`) Mechanics: Bytecode Compilation Precedence and Associativity Rules",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "134",
+                  "id": "114",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "131",
+              "id": "111",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "121",
+          "id": "101",
           "type": "section",
           "level": 2
         },
@@ -1547,29 +1313,29 @@
               "data": {},
               "children": [
                 {
-                  "title": "Static Typing: Early Domain Commitments and Type Compilation (C++, Java)",
+                  "title": "Static Typing: Early Domain Commitments, Variable Box Allocation, and Type Compilation (C, C++, Java Models)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "137",
+                  "id": "117",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Dynamic Typing: Late-Binding Runtime Variable Attachment and Name Labeling (Python)",
+                  "title": "Dynamic Typing: Late-Binding Runtime Object Attachment and Variable Name Labeling (Python Model)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "138",
+                  "id": "118",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "136",
+              "id": "116",
               "type": "subsection",
               "level": 3
             },
@@ -1581,175 +1347,62 @@
               "data": {},
               "children": [
                 {
-                  "title": "Weak Typing: Implicit Implicit Conversions and Silent Runtime Context Casting (JavaScript)",
+                  "title": "Weak Typing: Implicit Convergent Coercion and Silent Runtime Context Casting (JavaScript Model)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "140",
+                  "id": "120",
                   "type": "subsubsection",
                   "level": 4
                 },
                 {
-                  "title": "Strong Typing: Rigid Structural Isolation and Explicit Type Intersections (Python)",
+                  "title": "Strong Typing: Rigid Type-Safety Boundaries and the Prohibition of Implicit Heterogeneous Type Operations (Python Model)",
                   "paragraphs": [],
                   "items": [],
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "141",
+                  "id": "121",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "139",
+              "id": "119",
               "type": "subsection",
               "level": 3
             },
             {
-              "title": "Structural Summary:",
+              "title": "Structural Summary",
               "paragraphs": [],
               "items": [],
               "metadata": {},
               "data": {},
-              "children": [],
-              "id": "142",
+              "children": [
+                {
+                  "title": "Categorizing Python as a Dynamically Bound, Strongly Verified Runtime Typing Environment",
+                  "paragraphs": [],
+                  "items": [],
+                  "metadata": {},
+                  "data": {},
+                  "children": [],
+                  "id": "123",
+                  "type": "subsubsection",
+                  "level": 4
+                }
+              ],
+              "id": "122",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "135",
-          "type": "section",
-          "level": 2
-        },
-        {
-          "title": "Text Encoding Systems and Character Escapes",
-          "paragraphs": [],
-          "items": [],
-          "metadata": {},
-          "data": {},
-          "children": [
-            {
-              "title": "The Evolution of Character Interoperability Map Standards",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "The Classical Domain: The 8-Bit Strict Bounds of ASCII Codepoints (0–255 Limits)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "145",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "The Universal Map: The Multi-Byte Extended Standard of Unicode Architecture",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "146",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "144",
-              "type": "subsection",
-              "level": 3
-            },
-            {
-              "title": "Native ASCII Boundary Escape Sequences",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "Octal Literal Parsing Boundaries (`\\000` Values through Base-8 Conversions)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "148",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Hexadecimal Literal Parsing Boundaries (`\\xhh` Values through Base-16 Conversions)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "149",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "147",
-              "type": "subsection",
-              "level": 3
-            },
-            {
-              "title": "Extended Universal Codepoint Escape Access",
-              "paragraphs": [],
-              "items": [],
-              "metadata": {},
-              "data": {},
-              "children": [
-                {
-                  "title": "Formal Lexical Extraction: Querying Literals via System Naming Maps (`\\N{...}`)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "151",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Planar Transformations: 16-Bit Base-16 Codepoint Jumps via UTF-16 Escape Maps (`\\u`)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "152",
-                  "type": "subsubsection",
-                  "level": 4
-                },
-                {
-                  "title": "Absolute Space Mapping: 32-Bit Base-16 Extended Jumps via UTF-32 Absolute Maps (`\\U`)",
-                  "paragraphs": [],
-                  "items": [],
-                  "metadata": {},
-                  "data": {},
-                  "children": [],
-                  "id": "153",
-                  "type": "subsubsection",
-                  "level": 4
-                }
-              ],
-              "id": "150",
-              "type": "subsection",
-              "level": 3
-            }
-          ],
-          "id": "143",
+          "id": "115",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "95",
+      "id": "75",
       "type": "chapter",
       "level": 1
     },
@@ -1781,7 +1434,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "157",
+                  "id": "127",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1792,12 +1445,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "158",
+                  "id": "128",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "156",
+              "id": "126",
               "type": "subsection",
               "level": 3
             },
@@ -1815,7 +1468,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "160",
+                  "id": "130",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1826,12 +1479,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "161",
+                  "id": "131",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "159",
+              "id": "129",
               "type": "subsection",
               "level": 3
             },
@@ -1849,7 +1502,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "163",
+                  "id": "133",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1860,7 +1513,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "164",
+                  "id": "134",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1871,17 +1524,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "165",
+                  "id": "135",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "162",
+              "id": "132",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "155",
+          "id": "125",
           "type": "section",
           "level": 2
         },
@@ -1906,12 +1559,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "168",
+                  "id": "138",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "167",
+              "id": "137",
               "type": "subsection",
               "level": 3
             },
@@ -1929,7 +1582,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "170",
+                  "id": "140",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1940,7 +1593,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "171",
+                  "id": "141",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1951,7 +1604,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "172",
+                  "id": "142",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1962,12 +1615,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "173",
+                  "id": "143",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "169",
+              "id": "139",
               "type": "subsection",
               "level": 3
             },
@@ -1985,7 +1638,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "175",
+                  "id": "145",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -1996,17 +1649,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "176",
+                  "id": "146",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "174",
+              "id": "144",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "166",
+          "id": "136",
           "type": "section",
           "level": 2
         },
@@ -2031,7 +1684,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "179",
+                  "id": "149",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2042,12 +1695,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "180",
+                  "id": "150",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "178",
+              "id": "148",
               "type": "subsection",
               "level": 3
             },
@@ -2065,7 +1718,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "182",
+                  "id": "152",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2076,12 +1729,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "183",
+                  "id": "153",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "181",
+              "id": "151",
               "type": "subsection",
               "level": 3
             },
@@ -2099,17 +1752,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "185",
+                  "id": "155",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "184",
+              "id": "154",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "177",
+          "id": "147",
           "type": "section",
           "level": 2
         },
@@ -2134,7 +1787,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "188",
+                  "id": "158",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2145,12 +1798,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "189",
+                  "id": "159",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "187",
+              "id": "157",
               "type": "subsection",
               "level": 3
             },
@@ -2168,7 +1821,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "191",
+                  "id": "161",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2179,22 +1832,22 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "192",
+                  "id": "162",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "190",
+              "id": "160",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "186",
+          "id": "156",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "154",
+      "id": "124",
       "type": "chapter",
       "level": 1
     },
@@ -2226,7 +1879,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "196",
+                  "id": "166",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2237,7 +1890,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "197",
+                  "id": "167",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2248,12 +1901,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "198",
+                  "id": "168",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "195",
+              "id": "165",
               "type": "subsection",
               "level": 3
             },
@@ -2271,7 +1924,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "200",
+                  "id": "170",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2282,17 +1935,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "201",
+                  "id": "171",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "199",
+              "id": "169",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "194",
+          "id": "164",
           "type": "section",
           "level": 2
         },
@@ -2317,7 +1970,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "204",
+                  "id": "174",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2328,12 +1981,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "205",
+                  "id": "175",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "203",
+              "id": "173",
               "type": "subsection",
               "level": 3
             },
@@ -2351,7 +2004,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "207",
+                  "id": "177",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2362,17 +2015,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "208",
+                  "id": "178",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "206",
+              "id": "176",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "202",
+          "id": "172",
           "type": "section",
           "level": 2
         },
@@ -2397,7 +2050,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "211",
+                  "id": "181",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2408,12 +2061,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "212",
+                  "id": "182",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "210",
+              "id": "180",
               "type": "subsection",
               "level": 3
             },
@@ -2431,7 +2084,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "214",
+                  "id": "184",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2442,17 +2095,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "215",
+                  "id": "185",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "213",
+              "id": "183",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "209",
+          "id": "179",
           "type": "section",
           "level": 2
         },
@@ -2477,7 +2130,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "218",
+                  "id": "188",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2488,12 +2141,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "219",
+                  "id": "189",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "217",
+              "id": "187",
               "type": "subsection",
               "level": 3
             },
@@ -2511,7 +2164,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "221",
+                  "id": "191",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2522,12 +2175,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "222",
+                  "id": "192",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "220",
+              "id": "190",
               "type": "subsection",
               "level": 3
             },
@@ -2545,7 +2198,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "224",
+                  "id": "194",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2556,12 +2209,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "225",
+                  "id": "195",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "223",
+              "id": "193",
               "type": "subsection",
               "level": 3
             },
@@ -2579,7 +2232,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "227",
+                  "id": "197",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2590,17 +2243,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "228",
+                  "id": "198",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "226",
+              "id": "196",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "216",
+          "id": "186",
           "type": "section",
           "level": 2
         },
@@ -2625,7 +2278,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "231",
+                  "id": "201",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2636,12 +2289,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "232",
+                  "id": "202",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "230",
+              "id": "200",
               "type": "subsection",
               "level": 3
             },
@@ -2659,7 +2312,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "234",
+                  "id": "204",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2670,7 +2323,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "235",
+                  "id": "205",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2681,12 +2334,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "236",
+                  "id": "206",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "233",
+              "id": "203",
               "type": "subsection",
               "level": 3
             },
@@ -2704,7 +2357,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "238",
+                  "id": "208",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2715,22 +2368,22 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "239",
+                  "id": "209",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "237",
+              "id": "207",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "229",
+          "id": "199",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "193",
+      "id": "163",
       "type": "chapter",
       "level": 1
     },
@@ -2762,7 +2415,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "243",
+                  "id": "213",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2773,12 +2426,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "244",
+                  "id": "214",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "242",
+              "id": "212",
               "type": "subsection",
               "level": 3
             },
@@ -2796,7 +2449,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "246",
+                  "id": "216",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2807,7 +2460,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "247",
+                  "id": "217",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2818,7 +2471,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "248",
+                  "id": "218",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2829,17 +2482,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "249",
+                  "id": "219",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "245",
+              "id": "215",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "241",
+          "id": "211",
           "type": "section",
           "level": 2
         },
@@ -2864,7 +2517,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "252",
+                  "id": "222",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2875,7 +2528,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "253",
+                  "id": "223",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2886,7 +2539,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "254",
+                  "id": "224",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2897,12 +2550,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "255",
+                  "id": "225",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "251",
+              "id": "221",
               "type": "subsection",
               "level": 3
             },
@@ -2920,7 +2573,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "257",
+                  "id": "227",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2931,12 +2584,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "258",
+                  "id": "228",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "256",
+              "id": "226",
               "type": "subsection",
               "level": 3
             },
@@ -2954,7 +2607,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "260",
+                  "id": "230",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -2965,17 +2618,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "261",
+                  "id": "231",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "259",
+              "id": "229",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "250",
+          "id": "220",
           "type": "section",
           "level": 2
         },
@@ -3000,7 +2653,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "264",
+                  "id": "234",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3011,7 +2664,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "265",
+                  "id": "235",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3022,12 +2675,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "266",
+                  "id": "236",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "263",
+              "id": "233",
               "type": "subsection",
               "level": 3
             },
@@ -3045,7 +2698,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "268",
+                  "id": "238",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3056,7 +2709,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "269",
+                  "id": "239",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3067,12 +2720,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "270",
+                  "id": "240",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "267",
+              "id": "237",
               "type": "subsection",
               "level": 3
             },
@@ -3090,7 +2743,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "272",
+                  "id": "242",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3101,7 +2754,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "273",
+                  "id": "243",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3112,7 +2765,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "274",
+                  "id": "244",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3123,22 +2776,22 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "275",
+                  "id": "245",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "271",
+              "id": "241",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "262",
+          "id": "232",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "240",
+      "id": "210",
       "type": "chapter",
       "level": 1
     },
@@ -3170,7 +2823,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "279",
+                  "id": "249",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3181,7 +2834,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "280",
+                  "id": "250",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3192,12 +2845,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "281",
+                  "id": "251",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "278",
+              "id": "248",
               "type": "subsection",
               "level": 3
             },
@@ -3215,7 +2868,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "283",
+                  "id": "253",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3226,7 +2879,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "284",
+                  "id": "254",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3237,17 +2890,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "285",
+                  "id": "255",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "282",
+              "id": "252",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "277",
+          "id": "247",
           "type": "section",
           "level": 2
         },
@@ -3272,7 +2925,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "288",
+                  "id": "258",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3283,7 +2936,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "289",
+                  "id": "259",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3294,7 +2947,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "290",
+                  "id": "260",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3305,12 +2958,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "291",
+                  "id": "261",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "287",
+              "id": "257",
               "type": "subsection",
               "level": 3
             },
@@ -3328,7 +2981,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "293",
+                  "id": "263",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3339,7 +2992,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "294",
+                  "id": "264",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3350,17 +3003,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "295",
+                  "id": "265",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "292",
+              "id": "262",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "286",
+          "id": "256",
           "type": "section",
           "level": 2
         },
@@ -3385,7 +3038,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "298",
+                  "id": "268",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3396,12 +3049,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "299",
+                  "id": "269",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "297",
+              "id": "267",
               "type": "subsection",
               "level": 3
             },
@@ -3419,7 +3072,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "301",
+                  "id": "271",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3430,7 +3083,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "302",
+                  "id": "272",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3441,17 +3094,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "303",
+                  "id": "273",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "300",
+              "id": "270",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "296",
+          "id": "266",
           "type": "section",
           "level": 2
         },
@@ -3476,7 +3129,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "306",
+                  "id": "276",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3487,12 +3140,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "307",
+                  "id": "277",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "305",
+              "id": "275",
               "type": "subsection",
               "level": 3
             },
@@ -3510,7 +3163,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "309",
+                  "id": "279",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3521,12 +3174,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "310",
+                  "id": "280",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "308",
+              "id": "278",
               "type": "subsection",
               "level": 3
             },
@@ -3544,7 +3197,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "312",
+                  "id": "282",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3555,7 +3208,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "313",
+                  "id": "283",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3566,17 +3219,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "314",
+                  "id": "284",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "311",
+              "id": "281",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "304",
+          "id": "274",
           "type": "section",
           "level": 2
         },
@@ -3601,7 +3254,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "317",
+                  "id": "287",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3612,12 +3265,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "318",
+                  "id": "288",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "316",
+              "id": "286",
               "type": "subsection",
               "level": 3
             },
@@ -3635,7 +3288,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "320",
+                  "id": "290",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3646,17 +3299,17 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "321",
+                  "id": "291",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "319",
+              "id": "289",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "315",
+          "id": "285",
           "type": "section",
           "level": 2
         },
@@ -3681,7 +3334,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "324",
+                  "id": "294",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3692,12 +3345,12 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "325",
+                  "id": "295",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "323",
+              "id": "293",
               "type": "subsection",
               "level": 3
             },
@@ -3715,7 +3368,7 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "327",
+                  "id": "297",
                   "type": "subsubsection",
                   "level": 4
                 },
@@ -3726,22 +3379,22 @@
                   "metadata": {},
                   "data": {},
                   "children": [],
-                  "id": "328",
+                  "id": "298",
                   "type": "subsubsection",
                   "level": 4
                 }
               ],
-              "id": "326",
+              "id": "296",
               "type": "subsection",
               "level": 3
             }
           ],
-          "id": "322",
+          "id": "292",
           "type": "section",
           "level": 2
         }
       ],
-      "id": "276",
+      "id": "246",
       "type": "chapter",
       "level": 1
     }

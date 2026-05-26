@@ -1,4 +1,4 @@
-# CHAPTER 1: PROGRAMMING PARADIGMS AND ENVIRONMENT SETUP
+# PROGRAMMING PARADIGMS AND ENVIRONMENT SETUP
 
 ## 1.1 Operating Systems, Programs, and Process Mechanics
 
@@ -33,8 +33,6 @@
 #### 1.1.4.2 The Data and BSS Segments: Initialized and Uninitialized Global/Static Variable Storage Boundaries
 #### 1.1.4.3 The Process Heap: Dynamic Manual Memory Allocation and Deallocation Schemes (`malloc()` and `free()`)
 #### 1.1.4.4 The Process Stack: Automatic Variable Lifetime Tracking, Call Chains, and Push/Pop Stack Frames
-
-
 
 ### 1.1.5 Operating System Resource Management
 #### 1.1.5.1 The Evolution of Multitasking Subsystems: Time-Slicing Hardware Resources
