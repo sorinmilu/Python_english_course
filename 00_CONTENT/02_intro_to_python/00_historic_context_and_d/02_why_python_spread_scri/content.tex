@@ -1,1 +1,69 @@
 \subsection{Why Python Spread: Scripting, Web Frameworks, Scientific Computing, Research Workflows, and Package Ecosystem Expansion}
+
+Python spread because it occupied a useful middle layer. It was not the fastest language, the most formally pure language, or the most revolutionary language. It spread because many programmers had daily problems that were too annoying to solve in C, too large for shell scripts, too system-facing for sealed educational languages, and too dependent on glue logic for rigid compiled workflows. Python became attractive because it sat between these worlds: high-level enough to write quickly, but close enough to the operating system and native libraries to do real work.
+
+Its expansion was therefore not caused by syntax alone. Python became a control language: it opened files, moved data, called programs, connected services, wrapped native libraries, automated workflows, launched experiments, and coordinated systems written in other languages. In many domains, Python was not the engine itself. It was the dashboard, wiring, and control surface above the engine.
+
+\subsubsection{Scripting: The First Practical Expansion Layer}
+
+The first major field of expansion was scripting. Programmers needed to rename files, transform text, inspect logs, generate reports, configure systems, call external tools, copy data between formats, test network services, and automate repetitive actions. Shell scripts were useful, but fragile for complex data structures. Perl was powerful, but often culturally tolerant of dense symbolic code. C was too heavy for everyday automation.
+
+Python offered a practical compromise: readable scripts with real functions, modules, exceptions, files, sockets, regular expressions, dictionaries, lists, and operating-system interfaces. A programmer could begin with one small file and later split it into functions, modules, or packages. This gradual growth mattered. Python did not force a script to begin as a large software project, but it also gave the script enough structure to survive if it became larger.
+
+The standard library amplified this effect. File handling, path manipulation, text processing, serialization, dates, compression, networking, subprocess management, and many other tools were immediately available. The phrase ``batteries included'' should not be read as mythology. It simply means that a fresh Python installation already contained enough machinery to solve many practical tasks before installing anything else.
+
+\subsubsection{Web Frameworks: Python as Application Glue}
+
+The web created another natural opening. Web applications often do not spend most of their time performing raw numerical computation. They receive requests, validate input, query databases, build responses, handle sessions, render templates, and coordinate external services. This is coordination work, and Python is good at coordination work.
+
+Python web development passed through many forms: CGI scripts, Zope, CherryPy, Twisted, Pylons, TurboGears, Django, Flask, Pyramid, FastAPI, and others. The frameworks differed, but the reason Python fit the domain remained stable: web programming rewards fast iteration, readable control flow, and strong libraries for text, networking, database access, and structured data.
+
+Django was especially important because it showed that Python could support large, coherent web applications, not only loose scripts. It provided routing, models, templates, forms, administrative tools, and deployment conventions. Flask later showed the opposite style: a small core around which the programmer could assemble chosen components. Together, these frameworks helped Python cover both integrated and minimalist web development cultures.
+
+\subsubsection{Scientific Computing: Python Above Native Kernels}
+
+At first glance, Python's success in scientific computing seems strange. Ordinary Python loops are slow compared with C or Fortran loops. Each operation may involve bytecode execution, dynamic type handling, object dispatch, reference counting, and runtime checks. For raw numerical loops, this overhead is real.
+
+The explanation is architectural. Scientific Python did not win by making every numerical operation pure Python. It won by placing Python above optimized native kernels. NumPy arrays, for example, are not ordinary Python lists. They expose structured native memory through Python objects. Large array operations can run in compiled C or Fortran-level code while the user writes compact Python expressions.
+
+This created a powerful division of labor. Python handled experiment logic, data loading, orchestration, visualization, and interactive control. Native libraries handled heavy computation. SciPy, Matplotlib, pandas, scikit-learn, PyTorch, TensorFlow, and related tools expanded this pattern. Python became the workbench, not necessarily the innermost computation loop.
+
+For a C programmer, this is the important point: Python's scientific success is not proof that Python has no runtime cost. It is proof that a high-level runtime can be extremely effective when it controls lower-level optimized code.
+
+\subsubsection{Research Workflows and Notebooks}
+
+Research programming is often exploratory. The researcher does not always know the final structure of the program before starting. They inspect data, try transformations, plot intermediate results, adjust parameters, test hypotheses, and gradually convert experiments into scripts or reusable code.
+
+Python fit this style well. The interactive interpreter, IPython, and later notebook environments made Python attractive for teaching, experimentation, and research communication. A notebook could combine code, output, plots, notes, and explanations in one document. This made the computational path visible, not only the final result.
+
+However, notebooks also introduced a serious weakness. Their visible order is not always their execution order. Hidden kernel state can affect results. Cells may be run, changed, skipped, and rerun in ways that the final document does not clearly show. Notebooks helped Python spread through research culture, but they also require discipline if the result is meant to become reproducible software.
+
+\subsubsection{Package Ecosystem Expansion}
+
+A language spreads faster when useful code is easy to share. Python's package ecosystem became one of its strongest forces. PyPI, \texttt{pip}, virtual environments, wheels, source distributions, and later packaging standards made it possible to install and reuse community code across many domains.
+
+This changed what it meant to choose Python. Choosing Python no longer meant choosing only the core language. It meant choosing access to web frameworks, HTTP clients, parsers, testing tools, plotting libraries, numerical libraries, database connectors, image-processing tools, machine-learning systems, command-line builders, and infrastructure utilities.
+
+The ecosystem also helped Python spread outside professional programming. Scientists, teachers, journalists, economists, biologists, linguists, and data analysts could use packages written by specialists without writing every component themselves. Python became a shared interface to other people's work.
+
+But packaging also became one of Python's persistent pain points. Pure Python packages are relatively easy to distribute. Packages with native dependencies are harder. Scientific packages may depend on C, C++, Fortran, BLAS, LAPACK, GPU libraries, or platform-specific binaries. This is why tools such as \texttt{conda} became important: they manage not only Python packages, but also binary dependencies and complete environments.
+
+\subsubsection{The Cost of Easy Beginnings}
+
+Python often makes beginnings easy. A script can be written quickly. A notebook can be started without project structure. A web service can be prototyped in a few files. A scientific experiment can be assembled interactively.
+
+The cost appears later. A quick script can become a fragile production tool. A notebook can become an undocumented pipeline. A dynamic web application can become difficult to refactor. A package environment can become hard to reproduce. Python lowers the entry cost, but it does not automatically impose long-term discipline.
+
+This explains several later developments in Python culture: type hints, testing frameworks, virtual environments, packaging standards, linters, formatters, asynchronous frameworks, and deployment tools. These were not signs that the original language philosophy was complete. They were responses to Python being used in larger, more serious, more durable systems than its early scripting identity suggested.
+
+\subsubsection{Why the Spread Was Durable}
+
+Python's spread was durable because it was porous. It could call native code. Native code could expose Python interfaces. C extensions, Cython, foreign-function interfaces, and binding systems allowed Python to sit above efficient implementations. This meant Python did not need to win every performance contest directly. It only needed to be a good coordination layer over code that was already fast.
+
+This also explains why Python entered so many communities. System administrators used it for automation. Web developers used it for applications. Scientists used it for computation and data. Researchers used it for exploration. Teachers used it because the syntax was readable. Machine-learning engineers used it because the libraries gathered there.
+
+The result is that modern Python is not one culture. It is a federation of cultures sharing one language, one dominant runtime, and one enormous ecosystem.
+
+For this course, the main conclusion is architectural. Python spread because it became a managed runtime language above native execution, but not isolated from native execution. The operating system still runs a native CPython process. CPython still allocates objects, manages reference counts, executes bytecode, calls native libraries, loads extension modules, and exposes system services. Python looks light at the surface because the runtime and ecosystem carry much of the weight underneath.
+
+This prepares the transition into the next sections. Python's spread was not only a story of readable syntax. It was a story of runtime architecture, ecosystem architecture, and cultural architecture working together. To understand Python seriously, one must understand all three.

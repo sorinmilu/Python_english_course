@@ -1,1 +1,91 @@
 \subsection{The Practical Consequence: Python Code Can Have Different Execution Backends but One Dominant Reference Runtime}
+
+The practical consequence of the previous sections is simple: Python code is not naturally tied to one single execution backend, but real-world Python programming is still strongly centered on CPython. This creates a useful but slightly confusing situation. At the language level, Python is broader than CPython. At the practical level, most Python code, tools, packages, documentation, and programmer expectations are shaped by CPython.
+
+A Python file is therefore not like a C executable. It is source code written in a language that can, in principle, be consumed by different execution systems. CPython may compile it to CPython bytecode and execute it through an interpreter loop. PyPy may execute it through a JIT-oriented runtime. Jython may host Python semantics on the Java Virtual Machine. IronPython may host them on .NET. Cython, Numba, Nuitka, and MyPyC may compile or specialize selected parts of the program under particular assumptions.
+
+This means that Python has several possible execution paths, but one overwhelmingly important reference path.
+
+\subsubsection{The Same Source Surface Can Hide Different Machines}
+
+Consider a simple Python statement:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+At the language level, this means that the names \texttt{a} and \texttt{b} are resolved, the addition operation is performed according to the objects involved, and the name \texttt{x} is bound to the result.
+
+But different runtimes may realize this behavior differently. CPython may dispatch a bytecode instruction through its interpreter loop. PyPy may eventually compile a hot path after observing repeated behavior. Cython may generate C-level addition if the types are declared. Numba may compile a numerical version of the function if the operation fits its supported subset. A packaging tool may simply bundle the same CPython execution model inside an executable-looking file.
+
+The visible Python line is the same. The machinery underneath is not.
+
+This is why one must not treat ``Python execution'' as one mechanism. Python source code describes behavior. The backend decides how that behavior is produced.
+
+\subsubsection{Why CPython Still Dominates Practice}
+
+Despite this plurality, CPython remains the practical center. There are several reasons.
+
+First, CPython is the reference implementation. New language features, documentation, tests, and ordinary programmer expectations are usually developed around it first.
+
+Second, CPython is the default installation for most users. When someone downloads Python from the main Python website, installs it through many operating-system package managers, or follows most introductory tutorials, they are usually using CPython.
+
+Third, the package ecosystem is deeply CPython-shaped. Many packages are pure Python and may run elsewhere, but many important packages depend on native extension modules compiled for CPython's C API. This matters especially in scientific computing, machine learning, image processing, cryptography, databases, and systems programming.
+
+Fourth, CPython's behavior has become part of Python culture. Programmers often expect immediate object destruction through reference counting, \texttt{id()} values that resemble memory addresses, \texttt{.pyc} bytecode caches, and CPython-style stack traces and frames. Some of these are language-level behaviors; others are CPython implementation habits that programmers have learned as if they were universal Python facts.
+
+\subsubsection{Portability Is Real, but Not Automatic}
+
+A simple pure Python program may run without modification on several Python implementations. For example, code that uses ordinary functions, lists, dictionaries, loops, exceptions, and pure standard-library modules is often portable.
+
+But portability becomes weaker when the program depends on implementation details. A program becomes less portable when it relies on:
+
+\begin{itemize}
+    \item CPython C extension modules;
+    \item exact object destruction timing;
+    \item CPython bytecode details;
+    \item frame inspection behavior;
+    \item memory-address-like interpretations of \texttt{id()};
+    \item CPython-specific performance assumptions;
+    \item packages distributed only as CPython binary wheels.
+\end{itemize}
+
+This distinction is important. The Python language may allow different backends, but the ecosystem may quietly pull the program back toward CPython. In practice, many Python projects are not only Python projects. They are CPython projects.
+
+\subsubsection{The False Simplicity of “Compiled vs. Interpreted”}
+
+This backend diversity also shows why the old question ``Is Python compiled or interpreted?'' is too crude.
+
+In CPython, Python source is compiled to bytecode, and that bytecode is interpreted by the CPython virtual machine. In PyPy, execution may involve interpretation plus JIT compilation. In Cython, Python-like code may be translated into C and compiled into a native extension. In Numba, selected functions may be compiled at runtime. In Nuitka, a larger program may be compiled while still preserving Python runtime behavior.
+
+So Python is not defined by one compilation story. The correct question is:
+
+\begin{quote}
+Which implementation or toolchain is executing this Python code, and what runtime machinery does it use?
+\end{quote}
+
+That question is much more useful than asking whether Python is simply compiled or interpreted.
+
+\subsubsection{The Teaching Consequence}
+
+For this course, the consequence is methodological. We will not pretend that CPython is the whole Python language. But we will study CPython because it is the concrete runtime through which most Python programmers encounter the language.
+
+This gives us two layers of explanation.
+
+At the first layer, we explain Python as a language: names, objects, assignment, functions, classes, exceptions, modules, mutability, iteration, and type behavior.
+
+At the second layer, we explain CPython as the dominant implementation: \texttt{PyObject}, reference counts, type pointers, heap allocation, frames, bytecode, namespace dictionaries, the interpreter loop, \texttt{.pyc} files, and the Python/C extension boundary.
+
+The first layer explains what Python code means. The second layer explains how the dominant runtime makes that meaning happen.
+
+\subsubsection{The Practical Rule for Programmers}
+
+The practical rule is:
+
+\begin{quote}
+Write Python according to the language model, but understand performance, memory, packaging, and debugging through the implementation model.
+\end{quote}
+
+If the question is whether assigning \texttt{b = a} copies a list, the answer belongs mostly to the Python language model: it binds another name to the same object. If the question is when that object is released from memory, the answer depends strongly on CPython's reference counting and garbage-collection behavior. If the question is why a numerical loop is slow, the answer involves CPython bytecode dispatch and dynamic object operations. If the question is why NumPy is fast, the answer involves native code underneath Python objects.
+
+Therefore, both facts should be held at once. Python is a language with multiple possible execution backends. CPython is the dominant reference runtime that gives ordinary Python its concrete behavior in most real installations.

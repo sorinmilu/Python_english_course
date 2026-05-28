@@ -1,1 +1,104 @@
 \subsection{Python as a Language vs. CPython as the Reference Implementation}
+
+Before studying Python's runtime architecture, one distinction must be made very clearly: Python and CPython are not the same thing. Python is the programming language. CPython is the dominant implementation of that language.
+
+The difference is similar to the difference between the C language and a particular C compiler. C is defined by a language standard and a set of rules: syntax, types, expressions, declarations, undefined behaviors, translation phases, and so on. GCC or Clang are concrete implementations that accept C source code and turn it into executable behavior. In the same way, Python is the language described by its syntax, semantics, data model, standard behavior, and library expectations. CPython is the concrete runtime system, written mostly in C, that parses Python source code, compiles it to bytecode, creates Python objects, manages memory, and executes the program.
+
+This distinction is not academic decoration. It prevents a major confusion. When a programmer says “Python does reference counting,” that statement is not fully precise. CPython uses reference counting as its primary object lifetime mechanism. The Python language itself does not require every implementation to use reference counting. Another implementation may use a different garbage collector and still be a valid Python implementation if it preserves the observable language behavior expected by Python programs.
+
+\subsubsection{The Language: Rules Visible to the Programmer}
+
+The Python language defines what source code means. It defines that indentation creates block structure, that assignment binds names to objects, that functions are objects, that classes create type objects, that exceptions propagate through call frames, that iteration follows the iterator protocol, and that operators are resolved through the object data model.
+
+For example:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+b.append(4)
+\end{verbatim}
+
+The language-level explanation is that \texttt{a} is bound to a list object, \texttt{b} is then bound to the same list object, and \texttt{append} mutates that object. Therefore, observing \texttt{a} later shows the mutation. This behavior belongs to Python as a language. Any serious Python implementation must preserve it.
+
+But the language does not require that this list object be represented internally by one exact C structure, allocated by one exact allocator, or reclaimed through one exact reference-counting path. Those are implementation details.
+
+The language therefore answers questions such as:
+
+\begin{itemize}
+    \item What is valid Python syntax?
+    \item What does assignment mean?
+    \item How are names resolved?
+    \item How do functions, classes, modules, and exceptions behave?
+    \item What operations must built-in objects support?
+    \item What behavior should a program observe when it runs?
+\end{itemize}
+
+These are the rules that a programmer normally experiences.
+
+\subsubsection{The Implementation: The Machine That Realizes the Rules}
+
+An implementation answers a different question: how are those rules made to happen on a real machine?
+
+CPython answers that question in a very concrete way. It is a native program, compiled from C source code into an executable such as \texttt{python} or \texttt{python.exe}. When the operating system runs Python code, it does not run the \texttt{.py} file directly as machine code. It runs the CPython executable. CPython then reads the Python source file, tokenizes it, parses it, builds an abstract syntax tree, compiles that tree into bytecode, creates code objects and frame objects, and executes bytecode instructions inside its interpreter loop.
+
+So when the user writes:
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+the operating system starts CPython. CPython starts the Python program.
+
+This distinction repeats the architecture established in the previous chapter. At the operating-system level, CPython is the native process. At the Python-language level, \texttt{script.py} is the program being executed inside that process.
+
+\subsubsection{Why CPython Became the Reference Implementation}
+
+CPython is called the reference implementation because it is the implementation against which Python behavior is normally understood, tested, and developed. It is not merely one interpreter among many with equal cultural weight. It is the implementation maintained together with the main evolution of the language. New language features are normally developed, tested, and released first in CPython.
+
+This historical dominance has practical consequences. When documentation, tutorials, packages, debugging tools, and extension modules describe “Python behavior,” they often silently mean CPython behavior unless they say otherwise. This is convenient, but it can also mislead students.
+
+For example, in CPython:
+
+\begin{itemize}
+    \item most objects are destroyed immediately when their reference count reaches zero;
+    \item \texttt{id(obj)} often corresponds to the object's memory address;
+    \item the Global Interpreter Lock affects native threading behavior;
+    \item Python bytecode is stored in \texttt{.pyc} files;
+    \item many packages rely on C extension modules built for CPython's C API.
+\end{itemize}
+
+These facts are extremely important in real Python programming, but they are not all pure language rules. Some are CPython implementation facts. Other Python implementations may behave differently while still preserving the intended high-level semantics of Python code.
+
+\subsubsection{The Boundary Between Guaranteed Behavior and CPython Behavior}
+
+A serious Python programmer must learn to separate two layers.
+
+The first layer is guaranteed or intended Python behavior. For example, integers behave as arbitrary-precision integer objects. Lists are mutable sequences. Dictionaries map keys to values. Function calls create local scope. Exceptions propagate until caught. These are language-level facts.
+
+The second layer is CPython-specific realization. For example, a Python object in CPython begins with a C-level object header containing a reference count and a pointer to its type object. A list is implemented internally as a dynamic array of pointers to Python objects. A function call creates a frame object or frame-like execution structure. The interpreter loop dispatches bytecode instructions. Memory is managed through CPython's private allocator and reference-counting machinery.
+
+The first layer tells us what Python code means. The second layer tells us how CPython makes that meaning happen.
+
+This distinction is especially important for students coming from C. A C programmer naturally asks where things are stored, what the pointer is, who owns the memory, when allocation happens, and when the object is released. Python does not remove those questions. It moves them into the implementation. CPython still has memory layouts, pointers, allocators, stacks, heaps, and C structures. The difference is that ordinary Python code does not manipulate most of them directly.
+
+\subsubsection{Why This Course Focuses on CPython}
+
+This chapter focuses mainly on CPython because CPython is the concrete runtime most Python programmers actually use. It is also the implementation that best explains the everyday behavior encountered in normal Python work: reference counting, object identity, bytecode, \texttt{.pyc} files, stack frames, namespace dictionaries, the import system, and the Python/C extension ecosystem.
+
+Studying only the abstract language would leave the same problem that a syntax-first course creates. The student would know what Python code looks like, but not what kind of machine executes it. CPython gives us that machine. It turns Python from an abstract language into a real process with memory, objects, frames, bytecode, native calls, and runtime-managed execution.
+
+However, the focus on CPython must not become a conceptual prison. Python is broader than CPython. Other implementations exist because the language can be realized through different runtime strategies. PyPy uses a different implementation strategy with just-in-time compilation. Jython connects Python semantics to the Java Virtual Machine. IronPython connects Python to the .NET runtime. These implementations show that Python is a language specification and culture, not only one C program.
+
+Still, CPython remains the practical center. It is the implementation used by most packages, the implementation targeted by the most native extensions, and the implementation whose behavior most programmers implicitly learn first.
+
+\subsubsection{The Practical Rule}
+
+The practical rule is this:
+
+\begin{quote}
+Python is the language contract; CPython is the dominant machine that realizes that contract.
+\end{quote}
+
+When explaining syntax, name binding, mutability, exceptions, or object behavior, we are usually talking about Python. When explaining \texttt{PyObject}, reference counts, bytecode dispatch, \texttt{.pyc} files, the Global Interpreter Lock, memory arenas, or C extension modules, we are talking about CPython.
+
+This distinction prepares the rest of the chapter. We first separate the abstract language from its implementation, then we study CPython as the concrete runtime that makes the language executable. Only after that can Python's object model, memory behavior, stack frames, bytecode execution, and namespace machinery be explained without myth.
