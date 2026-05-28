@@ -716,6 +716,11 @@ ul.synopsis-children:not(:has(> li)) {
   width: 1.25rem;
 }
 
+.synopsis-display-btn {
+  font-size: inherit;
+  line-height: 1.2;
+}
+
 .synopsis-node-title {
   flex: 1;
   min-width: 4rem;

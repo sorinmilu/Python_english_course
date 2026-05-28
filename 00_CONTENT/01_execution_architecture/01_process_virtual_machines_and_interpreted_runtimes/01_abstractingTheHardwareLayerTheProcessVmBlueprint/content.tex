@@ -1,0 +1,972 @@
+\subsection{Abstracting the Hardware Layer: The Process VM Blueprint}
+
+
+
+\subsubsection{Definition, Scope, and Intent of a Software-Driven Execution Runtime Environment}
+
+A \textbf{process virtual machine} is a software execution environment that runs inside an ordinary operating-system process and presents the user program with a machine-like model that is not identical to the physical hardware. It is called a \emph{process} virtual machine because it does not normally emulate an entire computer, boot an operating system, or replace the kernel. Instead, it lives inside one native process created by the real operating system.
+
+This distinction matters. A system virtual machine, such as a full virtualized computer, tries to reproduce enough hardware for an operating system to run inside it. A process virtual machine has a narrower purpose. It exists to run programs written for a language-level or runtime-level execution model.
+
+A simplified distinction is:
+
+\begin{verbatim}
+system virtual machine:
+    virtual hardware
+        |
+        v
+    guest operating system
+        |
+        v
+    guest processes
+
+process virtual machine:
+    host operating system process
+        |
+        v
+    language/runtime engine
+        |
+        v
+    user program representation
+\end{verbatim}
+
+The process VM is therefore not an operating system. It does not replace the kernel scheduler, the memory management unit, the file system, or the system-call interface. It depends on the real operating system for process creation, virtual memory, files, sockets, timers, native threads, and device access. However, inside that process, it creates another execution layer: a runtime environment in which the user's program can run according to rules defined by the language implementation.
+
+In the C model, the compiled program is translated into native instructions for the physical processor. The operating system loads the executable, maps its text segment, prepares its stack and heap, and the CPU executes the program's instructions directly. In a process VM model, the operating system loads the runtime executable first. The user program is then represented inside that runtime as source code, bytecode, opcodes, class files, command structures, or another internal form.
+
+A general process VM model looks like this:
+
+\begin{verbatim}
+native runtime executable
+    |
+    | loaded by the operating system
+    v
+runtime process
+    |
+    | reads / loads user program representation
+    v
+virtual instruction stream or runtime structure
+    |
+    | interpreted, compiled, dispatched, or scheduled by runtime
+    v
+program behavior
+\end{verbatim}
+
+The main intent is to separate the user program from direct dependence on the physical processor instruction set. The runtime can define its own execution model: its own bytecode, object representation, function-call mechanism, exception rules, memory-management strategy, type system, module system, and sometimes its own scheduling model. The user's program targets that runtime model rather than directly targeting x86-64, ARM64, or another hardware architecture.
+
+This does not mean that the physical machine disappears. The processor still executes native instructions. The difference is that those native instructions mostly belong to the runtime engine. The runtime then performs the user's program operations indirectly. In CPython, the CPU executes CPython's native interpreter loop; that loop reads Python bytecode and performs the corresponding Python operations. In the JVM, the CPU executes JVM runtime code, interpreter code, or JIT-compiled native code derived from JVM bytecode. In PHP, the engine executes internal opcodes. In V8, the engine uses several internal execution tiers to run JavaScript code inside a host process.
+
+A process VM usually provides more than instruction dispatch. It often owns a complete runtime environment. This may include:
+
+\begin{itemize}
+    \item a representation for code, such as bytecode, opcodes, or internal compiled forms;
+    \item a call-frame model for functions or methods;
+    \item an object model and type system;
+    \item a managed heap for runtime objects;
+    \item memory reclamation, such as reference counting or garbage collection;
+    \item exception propagation and stack unwinding rules;
+    \item module, class, or package loading mechanisms;
+    \item reflection or introspection facilities;
+    \item foreign-function or native-extension interfaces;
+    \item event loops, task queues, or coroutine schedulers in some environments.
+\end{itemize}
+
+This is why a process VM can support language features that are harder to express directly in the bare C execution model. If the runtime owns frames, objects, and control state, it can expose dynamic inspection, preserve suspended computations, route exceptions through managed frames, allocate objects uniformly on a managed heap, and decide at runtime how operations should be dispatched.
+
+For example, Python can ask for the type of an object at runtime:
+
+\begin{verbatim}
+type(x)
+\end{verbatim}
+
+It can inspect attributes, build functions dynamically, catch exceptions as objects, and keep generators suspended between calls. These features are possible because the CPython runtime keeps language-level state in runtime-managed structures. The hardware only sees native CPython instructions and memory accesses. The Python-level meaning is maintained by the interpreter.
+
+The scope of a process VM is therefore language execution, not whole-machine execution. It abstracts selected parts of the hardware model and replaces them with runtime-defined structures. The physical processor has registers, instruction pointers, native stacks, memory addresses, and machine instructions. The process VM may instead expose or internally use virtual instructions, evaluation stacks, frame objects, operand stacks, local-variable arrays, object references, dynamic dispatch tables, and managed memory.
+
+A useful comparison is:
+
+\begin{center}
+\begin{tabular}{|p{0.36\textwidth}|p{0.48\textwidth}|}
+\hline
+\textbf{Native process model} & \textbf{Process VM model} \\
+\hline
+CPU executes compiled machine instructions from the user's program & CPU executes native runtime code that executes or compiles the user's program representation \\
+\hline
+Function calls use native calling conventions directly & Function or method calls may use runtime-managed frames or virtual call conventions \\
+\hline
+Values may be raw primitives in registers, stack slots, or memory & Values are often runtime objects or tagged values managed by the VM \\
+\hline
+Memory lifetime may be manual, as in C heap allocation & Memory lifetime is often managed by reference counting or garbage collection \\
+\hline
+Errors are often return codes, flags, signals, or hardware traps & Errors are often runtime exception objects propagated through managed frames \\
+\hline
+\end{tabular}
+\end{center}
+
+This abstraction has a cost. A runtime layer must do work that native compiled code may not need to do at runtime. It may need to decode bytecode, look up names dynamically, check object types, dispatch operations through type slots or method tables, manage reference counts, trace garbage, and maintain runtime metadata. These operations add overhead.
+
+However, the runtime layer also provides important advantages. It can make programs more portable, because the same user program representation can run on different platforms if the runtime exists for those platforms. It can make the language more dynamic, because names, types, objects, and modules can be handled at runtime. It can simplify memory management for the programmer. It can provide introspection, sandboxing mechanisms, debugging hooks, interactive execution, and advanced control-flow structures.
+
+The balance differs between runtimes. CPython emphasizes a simple and predictable bytecode interpreter with a rich object model. The JVM emphasizes verified bytecode, managed memory, and strong runtime optimization through JIT compilation. V8 emphasizes aggressive adaptive optimization for JavaScript inside host environments such as browsers, Node.js, and Electron-style applications. PHP's Zend Engine compiles PHP source into opcodes and executes them inside request-oriented or command-line runtime contexts. Bash is less like a bytecode VM and more like a command interpreter, but it still acts as the runtime owner for shell variables, expansions, built-ins, redirections, and child-process dispatch.
+
+The common pattern is that the user program targets the runtime environment first. The runtime then targets the real operating system and hardware. This creates a layered execution architecture:
+
+\begin{verbatim}
+user program semantics
+        |
+        v
+runtime representation
+        |
+        v
+process virtual machine
+        |
+        v
+native process
+        |
+        v
+operating system and hardware
+\end{verbatim}
+
+For students moving from C to Python, this is the central shift. In C, the program is usually transformed into the native executable that becomes the process. In Python, the native process is CPython, and the Python program is represented inside CPython's runtime environment. The process VM is the software machine that gives Python code its execution world: bytecode, frames, objects, namespaces, exceptions, and managed memory.
+
+
+
+\subsubsection{The Bytecode Concept: Platform-Agnostic Virtual Instruction Set Architecture (ISA) Layouts}
+
+A process virtual machine needs a representation of the user's program that it can execute. That representation is often called \textbf{bytecode}. Bytecode is an instruction stream for a software machine, not for the physical processor. It is similar in purpose to machine code, but its target is a virtual instruction set implemented by a runtime engine.
+
+In a native C program, the compiler eventually emits instructions for a real processor architecture. The final instruction stream may target x86-64, ARM64, RISC-V, or another hardware ISA. The physical CPU can fetch and execute those instructions directly. In a bytecode runtime, the source program is instead translated into instructions for a virtual machine. The physical CPU does not execute those bytecode instructions directly. The runtime reads them and performs the corresponding operations.
+
+A simplified native compilation model is:
+
+\begin{verbatim}
+C source code
+    |
+    v
+native machine code
+    |
+    v
+physical CPU execution
+\end{verbatim}
+
+A simplified bytecode runtime model is:
+
+\begin{verbatim}
+high-level source code
+    |
+    v
+bytecode for a virtual machine
+    |
+    v
+runtime engine executes bytecode
+    |
+    v
+physical CPU executes the runtime engine
+\end{verbatim}
+
+The term \emph{bytecode} originally suggests instructions stored as compact byte-sized operation codes, but the exact layout varies across runtimes. Some virtual machines use one-byte opcodes. Others use wider instructions, wordcode, variable-length encodings, operands following the opcode, constant-pool indexes, register indexes, stack operations, or other implementation-specific forms. The important idea is not the literal byte size of every instruction. The important idea is that the instruction stream belongs to a virtual machine rather than to the hardware processor.
+
+For example, a Python statement such as:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+can be compiled by CPython into bytecode operations that conceptually mean:
+
+\begin{verbatim}
+load the value named a
+load the value named b
+perform Python addition
+store the result under the name x
+\end{verbatim}
+
+These are not CPU instructions. They are instructions for CPython's evaluation loop. The real CPU executes the native machine code of the interpreter. The interpreter reads each bytecode operation and executes the corresponding C-level runtime logic.
+
+A virtual instruction set may include operations such as:
+
+\begin{itemize}
+    \item loading constants;
+    \item loading or storing local names;
+    \item loading or storing global names;
+    \item performing arithmetic operations;
+    \item calling functions;
+    \item returning values;
+    \item creating objects;
+    \item jumping to another bytecode position;
+    \item handling exceptions;
+    \item accessing attributes or indexes.
+\end{itemize}
+
+This resembles a hardware ISA because it defines the operations that the execution engine understands. However, it is not constrained in the same way as a physical ISA. A bytecode instruction can represent a high-level language action. For example, a Python addition operation does not simply mean ``add two machine integers.'' It may mean: inspect the runtime types of the two objects, dispatch through the appropriate numeric protocol, call special methods if needed, allocate a result object, update reference counts, and handle possible exceptions.
+
+Therefore, a bytecode instruction can hide a large amount of runtime work. One virtual instruction may expand into many native instructions executed by the interpreter. This is one reason bytecode interpretation is usually slower than direct native execution, but also one reason it can support rich dynamic behavior.
+
+The main advantage of bytecode is portability across hardware. If the same bytecode format can be understood by virtual machines on different platforms, the program representation becomes less tied to one processor architecture. The runtime must still be implemented separately for each platform, but the bytecode can remain mostly the same.
+
+This is the principle behind the Java Virtual Machine. Java source code is compiled into JVM bytecode stored in \texttt{.class} files. The same class file can, in principle, be loaded by a JVM on different operating systems and processor architectures. The JVM implementation on each platform is responsible for interpreting or compiling that bytecode into behavior on the local machine.
+
+A simplified Java model is:
+
+\begin{verbatim}
+Java source
+    |
+    | javac
+    v
+JVM bytecode (.class)
+    |
+    | JVM on Windows / Linux / macOS / different CPUs
+    v
+program execution
+\end{verbatim}
+
+CPython also uses bytecode, but with a different portability intention. CPython bytecode is an internal implementation artifact, not a stable cross-version distribution format in the same strong sense as JVM bytecode. Python bytecode can be cached in \texttt{.pyc} files, but those files are tied to a compatible Python implementation and version. They are useful for avoiding repeated compilation, not as a universal long-term binary distribution format.
+
+A simplified CPython model is:
+
+\begin{verbatim}
+Python source
+    |
+    | CPython compiler
+    v
+CPython bytecode
+    |
+    | CPython evaluation loop
+    v
+Python program execution
+\end{verbatim}
+
+PHP uses a similar idea through engine opcodes. A PHP file is parsed and compiled into internal opcodes for the Zend Engine. These opcodes are usually created in memory, and an opcode cache may store them to reduce repeated compilation. They are virtual instructions for the PHP runtime, not direct hardware instructions.
+
+V8, the JavaScript engine, also uses internal bytecode-like representations, but its execution model is more adaptive. JavaScript source may first be parsed and compiled into an internal bytecode form for an interpreter. As the program runs, V8 collects profiling information. Frequently executed paths may then be compiled into optimized native code by a JIT compiler. Therefore, V8 demonstrates an important point: bytecode does not prevent later native-code generation. A runtime can start from bytecode and then compile selected parts into machine code at runtime.
+
+Bash is different. It is not usually explained as a bytecode virtual machine in the same sense. A Bash script is interpreted as shell command syntax. Bash parses commands, expands variables and patterns, applies redirections and pipelines, executes built-ins inside the shell process, and launches external native programs as child processes. The runtime representation is more command-dispatch-oriented than bytecode-instruction-oriented. This makes Bash a useful contrast: not every interpreted runtime has the same bytecode architecture.
+
+The bytecode concept also explains why virtual machines can define their own execution architecture. Some bytecode systems are stack-based. In a stack-based virtual machine, many operations take operands from an evaluation stack and push results back onto it. An addition may look conceptually like:
+
+\begin{verbatim}
+push a
+push b
+add
+store x
+\end{verbatim}
+
+The \texttt{add} instruction does not name its operands directly. It assumes they are already on the evaluation stack.
+
+Other virtual machines are register-based. In a register-based virtual machine, instructions name virtual registers explicitly:
+
+\begin{verbatim}
+r1 = load a
+r2 = load b
+r3 = add r1, r2
+store x, r3
+\end{verbatim}
+
+Here, the instruction stream contains more explicit operand references. The registers are not necessarily physical CPU registers. They are virtual storage locations defined by the runtime's instruction set.
+
+This distinction between stack-based and register-based bytecode is architectural. It affects bytecode density, interpreter design, instruction dispatch, optimization strategies, and how close the virtual machine feels to a real CPU model. It does not change the main idea: the instruction set belongs to a software machine.
+
+Bytecode also provides a useful boundary for tooling. If a language implementation exposes bytecode inspection, students and developers can examine what the compiler produced from source code. In Python, the \texttt{dis} module can display CPython bytecode. This makes it possible to see that high-level source constructs are transformed into lower-level virtual instructions before execution.
+
+For example, source code such as:
+
+\begin{verbatim}
+x = 1 + 2
+\end{verbatim}
+
+does not remain only source text. CPython compiles it into a code object containing bytecode and constants. The exact bytecode varies across Python versions, but the principle remains: the interpreter executes a compiled internal instruction stream, not the raw source characters.
+
+Bytecode sits between source code and native execution:
+
+\begin{verbatim}
+source code:
+    human-readable language text
+
+bytecode:
+    virtual-machine instruction stream
+
+native machine code:
+    physical processor instruction stream
+\end{verbatim}
+
+This middle layer is the main tool by which a process virtual machine abstracts the hardware. The user program is no longer expressed directly in terms of physical registers, raw addresses, and hardware instructions. It is expressed in terms of virtual operations chosen by the language runtime.
+
+That abstraction has consequences. It can improve portability and make dynamic language behavior easier to implement. It can also add execution overhead, because a runtime must decode and execute virtual instructions. Some runtimes accept this overhead. Some reduce it through caching, specialization, adaptive interpretation, or JIT compilation. Others, such as CPython, historically prioritize a relatively simple interpreter model and a rich runtime object system over aggressive default native compilation.
+
+For the transition from C to Python, the main conclusion is this: C normally produces machine instructions for the physical CPU, while CPython produces bytecode instructions for the CPython virtual machine. The physical CPU still does all real execution, but it executes the interpreter's native code. Python bytecode is the structured instruction stream that tells the interpreter what Python-level operation to perform next.
+
+
+
+\subsubsection{Structural Models of Execution Engines}
+
+Execution engines can be classified by the representation they execute and by the moment at which translation occurs. A C program follows the native ahead-of-time model: source code is transformed before execution into machine code for a physical processor. Runtime-hosted languages use different models. Some execute source-like structures, some execute bytecode or opcodes, some compile hot paths into native machine code while the program is already running, and some dispatch commands rather than virtual instructions.
+
+A useful first classification is:
+
+\begin{center}
+\begin{tabular}{|p{0.28\textwidth}|p{0.32\textwidth}|p{0.28\textwidth}|}
+\hline
+\textbf{Model} & \textbf{What the engine executes} & \textbf{Typical examples} \\
+\hline
+Native ahead-of-time execution & Physical CPU machine code produced before execution & C, C++ compiled binaries \\
+\hline
+Source or AST interpretation & Source-derived syntax tree or statement structure & Simple interpreters, teaching interpreters \\
+\hline
+Bytecode / opcode interpretation & Virtual instruction stream executed by a runtime loop & CPython, PHP Zend Engine, JVM interpreter tier \\
+\hline
+Hybrid bytecode and JIT execution & Bytecode first, selected paths compiled to native code at runtime & JVM, V8, modern PHP variants \\
+\hline
+Command interpretation and dispatch & Parsed shell commands, built-ins, and child-process launches & Bash and other shells \\
+\hline
+\end{tabular}
+\end{center}
+
+These categories are not language labels. They are implementation strategies. The same language can have several implementations with different execution engines. Python is usually taught through CPython, but other Python implementations may use different internal strategies. JavaScript in V8 is not executed exactly like JavaScript in every possible engine. PHP source is not executed in the same way as Bash command text, even though both may be casually called interpreted.
+
+The simplest structural model is direct native execution. This is the C reference model:
+
+\begin{verbatim}
+C source
+    |
+    | ahead-of-time compiler
+    v
+native machine code
+    |
+    | OS loader
+    v
+process text segment
+    |
+    | physical CPU fetch/decode/execute
+    v
+program behavior
+\end{verbatim}
+
+Here, the user's program becomes the native instruction stream. The processor fetches the program's compiled instructions directly from the process text segment. The execution engine is essentially the physical CPU plus the operating-system process environment.
+
+A source-level or tree-walking interpreter uses a different structure. It reads source code, parses it into a tree or similar representation, and then walks that structure to produce behavior:
+
+\begin{verbatim}
+source code
+    |
+    | parser
+    v
+syntax tree / AST
+    |
+    | interpreter walks tree nodes
+    v
+program behavior
+\end{verbatim}
+
+For example, an assignment node may cause the interpreter to evaluate the right-hand expression and update an environment. An \texttt{if} node may cause the interpreter to evaluate a condition and choose one branch. This model is simple to understand and useful for teaching interpreter construction. However, repeatedly walking a high-level tree can be inefficient compared with executing a compact instruction stream.
+
+Bytecode interpreters improve this by translating source-level structure into a sequence of simpler virtual instructions. CPython belongs primarily to this family. Python source is parsed and compiled into CPython bytecode. The interpreter loop reads bytecode instructions and performs the corresponding Python operations:
+
+\begin{verbatim}
+Python source
+    |
+    | CPython parser and compiler
+    v
+CPython code object / bytecode
+    |
+    | bytecode evaluation loop
+    v
+Python runtime behavior
+\end{verbatim}
+
+This model separates source parsing from execution. The interpreter does not repeatedly analyze raw source text. It executes a lower-level internal instruction stream. Each bytecode instruction is still virtual, not physical. The hardware executes CPython's native interpreter code; CPython executes the Python bytecode.
+
+PHP uses a closely related model. PHP source is parsed and compiled into internal opcodes for the Zend Engine. These opcodes are then executed by the PHP runtime. In many deployments, this compiled form is produced in memory, and an opcode cache may keep the compiled representation available for later requests:
+
+\begin{verbatim}
+PHP source
+    |
+    | PHP parser/compiler
+    v
+Zend opcodes
+    |
+    | Zend Engine executor
+    v
+PHP runtime behavior
+\end{verbatim}
+
+The model resembles CPython structurally, but the surrounding execution environment is often request-oriented. A PHP script may be executed by a command-line PHP process, a PHP-FPM worker, or a web-server-integrated runtime. The user source is still not the native process image; it is compiled into engine instructions consumed by the PHP runtime.
+
+Java uses a more explicit two-stage model. Java source is normally compiled before execution into class files containing JVM bytecode. The JVM then loads, verifies, interprets, and often JIT-compiles that bytecode:
+
+\begin{verbatim}
+Java source
+    |
+    | javac
+    v
+JVM bytecode (.class / .jar)
+    |
+    | JVM class loader and verifier
+    v
+JVM execution engine
+    |
+    +--> interpreter tier
+    |
+    +--> JIT-compiled native code for selected paths
+    v
+program behavior
+\end{verbatim}
+
+This makes Java different from CPython in the usual workflow. CPython normally hides source-to-bytecode compilation inside interpreter startup or import. Java normally exposes source-to-bytecode compilation as a separate build step. At runtime, the JVM is the process virtual machine that owns method frames, operand stacks, class metadata, heap objects, and garbage collection.
+
+V8, the JavaScript engine used in browsers, Node.js, and Electron-style applications, is a hybrid adaptive engine. It is embedded inside a larger host process. That host may be a browser, the Node.js executable, or a desktop application shell such as Electron. Applications such as Visual Studio Code belong to this broad family: the operating system runs a native application process, and JavaScript or TypeScript-derived code executes inside an embedded runtime stack.
+
+A simplified V8 model is:
+
+\begin{verbatim}
+browser / node / electron host
+    |
+    v
+embedded V8 engine
+    |
+    | parses JavaScript source
+    v
+internal bytecode / runtime representation
+    |
+    +--> interpreter or baseline execution
+    |
+    +--> optimized native code for hot paths
+    v
+JavaScript behavior inside host environment
+\end{verbatim}
+
+V8 is not merely a simple source interpreter. It uses internal representations, bytecode-like execution, profiling, and runtime optimization. Frequently executed code paths may be compiled into native machine code while the program is running. This is called just-in-time compilation, or JIT compilation. The important structural point is that the JavaScript file is still not the operating-system process image. The host process and embedded engine own execution.
+
+Bash provides a useful contrast because it is not normally described as a bytecode virtual machine. Bash reads shell command text, parses commands, performs expansions, applies redirections and pipelines, and then either executes built-ins inside the shell process or launches external programs as child processes.
+
+\begin{verbatim}
+Bash script
+    |
+    | Bash parser and expansion rules
+    v
+command dispatch
+    |
+    +--> shell built-in:
+    |       executed inside Bash process
+    |
+    +--> external command:
+            fork / exec child process
+            OS loads native executable
+\end{verbatim}
+
+For example, \texttt{cd} must affect the shell process itself, so it is a shell built-in. Commands such as \texttt{ls}, \texttt{cat}, and \texttt{grep} are usually separate native executables. Bash interprets the script structure, but many individual operations are delegated to child processes. This is different from CPython, where ordinary Python statements are compiled into bytecode and executed inside the interpreter process.
+
+These models differ in where they place the execution burden. A native compiled program pushes most translation work before runtime. A bytecode interpreter keeps a virtual instruction stream and dispatches it at runtime. A JIT engine begins with a portable or internal representation and later compiles selected parts into native machine code. A shell mostly interprets command structure and delegates many operations to external native programs.
+
+The structural difference can be sketched as follows:
+
+\begin{verbatim}
+A. Native ahead-of-time model
+
+source
+  -> native compiler
+  -> native executable
+  -> CPU execution
+
+
+B. Bytecode interpreter model
+
+source
+  -> runtime compiler
+  -> bytecode / opcodes
+  -> interpreter loop
+  -> behavior
+
+
+C. Hybrid VM + JIT model
+
+source or bytecode
+  -> VM representation
+  -> interpreter / baseline tier
+  -> profiling
+  -> optimized native code for hot paths
+  -> behavior
+
+
+D. Command interpreter model
+
+script text
+  -> command parser
+  -> built-ins inside interpreter
+  -> external commands as child processes
+  -> behavior
+\end{verbatim}
+
+The classification also helps explain why performance characteristics differ. In a bytecode interpreter, every virtual instruction normally requires runtime dispatch. The engine must fetch the virtual instruction, decode it, and execute the corresponding native implementation. In a JIT engine, the runtime tries to remove some of that repeated dispatch cost by compiling frequently used paths into native code. In a shell, much of the cost may come from launching child processes, performing I/O, and coordinating pipelines rather than from arithmetic instruction dispatch.
+
+This does not mean that one model is always better. Each model serves different priorities:
+
+\begin{itemize}
+    \item native ahead-of-time compilation prioritizes direct machine execution and low runtime translation overhead;
+    \item bytecode interpretation prioritizes portability, simplicity of runtime execution, and dynamic language support;
+    \item hybrid JIT execution prioritizes adaptive performance by observing runtime behavior;
+    \item command interpretation prioritizes process orchestration, system composition, and interactive control.
+\end{itemize}
+
+For this course, CPython remains the central model. CPython is best understood as a native executable that hosts a bytecode-based execution engine. The user's Python code becomes bytecode and runtime objects. The CPython evaluation loop drives execution. This places Python between the C native model and more aggressive adaptive engines such as V8 or the JVM.
+
+The next structural distinction is inside bytecode execution itself. A virtual machine can be organized around an evaluation stack or around virtual registers. Stack-based and register-based virtual machines both execute virtual instructions, but they encode operands differently. That difference affects bytecode layout, dispatch behavior, and how the runtime engine represents temporary computation.
+
+
+
+
+
+\subsubsection{Stack-Based Virtual Machines: Evaluation Stack Operations and Zero-Address Instruction Sets}
+
+A \textbf{stack-based virtual machine} is an execution engine in which most temporary computation is organized around an internal evaluation stack. Instead of naming explicit operand locations for every operation, many instructions take their input values from the top of the stack and place their result back on the stack.
+
+This is different from the native process stack discussed earlier. The native process stack belongs to the operating system and hardware execution model. It stores native call frames, return addresses, saved registers, and automatic local storage for native code. A virtual-machine evaluation stack is a runtime data structure used by the interpreter to evaluate expressions inside a language-level frame.
+
+The two must not be confused:
+
+\begin{itemize}
+    \item the \textbf{native stack} belongs to the real process and is used by native machine-code calls;
+    \item the \textbf{VM evaluation stack} belongs to the language runtime and is used to evaluate virtual instructions.
+\end{itemize}
+
+In CPython, when Python bytecode is executed, each active Python frame has access to evaluation-stack-like storage used by the bytecode evaluator. Bytecode instructions push Python object references onto this stack, pop them when operations need operands, and push results back. The values on the stack are not raw integers or raw C values from the user's program. They are references to Python objects managed by the runtime.
+
+The basic pattern is:
+
+\begin{verbatim}
+push value
+push value
+operation consumes values
+operation pushes result
+\end{verbatim}
+
+For example, consider the expression:
+
+\begin{verbatim}
+a + b
+\end{verbatim}
+
+A stack-based virtual machine may execute this expression conceptually as:
+
+\begin{verbatim}
+LOAD a      # push value of a
+LOAD b      # push value of b
+ADD         # pop two values, add them, push result
+\end{verbatim}
+
+The evaluation stack changes like this:
+
+\begin{verbatim}
+initial stack:
+
+    [ empty ]
+
+after LOAD a:
+
+    [ value_of_a ]
+
+after LOAD b:
+
+    [ value_of_a ]
+    [ value_of_b ]
+
+after ADD:
+
+    [ result_of_a_plus_b ]
+\end{verbatim}
+
+The instruction \texttt{ADD} does not need to say explicitly where its operands are. Its operands are implicitly the top two stack entries. This is why stack-machine operations are often described as \textbf{zero-address instructions}. The arithmetic instruction itself does not name source registers or destination registers. The operand locations are implied by the stack discipline.
+
+The phrase \emph{zero-address} should be understood carefully. Not every bytecode instruction has no operand at all. An instruction such as \texttt{LOAD\_CONST} may include an index into a constants table. An instruction such as \texttt{LOAD\_FAST} may include an index into local variables. The point is narrower: many computational operations, especially arithmetic and logical operations, do not explicitly name both operands and a destination. They use the evaluation stack.
+
+A more complete example is assignment:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+A simplified stack VM execution may look like this:
+
+\begin{verbatim}
+LOAD a      # push object bound to a
+LOAD b      # push object bound to b
+ADD         # pop two objects, compute result, push result
+STORE x     # pop result and bind/store it as x
+\end{verbatim}
+
+The stack states are:
+
+\begin{verbatim}
+[ empty ]
+
+LOAD a:
+[ a ]
+
+LOAD b:
+[ a ]
+[ b ]
+
+ADD:
+[ a + b ]
+
+STORE x:
+[ empty ]
+\end{verbatim}
+
+The temporary result does not need a named virtual register. It exists briefly on the evaluation stack, then is consumed by the store operation.
+
+This makes stack bytecode compact. Since many operations do not need to encode explicit operand locations, the instruction stream can be smaller. For example, a register-based instruction might need to say:
+
+\begin{verbatim}
+r3 = add r1, r2
+\end{verbatim}
+
+A stack-based instruction can simply say:
+
+\begin{verbatim}
+ADD
+\end{verbatim}
+
+provided that the correct operands are already on top of the stack.
+
+The cost is that the compiler must arrange instructions so that the correct values appear on the stack at the correct time. Expression order becomes stack choreography. The compiler translates nested expressions into a sequence of pushes and operations.
+
+For example:
+
+\begin{verbatim}
+x = (a + b) * c
+\end{verbatim}
+
+can be represented as:
+
+\begin{verbatim}
+LOAD a
+LOAD b
+ADD
+LOAD c
+MULTIPLY
+STORE x
+\end{verbatim}
+
+The evaluation stack evolves as:
+
+\begin{verbatim}
+LOAD a:
+[ a ]
+
+LOAD b:
+[ a ]
+[ b ]
+
+ADD:
+[ a + b ]
+
+LOAD c:
+[ a + b ]
+[ c ]
+
+MULTIPLY:
+[ (a + b) * c ]
+
+STORE x:
+[ empty ]
+\end{verbatim}
+
+This is a natural fit for expression evaluation because expressions are often tree-shaped. A stack machine can evaluate the leaves, combine them, and leave the result on the stack.
+
+Function calls can also be represented through stack activity. Conceptually, the callable object and arguments are prepared, then a call instruction consumes them and pushes the return value. A simplified model is:
+
+\begin{verbatim}
+LOAD function
+LOAD argument1
+LOAD argument2
+CALL 2
+STORE result
+\end{verbatim}
+
+The call instruction knows how many arguments to consume. It invokes the runtime's function-call machinery, creates or enters a new language-level frame, executes the function, receives a return value, and pushes that value back to the caller's evaluation stack.
+
+In CPython, the exact bytecode names and call protocol change across Python versions, but the structural idea remains stable: Python source is compiled into virtual instructions, and those instructions manipulate a frame-local evaluation stack of Python object references.
+
+A simplified CPython-like frame can be sketched as:
+
+\begin{verbatim}
+Python frame
++----------------------------------+
+| code object / bytecode           |
+| current bytecode offset          |
+| local variable slots / namespace |
+| global namespace link            |
+| builtins namespace link          |
+| evaluation stack                 |
++----------------------------------+
+\end{verbatim}
+
+During execution, the interpreter loop repeatedly performs a cycle similar to:
+
+\begin{verbatim}
+fetch next bytecode instruction
+decode instruction
+perform runtime operation
+update evaluation stack / frame state
+move to next bytecode position
+\end{verbatim}
+
+This resembles a hardware CPU fetch-decode-execute cycle, but at the software-machine level. The hardware CPU fetches native CPython instructions. CPython fetches Python bytecode instructions. The two layers are separate.
+
+A stack VM also has a simple control-flow model. A jump instruction changes the current bytecode position. A conditional jump usually consumes or inspects a value from the evaluation stack. For example, an \texttt{if} statement may be compiled conceptually as:
+
+\begin{verbatim}
+LOAD condition
+JUMP_IF_FALSE else_block
+
+    ... then body ...
+    JUMP end_if
+
+else_block:
+    ... else body ...
+
+end_if:
+\end{verbatim}
+
+The condition value is placed on the evaluation stack. The conditional jump uses its truth value to choose the next bytecode location. Again, the branch does not directly manipulate native instruction pointers. It manipulates the virtual instruction position inside the runtime frame.
+
+The Java Virtual Machine is another major example of a stack-based virtual machine. JVM bytecode operates around operand stacks inside method frames. A Java method frame contains local variable slots and an operand stack. Instructions load values from local variables onto the operand stack, operate on stack values, and store results back into local variables or object fields.
+
+A simplified JVM method model is:
+
+\begin{verbatim}
+JVM method frame
++----------------------+
+| local variable array |
+| operand stack        |
+| constant pool links  |
++----------------------+
+\end{verbatim}
+
+A Java expression such as:
+
+\begin{verbatim}
+x = a + b;
+\end{verbatim}
+
+may conceptually involve loading local variables onto the operand stack, applying an addition instruction, and storing the result. The JVM's operand stack is not the native process stack. It is part of the JVM's method-frame execution model.
+
+CPython and the JVM are therefore both useful examples of stack-oriented virtual machines, although their surrounding language rules are very different. Java bytecode is statically typed and verified before execution. CPython bytecode operates on dynamically typed Python objects and relies heavily on runtime object protocols. The stack structure is similar as an execution-engine idea, but the language semantics are different.
+
+PHP's Zend Engine should be treated more cautiously in this classification. PHP does compile source into opcodes, but its opcode format is not a simple pure zero-address stack machine in the same sense as the JVM operand-stack model. Zend opcodes use explicit operands that refer to variables, temporaries, constants, and result locations inside the engine's execution structures. Therefore, PHP belongs clearly to the opcode-runtime family, but it is not the best example of a pure stack-based VM.
+
+V8 is also not a clean stack-machine example. Its interpreter tier, Ignition, uses a bytecode model based around an accumulator and virtual registers. This places it closer to a register/accumulator-based engine than to a pure stack VM. V8 then adds profiling and optimized native-code generation on top of that. It is therefore better used as a contrast in the next subsection.
+
+Bash is outside this bytecode-stack classification. Bash interprets command structures, manages shell state, executes built-ins, and launches external commands. It does not normally execute a compact stack bytecode instruction stream in the CPython or JVM sense.
+
+The stack-based VM model can be summarized as follows:
+
+\begin{verbatim}
+source expression tree
+        |
+        v
+linear bytecode sequence
+        |
+        v
+evaluation stack
+        |
+        v
+runtime operations on objects / values
+\end{verbatim}
+
+A stack VM is attractive because it is simple to generate code for. The compiler can translate expression trees into stack operations using a direct traversal. It is also simple for an interpreter loop to understand: many operations consume the top stack entries and push one result.
+
+The main disadvantage is that stack traffic can be high. Values may be pushed and popped frequently. The instruction stream may contain many load/store stack operations. A register-based virtual machine can sometimes express the same computation with fewer dispatches by naming virtual locations explicitly. This is one reason some engines prefer register-based or accumulator-based bytecode forms.
+
+However, stack-based virtual machines remain important because they provide a clear, compact, and language-independent model of expression execution. They make the bridge from syntax trees to bytecode easy to understand: evaluate subexpressions, push their results, combine them, and leave the final result on the stack.
+
+For Python students, the most important conclusion is this: CPython does not execute a Python expression by turning every source-level operation directly into native hardware instructions. It compiles the expression into bytecode. That bytecode operates inside Python frames and manipulates an evaluation stack of object references. The stack belongs to the runtime execution model, not to the physical CPU as a direct representation of the user's variables.
+
+
+
+
+
+\subsubsection{Register-Based Virtual Machines: Virtual CPU Register Mapping and Explicit-Address Instructions}
+
+A \textbf{register-based virtual machine} is an execution engine in which bytecode instructions refer explicitly to named virtual storage locations. These storage locations are usually called \textbf{virtual registers}. They are not necessarily physical CPU registers. They are runtime-defined slots used by the virtual machine to hold temporary values during execution.
+
+This is the main contrast with a stack-based virtual machine. In a stack VM, many operations take their operands implicitly from the top of the evaluation stack. In a register VM, instructions usually name their input and output locations directly.
+
+A stack-style operation may look conceptually like this:
+
+\begin{verbatim}
+LOAD a
+LOAD b
+ADD
+STORE x
+\end{verbatim}
+
+The \texttt{ADD} instruction implicitly consumes the two values on top of the stack.
+
+A register-style operation may look conceptually like this:
+
+\begin{verbatim}
+r1 = LOAD a
+r2 = LOAD b
+r3 = ADD r1, r2
+STORE x, r3
+\end{verbatim}
+
+Here, the addition instruction explicitly says where its operands come from and where the result goes. The instruction has addresses or register references built into it. This is why register-machine instructions are often called \textbf{explicit-address instructions}. They name their data locations rather than relying only on stack position.
+
+The word \emph{register} must be interpreted carefully. A virtual register is not the same thing as a hardware register such as \texttt{RAX}, \texttt{RBX}, or \texttt{X0}. It is a logical slot inside the VM's execution frame. The runtime may store that slot in memory, in a native stack frame, in a heap-allocated frame object, or sometimes in a real CPU register after optimization. But at the bytecode level, it belongs to the virtual machine, not directly to the hardware.
+
+A simplified register-based VM frame can be sketched as:
+
+\begin{verbatim}
+VM frame
++----------------------------------+
+| bytecode / instruction pointer   |
+| virtual register r0              |
+| virtual register r1              |
+| virtual register r2              |
+| virtual register r3              |
+| ...                              |
+| constants / metadata links       |
++----------------------------------+
+\end{verbatim}
+
+An expression such as:
+
+\begin{verbatim}
+x = (a + b) * c
+\end{verbatim}
+
+may be represented in a register-based bytecode style as:
+
+\begin{verbatim}
+r1 = LOAD a
+r2 = LOAD b
+r3 = ADD r1, r2
+r4 = LOAD c
+r5 = MUL r3, r4
+STORE x, r5
+\end{verbatim}
+
+The temporary values do not appear only as stack entries. They are assigned to explicit virtual registers. This can make the data flow easier to see: \texttt{r3} holds \texttt{a + b}, and \texttt{r5} holds the final result.
+
+A diagram of the data flow would be:
+
+\begin{verbatim}
+a ----\
+       ADD ---> r3 ----\
+b ----/                 MUL ---> r5 ---> x
+c ---------------------/
+\end{verbatim}
+
+This explicitness can reduce the number of virtual instructions needed for some programs. In a stack machine, intermediate values may need repeated pushes and pops. In a register machine, values can remain in named virtual locations and be reused directly.
+
+For example, the expression:
+
+\begin{verbatim}
+(a + b) + (a + b)
+\end{verbatim}
+
+could be represented inefficiently by recomputing the left and right sides. A register-based representation can make reuse obvious:
+
+\begin{verbatim}
+r1 = LOAD a
+r2 = LOAD b
+r3 = ADD r1, r2
+r4 = ADD r3, r3
+\end{verbatim}
+
+The intermediate result \texttt{r3} is explicitly available for reuse.
+
+This does not mean register VMs are always faster. They have different trade-offs. Register instructions are often wider because they must encode operand locations. A stack instruction such as \texttt{ADD} may be very compact because it does not name operands. A register instruction such as \texttt{ADD r3, r1, r2} must encode at least three virtual locations. So register bytecode may have fewer instructions, but each instruction may be larger.
+
+The trade-off can be summarized as:
+
+\begin{center}
+\begin{tabular}{|p{0.30\textwidth}|p{0.30\textwidth}|p{0.30\textwidth}|}
+\hline
+\textbf{Property} & \textbf{Stack VM} & \textbf{Register VM} \\
+\hline
+Operand location & Mostly implicit, top of stack & Explicit virtual registers \\
+\hline
+Instruction size & Often compact & Often wider \\
+\hline
+Instruction count & May be higher because of stack traffic & May be lower because values can be reused directly \\
+\hline
+Expression evaluation & Stack choreography & Named temporary slots \\
+\hline
+Compiler output & Easy to generate from expression trees & Requires virtual register assignment \\
+\hline
+\end{tabular}
+\end{center}
+
+A register-based virtual machine also resembles a real CPU more closely than a stack VM in one specific sense: real CPUs usually operate on registers and memory locations, not on an abstract operand stack. However, virtual registers are still not hardware registers. They are a software abstraction that can later be mapped, optimized, interpreted, or compiled.
+
+A hardware-like instruction may look like:
+
+\begin{verbatim}
+ADD RAX, RBX
+\end{verbatim}
+
+A register VM instruction may look like:
+
+\begin{verbatim}
+ADD r3, r1, r2
+\end{verbatim}
+
+The visual similarity is useful, but the meaning is different. \texttt{RAX} and \texttt{RBX} are physical CPU registers. \texttt{r1}, \texttt{r2}, and \texttt{r3} are virtual frame slots. The VM engine decides how they are represented during execution.
+
+Register-based bytecode is used in several important runtime systems. Lua is a well-known example of a register-based virtual machine. Android's older Dalvik VM also used a register-based bytecode model, in contrast with the stack-based JVM bytecode model. These designs were chosen partly because register bytecode can reduce instruction dispatch count and make some data dependencies explicit.
+
+V8's interpreter tier also provides an important modern contrast. V8's Ignition interpreter is not a pure stack machine like the JVM model. It uses an accumulator-based bytecode design together with virtual registers. The accumulator is a special implicit working location, while other values can live in virtual registers. This is a hybrid style: not every operation names all operands, but the engine is still much closer to register/accumulator bytecode than to a simple operand-stack VM.
+
+A simplified accumulator/register model looks like this:
+
+\begin{verbatim}
+LOAD a        -> accumulator
+ADD r1        -> accumulator = accumulator + r1
+STORE r2      -> r2 = accumulator
+\end{verbatim}
+
+The accumulator acts as an implicit current value. Virtual registers hold additional temporary values, local values, or intermediate results. This design can reduce instruction width compared with a fully explicit three-address register machine while still avoiding some of the push/pop traffic of a pure stack machine.
+
+PHP's Zend Engine is also better understood as an explicit-operand opcode engine than as a pure stack VM. Zend opcodes can refer to variables, temporaries, constants, and result locations. For example, an operation may conceptually say: take operand 1, take operand 2, place the result in a temporary. This makes PHP's engine structurally closer to explicit-address opcode execution than to the JVM operand-stack model.
+
+A simplified PHP-like opcode shape is:
+
+\begin{verbatim}
+T1 = ADD CV(a), CV(b)
+ASSIGN CV(x), T1
+\end{verbatim}
+
+Here, \texttt{CV} can be read as a compiled variable slot, and \texttt{T1} as a temporary. The exact Zend internals are more specific, but the broad structural point is that operands and result locations are explicitly represented in the opcode execution model.
+
+Java is the important opposite example. JVM bytecode is stack-based. A Java method frame has local variable slots and an operand stack. Instructions commonly load values from local variables onto the operand stack, operate on the stack, and store results back. Therefore, Java belongs mainly with the previous subsection, not this one, although JIT compilation inside the JVM eventually maps bytecode behavior onto real machine registers and native instructions.
+
+CPython also belongs mainly with the stack-based family. CPython bytecode execution uses an evaluation-stack model inside Python frames. Python operations push and pop references to Python objects. CPython may contain optimizations and implementation changes across versions, but the conceptual teaching model remains stack-oriented bytecode execution.
+
+Bash does not fit either the stack VM or register VM model very well. Bash does not normally compile a shell script into a compact virtual instruction stream with operand stacks or virtual registers. It parses shell syntax, performs expansions, executes built-ins, and launches external commands. Its execution structure is command-dispatch-oriented rather than register-bytecode-oriented.
+
+The register-based model is useful because it makes explicit one possible answer to the question: where do temporary values live inside a virtual machine? In a stack VM, temporary values live at positions on an evaluation stack. In a register VM, temporary values live in named virtual slots. Both are software structures. Both are inside the runtime. Neither should be confused with the programmer's source-level variables or the hardware's physical registers.
+
+The general picture is:
+
+\begin{verbatim}
+source code
+    |
+    v
+compiler / runtime compiler
+    |
+    v
+virtual instructions
+    |
+    +--> stack model:
+    |       operands live on evaluation stack
+    |
+    +--> register model:
+            operands live in virtual registers
+\end{verbatim}
+
+For students moving from C to Python, the main value of this distinction is conceptual. A C compiler eventually maps values onto real hardware registers, stack slots, and memory addresses. A process virtual machine first maps values onto its own virtual execution structures. In CPython, that structure is mainly stack-oriented. In engines such as V8 or PHP's Zend Engine, explicit virtual locations or accumulator/register patterns play a stronger role. In all cases, the runtime inserts a software machine between the user's program and the physical CPU.
+
+

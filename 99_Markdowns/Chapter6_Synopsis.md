@@ -1,47 +1,131 @@
-# Hash-based collections and associative mappings
+# CHAPTER: Hash-Based Collections and Associative Mappings
 
-## 5.1 Unordered Unique Domains: The Set Architecture (`set`)
+## Hash Tables as Non-Sequential Component Access Structures
 
-### 5.1.1 Mathematical Foundations and Structural Syntax
-#### 5.1.1.1 Defining Unique Unordered Domains using the Curly-Brace `{}` Construct
-#### 5.1.1.2 Instantiation Boundaries: Differentiating Empty Set Initialization `set()` from Empty Dictionary Literal Declarations `{}`
+### From Positional Access to Hash-Based Access
 
-### 5.1.2 Constraints of Element Ingestion and Runtime Engines
-#### 5.1.2.1 The Uniqueness Invariant: Automated De-duplication Mechanics at Runtime
-#### 5.1.2.2 The Hashability Criterion: Object Identity (`id()`), Value Equality (`__eq__`), and Hash Stability (`__hash__`) Requirements
-#### 5.1.2.3 CPython Open-Addressing Architecture: How the Runtime Allocates the Underlying Set Hash Table Array and Resolves Collisions via Dummy/Pseudo-Random Probing
-#### 5.1.2.4 Algorithmic Efficiency Matrix: Amortized O(1) Membership Lookups vs. the O(N) Shifting Penalties of Sequential Array Traversal
+#### Sequential Collections: Why Lists, Tuples, and Strings Locate Components by Index
 
-## 5.2 Set Mathematical Operators and Mutator Methods
+#### Hash-Based Collections: Why Sets and Dictionaries Locate Components by Hash-Derived Table Slots
 
-### 5.2.1 Fundamental Set Calculations
-#### 5.2.1.1 The Union Operator (`|`) and Method Equivalent (`.union()`)
-#### 5.2.1.2 The Intersection Operator (`&`) and Method Equivalent (`.intersection()`)
-#### 5.2.1.3 The Difference Operator (`-`) and Method Equivalent (`.difference()`)
-#### 5.2.1.4 The Symmetric Difference Operator (`^`) and Method Equivalent (`.symmetric_difference()`)
+### The Hash and Equality Contract
 
-### 5.2.2 In-Place Memory Mutation (Destructive Updates)
-#### 5.2.2.1 Modifying Heap Collections Directly via `.intersection_update()`
-#### 5.2.2.2 Differential Mutator Operations via `.difference_update()`
+#### `__hash__()` as the Stable Integer Descriptor Used for Table Placement
 
-### 5.2.3 Structural Relationship Evaluation
-#### 5.2.3.1 Containment and Scope Testing: Identifying Subsets (`.issubset()`) and Supersets (`.issuperset()`)
-#### 5.2.3.2 Intersection Disjoint Verification via `.isdisjoint()`
+#### `__eq__()` as the Equality Check Used After Candidate Slot Discovery
 
-## 5.3 Dictionaries (`dict`) — Key-Value Associated Mapping
+#### The Required Invariant: Equal Objects Must Produce Equal Hash Values
 
-### 5.3.1 Foundations of Associative Mapping
-#### 5.3.1.1 Structural Syntax: The Key-Value Paradigm and Curly-Brace `{}` Literals
-#### 5.3.1.2 Integrity Constraints: Why Dictionary Keys Must Be Immutable and Universally Hashable
-#### 5.3.1.3 Value Flexibility: Storing Arbitrary, Nested Data Types and Mutable Heap Objects
+#### Hash Stability: Why Keys and Set Elements Must Not Change Their Hash-Relevant State While Stored
 
-### 5.3.2 CPython Architectural Evolution
-#### 5.3.2.1 The Classic Hash Table Design: Unordered Item Management via Sparse Arrays (Pre-Python 3.7)
-#### 5.3.2.2 The Modern Compact Dictionary: How CPython Splits Storage into a Dense Key/Value Array and a Small Index Array to Preserve Insertion Order and Reduce Memory Footprint (Post-Python 3.7 / Raymond Hettinger Blueprint)
-#### 5.3.2.3 Algorithmic Efficiency Matrix: Amortized O(1) Complexity for Key Insertion, Value Retrieval, and Structural Deletion
+## Unordered Unique Domains: The Set Architecture (`set`)
 
-### 5.3.3 Querying, Manipulating, and Mutating Dictionary States
-#### 5.3.3.1 Explicit Lookups and the `KeyError` Boundary vs. Safe Ingestion via the `.get()` Method and Default Values
-#### 5.3.3.2 View Objects Subsystems: Interrogating `.keys()`, `.values()`, and `.items()` Dynamic Proxies
-#### 5.3.3.3 The Mutation Trap: Why Mutating a Dictionary's Geometry During View Object Iteration Triggers Immediate Runtime Exceptions
-#### 5.3.3.4 Dynamic Modifications: In-Place Mutation, Dictionary Merging Operators (`|`, `|=`), and Key-Value Eviction Subsystems (`.pop()`, `del`)
+### Mathematical Foundations and Structural Syntax
+
+#### Defining Unique Unordered Domains Using the Curly-Brace `{}` Construct
+
+#### Instantiation Boundaries: Differentiating Empty Set Initialization `set()` from Empty Dictionary Literal Declaration `{}`
+
+#### Set Comprehensions as Hash-Based Filtering Structures
+
+### Constraints of Element Ingestion and Runtime Engines
+
+#### The Uniqueness Invariant: Automated De-Duplication Mechanics at Runtime
+
+#### The Hashability Criterion: Value Equality, Hash Stability, and Table Placement Requirements
+
+#### CPython Open-Addressing Architecture: Hash Table Slots, Collision Probing, Empty Slots, and Deleted-Entry Markers
+
+#### Algorithmic Efficiency Matrix: Amortized O(1) Membership Lookups vs. O(N) Sequential Traversal
+
+### Core Set Mutation Operations
+
+#### Adding Elements with `.add()`
+
+#### Removing Elements with `.remove()`, `.discard()`, `.pop()`, and `.clear()`
+
+#### Membership Testing with `in`
+
+### Immutable Set Variants
+
+#### `frozenset` as an Immutable Hashable Set-Like Object
+
+#### Using `frozenset` as a Dictionary Key or Set Element
+
+## Set Mathematical Operators and Mutator Methods
+
+### Fundamental Set Calculations
+
+#### The Union Operator (`|`) and Method Equivalent (`.union()`)
+
+#### The Intersection Operator (`&`) and Method Equivalent (`.intersection()`)
+
+#### The Difference Operator (`-`) and Method Equivalent (`.difference()`)
+
+#### The Symmetric Difference Operator (`^`) and Method Equivalent (`.symmetric_difference()`)
+
+### In-Place Memory Mutation
+
+#### Destructive Union Updates via `.update()`
+
+#### Destructive Intersection Updates via `.intersection_update()`
+
+#### Destructive Difference Updates via `.difference_update()`
+
+#### Destructive Symmetric Difference Updates via `.symmetric_difference_update()`
+
+### Structural Relationship Evaluation
+
+#### Containment and Scope Testing: Identifying Subsets (`.issubset()`) and Supersets (`.issuperset()`)
+
+#### Intersection Disjoint Verification via `.isdisjoint()`
+
+## Dictionaries (`dict`) — Key-Value Associative Mappings
+
+### Foundations of Associative Mapping
+
+#### Structural Syntax: The Key-Value Paradigm and Curly-Brace `{}` Literals
+
+#### Integrity Constraints: Why Dictionary Keys Must Be Hashable and Hash-Stable
+
+#### Value Flexibility: Storing Arbitrary, Nested Data Types and Mutable Heap Objects
+
+#### Membership Testing: Why `x in d` Checks Keys, Not Values
+
+### Dictionary Construction Patterns
+
+#### Literal Construction with `{key: value}` Pairs
+
+#### Constructor-Based Construction with `dict()`
+
+#### Dictionary Comprehensions as Key-Value Generation Pipelines
+
+#### Building Dictionaries from Pair Sequences
+
+### CPython Architectural Evolution
+
+#### The Classic Dictionary Model: Sparse Hash Table Storage and Historically Unspecified Iteration Order
+
+#### The Modern Compact Dictionary: Dense Entry Storage, Sparse Indexing, Memory Reduction, and Insertion-Order Preservation
+
+#### Algorithmic Efficiency Matrix: Amortized O(1) Complexity for Key Insertion, Value Retrieval, and Structural Deletion
+
+### Ordering Guarantees and Misconceptions
+
+#### Dictionary Insertion Order: Preserved Order Is Not Sorted Order
+
+#### Set Iteration Order: Why Sets Remain Unordered Even When They Appear Stable in Small Examples
+
+### Querying, Manipulating, and Mutating Dictionary States
+
+#### Explicit Lookups and the `KeyError` Boundary vs. Safe Access via `.get()`
+
+#### Default Insertion Patterns with `.setdefault()`
+
+#### View Object Subsystems: Interrogating `.keys()`, `.values()`, and `.items()` Dynamic Proxies
+
+#### Dynamic Views: Why Dictionary Views Reflect Later Dictionary Mutations
+
+#### The Mutation Trap: Why Mutating Dictionary Geometry During Iteration Triggers Runtime Exceptions
+
+#### Dynamic Modifications: In-Place Mutation, Dictionary Merging Operators (`|`, `|=`), and Key-Value Eviction (`.pop()`, `del`)

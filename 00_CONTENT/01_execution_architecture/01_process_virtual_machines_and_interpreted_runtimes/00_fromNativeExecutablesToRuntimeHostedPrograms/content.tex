@@ -1,0 +1,708 @@
+\subsection{From Native Executables to Runtime-Hosted Programs}
+
+
+\subsubsection{What Actually Runs When We Run a Python File?}
+
+When a user writes and executes a command such as:
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+it is tempting to say that the operating system runs the file \texttt{script.py}. This is not accurate. The operating system does not normally execute the Python source file directly. The file \texttt{script.py} is not a native executable binary in the same sense as a compiled C program. It does not contain machine instructions arranged in an ELF or PE/COFF executable format. It does not have a native text segment, a native executable entry point, or direct processor instructions produced from the user's source code.
+
+What the operating system actually runs is the Python interpreter executable. On Linux or other Unix-like systems, this executable is often called \texttt{python}, \texttt{python3}, or something similar. On Windows, it is commonly \texttt{python.exe}. This interpreter executable is a native program. It has been compiled, assembled, linked, and stored in an executable format that the operating system loader understands.
+
+Therefore, when the command is launched, the first native process created by the operating system is not a process whose executable image is \texttt{script.py}. It is a process whose executable image is the Python interpreter:
+
+\begin{verbatim}
+operating system
+    loads native executable: python / python.exe
+        |
+        v
+CPython interpreter process
+    receives script.py as an argument
+        |
+        v
+CPython opens, parses, compiles, and executes script.py
+\end{verbatim}
+
+The Python file is input to the interpreter process. It is closer to data consumed by a runtime engine than to a native binary image loaded directly by the kernel. The interpreter process receives the file path \texttt{script.py} through the normal command-line argument mechanism. Once the CPython executable has started, it examines its arguments, finds the script name, opens the source file, reads the Python code, compiles it to an internal bytecode representation, and executes that bytecode inside the interpreter runtime.
+
+This creates two distinct execution layers:
+
+\begin{itemize}
+    \item the \textbf{native operating-system layer}, where the executable \texttt{python} or \texttt{python.exe} is loaded as a normal process;
+    \item the \textbf{Python runtime layer}, where \texttt{script.py} is treated as source code to be compiled and executed by CPython.
+\end{itemize}
+
+At the native layer, the CPU executes machine instructions belonging to the interpreter executable and its native libraries. These instructions are stored in the text segment of the CPython process. The operating system scheduler gives CPU time to this process or to its native threads. The kernel sees it as an ordinary native process with virtual memory, mapped libraries, file descriptors or handles, stack, heap, and scheduling state.
+
+At the Python layer, the user's program is represented by Python objects, code objects, bytecode instructions, module namespaces, function frames, and managed heap allocations. These do not exist as independent operating-system processes. They exist inside the CPython process.
+
+This distinction is the main architectural difference between running a compiled C program and running a Python source file. In the ordinary C model, the user's source code is transformed into the native executable itself:
+
+\begin{verbatim}
+hello.c
+    |
+    | compile, assemble, link
+    v
+hello executable
+    |
+    | OS loader
+    v
+running process
+\end{verbatim}
+
+In the ordinary Python model, the interpreter is already the native executable:
+
+\begin{verbatim}
+script.py
+    |
+    | input to CPython
+    v
+Python bytecode and runtime objects
+    |
+    | executed by CPython interpreter process
+    v
+behavior produced by the running interpreter
+\end{verbatim}
+
+A more complete Python execution chain looks like this:
+
+\begin{verbatim}
+python executable
+    |
+    | OS loader maps native interpreter process
+    v
+CPython process starts
+    |
+    | reads script.py
+    v
+source text
+    |
+    | tokenizer and parser
+    v
+AST
+    |
+    | compiler
+    v
+code object / bytecode
+    |
+    | evaluation loop
+    v
+Python-level execution
+\end{verbatim}
+
+The physical processor does not understand Python bytecode directly. Python bytecode is not x86-64, ARM64, or another hardware instruction set. It is an instruction stream for the CPython virtual machine. The processor executes the native machine instructions of CPython. CPython's interpreter loop then reads Python bytecode instructions and performs the corresponding runtime operations.
+
+For example, a Python statement such as:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+does not become a native instruction sequence in the usual CPython execution model. Instead, CPython compiles it into bytecode operations that load the objects bound to \texttt{a} and \texttt{b}, perform Python's addition protocol, and bind the result to the name \texttt{x}. The interpreter loop executes these bytecode instructions by running native C code inside the CPython process.
+
+This is why saying that Python is simply ``not compiled'' is misleading. CPython does compile Python source code, but not usually into native machine code. It compiles source code into bytecode for its own virtual machine. That bytecode is then interpreted. Therefore, in CPython, Python execution contains both compilation and interpretation:
+
+\begin{verbatim}
+Python source code
+    -> compiled to Python bytecode
+    -> interpreted by the CPython virtual machine
+\end{verbatim}
+
+The result is very different from traditional C execution:
+
+\begin{verbatim}
+C source code
+    -> compiled to native machine code
+    -> loaded and executed directly as a process
+\end{verbatim}
+
+This also explains why Python can be interactive. In an interactive Python session, the interpreter process is already running. Each line or block entered by the user is read, parsed, compiled, and executed inside the existing process. The operating system is not creating a new native process for every expression typed at the prompt. The interpreter process remains alive and repeatedly processes new pieces of Python source code.
+
+For example:
+
+\begin{verbatim}
+>>> x = 10
+>>> x + 5
+15
+\end{verbatim}
+
+The name \texttt{x} persists because it is stored in the interpreter's current namespace, not because a native executable was rebuilt. The runtime environment remains active between inputs. This behavior would be unnatural in the traditional C compilation model, where source is normally compiled and linked before execution.
+
+The same explanation applies to notebooks. In a Jupyter notebook, the visible cells are not separate native programs. A Python kernel process is running in the background. Each executed cell is sent to that kernel, compiled, and executed in the kernel's runtime state. Variables remain available across cells because the same interpreter process and namespace continue to exist.
+
+This means that Python execution is process-hosted rather than directly source-file-hosted. The host process is CPython. The Python source file, interactive input, or notebook cell becomes material processed by that host process.
+
+There are tools that can package Python applications into executable-looking files, and there are alternative implementations or compilers that change parts of this picture. However, the standard teaching model for CPython is clear: the operating system runs the interpreter executable; the interpreter runs the Python program.
+
+This distinction will be used throughout the rest of the course. When we later discuss Python objects, variables, functions, modules, bytecode, frames, garbage collection, generators, coroutines, and exceptions, all of these are runtime structures inside the interpreter process. They are not separate operating-system processes, and they are not direct native-machine structures in the same way C stack variables or compiled function instructions are.
+
+Thus, the answer to the question ``what actually runs when we run a Python file?'' is layered. At the operating-system level, the CPython interpreter executable runs. At the Python-language level, the user's source file is compiled to bytecode and executed by that interpreter. The user experiences this as running \texttt{script.py}, but the machine is executing the native interpreter that hosts the script.
+
+
+\subsubsection{The Native Interpreter Process: CPython as the Executable Loaded by the Operating System}
+
+When Python code is executed through the usual CPython implementation, the native executable loaded by the operating system is not the user's \texttt{.py} file. The native executable is the CPython interpreter itself. This distinction separates the operating-system execution layer from the Python language execution layer.
+
+The file \texttt{script.py} is source text. It contains Python statements, expressions, function definitions, class definitions, imports, and other language constructs. But it is not a native binary program. It does not contain an ELF header on Linux or a PE/COFF executable header on Windows. It does not contain processor instructions arranged for direct execution by x86-64, ARM64, or another physical instruction set. It is not mapped by the operating system as the process text segment.
+
+By contrast, the CPython interpreter is a native executable. On Linux, this may be a file such as:
+
+\begin{verbatim}
+python3
+\end{verbatim}
+
+On Windows, it may be:
+
+\begin{verbatim}
+python.exe
+\end{verbatim}
+
+This executable has already gone through the native compilation pipeline. CPython is written mostly in C. Its source code is compiled, assembled, linked, and packaged as an executable binary for a specific operating system and processor architecture. Therefore, when the operating system creates a process for Python execution, it is creating a process from the CPython executable image.
+
+A simplified view is:
+
+\begin{verbatim}
+python / python.exe
+    native executable loaded by the OS
+        |
+        v
+CPython process
+    reads and executes script.py
+\end{verbatim}
+
+The operating system loader performs the same kind of work for CPython that it performs for any other native executable. It validates the executable format, maps code and data segments into virtual memory, prepares the stack, processes dynamic library dependencies, applies required relocations, initializes the execution context, and transfers control to the interpreter's native entry point.
+
+At this level, CPython is not special. It is a normal native process. It has:
+
+\begin{itemize}
+    \item a text segment containing compiled machine instructions of the interpreter;
+    \item data and BSS regions containing native global and static runtime state;
+    \item a process heap used by CPython's allocator and the C runtime allocator;
+    \item one or more native stacks used by interpreter and library calls;
+    \item mapped shared libraries;
+    \item file descriptors or handles;
+    \item command-line arguments;
+    \item environment variables;
+    \item a scheduler-visible process identity.
+\end{itemize}
+
+Only after this native interpreter process exists can the user's Python source code begin to matter. The file name \texttt{script.py} is passed to the interpreter as a command-line argument. CPython then opens the file, reads its contents, tokenizes the source, parses it, builds internal structures, compiles it to bytecode, and evaluates that bytecode.
+
+This means that the physical CPU is always executing native machine code. However, the native machine code belongs to the CPython interpreter, not directly to the user's Python source file. The Python program is executed because CPython's native code implements a virtual execution engine for Python bytecode.
+
+A useful layered view is:
+
+\begin{verbatim}
+physical CPU
+    executes native machine instructions
+        |
+        v
+CPython interpreter executable
+    implements Python runtime and bytecode evaluation
+        |
+        v
+Python bytecode
+    represents compiled form of user's Python source
+        |
+        v
+Python program behavior
+\end{verbatim}
+
+This also explains why the Python interpreter must match the operating system and architecture. A Windows \texttt{python.exe} is not the same binary as a Linux \texttt{python3} executable. A CPython binary compiled for x86-64 is not the same as one compiled for ARM64. The interpreter itself is native software and must be compatible with the platform on which it runs.
+
+The Python source file, however, is mostly platform-independent at the source level, provided it does not depend on platform-specific libraries, paths, encodings, or system behavior. The same \texttt{script.py} file may be read by CPython on Linux, Windows, or macOS. This is possible because the source file is not directly executed by the processor. It is interpreted by a platform-specific CPython executable that provides a common Python language runtime.
+
+This pattern is not unique to Python. Many language systems use a native host process that executes user code through a runtime layer. The exact internal strategy differs, but the architectural separation remains the same: the operating system runs the runtime executable; the runtime executes the user's program representation.
+
+For example, PHP is also commonly executed through a native runtime. A PHP source file is not normally loaded by the operating system as a native executable. Instead, a PHP runtime executable or server module receives the PHP file, parses it, compiles it into internal opcodes, and executes those opcodes inside the PHP engine. In modern PHP, this compilation usually happens in memory, although opcode caches may preserve compiled forms to avoid repeated compilation. The user writes \texttt{.php} source code, but the native process is the PHP engine, the web server module, PHP-FPM worker, or command-line PHP executable that hosts and executes it.
+
+JavaScript in V8 follows another variation. V8 is a JavaScript engine, but it is usually embedded inside another native application. In the browser, V8 is embedded inside a browser process. In Node.js, V8 is embedded inside the Node.js runtime. In Electron applications, V8 appears through the Chromium/Node-based application stack. Applications such as Visual Studio Code use this general model: the visible application is a native desktop program built around an embedded web/runtime engine, and JavaScript or TypeScript-derived code runs inside that hosted environment. Here again, the operating system does not run a \texttt{.js} file directly as a native executable. It runs the browser, Node.js, or Electron application, and the embedded engine executes the JavaScript program.
+
+Bash shows a different and more direct interpretation model. A shell script is usually read by the shell process as text. Bash interprets the script command by command. For shell built-ins, the shell may execute the operation inside the shell process itself. For external commands such as:
+
+\begin{verbatim}
+ls
+cat
+grep
+\end{verbatim}
+
+the shell typically creates a child process and asks the operating system to execute the corresponding native program. Control moves back and forth between the shell process and child processes. The script is interpreted by Bash, but many individual commands are separate native executables launched as child processes.
+
+A simplified Bash execution model is:
+
+\begin{verbatim}
+bash script.sh
+    |
+    v
+Bash process reads command text
+    |
+    +--> built-in command executed inside Bash
+    |
+    +--> external command:
+            fork / create child process
+            exec native program such as ls, cat, grep
+            wait or continue depending on shell syntax
+\end{verbatim}
+
+This is different from CPython bytecode execution. CPython usually compiles a Python source file into bytecode and then runs that bytecode inside the interpreter process. Bash more directly reads command syntax and dispatches commands. Some commands remain inside the shell; others cause process creation and native executable loading. Therefore, Bash is closer to real command-by-command interpretation, while Python is better described as source-to-bytecode compilation followed by bytecode interpretation inside a runtime.
+
+These examples show that the phrase ``interpreted language'' is too vague if used alone. Different runtimes place the boundary in different places:
+
+\begin{itemize}
+    \item CPython compiles Python source into bytecode and interprets that bytecode inside the CPython process;
+    \item PHP commonly compiles source into engine opcodes in memory and executes those opcodes inside the PHP runtime;
+    \item V8 is a JavaScript engine embedded in host programs such as browsers, Node.js, or Electron-style applications, and may use several execution tiers including interpretation and JIT compilation;
+    \item Bash reads shell commands and often alternates between interpreting built-ins inside the shell and launching external native child processes.
+\end{itemize}
+
+The command:
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+can therefore be understood as two different operations joined into one user-visible action:
+
+\begin{enumerate}
+    \item the operating system starts the native CPython executable;
+    \item CPython reads and executes the Python script inside that process.
+\end{enumerate}
+
+The first operation is native process creation. The second operation is runtime-hosted language execution.
+
+This distinction is also visible when using an interactive Python shell. When the user starts:
+
+\begin{verbatim}
+python
+\end{verbatim}
+
+without a script file, the operating system still loads and starts the same native interpreter executable. But instead of reading a complete source file from disk, CPython enters an interactive loop. It reads input from the user, compiles each complete statement or block, executes it, prints results when appropriate, and waits for more input. The interpreter process stays alive across many small pieces of source code.
+
+The same principle applies to Jupyter notebooks. The visible notebook cells are not independent native programs. A Python kernel process is already running. Each executed cell is sent to the kernel, compiled, and executed inside that process. Variables persist across cells because they live in the continuing interpreter runtime state, not because each cell becomes a separate executable.
+
+The native interpreter process also owns the Python runtime environment. Python objects are allocated inside memory managed by CPython. Python function calls produce Python-level frames or internal frame structures. Python modules are represented by module objects and namespace dictionaries. Python exceptions are represented by runtime objects and propagated through interpreter-managed frame state. These structures exist inside the CPython process address space.
+
+For example, when Python code creates a list:
+
+\begin{verbatim}
+values = [1, 2, 3]
+\end{verbatim}
+
+the operating system does not create a new native process or a new executable segment for this list. CPython allocates Python objects inside its managed heap. The name \texttt{values} becomes a binding in a Python namespace to a list object. That list object stores references to other Python objects. All of this is interpreter-level runtime state inside the already existing native process.
+
+This layered architecture also explains why native extension modules are possible. Some Python modules are not written purely in Python. They may be compiled shared libraries loaded into the CPython process. When CPython imports such a module, the operating system dynamic loader may map additional native code into the interpreter process. The Python program still appears to import a module, but the implementation crosses into native binary code.
+
+A simplified picture is:
+
+\begin{verbatim}
+CPython process
+    native interpreter code
+    Python runtime heap
+    Python bytecode objects
+    loaded Python modules
+    loaded native extension modules
+\end{verbatim}
+
+This is why Python sometimes behaves like a high-level interpreted language and sometimes exposes native dependency problems. The user's code may be Python source, but the interpreter and many libraries may depend on compiled C, C++, Fortran, or system libraries.
+
+For students coming from C, the key point is that CPython is itself a C program running as a native process. The Python program is not outside this process. It is not directly run by the operating system. It is represented and executed inside CPython's memory, using CPython's runtime rules.
+
+This gives the Python execution model a different shape from the C model:
+
+\begin{verbatim}
+C:
+    user source code
+        -> native executable
+        -> operating-system process
+
+Python:
+    CPython executable
+        -> operating-system process
+        -> reads user source code
+        -> creates bytecode and runtime objects
+        -> executes them inside the interpreter
+\end{verbatim}
+
+Therefore, the native interpreter process is the real operating-system object behind ordinary Python execution. The kernel schedules CPython. The loader maps CPython. The CPU executes CPython's native instructions. The Python file is handled later, by the interpreter, as source input to a managed runtime. Understanding this separation is the foundation for understanding Python bytecode, frames, objects, namespaces, memory management, and runtime introspection.
+
+
+
+\subsubsection{The User Script as Runtime Input: Source File, Module Body, and First Executable Statement}
+
+Once the interpreter process already exists, the user's Python file becomes runtime input. At this level we are no longer discussing how the operating system loads the interpreter executable. We are now discussing what CPython does with the source file it receives.
+
+A file such as \texttt{script.py} is a text file containing Python source code. CPython reads that text and treats it as a \textbf{module body}: a top-level sequence of Python statements. The module body is not only a collection of declarations. It is executable code. Statements placed at the top level of the file are executed in order.
+
+For example:
+
+\begin{verbatim}
+print("before")
+
+x = 10
+
+def f():
+    print("inside f")
+
+print("after")
+\end{verbatim}
+
+Execution starts at the first top-level statement:
+
+\begin{verbatim}
+print("before")
+\end{verbatim}
+
+Then the assignment statement is executed:
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+Then the \texttt{def} statement is executed. This is important: executing a function definition does not execute the body of the function. It creates a function object and binds the name \texttt{f} to that object in the module namespace. The body of \texttt{f} runs only if the function is later called.
+
+Therefore, the top-level execution order is:
+
+\begin{verbatim}
+1. execute print("before")
+2. bind x to the integer object 10
+3. create function object f
+4. bind name f to that function object
+5. execute print("after")
+\end{verbatim}
+
+The function body:
+
+\begin{verbatim}
+print("inside f")
+\end{verbatim}
+
+is not part of the immediate module execution path. It is compiled as part of the function's code object, but it is executed only when the function is called.
+
+This is different from the C model. In C, the programmer's ordinary execution entry is conventionally the function \texttt{main()}. Top-level declarations in C do not execute as a sequence of runtime statements in the same way Python module statements do. In Python, the file itself has an executable body. A function named \texttt{main} has no automatic special status unless the programmer explicitly calls it.
+
+For example:
+
+\begin{verbatim}
+def main():
+    print("program logic")
+\end{verbatim}
+
+This file creates a function object named \texttt{main}, but it does not run that function. To execute it, the file must contain a call:
+
+\begin{verbatim}
+def main():
+    print("program logic")
+
+main()
+\end{verbatim}
+
+A common Python convention is:
+
+\begin{verbatim}
+def main():
+    print("program logic")
+
+if __name__ == "__main__":
+    main()
+\end{verbatim}
+
+This pattern separates two roles of the same file. If the file is executed directly, the special module variable \texttt{\_\_name\_\_} receives the value \texttt{"\_\_main\_\_"}, and \texttt{main()} is called. If the file is imported as a module, \texttt{\_\_name\_\_} receives the module's import name, and the guarded call is skipped.
+
+This distinction is central to Python's module system. A Python file can be used as:
+
+\begin{itemize}
+    \item a \textbf{script}, where the module body is executed as the main program;
+    \item an \textbf{imported module}, where the module body is executed to create definitions and bindings for reuse.
+\end{itemize}
+
+Importing a module still executes its top-level body once. This often surprises students coming from C. Python's \texttt{import} is not equivalent to C's \texttt{\#include}. C header inclusion is source-text insertion before compilation. Python import is runtime module loading. It creates or retrieves a module object, executes its body if needed, and then binds a name to that module or imports selected names from it.
+
+For example, suppose \texttt{tools.py} contains:
+
+\begin{verbatim}
+print("loading tools")
+
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+If another file contains:
+
+\begin{verbatim}
+import tools
+\end{verbatim}
+
+then the top-level statement:
+
+\begin{verbatim}
+print("loading tools")
+\end{verbatim}
+
+runs during the import, and the function object \texttt{add} is created inside the module namespace. The function body of \texttt{add} still does not run until \texttt{tools.add(...)} is called.
+
+At runtime, CPython represents the compiled module body as a code object. That code object contains bytecode for the top-level statements of the file. Function definitions, class definitions, imports, assignments, and ordinary expressions are all represented as executable operations inside that module-level code object.
+
+A simplified view is:
+
+\begin{verbatim}
+script.py source text
+    |
+    v
+module-level code object
+    |
+    v
+module namespace dictionary
+    |
+    v
+top-level statements execute in order
+\end{verbatim}
+
+The module namespace is where top-level names are stored. If the script contains:
+
+\begin{verbatim}
+a = 10
+b = 20
+\end{verbatim}
+
+then execution creates bindings in the module namespace. The names \texttt{a} and \texttt{b} are not fixed native memory boxes like C local variables. They are entries in a Python namespace pointing to Python objects.
+
+This idea also explains interactive execution. In an interactive Python prompt, the user does not provide a complete file. Instead, the interpreter repeatedly receives smaller source fragments. Each complete statement or block is compiled and executed in the current interactive namespace. The persistent namespace is why this works:
+
+\begin{verbatim}
+>>> x = 10
+>>> x + 5
+15
+\end{verbatim}
+
+The second input can use \texttt{x} because the first input created a binding in the still-existing interpreter state.
+
+Jupyter notebooks behave similarly. A notebook cell is source input sent to a running Python kernel. The cell is compiled and executed in the kernel's current namespace. Variables persist across cells because the kernel process and its runtime namespace remain alive.
+
+Other runtime-hosted languages use related but not identical input models.
+
+In PHP, a \texttt{.php} file is also a source file consumed by a runtime engine. The PHP engine parses the file, compiles it into internal opcodes, and executes the top-level script body. In command-line PHP, this resembles direct script execution. In web use, a PHP-FPM worker or server-integrated PHP runtime may execute the script body as part of a request. Modern PHP can cache opcodes, but the important model is that the source file is compiled into engine instructions and executed by the PHP runtime, not loaded as a native executable by itself.
+
+In JavaScript systems using V8, the script or module source is input to an engine embedded inside a host. In a browser, the host is the browser. In Node.js, the host is the Node runtime. In Electron applications, the host is an application stack built around Chromium and Node-related components. Applications such as Visual Studio Code use this kind of embedded-runtime architecture. The JavaScript file is not the operating-system process image. It is source input compiled and executed inside the embedded engine and its host environment.
+
+Java differs because the usual runtime input is not source text. A Java source file is normally compiled first:
+
+\begin{verbatim}
+Main.java
+    |
+    | javac
+    v
+Main.class
+\end{verbatim}
+
+The JVM then receives bytecode class files or archives such as JAR files. Execution begins from a selected static method with the conventional signature:
+
+\begin{verbatim}
+public static void main(String[] args)
+\end{verbatim}
+
+So Java has an explicit source-to-bytecode step before normal execution. Python and PHP usually hide this compilation step inside the runtime invocation. Java exposes it as a separate build step.
+
+Bash is different again. A shell script is closer to command-by-command interpretation. Bash reads the script as command text. Some commands are shell built-ins and execute inside the Bash process. Other commands are external programs, so Bash creates child processes and asks the operating system to execute those native programs.
+
+For example:
+
+\begin{verbatim}
+echo "files:"
+ls
+cat notes.txt
+\end{verbatim}
+
+The \texttt{echo} command may be handled as a shell built-in. The commands \texttt{ls} and \texttt{cat} are commonly external executables. Bash interprets the script structure, expands variables and patterns, prepares redirections or pipes, and launches child processes for external commands. This is much closer to direct command dispatch than CPython's module-to-bytecode execution model.
+
+The comparison can be summarized as follows:
+
+\begin{itemize}
+    \item \textbf{Python}: source file becomes a module body, compiled to bytecode and executed in a module namespace;
+    \item \textbf{PHP}: source file becomes a script body, compiled to engine opcodes and executed by the PHP runtime;
+    \item \textbf{V8 JavaScript}: source or module input is compiled and executed inside an embedded engine hosted by a browser, Node.js, or Electron-like application;
+    \item \textbf{Java}: source is normally compiled ahead of execution into JVM bytecode, and the JVM starts from a selected \texttt{main} method;
+    \item \textbf{Bash}: script text is interpreted as shell commands, with built-ins executed in the shell and external commands launched as child processes.
+\end{itemize}
+
+For Python, the important conclusion is precise: the user's file is a module-level source input. Its top-level statements form the first executable Python path. Function and class bodies are compiled and stored for later execution, but they do not run merely because they are defined. Execution begins with the first top-level statement of the module body, inside the already initialized Python runtime.
+
+
+
+\subsubsection{Runtime Ownership of Execution State: Frames, Objects, Bytecode, and Managed Memory}
+
+After the user's source has been accepted as runtime input, the next important question is: who owns the execution state? In a native C program, much of the execution state is directly expressed through native stack frames, registers, machine-code instruction addresses, raw memory addresses, and manually managed heap allocations. In Python, the user's program state is not owned directly by the hardware in that form. It is owned by the CPython runtime.
+
+This means that Python execution is represented through runtime structures created and managed by the interpreter. The processor still executes native machine instructions, but those native instructions belong to CPython. The user's program advances because CPython reads Python bytecode, maintains Python execution frames, allocates Python objects, updates namespaces, handles exceptions, and manages object lifetime.
+
+A simplified CPython-level execution model is:
+
+\begin{verbatim}
+Python source
+    |
+    v
+code object containing bytecode
+    |
+    v
+Python execution frame
+    |
+    v
+bytecode evaluation loop
+    |
+    v
+Python objects, namespaces, exceptions, and return values
+\end{verbatim}
+
+The central execution unit is not a native instruction from the user's source file. It is a Python bytecode instruction stored inside a code object. The code object represents compiled Python code. It contains bytecode plus metadata needed by the interpreter, such as constants, variable names, free-variable information, and other structural details.
+
+For example, a Python function definition creates a function object that refers to a code object:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+The body of \texttt{add} is compiled into a code object. When \texttt{add(2, 3)} is called, CPython creates a new execution frame for that call. The frame stores the runtime state needed to execute the function: local bindings, links to global and built-in namespaces, the current bytecode position, and the evaluation stack used by bytecode operations.
+
+This frame is not the same thing as a C stack frame. CPython itself uses native C stack frames while running its interpreter code, but Python function calls are represented at the language-runtime level by Python frames or internal frame structures. A Python local variable is not simply a raw slot in the native process stack. It is a Python-level name or local slot referring to a Python object.
+
+For example:
+
+\begin{verbatim}
+def f():
+    x = 10
+    y = x + 5
+    return y
+\end{verbatim}
+
+When \texttt{f()} runs, the integer objects and name bindings are managed by CPython. The name \texttt{x} refers to a Python integer object. The name \texttt{y} later refers to another Python integer object. The execution frame records these bindings and the current progress through the bytecode. The hardware does not know that a Python variable named \texttt{x} exists. CPython knows.
+
+This is why Python execution state is inspectable in ways that native C execution state usually is not. Python can expose objects, types, frames, tracebacks, globals, locals, functions, closures, and bytecode-level information because these are runtime-managed structures. They are not merely temporary consequences of native machine execution; they are represented as objects or internal records inside the interpreter.
+
+The object model is also runtime-owned. In C, an \texttt{int} local variable may be a fixed-width value stored directly in a stack slot or register. In Python, an integer value is an object. A list is an object. A function is an object. A class is an object. A module is an object. The runtime tracks these objects, stores their type information, manages references to them, and decides when their memory can be reclaimed.
+
+A simplified Python binding looks like this:
+
+\begin{verbatim}
+name in namespace
+        |
+        v
+reference to Python object
+        |
+        v
+object header + type pointer + value-specific data
+\end{verbatim}
+
+The name is not the object. The name is a binding. The object lives in memory managed by CPython. Multiple names can refer to the same object. Function arguments are also new local bindings to existing objects, not automatic deep copies of object contents.
+
+This managed object model also controls memory lifetime. In C, the programmer often decides directly when heap memory is allocated and freed through \texttt{malloc()} and \texttt{free()}. In Python, ordinary user code does not call \texttt{free()} on every object. CPython tracks object references and reclaims memory when objects are no longer reachable according to its memory-management rules. CPython primarily uses reference counting, with additional garbage collection for certain cyclic object graphs.
+
+Therefore, Python memory management exists above the native heap. CPython uses the process heap and its own allocator mechanisms internally, but the Python programmer usually sees object creation and object reachability, not raw allocation and deallocation calls.
+
+The same principle applies to exceptions. In C, error handling is often represented through return codes, special values, flags, or manually checked pointers. In Python, an exception is a runtime object routed through interpreter-managed frames. When an exception is raised, CPython does not merely return a special integer. It creates or propagates an exception object, unwinds Python frames, searches for a matching handler, and constructs traceback information describing the route of failure.
+
+This is runtime ownership of control state. The interpreter knows which Python frames are active, where execution is suspended or failing, which handlers exist, and where control should continue if an exception is caught.
+
+Other runtime-hosted languages follow the same broad idea, although their internal structures differ.
+
+In PHP, the PHP engine owns the script execution state. PHP source is compiled into internal opcodes. Those opcodes are executed by the Zend Engine. Variables live in PHP runtime symbol tables and value containers, not as direct native C variables belonging to the user's source. Function calls create runtime call frames managed by the engine. Object lifetime is handled by the PHP runtime, which uses reference counting and garbage collection mechanisms. As with Python, the user's script behavior is produced by a native engine maintaining language-level execution state.
+
+A simplified PHP model is:
+
+\begin{verbatim}
+PHP source
+    |
+    v
+PHP opcodes
+    |
+    v
+Zend Engine call frames and symbol tables
+    |
+    v
+PHP values and objects managed by the runtime
+\end{verbatim}
+
+In Java, the JVM owns the execution state of Java bytecode. A Java source file is normally compiled ahead of time into \texttt{.class} files containing JVM bytecode. At runtime, the JVM loads classes, verifies bytecode, creates stack frames for method calls, manages the heap, performs garbage collection, and may compile hot bytecode paths into native machine code using a JIT compiler. The Java method frame is a JVM-level structure with local variables and an operand stack. Java objects live on the JVM-managed heap. The operating system runs the JVM process; the JVM runs the Java program.
+
+A simplified Java model is:
+
+\begin{verbatim}
+.class bytecode
+    |
+    v
+JVM method frames
+    |
+    v
+operand stacks and local variable arrays
+    |
+    v
+JVM heap objects and garbage collection
+\end{verbatim}
+
+In V8, JavaScript execution state is owned by the JavaScript engine embedded inside a host program. The host may be a browser, Node.js, or an Electron-style application. V8 parses JavaScript, creates internal representations, executes bytecode, gathers profiling information, and may compile frequently executed paths into optimized native code. JavaScript objects, closures, lexical environments, promises, and call frames are engine-managed structures. The surrounding host supplies APIs such as timers, file operations in Node.js, DOM access in browsers, or application-level services in Electron programs such as Visual Studio Code.
+
+A simplified V8 model is:
+
+\begin{verbatim}
+JavaScript source
+    |
+    v
+V8 internal code representation / bytecode
+    |
+    v
+V8 execution frames and lexical environments
+    |
+    v
+JavaScript heap objects and garbage collection
+    |
+    v
+host event loop and external APIs
+\end{verbatim}
+
+Bash is different because its runtime state is closer to command interpretation than to a bytecode virtual machine. Bash owns shell variables, functions, aliases, expansion rules, redirections, pipelines, and job-control state. For shell built-ins, execution happens inside the Bash process. For external commands, Bash creates child processes and the operating system loads native executables such as \texttt{ls}, \texttt{cat}, or \texttt{grep}. Therefore, Bash execution state is split: the shell owns the script interpretation state, but many individual commands own their own separate process state.
+
+A simplified Bash model is:
+
+\begin{verbatim}
+Bash script text
+    |
+    v
+Bash parser and command dispatcher
+    |
+    +--> built-in command:
+    |       shell state changes inside Bash
+    |
+    +--> external command:
+            child process with separate native execution state
+\end{verbatim}
+
+For example, a command such as:
+
+\begin{verbatim}
+cd /tmp
+\end{verbatim}
+
+must be a shell built-in because it changes the current directory of the shell process itself. But a command such as:
+
+\begin{verbatim}
+ls
+\end{verbatim}
+
+usually runs as a separate native program. Bash prepares the arguments, starts the child process, and waits or continues depending on the script structure.
+
+These examples show that runtime ownership has different forms:
+
+\begin{itemize}
+    \item CPython owns Python bytecode, Python frames, Python objects, namespaces, and managed memory;
+    \item PHP owns opcodes, call frames, symbol tables, values, and request/runtime state;
+    \item the JVM owns class metadata, method frames, operand stacks, heap objects, and garbage collection;
+    \item V8 owns JavaScript execution frames, lexical environments, objects, optimized code tiers, and garbage-collected memory;
+    \item Bash owns shell interpretation state, but external commands run in separate native child processes.
+\end{itemize}
+
+The common idea is that the user's high-level program is not directly identical to the native process machinery. A runtime stands between the source-level program and the hardware. That runtime decides how program state is represented, where values live, how calls are tracked, how memory is reclaimed, and how control flow is routed.
+
+For Python, this point is fundamental. The operating system owns the native process boundary. CPython owns the Python execution boundary. The CPU executes CPython's native instructions, but CPython owns the Python-level state: bytecode, frames, objects, namespaces, exceptions, and managed memory. Understanding this separation makes later Python behavior much less mysterious. Variables are bindings, not raw boxes. Function calls create interpreter-managed frames. Exceptions unwind runtime frames. Objects live in managed memory. The Python program runs because the runtime continuously maps bytecode-level operations onto native work performed by the interpreter.

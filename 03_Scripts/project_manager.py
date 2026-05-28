@@ -25,12 +25,14 @@ from typing import Any, Sequence
 
 from flask import Flask, jsonify, request, send_file, send_from_directory
 
+from content_sync_utils import sync_content_tree
 from course_synopsis_utils import (
     apply_reordered_tree,
     export_synopsis_tree_to_markdown,
     load_synopsis,
     save_synopsis,
     save_text_file_atomic,
+    validate_tree,
 )
 
 
@@ -858,7 +860,7 @@ class ProjectManager:
     def __init__(self, config_path: Path) -> None:
         self.config_path = config_path.expanduser().resolve()
         self.config = self._load_config(self.config_path)
-        self.root_dir = self._resolve_root_dir(self.config)
+        self.root_dir = self._resolve_root_dir(self.config, self.config_path)
         self.temp_dir = self._resolve_project_path(self.config.get("temp_dir", "build/temp"))
         self.main_latex_file = str(self.config.get("main_latex_file", "main_document.tex"))
         self.final_bibliography_file = str(
@@ -896,12 +898,39 @@ class ProjectManager:
             raise ValueError("Config root must be a JSON object")
         return data
 
+    def _save_config(self) -> None:
+        """Persist in-memory config to config_path."""
+        text = json.dumps(self.config, indent=2, ensure_ascii=False) + "\n"
+        save_text_file_atomic(self.config_path, text.rstrip("\n"))
+
+    def _sync_content_root(self) -> Path:
+        """Resolve 00_CONTENT under root_dir from main_project.json."""
+        content = referat_content_dir(self.root_dir)
+        if content is None:
+            raise ValueError(
+                "Could not find 00_CONTENT under root_dir "
+                f"({self.root_dir}); expected root_dir/00_CONTENT or "
+                "root_dir/Referat_2/00_CONTENT"
+            )
+        return content.resolve()
+
     @staticmethod
-    def _resolve_root_dir(config: dict[str, Any]) -> Path:
+    def _resolve_root_dir(config: dict[str, Any], config_path: Path) -> Path:
         raw = config.get("root_dir")
         if not isinstance(raw, str) or not raw.strip():
             raise ValueError("Config must contain string root_dir")
-        return Path(raw).expanduser().resolve()
+        path = Path(raw.strip()).expanduser()
+        if not path.is_absolute():
+            path = (config_path.parent / path).resolve()
+        else:
+            path = path.resolve()
+        if path.is_dir():
+            return path
+        # Fallback: repository root (parent of 03_Scripts)
+        fallback = config_path.parent.parent.resolve()
+        if fallback.is_dir():
+            return fallback
+        return path
 
     def _resolve_project_path(self, raw: Any) -> Path:
         path = Path(str(raw)).expanduser()
@@ -1690,25 +1719,17 @@ class ProjectManager:
         except ValueError:
             return path.as_posix()
 
-    def course_synopsis_export_markdown_payload(
-        self, tree_input: Any, branch_expanded: Any
-    ) -> dict[str, Any]:
-        """Write filtered Markdown from client tree + session fold map."""
+    def course_synopsis_export_markdown_payload(self, tree_input: Any) -> dict[str, Any]:
+        """Write the full client tree to ``99_Markdowns/full_content.md`` (ignores UI fold state)."""
         if not isinstance(tree_input, list):
             raise ValueError("body.tree must be a JSON array")
         if len(tree_input) == 0:
             raise ValueError("tree must not be empty")
-        expanded_map: dict[str, bool] = {}
-        if isinstance(branch_expanded, dict):
-            for k, val in branch_expanded.items():
-                expanded_map[str(k)] = bool(val)
         for item in tree_input:
             if not isinstance(item, dict):
                 raise ValueError("tree items must be objects")
 
-        markdown = export_synopsis_tree_to_markdown(
-            tree_input, branch_expanded=expanded_map
-        )
+        markdown = export_synopsis_tree_to_markdown(tree_input)
         out_path = self.synopsis_full_markdown_export_path
         with self.lock:
             save_text_file_atomic(out_path, markdown)
@@ -1717,6 +1738,70 @@ class ProjectManager:
             "path": str(out_path),
             "path_relative": self._synopsis_full_markdown_path_relative(),
             "characters": len(markdown),
+        }
+
+    def course_synopsis_sync_content_payload(
+        self,
+        tree_input: Any,
+        *,
+        rename_orphans: bool = False,
+        dry_run: bool = False,
+        confirm_orphan_rename: bool = False,
+    ) -> dict[str, Any]:
+        """Materialize synopsis tree under root_dir's 00_CONTENT and update inspected_folders."""
+        path = self.course_synopsis_path
+        if tree_input is None:
+            with self.lock:
+                data = load_synopsis(path)
+            tree = data.get("tree") if isinstance(data.get("tree"), list) else []
+        elif not isinstance(tree_input, list):
+            raise ValueError("body.tree must be a JSON array")
+        else:
+            with self.lock:
+                data = load_synopsis(path)
+                merged = apply_reordered_tree(data, tree_input)
+                tree = merged.get("tree") if isinstance(merged.get("tree"), list) else []
+
+        validate_tree(tree)
+        content_root = self._sync_content_root()
+        root_r = self.root_dir.resolve()
+
+        allow_rename = bool(self.config.get("content_sync_rename_orphans", False))
+        if rename_orphans:
+            allow_rename = True
+        if confirm_orphan_rename:
+            allow_rename = True
+
+        with self.lock:
+            sync_result = sync_content_tree(
+                tree,
+                content_root=content_root,
+                root_dir=root_r,
+                rename_orphans=allow_rename,
+                dry_run=dry_run,
+            )
+
+            if not dry_run:
+                self.config["inspected_folders"] = list(sync_result.inspected_folders)
+                self._save_config()
+
+        try:
+            content_rel = str(content_root.relative_to(root_r))
+        except ValueError:
+            content_rel = str(content_root)
+
+        return {
+            "ok": True,
+            "dry_run": dry_run,
+            "content_root": str(content_root),
+            "content_root_relative": content_rel.replace("\\", "/"),
+            "inspected_folders": sync_result.inspected_folders,
+            "created_dirs": sync_result.created_dirs,
+            "skipped_dirs": sync_result.skipped_dirs,
+            "created_files": sync_result.created_files,
+            "skipped_files": sync_result.skipped_files,
+            "renamed_orphans": sync_result.renamed_orphans,
+            "pending_orphans": sync_result.pending_orphans,
         }
 
     def paragraph_style_analyze_payload(self, relative_path: Any, model: Any) -> dict[str, Any]:
@@ -2009,6 +2094,12 @@ def create_app(manager: ProjectManager) -> Flask:
         static_folder=str(UI_DIR / "static"),
     )
 
+    @app.after_request
+    def _no_cache_static(response):
+        if request.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-store, must-revalidate"
+        return response
+
     @app.get("/")
     def index():
         return send_from_directory(UI_DIR / "templates", "index.html")
@@ -2209,12 +2300,24 @@ def create_app(manager: ProjectManager) -> Flask:
     def api_course_synopsis_export_markdown():
         body = request.get_json(silent=True) or {}
         try:
+            return jsonify(manager.course_synopsis_export_markdown_payload(body.get("tree")))
+        except ValueError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 400
+
+    @app.post("/api/course-synopsis/sync-content")
+    def api_course_synopsis_sync_content():
+        body = request.get_json(silent=True) or {}
+        try:
             return jsonify(
-                manager.course_synopsis_export_markdown_payload(
+                manager.course_synopsis_sync_content_payload(
                     body.get("tree"),
-                    body.get("branch_expanded"),
+                    rename_orphans=bool(body.get("rename_orphans")),
+                    dry_run=bool(body.get("dry_run")),
+                    confirm_orphan_rename=bool(body.get("confirm_orphan_rename")),
                 )
             )
+        except FileNotFoundError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 404
         except ValueError as exc:
             return jsonify({"ok": False, "error": str(exc)}), 400
 

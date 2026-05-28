@@ -1,0 +1,1991 @@
+\subsection{Functions as Runtime Values and Saved Execution Context}
+
+The previous sections described runtime-hosted execution from the outside: the operating system runs a native interpreter or virtual machine, and the user's program is represented inside that runtime as bytecode, frames, objects, opcodes, or other managed structures. This subsection moves one level higher and examines what becomes possible when executable code itself can be treated as a runtime value.
+
+In the traditional C model, a function is primarily a compiled region of machine instructions with a callable address. Even there, function pointers make it possible to pass executable behavior into another function. Higher-level runtimes extend this idea substantially. In Python, JavaScript, PHP, and Java, functions, lambdas, methods, or callable objects can be stored, passed, returned, registered, and invoked later. This changes the shape of control flow: code is no longer only called directly by name from a fixed location in the source text.
+
+Callbacks introduce the first step in this shift. A callback lets one component pass executable behavior to another component, which later decides when to invoke it. This is the basis of sorting hooks, GUI event handlers, web route handlers, AJAX completion handlers, plugin systems, shell traps, and many framework-level extension points.
+
+Anonymous subroutines introduce the second step. They allow small executable blocks to be written inline, directly at the point where they are needed. Instead of defining a separate named function for every small transformation, comparison, event handler, or route body, the programmer can create a temporary function value locally. This makes sense only in languages or runtimes where executable code can exist as a value.
+
+Closures introduce the deepest step. A closure is not just code passed around; it is code together with preserved surrounding state. The ordinary stack frame that created the function may disappear, but selected variables from that frame remain available through heap-preserved cells, lexical environments, closure objects, captured fields, or explicit environment pointers. This is where the runtime clearly exceeds the simple native stack model: execution context can survive beyond the call that created it.
+
+The three topics therefore belong together because they describe the same progression:
+
+\begin{verbatim}
+executable address / function value
+        |
+        v
+callback passed to another controller
+        |
+        v
+anonymous function written inline
+        |
+        v
+closure carrying preserved lexical state
+\end{verbatim}
+
+This prepares the next control-flow abstractions. Once executable behavior can be passed as a value and can carry preserved state, the language can support more advanced patterns: decorators, lazy generators, coroutine suspension, event-loop dispatch, asynchronous callbacks, and runtime-managed execution graphs.
+
+
+
+
+
+\subsubsection{Callbacks: Inverting Program Flow Control via Code Execution References and Function Pointers}
+
+A \textbf{callback} is executable behavior handed to another component so that this component can invoke it later. The programmer does not directly write the complete control sequence. Instead, the programmer supplies a function, method, command name, closure, or callable object, and another piece of code decides when to execute it.
+
+In a direct procedural call, the control path is simple:
+
+\begin{verbatim}
+caller
+    calls function
+        function runs
+    caller continues
+\end{verbatim}
+
+In a callback pattern, the control path is inverted:
+
+\begin{verbatim}
+caller
+    gives callback to library / runtime / framework
+        library / runtime / framework performs work
+        library / runtime / framework calls callback when needed
+    caller receives final result or continues later
+\end{verbatim}
+
+This is why callbacks are often described as \textbf{inversion of control}. The user's code is no longer the only driver of execution. A sorting library, graphical interface framework, web server, asynchronous runtime, shell trap system, or browser event loop may call user code later, at a moment selected by that external system.
+
+The same idea appears in many languages, but the representation differs:
+
+\begin{itemize}
+    \item C uses function pointers and sometimes explicit context pointers;
+    \item Python uses function objects and bound method objects;
+    \item Java uses interfaces, anonymous classes, lambdas, and method references;
+    \item JavaScript uses function objects, especially in event-driven and asynchronous code;
+    \item PHP uses callable values, closures, hooks, and framework callbacks;
+    \item Bash approximates callbacks through function names, traps, and command dispatch.
+\end{itemize}
+
+The stack behavior depends on whether the callback is synchronous or asynchronous. A synchronous callback runs before the caller returns. It creates an ordinary call frame above the code that invokes it. An asynchronous callback is registered first and called later, often after the original registering stack has disappeared.
+
+\paragraph{C: function pointers, comparators, signal handlers, and C-style event hooks.}
+
+C does not have runtime function objects in the Python or JavaScript sense. A C function compiled into a native program lives in the text segment as machine instructions. A function pointer is a value that stores the address of such a function.
+
+A classical useful callback is the comparator passed to \texttt{qsort()}:
+
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+
+int compare_ints(const void *left, const void *right) {
+    int a = *(const int *)left;
+    int b = *(const int *)right;
+
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
+}
+
+int main(void) {
+    int values[] = {4, 1, 3, 2};
+    size_t count = sizeof(values) / sizeof(values[0]);
+
+    qsort(values, count, sizeof(values[0]), compare_ints);
+
+    for (size_t i = 0; i < count; i++) {
+        printf("%d\n", values[i]);
+    }
+
+    return 0;
+}
+\end{verbatim}
+
+The useful application is sorting arbitrary data. The C standard library provides the sorting algorithm, but the programmer provides the comparison rule. The library does not know what a user-defined record means, so it calls the callback whenever two elements must be compared.
+
+The control path is:
+
+\begin{verbatim}
+main()
+    calls qsort()
+        qsort() calls compare_ints()
+        compare_ints() returns to qsort()
+        qsort() calls compare_ints() again
+        compare_ints() returns to qsort()
+    qsort() returns to main()
+\end{verbatim}
+
+During one comparator call, the native process stack is conceptually:
+
+\begin{verbatim}
+top
++-----------------------------+
+| frame: compare_ints         |
++-----------------------------+
+| frame: qsort                |
++-----------------------------+
+| frame: main                 |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The callback is not a separate thread and not a saved continuation. It is an ordinary function call. The difference is only that \texttt{qsort()} calls through a function pointer supplied by the user.
+
+At implementation level:
+
+\begin{verbatim}
+compare_ints
+    -> compiled code in text segment
+
+function pointer
+    -> stores address of compare_ints
+
+qsort
+    -> performs indirect call through that address
+\end{verbatim}
+
+A second useful C callback pattern appears in event libraries. A C API may let the user register a function and an opaque state pointer:
+
+\begin{verbatim}
+typedef void (*event_callback_t)(int event_code, void *user_data);
+
+void dispatch_event(event_callback_t callback, void *user_data) {
+    int event_code = 42;
+    callback(event_code, user_data);
+}
+
+void print_event(int event_code, void *user_data) {
+    const char *name = (const char *)user_data;
+    printf("%s received event %d\n", name, event_code);
+}
+
+int main(void) {
+    dispatch_event(print_event, "handler A");
+    return 0;
+}
+\end{verbatim}
+
+The useful application is GUI programming, network libraries, embedded systems, plugin hooks, and low-level event loops. The function pointer supplies the code. The \texttt{void *user\_data} pointer supplies state. This manually emulates what higher-level languages do automatically with closures.
+
+The stack during callback execution is:
+
+\begin{verbatim}
+top
++-----------------------------+
+| frame: print_event          |
++-----------------------------+
+| frame: dispatch_event       |
++-----------------------------+
+| frame: main                 |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The state string \texttt{"handler A"} is not captured lexically. It is passed explicitly as a pointer. C makes the state channel visible and manual.
+
+\paragraph{Python: sorting keys, GUI handlers, web callbacks, and data-processing hooks.}
+
+In Python, functions are ordinary runtime objects. A function can be passed to another function exactly like a list, string, or integer object reference.
+
+A simple useful callback is a key function for sorting:
+
+\begin{verbatim}
+names = ["Ana", "Constantin", "Ioana"]
+
+names.sort(key=len)
+
+print(names)
+\end{verbatim}
+
+The useful application is custom sorting. The list object owns the sorting procedure. The programmer supplies \texttt{len} as the key extractor. The sorting machinery decides when to call it.
+
+The Python-level control path is:
+
+\begin{verbatim}
+module body
+    calls names.sort(...)
+        sort machinery calls len(name)
+        sort machinery calls len(name)
+        sort machinery rearranges list
+    sort returns
+module body continues
+\end{verbatim}
+
+During one callback call, the Python frame chain may be conceptually:
+
+\begin{verbatim}
+top Python frame
++-----------------------------+
+| frame: len or key function  |
++-----------------------------+
+| frame: sort implementation  |
++-----------------------------+
+| frame: module body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+For built-in callbacks such as \texttt{len}, part of the call may enter C-level CPython implementation directly. For a Python-defined callback, CPython creates a Python frame for the callback function. Under both cases, CPython itself is still executing on the native process stack underneath.
+
+A Python-defined callback example:
+
+\begin{verbatim}
+def apply_to_values(values, callback):
+    results = []
+
+    for value in values:
+        results.append(callback(value))
+
+    return results
+
+
+def square(x):
+    return x * x
+
+
+print(apply_to_values([1, 2, 3], square))
+\end{verbatim}
+
+Here, \texttt{square} is a function object. Passing it does not copy its bytecode. The parameter \texttt{callback} becomes another reference to the same function object.
+
+A simplified CPython object picture is:
+
+\begin{verbatim}
+name square
+    |
+    v
+function object
+    |
+    v
+code object with bytecode
+
+local name callback
+    |
+    v
+same function object
+\end{verbatim}
+
+Useful applications include:
+
+\begin{itemize}
+    \item \texttt{sorted(..., key=callback)} for custom ordering;
+    \item GUI event handlers, such as button-click callbacks;
+    \item web route handlers in frameworks;
+    \item data-processing hooks such as validators, filters, and transformation functions;
+    \item asynchronous completion callbacks in older or lower-level APIs.
+\end{itemize}
+
+For example, a web framework route handler is callback-like:
+
+\begin{verbatim}
+@app.route("/hello")
+def hello():
+    return "Hello"
+\end{verbatim}
+
+The programmer does not call \texttt{hello()} directly for each HTTP request. The framework stores the function object and calls it when a matching request arrives.
+
+The stack during a request is conceptually:
+
+\begin{verbatim}
+top Python frame
++-----------------------------+
+| frame: hello                |
++-----------------------------+
+| frame: framework dispatch   |
++-----------------------------+
+| frame: server request loop  |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The application is useful because control is inverted: the web server receives requests and invokes user functions only when routes match.
+
+\paragraph{Java: listeners, GUI events, stream operations, and functional interfaces.}
+
+Java traditionally represents callbacks through objects implementing interfaces. A very common useful application is GUI event handling.
+
+For example, in Swing-style programming:
+
+\begin{verbatim}
+button.addActionListener(event -> {
+    System.out.println("Button clicked");
+});
+\end{verbatim}
+
+The useful application is event-driven interface programming. The programmer registers behavior. The GUI framework later invokes that behavior when the user clicks the button.
+
+A longer interface-based shape is:
+
+\begin{verbatim}
+interface Callback {
+    void call(String message);
+}
+
+class Printer implements Callback {
+    public void call(String message) {
+        System.out.println(message);
+    }
+}
+
+class Dispatcher {
+    static void run(Callback callback) {
+        callback.call("event happened");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dispatcher.run(new Printer());
+    }
+}
+\end{verbatim}
+
+At source level, \texttt{callback.call(...)} looks like a method call. At JVM level, this creates ordinary method frames. During callback execution:
+
+\begin{verbatim}
+top JVM frame
++-----------------------------+
+| frame: Printer.call         |
++-----------------------------+
+| frame: Dispatcher.run       |
++-----------------------------+
+| frame: Main.main            |
++-----------------------------+
+bottom
+\end{verbatim}
+
+Modern Java uses lambdas for this pattern:
+
+\begin{verbatim}
+import java.util.function.Consumer;
+
+public class Main {
+    static void run(Consumer<String> callback) {
+        callback.accept("event happened");
+    }
+
+    public static void main(String[] args) {
+        run(message -> System.out.println(message));
+    }
+}
+\end{verbatim}
+
+The lambda is converted to an implementation of a functional interface. In common JVM implementations, this is connected through runtime linkage mechanisms such as \texttt{invokedynamic}. Conceptually, the result is still a callable object compatible with the expected interface.
+
+Useful applications include:
+
+\begin{itemize}
+    \item GUI listeners such as button clicks and window events;
+    \item stream operations such as \texttt{map}, \texttt{filter}, and \texttt{forEach};
+    \item asynchronous callbacks using futures or completion handlers;
+    \item dependency injection hooks and framework lifecycle methods;
+    \item server handlers in web frameworks.
+\end{itemize}
+
+For a stream example:
+
+\begin{verbatim}
+List<Integer> values = List.of(1, 2, 3);
+
+values.stream()
+      .map(x -> x * x)
+      .forEach(System.out::println);
+\end{verbatim}
+
+The functions passed to \texttt{map} and \texttt{forEach} are callback-like. The stream machinery controls when each function is invoked.
+
+The stack is ordinary JVM method-call stack while the stream pipeline is executing. However, the exact stack may include framework/library frames:
+
+\begin{verbatim}
+top JVM frame
++-----------------------------+
+| frame: lambda body          |
++-----------------------------+
+| frame: stream internals     |
++-----------------------------+
+| frame: Main.main            |
++-----------------------------+
+bottom
+\end{verbatim}
+
+If the stream is parallel, additional worker threads may be involved. Then each worker has its own native/JVM stack.
+
+\paragraph{JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.}
+
+JavaScript makes callbacks central because functions are objects and because JavaScript environments are heavily event-driven.
+
+A classical browser example is a DOM event callback:
+
+\begin{verbatim}
+button.addEventListener("click", function (event) {
+    console.log("button clicked");
+});
+\end{verbatim}
+
+The useful application is interactive web pages. The programmer registers a function. The browser calls it later when the user clicks the button.
+
+The first stack turn registers the callback:
+
+\begin{verbatim}
+top-level script
+    calls addEventListener()
+    browser stores callback
+top-level script continues
+\end{verbatim}
+
+Later, when the event occurs:
+
+\begin{verbatim}
+browser event loop
+    dispatches click event
+        V8 calls callback function
+    callback returns
+event loop continues
+\end{verbatim}
+
+The later JavaScript call stack is conceptually:
+
+\begin{verbatim}
+top JS frame
++-----------------------------+
+| frame: click callback       |
++-----------------------------+
+| frame: event dispatch       |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The original registration stack is gone. The callback survives because the browser host stores a reference to the JavaScript function object.
+
+A classic AJAX callback example uses \texttt{XMLHttpRequest}:
+
+\begin{verbatim}
+const request = new XMLHttpRequest();
+
+request.onload = function () {
+    console.log(request.responseText);
+};
+
+request.open("GET", "/data.json");
+request.send();
+\end{verbatim}
+
+The useful application is loading data from a server without reloading the whole page. The request is started, control returns to the browser, and the callback runs later when the response arrives.
+
+The control path is:
+
+\begin{verbatim}
+script starts request
+    registers onload callback
+    returns to browser
+
+network completes later
+    browser queues event
+    event loop invokes callback through V8
+\end{verbatim}
+
+Modern JavaScript often uses promises and \texttt{fetch}, but callbacks are still underneath the event-driven model:
+
+\begin{verbatim}
+fetch("/data.json")
+    .then(response => response.json())
+    .then(data => console.log(data));
+\end{verbatim}
+
+Each function passed to \texttt{then} is a callback scheduled when the previous promise is fulfilled.
+
+In Node.js, the traditional callback pattern appears in I/O:
+
+\begin{verbatim}
+const fs = require("fs");
+
+fs.readFile("notes.txt", "utf8", function (error, data) {
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    console.log(data);
+});
+\end{verbatim}
+
+The useful application is non-blocking file or network I/O. The Node runtime starts the operation, returns to the event loop, and later calls the callback when the operation completes.
+
+In V8, JavaScript function objects live on the managed heap. A synchronous callback creates a normal JavaScript call frame above the caller. An asynchronous callback creates a frame later, when the host event loop dispatches it. The event loop belongs to the host environment: browser, Node.js, or Electron-style application. V8 executes the callback; the host decides when the callback becomes runnable.
+
+\paragraph{PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.}
+
+PHP represents callbacks through \texttt{callable} values. A callable may be a function name, closure, object method, static method, or invokable object.
+
+A useful callback appears in array processing:
+
+\begin{verbatim}
+<?php
+
+$values = [1, 2, 3, 4];
+
+$result = array_map(function ($x) {
+    return $x * $x;
+}, $values);
+
+print_r($result);
+\end{verbatim}
+
+The useful application is transformation of collections. \texttt{array\_map} owns the iteration and calls the supplied function for each element.
+
+The Zend Engine call stack is conceptually:
+
+\begin{verbatim}
+top PHP frame
++-----------------------------+
+| frame: anonymous callback   |
++-----------------------------+
+| frame: array_map internals  |
++-----------------------------+
+| frame: script body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+Another useful callback is custom sorting:
+
+\begin{verbatim}
+<?php
+
+$users = [
+    ["name" => "Ana", "age" => 30],
+    ["name" => "Mihai", "age" => 20],
+];
+
+usort($users, function ($a, $b) {
+    return $a["age"] <=> $b["age"];
+});
+
+print_r($users);
+\end{verbatim}
+
+Here, \texttt{usort} owns the sorting algorithm. The programmer supplies comparison logic. This is directly analogous to C's \texttt{qsort}, but the callback is a PHP closure rather than a raw function pointer.
+
+PHP callbacks are also common in web frameworks and plugin systems. For example, a route handler is callback-like:
+
+\begin{verbatim}
+$router->get('/hello', function () {
+    return 'Hello';
+});
+\end{verbatim}
+
+The useful application is HTTP request routing. The programmer registers a callable. The framework invokes it when a request matches the route.
+
+Conceptually:
+
+\begin{verbatim}
+request enters framework
+    framework matches route
+        framework calls registered PHP callable
+    response is returned
+\end{verbatim}
+
+During execution, the Zend Engine creates a PHP call frame for the route callable. If the callable uses variables from the surrounding scope, PHP stores those captured values according to closure rules.
+
+PHP plugin systems also use callbacks. WordPress-style hooks are a common example conceptually:
+
+\begin{verbatim}
+add_action('init', function () {
+    // initialization code
+});
+\end{verbatim}
+
+The useful application is extension points. The core system reaches a lifecycle event and calls all registered callbacks.
+
+\paragraph{Bash: traps, shell hooks, command-name callbacks, and pipeline orchestration.}
+
+Bash does not have first-class function objects like Python or JavaScript. Still, callback-like patterns exist through function names, traps, and command dispatch.
+
+A useful Bash callback pattern is cleanup on exit:
+
+\begin{verbatim}
+cleanup() {
+    rm -f "$temp_file"
+    echo "cleaned up"
+}
+
+temp_file="$(mktemp)"
+
+trap cleanup EXIT
+
+echo "working with $temp_file"
+\end{verbatim}
+
+The useful application is resource cleanup. The programmer registers \texttt{cleanup} as a handler for the shell's \texttt{EXIT} event. When the script exits, Bash invokes the registered function.
+
+During normal execution, the stack may be only the script top level. During trap execution:
+
+\begin{verbatim}
+top shell frame
++-----------------------------+
+| frame: cleanup              |
++-----------------------------+
+| frame: shell trap dispatch  |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The trap is not a native hardware interrupt handler. It is shell-managed dispatch. Bash stores the trap action in its runtime state and evaluates it when the event occurs.
+
+A command-name callback pattern is also possible:
+
+\begin{verbatim}
+run_for_each() {
+    callback="$1"
+    shift
+
+    for item in "$@"; do
+        "$callback" "$item"
+    done
+}
+
+print_item() {
+    echo "item: $1"
+}
+
+run_for_each print_item apple banana cherry
+\end{verbatim}
+
+The useful application is small shell automation where one function controls iteration and another function defines the operation.
+
+The shell stack during one callback-like invocation is:
+
+\begin{verbatim}
+top shell frame
++-----------------------------+
+| frame: print_item           |
++-----------------------------+
+| frame: run_for_each         |
++-----------------------------+
+| frame: script top level     |
++-----------------------------+
+bottom
+\end{verbatim}
+
+If the callback name resolves to an external command rather than a shell function, Bash creates a child process. Then the external command has its own native process stack and address space. The shell waits or continues depending on whether the command is foreground, background, part of a pipeline, or part of another control structure.
+
+For example:
+
+\begin{verbatim}
+run_for_each cat file1.txt file2.txt
+\end{verbatim}
+
+Here, \texttt{cat} is external on most systems. Each invocation may involve a child process:
+
+\begin{verbatim}
+Bash run_for_each frame
+    launches child process: cat file1.txt
+    waits
+    launches child process: cat file2.txt
+    waits
+\end{verbatim}
+
+So Bash callback-like behavior can cross the process boundary, unlike Python or JavaScript function-object callbacks, which normally execute inside the same runtime process.
+
+\paragraph{Comparison and stack summary.}
+
+Callbacks are useful because they separate \emph{general control logic} from \emph{custom behavior}. The library or runtime owns the general pattern: sorting, event dispatch, iteration, request routing, I/O completion, cleanup, or plugin notification. The user supplies the custom operation.
+
+\begin{center}
+\begin{tabular}{|p{0.15\textwidth}|p{0.30\textwidth}|p{0.35\textwidth}|}
+\hline
+\textbf{Language} & \textbf{Useful callback applications} & \textbf{Implementation and stack behavior} \\
+\hline
+C & \texttt{qsort} comparators, event libraries, embedded callbacks, signal-like handlers & Function pointer stores code address; synchronous call creates ordinary native stack frame; state usually passed manually with \texttt{void *} \\
+\hline
+Python & Sorting keys, GUI handlers, web route handlers, validators, data-processing hooks & Function object reference; callback call creates Python frame; CPython native stack exists underneath \\
+\hline
+Java & GUI listeners, stream operations, completion handlers, framework lifecycle hooks & Interface/lambda object; JVM invokes method; callback creates JVM method frame \\
+\hline
+JavaScript / V8 & DOM events, AJAX/fetch completion, timers, Node.js I/O callbacks & Function object stored by host/runtime; synchronous callback creates JS frame immediately; async callback creates frame later from event loop dispatch \\
+\hline
+PHP & \texttt{array\_map}, \texttt{usort}, route handlers, hooks/plugin systems & Callable value resolved by Zend Engine; callback creates PHP call frame inside request/runtime execution \\
+\hline
+Bash & \texttt{trap} cleanup handlers, command-name dispatch, shell automation hooks & Function name or command text; shell functions create shell frames; external commands create child processes with separate native stacks \\
+\hline
+\end{tabular}
+\end{center}
+
+The key rule is simple: a callback is not special at the moment it runs. It uses the ordinary call machinery of its language or runtime. What is special is how the call target is chosen and when it is invoked. The callback is supplied earlier as a value, address, object, method implementation, closure, command name, or trap action. Later, another system calls it.
+
+This prepares the next concepts. Anonymous functions make callback definitions shorter and more local. Closures allow callbacks to carry saved lexical state. Generators and coroutines go further: they do not merely pass executable behavior around; they preserve suspended execution state across multiple resumptions.
+
+
+\subsubsection{Anonymous Subroutines: Inline Block Definitions, Lambda Expressions, and Function Objects Without Stable Source-Level Names}
+
+A named function has a stable source-level identifier. It is declared or defined once, receives a name, and can later be called through that name. An \textbf{anonymous subroutine} is different: it is executable logic created without a permanent ordinary source-level function name. It may be written directly at the place where it is needed, passed immediately to another function, stored in a variable, returned from another function, or registered as a handler.
+
+The basic contrast is:
+
+\begin{verbatim}
+named function:
+
+def square(x):
+    return x * x
+
+use(square)
+
+
+anonymous function:
+
+use(lambda x: x * x)
+\end{verbatim}
+
+The second form creates executable behavior inline. The programmer does not introduce a separate stable top-level function name such as \texttt{square}. This is useful when the behavior is small, local, and meaningful only at the point where it is passed.
+
+Anonymous subroutines are strongly connected to callbacks. A callback is the control-flow pattern: executable behavior is passed to another component. An anonymous function is one possible way to write that executable behavior without defining a separately named function first.
+
+\paragraph{Python: lambda expressions and local function objects.}
+
+Python supports anonymous functions through \texttt{lambda} expressions. A \texttt{lambda} creates a function object, but the function has no ordinary source-level name introduced by a \texttt{def} statement.
+
+For example:
+
+\begin{verbatim}
+numbers = [1, 2, 3, 4]
+
+squares = list(map(lambda x: x * x, numbers))
+
+print(squares)
+\end{verbatim}
+
+The useful application here is a small transformation function used immediately by \texttt{map}. The function object receives one argument and returns the square of that argument.
+
+A sorting example is even more common:
+
+\begin{verbatim}
+users = [
+    {"name": "Ana", "age": 30},
+    {"name": "Mihai", "age": 20},
+    {"name": "Ioana", "age": 25},
+]
+
+users.sort(key=lambda user: user["age"])
+
+print(users)
+\end{verbatim}
+
+The useful application is custom ordering. The lambda tells the sorting operation which value should be extracted from each item. The sorting algorithm owns the control flow; the lambda supplies the local rule.
+
+At the CPython level, the \texttt{lambda} expression creates a function object with an associated code object, just like \texttt{def} does. The difference is mainly syntactic and structural: \texttt{lambda} is an expression and can appear inline, while \texttt{def} is a statement and binds a name.
+
+Conceptually:
+
+\begin{verbatim}
+lambda user: user["age"]
+        |
+        v
+function object
+        |
+        v
+code object for expression body
+\end{verbatim}
+
+When the lambda is called during sorting, CPython creates a Python frame for that call:
+
+\begin{verbatim}
+top Python frame
++-----------------------------+
+| frame: lambda body          |
++-----------------------------+
+| frame: sort machinery       |
++-----------------------------+
+| frame: module body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The lambda frame disappears when the lambda returns. If the lambda does not escape anywhere else, the function object itself may also become unreachable after the surrounding operation finishes.
+
+Python lambdas are intentionally limited: they contain a single expression, not a full statement block. This is valid:
+
+\begin{verbatim}
+lambda x: x * x
+\end{verbatim}
+
+This is not valid Python:
+
+\begin{verbatim}
+lambda x:
+    y = x * x
+    return y
+\end{verbatim}
+
+For multi-statement behavior, Python uses a named local function:
+
+\begin{verbatim}
+def process(values):
+    def normalize(x):
+        y = x.strip()
+        return y.lower()
+
+    return list(map(normalize, values))
+\end{verbatim}
+
+Here, \texttt{normalize} has a local name, but it is not a stable top-level function. It is created during execution of \texttt{process}. This is often more readable than forcing too much logic into a lambda.
+
+\paragraph{JavaScript and V8: function expressions, arrow functions, AJAX, and DOM handlers.}
+
+JavaScript has several forms of anonymous function expressions. The older form is:
+
+\begin{verbatim}
+const square = function (x) {
+    return x * x;
+};
+\end{verbatim}
+
+The function expression may be anonymous even though it is stored in a variable. The variable has a name, but the function object itself does not need a source-level declaration name.
+
+Modern JavaScript often uses arrow functions:
+
+\begin{verbatim}
+const square = x => x * x;
+\end{verbatim}
+
+Anonymous functions are central in browser programming. A DOM event handler can be written inline:
+
+\begin{verbatim}
+button.addEventListener("click", event => {
+    console.log("button clicked");
+});
+\end{verbatim}
+
+The useful application is local event handling. The programmer does not need to define a separate named function if the logic is used only for that button event.
+
+A classic AJAX-style example is:
+
+\begin{verbatim}
+fetch("/data.json")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    });
+\end{verbatim}
+
+The functions passed to \texttt{then} are anonymous callback functions. They are scheduled by the promise machinery when the previous asynchronous stage completes.
+
+At the V8 level, each function expression or arrow function creates a JavaScript function object. If the function is called synchronously, V8 creates a normal JavaScript call frame:
+
+\begin{verbatim}
+top JS frame
++-----------------------------+
+| frame: anonymous function   |
++-----------------------------+
+| frame: caller               |
++-----------------------------+
+bottom
+\end{verbatim}
+
+For asynchronous cases, the original registration stack is gone before the anonymous function runs. The host environment stores the function object and schedules it later:
+
+\begin{verbatim}
+registration turn:
+
+top-level script
+    creates anonymous function object
+    passes it to event / promise / timer API
+top-level script returns
+
+
+later event-loop turn:
+
+event loop dispatch
+    calls anonymous function
+anonymous function returns
+\end{verbatim}
+
+The later stack is:
+
+\begin{verbatim}
+top JS frame
++-----------------------------+
+| frame: anonymous callback   |
++-----------------------------+
+| frame: event/promise dispatch |
++-----------------------------+
+bottom
+\end{verbatim}
+
+V8 may optimize this call if the call site becomes hot and predictable. But semantically, the anonymous function is still a heap-managed function object invoked by the engine.
+
+\paragraph{Java: anonymous classes, lambdas, GUI listeners, and stream functions.}
+
+Older Java used anonymous classes for inline callback definitions. A common GUI-style example is:
+
+\begin{verbatim}
+button.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent event) {
+        System.out.println("Button clicked");
+    }
+});
+\end{verbatim}
+
+The useful application is event handling. The programmer defines the handler inline at the registration site. The anonymous class has no ordinary source-level class name written by the programmer, although the compiler still generates class-like runtime structures.
+
+Modern Java usually uses lambdas when the target type is a functional interface:
+
+\begin{verbatim}
+button.addActionListener(event -> {
+    System.out.println("Button clicked");
+});
+\end{verbatim}
+
+Another useful application is stream processing:
+
+\begin{verbatim}
+List<Integer> values = List.of(1, 2, 3, 4);
+
+values.stream()
+      .map(x -> x * x)
+      .forEach(x -> System.out.println(x));
+\end{verbatim}
+
+The lambdas are inline functions passed to the stream machinery. The stream controls traversal; the lambdas provide transformation and output behavior.
+
+At the JVM level, a lambda is not a raw function pointer. It is linked to a functional interface. Common JVM implementations use runtime linkage mechanisms, such as \texttt{invokedynamic}, to create or obtain an object that can be called through the interface method.
+
+Conceptually:
+
+\begin{verbatim}
+x -> x * x
+    |
+    v
+functional-interface-compatible callable object
+    |
+    v
+method invocation by stream / event framework
+\end{verbatim}
+
+When the lambda body runs, the JVM uses ordinary method-frame execution:
+
+\begin{verbatim}
+top JVM frame
++-----------------------------+
+| frame: lambda body          |
++-----------------------------+
+| frame: stream/event internals |
++-----------------------------+
+| frame: caller method        |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The lambda itself does not create a new operating-system thread. It runs on whichever thread invokes it. In GUI code, that is often an event-dispatch thread. In stream code, it may be the current thread, or multiple worker threads if a parallel stream is used.
+
+\paragraph{PHP: anonymous functions, closures, array processing, and route handlers.}
+
+PHP supports anonymous functions directly:
+
+\begin{verbatim}
+<?php
+
+$values = [1, 2, 3, 4];
+
+$squares = array_map(function ($x) {
+    return $x * $x;
+}, $values);
+
+print_r($squares);
+\end{verbatim}
+
+The useful application is collection transformation. \texttt{array\_map} owns the traversal. The anonymous function supplies the operation.
+
+Custom sorting is another common example:
+
+\begin{verbatim}
+<?php
+
+$users = [
+    ["name" => "Ana", "age" => 30],
+    ["name" => "Mihai", "age" => 20],
+];
+
+usort($users, function ($a, $b) {
+    return $a["age"] <=> $b["age"];
+});
+
+print_r($users);
+\end{verbatim}
+
+The anonymous function supplies comparison logic directly at the call site.
+
+PHP web frameworks also commonly use anonymous functions as route handlers:
+
+\begin{verbatim}
+$router->get('/hello', function () {
+    return 'Hello';
+});
+\end{verbatim}
+
+The useful application is request routing. The route and the executable response logic are written together.
+
+At the Zend Engine level, the anonymous function is represented as a closure object or callable structure. When it is invoked, the engine creates a call frame for it:
+
+\begin{verbatim}
+top PHP frame
++-----------------------------+
+| frame: anonymous function   |
++-----------------------------+
+| frame: array_map / router   |
++-----------------------------+
+| frame: script body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The function object can also be stored:
+
+\begin{verbatim}
+$double = function ($x) {
+    return $x * 2;
+};
+
+echo $double(10);
+\end{verbatim}
+
+Here, \texttt{\$double} is a variable holding a callable object. The anonymous function has no ordinary declaration name, but it is still an executable runtime value.
+
+\paragraph{C: no standard lambdas, but function pointers and nonstandard emulations.}
+
+Standard C does not have anonymous functions or lambda expressions. A callback target must normally be a named function, and the program passes a function pointer.
+
+For example:
+
+\begin{verbatim}
+int square(int x) {
+    return x * x;
+}
+
+int apply(int value, int (*operation)(int)) {
+    return operation(value);
+}
+\end{verbatim}
+
+The useful application is still callback-based customization, but the executable code must be named:
+
+\begin{verbatim}
+int result = apply(10, square);
+\end{verbatim}
+
+At the native level, \texttt{square} is compiled into the text segment. The function pointer stores its address. Calling through the pointer creates an ordinary C stack frame:
+
+\begin{verbatim}
+top native frame
++-----------------------------+
+| frame: square               |
++-----------------------------+
+| frame: apply                |
++-----------------------------+
+| frame: main                 |
++-----------------------------+
+bottom
+\end{verbatim}
+
+C can emulate some anonymous-subroutine behavior, but not cleanly in portable standard C.
+
+One common manual pattern is to separate code and state:
+
+\begin{verbatim}
+typedef int (*operation_t)(int value, void *context);
+
+int apply(int value, operation_t operation, void *context) {
+    return operation(value, context);
+}
+
+struct multiplier {
+    int factor;
+};
+
+int multiply_by(int value, void *context) {
+    struct multiplier *m = context;
+    return value * m->factor;
+}
+
+int main(void) {
+    struct multiplier m = { .factor = 3 };
+    int result = apply(10, multiply_by, &m);
+    return 0;
+}
+\end{verbatim}
+
+This is useful in C libraries, embedded systems, GUI toolkits, and event loops. The function pointer supplies behavior. The \texttt{void *context} supplies state. Higher-level languages hide this pattern inside closures.
+
+Some C compilers provide nonstandard extensions. GCC supports nested functions in some modes:
+
+\begin{verbatim}
+int main(void) {
+    int factor = 3;
+
+    int multiply(int x) {
+        return x * factor;
+    }
+
+    return multiply(10);
+}
+\end{verbatim}
+
+This is not ISO C. Implementations may use mechanisms such as trampolines or hidden environment pointers, depending on compiler and target. The important point is that the compiler must somehow preserve access to \texttt{factor}. If the nested function escapes its defining stack frame, lifetime problems become serious unless the implementation prevents or handles them.
+
+Clang/Apple ecosystems also have \textbf{blocks}, an extension used heavily in some Objective-C and C APIs:
+
+\begin{verbatim}
+int factor = 3;
+
+int (^multiply)(int) = ^int(int x) {
+    return x * factor;
+};
+
+int result = multiply(10);
+\end{verbatim}
+
+Blocks behave much more like closures than ordinary C function pointers. They can capture surrounding values, and the runtime may copy them from stack-like storage to heap storage when needed. This is not standard C, but it shows how C-like environments can add anonymous callable objects through compiler/runtime support.
+
+Duff's Device is sometimes mentioned as an example of unusual C control-flow construction, but it is not an anonymous function mechanism. It manually interleaves \texttt{switch} and loop structure to optimize or unroll copying. It shows that C can encode strange control-flow patterns with labels and jumps, but it does not give C true anonymous subroutines. For anonymous callable behavior, function pointers plus explicit context pointers are the standard portable tool.
+
+\paragraph{Bash: no real anonymous functions, but inline commands and evaluated command bodies.}
+
+Bash does not have anonymous function objects. Shell functions are named:
+
+\begin{verbatim}
+say_hello() {
+    echo "hello"
+}
+\end{verbatim}
+
+However, Bash can emulate local inline behavior through command strings, subshells, and \texttt{bash -c}. For example:
+
+\begin{verbatim}
+find . -name "*.txt" -exec bash -c '
+    for file do
+        echo "file: $file"
+    done
+' bash {} +
+\end{verbatim}
+
+The useful application is inline command logic for tools such as \texttt{find}. The command body is not a function object in the Python sense. It is command text passed to a new Bash process.
+
+The stack/process behavior is very different:
+
+\begin{verbatim}
+parent shell
+    runs find
+        find launches bash -c as child process
+            child bash interprets inline command text
+        child bash exits
+    find continues / exits
+parent shell continues
+\end{verbatim}
+
+The inline command runs in a separate process. Its stack is the child Bash process's native/shell stack, not a frame inside the parent shell's current function stack.
+
+Bash can also use command groups:
+
+\begin{verbatim}
+{
+    echo "start"
+    echo "work"
+    echo "end"
+}
+\end{verbatim}
+
+or subshells:
+
+\begin{verbatim}
+(
+    cd /tmp
+    ls
+)
+\end{verbatim}
+
+These are anonymous blocks of command syntax, but they are not first-class function values. A command group runs in the current shell. A subshell runs in a child shell environment. They are useful for grouping redirections, temporary directory changes, and pipeline construction.
+
+For example:
+
+\begin{verbatim}
+{
+    echo "name,age"
+    echo "Ana,30"
+} > output.csv
+\end{verbatim}
+
+The useful application is redirecting the output of several commands as one unit. The block has no name, but it is not a callable object stored for later.
+
+\paragraph{Implementation comparison.}
+
+Anonymous subroutines differ less in surface syntax than in runtime representation. The essential question is: when the inline code is written, what runtime object or control structure is created?
+
+\begin{center}
+\begin{tabular}{|p{0.15\textwidth}|p{0.30\textwidth}|p{0.35\textwidth}|}
+\hline
+\textbf{Language} & \textbf{Anonymous form} & \textbf{Implementation and stack behavior} \\
+\hline
+Python & \texttt{lambda}; local \texttt{def} for multi-statement logic & Creates function object with code object; call creates Python frame; CPython native stack underneath \\
+\hline
+JavaScript / V8 & Function expressions and arrow functions & Creates JS function object; call creates JS frame; async cases are invoked later by host event loop \\
+\hline
+Java & Anonymous classes and lambdas & Produces functional-interface-compatible callable object; call creates JVM method frame \\
+\hline
+PHP & Anonymous functions / closures & Creates callable closure object; call creates Zend Engine call frame \\
+\hline
+C & No standard lambda; named function pointer plus \texttt{void *}; nonstandard nested functions/blocks & Function pointer is code address; call creates native frame; state must be explicit unless using extensions \\
+\hline
+Bash & No function objects; inline command text, command groups, subshells & Command group runs in shell; subshell or \texttt{bash -c} creates child process; no stable callable object model \\
+\hline
+\end{tabular}
+\end{center}
+
+Anonymous subroutines are useful when the code is small and local to the operation that consumes it:
+
+\begin{itemize}
+    \item sort this list by this field;
+    \item transform every element this way;
+    \item handle this button click;
+    \item respond to this AJAX request;
+    \item run this route handler;
+    \item clean up when this shell exits.
+\end{itemize}
+
+Their main advantage is locality. The behavior is written where it is used. Their main danger is overuse. If the inline function grows too large, contains complex branching, or needs to be reused, a named function becomes clearer.
+
+The stack rule remains simple: when the anonymous subroutine is called, it creates the same kind of call frame that a named function would create in that language. Anonymous does not mean stackless. It only means that the executable unit was created without a stable ordinary source-level name. If the function is invoked later, especially through an event loop or asynchronous system, the original registration stack may already be gone; the runtime preserves the function object, not the old call stack. Closures extend this idea by preserving selected surrounding variables together with the executable code.
+
+
+\subsubsection{Closures: Heap-Preserved Execution Environments, Non-Local Scope State Retention, and Lexical Binding}
+
+A \textbf{closure} is a callable unit that keeps access to variables from an enclosing lexical scope even after that enclosing scope has finished executing. It is not merely an anonymous function, and it is not merely a callback. A callback answers the question: \emph{who will call this code later?} An anonymous function answers the question: \emph{can this code be written without a stable source-level name?} A closure answers a different question: \emph{can this callable remember variables from the environment where it was created?}
+
+The basic closure pattern is:
+
+\begin{verbatim}
+outer function starts
+    local variable is created
+    inner function is created and refers to that variable
+outer function returns inner function
+    outer stack frame disappears
+inner function is called later
+    inner function still has access to the old variable
+\end{verbatim}
+
+This requires special runtime support. If the outer function's local variables lived only in an ordinary stack frame, they would disappear when the outer function returned. For a closure to work, the captured state must be preserved somewhere that outlives the stack frame. In managed runtimes, this usually means heap-allocated closure cells, environment objects, callable objects with captured fields, or similar structures.
+
+The core idea is:
+
+\begin{verbatim}
+ordinary local variable:
+    lives only while the function frame is active
+
+closed-over variable:
+    moved to or represented by heap-preserved environment storage
+    so an inner callable can still access it later
+\end{verbatim}
+
+\paragraph{Python / CPython: closure cells and non-local lexical bindings.}
+
+Python supports closures directly. A nested function can refer to a variable from an enclosing function.
+
+\begin{verbatim}
+def make_multiplier(factor):
+    def multiply(value):
+        return value * factor
+
+    return multiply
+
+
+times_three = make_multiplier(3)
+
+print(times_three(10))
+\end{verbatim}
+
+The useful application is function configuration. Instead of passing \texttt{factor} every time, the outer function builds a specialized function that remembers the value.
+
+The execution sequence is:
+
+\begin{verbatim}
+make_multiplier(3)
+    creates local binding factor = 3
+    creates inner function multiply
+    multiply refers to factor
+    returns multiply
+
+make_multiplier frame disappears
+
+times_three(10)
+    multiply runs
+    multiply still sees factor = 3
+\end{verbatim}
+
+At the Python frame level, while \texttt{make\_multiplier} is running:
+
+\begin{verbatim}
+top Python frame
++-----------------------------+
+| frame: make_multiplier      |
+| factor -> closure cell      |
+| multiply -> function object |
++-----------------------------+
+| frame: module body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+After \texttt{make\_multiplier} returns, its normal frame is gone. However, the captured variable is not gone. CPython stores closed-over variables in \textbf{cell objects}. The returned function object keeps a reference to those cells through its closure.
+
+Conceptually:
+
+\begin{verbatim}
+times_three
+    |
+    v
+function object: multiply
+    |
+    v
+__closure__
+    |
+    v
+cell object containing factor = 3
+\end{verbatim}
+
+When \texttt{times\_three(10)} is later called, CPython creates a new frame for \texttt{multiply}. That frame can access the preserved cell:
+
+\begin{verbatim}
+top Python frame
++-----------------------------+
+| frame: multiply             |
+| value = 10                  |
+| factor -> closure cell      |
++-----------------------------+
+| frame: module body          |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The old outer stack frame is not restored. Only the needed captured environment survives.
+
+A common practical use is creating validators or configured callbacks:
+
+\begin{verbatim}
+def min_length_validator(min_length):
+    def validate(text):
+        return len(text) >= min_length
+
+    return validate
+
+
+password_validator = min_length_validator(8)
+
+print(password_validator("abc"))
+print(password_validator("long-enough"))
+\end{verbatim}
+
+Here, \texttt{min\_length} is remembered by the returned function. This is useful in web forms, data validation pipelines, GUI callbacks, decorators, and small configurable behaviors.
+
+If the inner function must rebind a captured variable, Python requires \texttt{nonlocal}:
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_value():
+        nonlocal count
+        count += 1
+        return count
+
+    return next_value
+
+
+counter = make_counter()
+
+print(counter())
+print(counter())
+print(counter())
+\end{verbatim}
+
+The useful application is private state. The variable \texttt{count} is not global, but it persists between calls.
+
+The preserved environment is:
+
+\begin{verbatim}
+counter
+    |
+    v
+function object: next_value
+    |
+    v
+closure cell: count
+\end{verbatim}
+
+Each call to \texttt{counter()} creates a new frame for \texttt{next\_value}, but all those frames access the same preserved \texttt{count} cell.
+
+\paragraph{JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factories.}
+
+JavaScript closures are central to browser and Node.js programming. A function can capture variables from its lexical environment and use them later.
+
+\begin{verbatim}
+function makeMultiplier(factor) {
+    return function (value) {
+        return value * factor;
+    };
+}
+
+const timesThree = makeMultiplier(3);
+
+console.log(timesThree(10));
+\end{verbatim}
+
+The useful application is the same as in Python: creating specialized functions.
+
+At the V8-level conceptual model, \texttt{factor} is stored in a heap-managed lexical environment because the returned inner function may outlive the call to \texttt{makeMultiplier}.
+
+\begin{verbatim}
+timesThree
+    |
+    v
+JS function object
+    |
+    v
+lexical environment
+    |
+    v
+factor = 3
+\end{verbatim}
+
+The original call stack is gone:
+
+\begin{verbatim}
+makeMultiplier frame:
+    gone after return
+\end{verbatim}
+
+But the captured environment remains reachable through the returned function object.
+
+Closures are especially useful in asynchronous JavaScript:
+
+\begin{verbatim}
+function loadUser(userId) {
+    fetch("/users/" + userId)
+        .then(response => response.json())
+        .then(user => {
+            console.log("Loaded user:", userId, user.name);
+        });
+}
+\end{verbatim}
+
+The useful application is AJAX/fetch completion handling. The callback passed to \texttt{then} runs later, after the network operation completes. The original \texttt{loadUser} stack frame is no longer active, but the callback still remembers \texttt{userId}.
+
+The control and storage model is:
+
+\begin{verbatim}
+loadUser(42)
+    creates callback that captures userId
+    registers callback with promise machinery
+    returns
+
+later:
+    network completes
+    event loop schedules callback
+    callback runs and still sees userId = 42
+\end{verbatim}
+
+The later JavaScript stack is:
+
+\begin{verbatim}
+top JS frame
++-----------------------------+
+| frame: promise callback     |
+| userId from lexical env     |
++-----------------------------+
+| frame: promise dispatch     |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The old \texttt{loadUser} frame is not on the stack. The captured lexical environment is heap-preserved by the engine.
+
+Closures are also common for DOM event handlers:
+
+\begin{verbatim}
+function attachCounter(button) {
+    let count = 0;
+
+    button.addEventListener("click", () => {
+        count += 1;
+        console.log("clicked", count, "times");
+    });
+}
+\end{verbatim}
+
+The useful application is preserving per-button state without using a global variable. Each call to \texttt{attachCounter} creates a separate lexical environment with its own \texttt{count}. V8 keeps that environment alive as long as the event listener function remains reachable.
+
+\paragraph{Java: captured variables in lambdas and generated callable objects.}
+
+Java lambdas can capture local variables from the enclosing scope, but with an important restriction: captured local variables must be final or effectively final.
+
+\begin{verbatim}
+import java.util.function.IntUnaryOperator;
+
+public class Main {
+    static IntUnaryOperator makeMultiplier(int factor) {
+        return value -> value * factor;
+    }
+
+    public static void main(String[] args) {
+        IntUnaryOperator timesThree = makeMultiplier(3);
+
+        System.out.println(timesThree.applyAsInt(10));
+    }
+}
+\end{verbatim}
+
+The useful application is building configured functional objects for streams, callbacks, validators, listeners, and completion handlers.
+
+The Java stack behavior is:
+
+\begin{verbatim}
+makeMultiplier(3)
+    creates lambda object that captures factor
+    returns lambda object
+
+makeMultiplier frame disappears
+
+timesThree.applyAsInt(10)
+    lambda body runs
+    lambda still has captured factor = 3
+\end{verbatim}
+
+At JVM level, the captured value is not kept by preserving the old method stack frame. Instead, the lambda is represented as an object or runtime-generated callable structure with captured data stored as fields or equivalent internal state.
+
+Conceptually:
+
+\begin{verbatim}
+timesThree
+    |
+    v
+lambda / functional-interface object
+    |
+    v
+captured field: factor = 3
+\end{verbatim}
+
+When the lambda is invoked, the JVM creates a normal method frame for the call:
+
+\begin{verbatim}
+top JVM frame
++-----------------------------+
+| frame: lambda body          |
+| captured factor available   |
++-----------------------------+
+| frame: Main.main            |
++-----------------------------+
+bottom
+\end{verbatim}
+
+The lambda itself does not create a new operating-system thread. It runs on whichever thread invokes it. In GUI code, that is often an event-dispatch thread. In stream code, it may be the current thread, or multiple worker threads if a parallel stream is used.
+
+Java does not allow this:
+
+\begin{verbatim}
+int count = 0;
+
+Runnable r = () -> {
+    count++;  // invalid for local captured variable
+};
+\end{verbatim}
+
+The captured local variable cannot be mutated this way because Java captures local values under effectively-final rules. To preserve mutable state, the state must be placed inside a heap object:
+
+\begin{verbatim}
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        AtomicInteger count = new AtomicInteger(0);
+
+        Runnable r = () -> {
+            System.out.println(count.incrementAndGet());
+        };
+
+        r.run();
+        r.run();
+    }
+}
+\end{verbatim}
+
+Here, the lambda captures the reference to the \texttt{AtomicInteger} object. The object itself is mutable and lives on the heap.
+
+The preserved state is:
+
+\begin{verbatim}
+lambda object
+    |
+    v
+reference to AtomicInteger object
+    |
+    v
+mutable count state
+\end{verbatim}
+
+This pattern is useful in event listeners, stream pipelines, asynchronous callbacks, and small pieces of configured behavior.
+
+\paragraph{PHP: closures with \texttt{use}, captured values, and captured references.}
+
+PHP anonymous functions can capture variables from the surrounding scope using \texttt{use}.
+
+\begin{verbatim}
+<?php
+
+function make_multiplier($factor) {
+    return function ($value) use ($factor) {
+        return $value * $factor;
+    };
+}
+
+$times_three = make_multiplier(3);
+
+echo $times_three(10);
+\end{verbatim}
+
+The useful application is configured callbacks, route handlers, array transformations, and plugin hooks.
+
+The PHP execution sequence is:
+
+\begin{verbatim}
+make_multiplier(3)
+    local variable $factor exists
+    closure is created and captures $factor
+    closure is returned
+
+make_multiplier frame disappears
+
+$times_three(10)
+    closure runs
+    closure still has captured $factor = 3
+\end{verbatim}
+
+At the Zend Engine level, the closure is a runtime object containing the function body and captured variables. The old function call frame is not preserved. Captured values are stored in the closure structure.
+
+Conceptually:
+
+\begin{verbatim}
+$times_three
+    |
+    v
+Closure object
+    |
+    v
+captured variable: $factor = 3
+\end{verbatim}
+
+By default, PHP captures with \texttt{use (\$factor)} by value. If the closure must share and mutate the same variable, it can capture by reference:
+
+\begin{verbatim}
+<?php
+
+function make_counter() {
+    $count = 0;
+
+    return function () use (&$count) {
+        $count += 1;
+        return $count;
+    };
+}
+
+$counter = make_counter();
+
+echo $counter(); // 1
+echo $counter(); // 2
+echo $counter(); // 3
+\end{verbatim}
+
+The useful application is private persistent state inside a callable, similar to the Python counter closure.
+
+The preserved state is:
+
+\begin{verbatim}
+$counter
+    |
+    v
+Closure object
+    |
+    v
+captured reference to $count storage
+\end{verbatim}
+
+Each call creates a new PHP call frame for the closure body, but the captured \texttt{\$count} storage is shared across calls.
+
+Closures are also common in PHP routing:
+
+\begin{verbatim}
+$prefix = "/api";
+
+$router->get($prefix . "/users", function () use ($prefix) {
+    return "Route under " . $prefix;
+});
+\end{verbatim}
+
+The useful application is binding route-local or configuration-local state to a handler without using global variables.
+
+\paragraph{C: no standard closures, explicit environment structs, and lifetime hazards.}
+
+Standard C has function pointers, but not closures. A function pointer stores a code address. It does not automatically capture local variables.
+
+This does not work in standard C:
+
+\begin{verbatim}
+/* Not standard C closure behavior */
+
+make_multiplier(3) returns function that remembers 3
+\end{verbatim}
+
+To emulate a closure in portable C, the programmer usually separates code from state manually:
+
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef int (*call_fn)(void *env, int value);
+
+struct closure {
+    call_fn call;
+    void *env;
+};
+
+struct multiplier_env {
+    int factor;
+};
+
+int multiply_call(void *env, int value) {
+    struct multiplier_env *m = env;
+    return value * m->factor;
+}
+
+struct closure make_multiplier(int factor) {
+    struct multiplier_env *env = malloc(sizeof(*env));
+    env->factor = factor;
+
+    struct closure c;
+    c.call = multiply_call;
+    c.env = env;
+
+    return c;
+}
+
+void destroy_multiplier(struct closure c) {
+    free(c.env);
+}
+
+int main(void) {
+    struct closure times_three = make_multiplier(3);
+
+    printf("%d\n", times_three.call(times_three.env, 10));
+
+    destroy_multiplier(times_three);
+    return 0;
+}
+\end{verbatim}
+
+The useful application is callback APIs that need persistent state: event handlers, GUI callbacks, embedded systems, network protocol handlers, and plugin systems.
+
+The implementation is explicit:
+
+\begin{verbatim}
+closure struct
++-----------------------------+
+| function pointer: call      |
+| environment pointer: env    |
++-----------------------------+
+              |
+              v
+environment heap object
++-----------------------------+
+| factor = 3                  |
++-----------------------------+
+\end{verbatim}
+
+The stack behavior is:
+
+\begin{verbatim}
+make_multiplier frame:
+    creates heap environment
+    returns struct containing code pointer + env pointer
+    frame disappears
+
+later call:
+    multiply_call frame is created
+    env pointer gives access to heap-preserved factor
+\end{verbatim}
+
+The key rule is that the environment must outlive the callback. Therefore, allocating the environment on the stack would be wrong if the closure escapes:
+
+\begin{verbatim}
+struct closure bad_make_multiplier(int factor) {
+    struct multiplier_env env;
+    env.factor = factor;
+
+    struct closure c;
+    c.call = multiply_call;
+    c.env = &env;  /* invalid after return */
+
+    return c;
+}
+\end{verbatim}
+
+After \texttt{bad\_make\_multiplier} returns, \texttt{env} no longer exists. The closure contains a dangling pointer.
+
+Some C compilers provide nonstandard closure-like extensions. GCC nested functions can refer to enclosing variables in some modes, and Apple/Clang blocks provide a stronger closure-like extension:
+
+\begin{verbatim}
+int factor = 3;
+
+int (^multiply)(int) = ^int(int value) {
+    return value * factor;
+};
+
+printf("%d\n", multiply(10));
+\end{verbatim}
+
+Blocks can capture surrounding variables and may be copied to the heap when they must outlive their creation scope. This is not ISO C, but it shows what extra compiler/runtime machinery is needed to support closures safely.
+
+Duff's Device and similar C control-flow tricks are not closures. They can encode unusual jump and loop behavior, and they can be used in manual state-machine-style code, but they do not automatically preserve lexical environments. For closure behavior in C, the real portable pattern is still: function pointer plus explicit environment pointer.
+
+\paragraph{Bash: no lexical closures, but state can be approximated with globals, subshells, and generated commands.}
+
+Bash does not have lexical closures in the Python or JavaScript sense. Shell functions do not automatically capture local lexical environments as heap-preserved callable objects.
+
+A Bash function can use global variables:
+
+\begin{verbatim}
+prefix="item:"
+
+print_item() {
+    echo "$prefix $1"
+}
+
+print_item "apple"
+\end{verbatim}
+
+The useful application is small script configuration, but this is not a true closure. The function reads the variable \texttt{prefix} from the shell environment/scope rules when it runs. If \texttt{prefix} changes, the function sees the changed value.
+
+\begin{verbatim}
+prefix="first:"
+print_item "apple"
+
+prefix="second:"
+print_item "apple"
+\end{verbatim}
+
+This is not heap-preserved lexical state. It is lookup in the shell's current variable environment.
+
+A callback-like function generator can be approximated with \texttt{eval}, but this is fragile and often unsafe:
+
+\begin{verbatim}
+make_printer() {
+    local name="$1"
+    local prefix="$2"
+
+    eval "$name() { echo '$prefix' \"\$1\"; }"
+}
+
+make_printer print_error "ERROR:"
+print_error "file missing"
+\end{verbatim}
+
+This creates a named function whose body contains the chosen prefix text. The useful application is limited script metaprogramming, but it is not the same as a runtime closure object. It is command-text generation.
+
+The shell stack behavior is ordinary shell function execution:
+
+\begin{verbatim}
+top shell frame
++-----------------------------+
+| frame: print_error          |
++-----------------------------+
+| frame: script top level     |
++-----------------------------+
+bottom
+\end{verbatim}
+
+If Bash runs a subshell:
+
+\begin{verbatim}
+prefix="inside"
+
+(
+    echo "$prefix"
+)
+\end{verbatim}
+
+The subshell receives a copy of the shell state, but this is process/environment behavior, not a lexical closure object. External commands receive environment variables, arguments, and file descriptors, not live references to the parent shell's local variables.
+
+Therefore, Bash can emulate some closure-like uses through globals, command strings, exported environment, or generated functions, but it does not provide true lexical closures as first-class callable objects.
+
+\paragraph{Closures and stack preservation: the crucial distinction.}
+
+A closure does not usually preserve the entire old stack frame. It preserves only the variables that the inner function needs, and it stores them in runtime-managed environment storage.
+
+The wrong mental model is:
+
+\begin{verbatim}
+outer function returns
+    whole old stack frame remains alive
+\end{verbatim}
+
+The better model is:
+
+\begin{verbatim}
+outer function returns
+    ordinary stack frame disappears
+    captured variables survive in heap/environment objects
+    returned function points to that environment
+\end{verbatim}
+
+A general closure diagram is:
+
+\begin{verbatim}
+callable object
++-----------------------------+
+| pointer to code             |
+| pointer to environment      |
++-----------------------------+
+              |
+              v
+environment object / cells
++-----------------------------+
+| captured variable 1         |
+| captured variable 2         |
++-----------------------------+
+\end{verbatim}
+
+Different runtimes implement the environment differently:
+
+\begin{center}
+\begin{tabular}{|p{0.15\textwidth}|p{0.34\textwidth}|p{0.35\textwidth}|}
+\hline
+\textbf{Language} & \textbf{Closure representation} & \textbf{Stack and lifetime behavior} \\
+\hline
+Python / CPython & Function object plus \texttt{\_\_closure\_\_} cells & Outer Python frame disappears; captured variables survive in cell objects referenced by function \\
+\hline
+JavaScript / V8 & Function object plus lexical environment & Old JS call frame disappears; lexical environment survives while reachable from function/event structures \\
+\hline
+Java / JVM & Lambda or anonymous object with captured values as fields or equivalent state & Method frame disappears; captured values live inside heap object or referenced heap objects \\
+\hline
+PHP / Zend & Closure object with variables captured by \texttt{use}, by value or by reference & Function frame disappears; captured variables live in closure storage \\
+\hline
+C & No standard closure; manual struct with function pointer and environment pointer & Caller must place environment on heap or otherwise ensure lifetime; stack environment causes dangling pointer if it escapes \\
+\hline
+Bash & No true lexical closures & Uses current shell variables, generated functions, subshell copies, or command strings; no first-class heap-preserved lexical environment \\
+\hline
+\end{tabular}
+\end{center}
+
+Closures are useful because they combine executable behavior with remembered context. They allow small pieces of code to carry private configuration or state without using global variables. They appear in validators, decorators, route handlers, GUI event handlers, AJAX callbacks, timer callbacks, stream operations, plugin hooks, and factory functions.
+
+The architectural point is deeper than syntax. A closure proves that the runtime can separate function lifetime from stack-frame lifetime. The function may outlive the call that created it. The stack frame may disappear. The selected environment variables remain reachable because the runtime moved or represented them in heap-preserved storage. This is one of the clearest examples of a high-level runtime owning execution state beyond the simple native call stack model.
+
+

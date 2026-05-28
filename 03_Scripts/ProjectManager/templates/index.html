@@ -16,7 +16,7 @@
     </script>
     <link rel="stylesheet" href="/static/styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-    <script defer src="/static/app.js?v=28"></script>
+    <script defer src="/static/app.js?v=29"></script>
   </head>
   <body class="bg-neutral-100 text-neutral-900 min-h-screen">
     <header class="border-b border-neutral-300 bg-white px-2 py-1 flex items-center gap-2 flex-wrap">
@@ -222,8 +222,11 @@
           <span class="panel-title mb-0">Course synopsis</span>
           <span id="synopsisPathHint" class="text-xxs text-neutral-500 mono truncate flex-1 min-w-0"></span>
           <span id="synopsisSaveState" class="synopsis-save-state text-xxs text-neutral-500"></span>
-          <button id="synopsisMarkdownBtn" type="button" class="btn-secondary" title="Export expanded branches to 99_Markdowns/full_content.md">
+          <button id="synopsisMarkdownBtn" type="button" class="btn-secondary" title="Export the full synopsis tree to 99_Markdowns/full_content.md">
             Markdown
+          </button>
+          <button id="synopsisSyncContentBtn" type="button" class="btn-secondary" title="Create LaTeX folders under root_dir 00_CONTENT from the synopsis tree">
+            Sync with content
           </button>
           <button id="synopsisReloadBtn" type="button" class="btn-secondary">Reload</button>
         </div>
@@ -315,10 +318,9 @@
         <p class="text-xxs text-neutral-500 shrink-0 mb-1 leading-snug">
           Drag headings to reorder; order is saved to disk automatically. Regenerating with
           <span class="mono">build_course_synopsis.py</span> overwrites manual changes.
-          <strong>Markdown</strong> exports the current tree to
+          <strong>Markdown</strong> exports the full current tree to
           <span class="mono">99_Markdowns/full_content.md</span> (next to the repo that contains this
-          config&apos;s <span class="mono">03_Scripts</span> folder), including only branches that are
-          <em>expanded</em> in this session (collapsed subtrees are omitted).
+          config&apos;s <span class="mono">03_Scripts</span> folder), regardless of fold state in the viewer.
         </p>
         <div class="synopsis-tree-shell relative flex-1 min-h-0 overflow-hidden flex flex-col">
           <div
@@ -476,6 +478,29 @@
           <button id="proofFileAnalyzeBtn" class="btn-primary" type="button">Analyze with ChatGPT</button>
         </div>
         <pre id="proofFileViewer" class="source-viewer mono mt-2 text-xxs max-h-[60vh] overflow-auto"><code></code></pre>
+      </div>
+    </div>
+
+    <div id="synopsisChapterModal" class="source-modal hidden" aria-hidden="true">
+      <div
+        class="source-dialog source-dialog-proof"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="synopsisChapterTitle"
+      >
+        <div class="source-dialog-header">
+          <div class="min-w-0">
+            <div class="font-semibold text-xxs">Chapter synopsis</div>
+            <div id="synopsisChapterTitle" class="text-xxs text-neutral-500 truncate"></div>
+          </div>
+          <button id="synopsisChapterCloseBtn" class="btn-secondary ml-auto shrink-0" type="button">
+            close
+          </button>
+        </div>
+        <pre
+          id="synopsisChapterViewer"
+          class="source-viewer mono mt-2 text-xxs max-h-[70vh] overflow-auto"
+        ><code></code></pre>
       </div>
     </div>
 

@@ -1,0 +1,333 @@
+\subsection{Program Loading and Execution Mechanics}
+
+\subsubsection{The Lifecycle of Transformation: From Storage Binary Block to Active Virtual Memory Process}
+
+After compilation, assembly, and linking, the program exists as an executable binary file stored on a persistent medium. It may be an ELF executable on Linux, a PE executable on Windows, or another platform-specific executable format. At this stage, the program is still not running. It is a structured block of stored data. It contains machine instructions, data sections, metadata, headers, symbol information, relocation information, dynamic dependency descriptions, and an entry point description, but none of its instructions are currently being executed by the processor.
+
+The transition from stored executable file to active process begins when the user, shell, script, desktop environment, or another process requests execution. On a Unix-like system, this request eventually reaches a system call such as \texttt{execve()}. On Windows, a related role is performed through process-creation APIs such as \texttt{CreateProcess()}. The exact interface differs, but the architectural event is the same: user-space code asks the operating system kernel to create or replace a process image using an executable file.
+
+The operating system does not simply copy the whole executable file into memory and start reading it from the first byte. An executable file is not a flat instruction tape. It is a formatted binary object that must be interpreted by the loader. The loader reads the executable headers, checks that the file is valid for the current system, determines which parts must be mapped into memory, prepares the initial process state, and finally transfers control to the program's entry point.
+
+The lifecycle can be simplified as the following transformation chain:
+
+\begin{verbatim}
+executable file on disk
+        |
+        | kernel / loader reads executable format
+        v
+validated executable image description
+        |
+        | virtual memory mappings are created
+        v
+process virtual address space
+        |
+        | stack, arguments, environment, registers prepared
+        v
+initial execution context
+        |
+        | control transferred to entry point
+        v
+running process
+\end{verbatim}
+
+The first major operation is validation. The kernel or loader must determine whether the file is actually an executable of a supported format. It checks the executable header, the target architecture, permissions, required loader behavior, and sometimes security constraints. A Linux system cannot normally execute a Windows PE file directly because the loader does not treat it as a native ELF executable. A processor cannot execute instructions compiled for an incompatible architecture unless an emulation or translation layer is involved.
+
+Once the executable is accepted, the operating system creates or replaces a process image. In the common Unix \texttt{fork()} followed by \texttt{exec()} model, \texttt{fork()} creates a new process by duplicating the current one, and \texttt{exec()} replaces that process's memory image with the new executable. In other systems or APIs, process creation and executable loading may be combined into one operation. Regardless of the interface, the result is that the operating system constructs a new runtime container for the program.
+
+This runtime container is the process. The process receives a virtual address space. The executable's loadable regions are mapped into that address space according to the executable format. Code regions are usually mapped as readable and executable but not writable. Data regions are usually mapped as readable and writable. Read-only constants may be mapped as readable but not writable. The heap and stack are not simply copied from the executable file; they are runtime memory regions created for the process.
+
+This is the point where the static structure of the executable becomes an active memory layout. The binary file may describe that a certain segment must appear at a certain virtual address range with certain permissions. The loader uses that description to create virtual memory mappings. These mappings connect regions of the process address space to file-backed pages, anonymous memory pages, or other operating-system-managed memory objects.
+
+The transformation is not necessarily eager. Modern operating systems usually do not copy every byte of the executable into physical memory immediately. Instead, they create mappings. Pages may be loaded from disk only when they are first touched. This is possible because virtual memory and page faults allow the operating system to delay physical loading until actual access. From the program's point of view, the memory appears available. Internally, the kernel may populate it lazily.
+
+The loader also prepares memory that does not come directly from the executable file. The stack must be created. Command-line arguments must be placed in a form that startup code can read. Environment variables must be made available. Auxiliary information may be written for the runtime or dynamic linker. The initial stack is therefore not an arbitrary empty region. It is a carefully prepared runtime structure.
+
+If the executable depends on shared libraries, the dynamic linking machinery also becomes part of the lifecycle. The executable may request libraries such as the C runtime library or other shared objects. These libraries must be located, validated, mapped into the process address space, and connected to the executable through symbol resolution and relocation mechanisms. The process that begins execution is often not only the main executable; it is the main executable plus a set of mapped shared libraries.
+
+After memory mappings are prepared, the operating system initializes the execution context. The processor must be given a starting instruction address. The stack pointer must point to the initial stack. Other registers may be initialized according to the platform ABI. The process must also be registered with the scheduler so that it can receive CPU time.
+
+The final step is control handover. The kernel returns from its loading path not to the caller's ordinary next instruction, but into the newly prepared execution context. The instruction pointer is set to the executable's entry point or to a dynamic loader entry point that will eventually reach the program's startup code. At that moment, the stored binary has become an active running process.
+
+For a C program, this does not usually mean that the first executed user-level instruction is the first instruction inside \texttt{main()}. The native entry point normally belongs to runtime startup code. That startup code prepares the C runtime environment, initializes required runtime structures, handles constructors or initialization arrays if needed, prepares arguments, and then calls \texttt{main()}. When \texttt{main()} returns, control usually goes back to runtime cleanup code, which then terminates the process through an operating-system call.
+
+This distinction matters because \texttt{main()} is the source-level entry convention of C programs, not necessarily the first native instruction executed after loading. The operating system loader works with executable-format entry points. The C runtime then bridges from that low-level entry point to the programmer's \texttt{main()} function.
+
+The same lifecycle also explains what happens when Python code is launched from a command line such as:
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+The operating system does not transform \texttt{script.py} into a native process. Instead, it loads the executable binary named \texttt{python} or \texttt{python.exe}. That executable goes through the native loading lifecycle described above. Once the CPython process is active, the interpreter opens \texttt{script.py}, parses it, compiles it to bytecode, creates Python-level execution frames, and executes the program inside the interpreter process.
+
+Thus, there are two transformation layers in the Python case. At the operating-system layer, the CPython interpreter executable is transformed from storage binary into active process. At the language-runtime layer, the Python source file is transformed into bytecode and executed by the interpreter. Confusing these two layers leads to the mistaken idea that the operating system directly runs Python source code.
+
+The lifecycle from stored binary to running process is therefore the operating-system side of execution. It is the stage where a passive executable file becomes an isolated virtual memory environment with code mappings, data mappings, stack, heap potential, loaded libraries, register state, and scheduler identity. Only after this transformation does the processor begin executing the program's instructions.
+
+
+\subsubsection{The OS Loader Subsystem: VMA Memory Mapping, Page Table Initialization, and Stack Argument Injection}
+
+The operating system loader is the component responsible for turning the executable file's loading description into a real process memory image. The executable file already contains information about which regions must be loaded, which permissions they require, where execution should begin, and which dynamic dependencies may be needed. The loader interprets this information and builds the initial virtual memory structure of the process.
+
+The loader does not treat the executable as a simple byte array. It reads the executable format and identifies its loadable regions. In ELF, these are described mainly by program headers. In PE/COFF, similar information is described through PE headers and section tables. The loader uses this metadata to decide which parts of the file become memory regions in the process virtual address space.
+
+On Linux, these memory regions are commonly described as \textbf{virtual memory areas}, or VMAs. A VMA is a continuous range of virtual addresses with common properties: readable, writable, executable, private, shared, file-backed, anonymous, and so on. A process is not just given one large block of memory. Its address space is built from many mapped regions, each with a specific role.
+
+A simplified process memory map may contain regions such as:
+
+\begin{itemize}
+    \item executable code mapped from the program file;
+    \item read-only constants mapped from the program file;
+    \item initialized writable data mapped from the program file;
+    \item uninitialized data backed by zero-filled memory;
+    \item shared libraries mapped into the same process;
+    \item the process heap;
+    \item the main thread stack;
+    \item special kernel or runtime helper mappings.
+\end{itemize}
+
+Each region has permissions. The code region is normally executable and readable, but not writable. Writable data is normally readable and writable, but not executable. These permissions are part of process isolation and security. If a program tries to write into a read-only code segment, the processor and operating system can detect the violation and raise a memory protection fault.
+
+The loader creates mappings, not merely copies. A file-backed mapping connects a virtual address range to bytes stored inside the executable or shared library file. The physical memory page may not be loaded immediately. Instead, the operating system may wait until the process first accesses that page. When access occurs, a page fault brings the required page into physical memory. This lazy loading avoids unnecessary work and is one reason large programs can start without reading every byte of every mapped file immediately.
+
+The loader also initializes anonymous memory regions. Anonymous memory is memory that does not directly come from a file. The stack is anonymous. Heap pages are anonymous when first created. The BSS region, which represents uninitialized global or static storage, is usually backed by zero-filled memory rather than by explicit bytes stored in the executable. The executable describes the size of this region, but the file does not need to physically contain thousands or millions of zero bytes.
+
+After deciding what virtual memory regions must exist, the operating system must make address translation possible. This requires page table initialization. A page table is a data structure used by the processor's memory management unit to translate virtual addresses into physical memory locations or into faults that the kernel can handle.
+
+From the program's point of view, an instruction may access an address such as:
+
+\begin{verbatim}
+0x7fffffffdc00
+\end{verbatim}
+
+The processor does not treat this as a physical RAM address directly. It asks the memory management unit to translate it through the page tables associated with the current process. If the page table says the address is valid and has the requested permission, the access continues. If the page is not present, or if the requested access violates permissions, the processor traps into the kernel.
+
+This is how the operating system gives each process its own private address space. Two processes may both contain a virtual address such as \texttt{0x400000}, but their page tables may map that address to different physical pages. The virtual address is meaningful only inside the address space of the current process.
+
+The page tables do not have to map every possible virtual address. Most of the address space is usually unmapped. If a program dereferences a pointer into unmapped memory, the page-table lookup fails and the kernel receives a trap. If the access is invalid, the process may be terminated with an error such as a segmentation fault or access violation.
+
+The loader must also prepare the initial stack. The stack is not empty when user code begins. It contains startup information required by the runtime. In a C program, \texttt{main()} commonly receives arguments in the form:
+
+\begin{verbatim}
+int main(int argc, char *argv[])
+\end{verbatim}
+
+The values \texttt{argc} and \texttt{argv} do not appear by magic. They are constructed from command-line arguments supplied when the program was launched. The loader and runtime startup code cooperate to place this information into memory and make it available in the form expected by the C runtime.
+
+The initial stack usually contains information such as:
+
+\begin{itemize}
+    \item command-line argument strings;
+    \item pointers to those argument strings;
+    \item the argument count;
+    \item environment variable strings;
+    \item pointers to environment variables;
+    \item auxiliary platform information used by the runtime or dynamic loader.
+\end{itemize}
+
+A simplified view is:
+
+\begin{verbatim}
+initial stack
+    argc
+    argv[0] -> program name string
+    argv[1] -> first command-line argument
+    argv[2] -> second command-line argument
+    ...
+    envp[0] -> first environment string
+    envp[1] -> second environment string
+    ...
+    auxiliary runtime data
+\end{verbatim}
+
+The exact layout depends on the operating system and ABI, but the principle is stable: the process starts with an already prepared stack containing the data needed by the startup code. The programmer sees this through \texttt{argc}, \texttt{argv}, environment access functions, or higher-level runtime abstractions.
+
+This stack preparation is called \textbf{stack argument injection} in the sense that the operating system constructs the initial stack content before the user-level program begins normal execution. The future process does not read command-line arguments from nowhere. They are copied or mapped into the process address space by the loader path.
+
+The loader also prepares dynamic libraries when needed. If the executable depends on shared libraries, the dynamic loader maps those libraries into the same process address space. Each library receives its own code and data mappings. Some relocations may be applied immediately. Some symbol resolutions may be delayed depending on lazy binding behavior. The important point is that the final process image usually contains more than the main executable file.
+
+Once mappings are established, page tables are prepared, dynamic dependencies are handled, and the initial stack is built, the process has the memory structure required to run. The loader can then prepare the initial register state. The instruction pointer must point to the correct entry location. The stack pointer must point to the top of the prepared stack. Other registers must satisfy the platform's startup convention.
+
+Only after these steps can the process begin executing user-mode instructions. The executable file has now been transformed into a process memory image: code is mapped, data is mapped, the stack exists, arguments exist, libraries may be present, page tables define valid address translation, and the processor has a starting execution context.
+
+This also clarifies the Python case. When the command
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+is launched, the loader performs these operations for the native Python interpreter executable. The process memory image belongs to CPython. The argument \texttt{script.py} is placed among the command-line arguments available to that interpreter process. CPython later reads that file as input, compiles it to bytecode, and executes it inside its own runtime. The loader does not map the Python source file as executable machine code. It maps and starts the interpreter executable.
+
+Therefore, the loader subsystem is the concrete operating-system machinery that builds a process from an executable. It creates virtual memory areas, initializes page-table mappings, prepares file-backed and anonymous memory regions, constructs the initial stack, injects command-line and environment data, maps shared libraries when required, and sets the initial execution context. Without this loading phase, an executable file would remain only a passive binary object on storage.
+
+\subsubsection{Relocation Invariants and Control Handover to the Hardware Thread Execution Context}
+
+After the executable and its required libraries have been mapped into the process virtual address space, the loader must make sure that all address-dependent references are valid. This is the role of relocation. Relocation is the process of adjusting addresses, offsets, pointers, and symbolic references so that code and data refer to their real runtime locations inside the process.
+
+A compiled program often contains references to functions, global variables, constants, jump targets, tables, and external library symbols. At compile time, many of these references cannot be known as final absolute virtual addresses. The compiler and assembler may know that a function named \texttt{printf} is needed, or that a global variable named \texttt{counter} exists, but they may not know the final address where that function or variable will appear after linking and loading.
+
+Some address decisions are made during static linking. The linker combines object files, resolves many symbols, assigns section layouts, and patches many references. However, not everything can always be fixed before execution. Dynamically linked libraries may be mapped at addresses chosen when the process starts. Security mechanisms such as address space layout randomization, commonly called ASLR, intentionally vary load addresses between executions. Shared libraries may also be loaded in different regions depending on what else is already mapped into the process.
+
+Therefore, the executable may still contain relocation entries. A relocation entry tells the loader or dynamic linker that a particular location in code or data must be adjusted once the final runtime address of a symbol or segment is known. Conceptually, a relocation entry says:
+
+\begin{quote}
+When the process image is created, compute the real address or offset of this target and write the corrected value here.
+\end{quote}
+
+For example, if a global pointer must point to a global object, the executable may contain a placeholder value. During loading, the dynamic linker computes the actual virtual address of that object and writes the correct pointer value. If a function call targets a symbol in a shared library, the dynamic linker must connect that call path to the loaded library function. If a table contains addresses of functions, those addresses may need to be fixed before the program uses the table.
+
+Relocation must preserve several invariants. An invariant is a condition that must remain true for execution to be correct. Important relocation invariants include:
+
+\begin{itemize}
+    \item every required external symbol must resolve to a valid definition;
+    \item every relocated address must point into a valid mapped region;
+    \item executable code must not refer to stale link-time addresses if the runtime load address differs;
+    \item relocation must respect memory permissions, such as read-only code and writable data;
+    \item the final process image must be internally consistent before control is given to user-level startup code.
+\end{itemize}
+
+If these invariants are not satisfied, execution cannot safely begin. A missing shared library, an unresolved external symbol, an incompatible binary interface, or an invalid relocation can prevent the program from starting. In such cases, the loader reports an error before the program reaches its normal entry point.
+
+Modern systems try to reduce the amount of relocation needed at load time. One important technique is \textbf{position-independent code}, often abbreviated as PIC. Position-independent code is generated so that it can execute correctly regardless of the exact virtual address where it is loaded. Instead of relying heavily on fixed absolute addresses, it uses relative addressing, tables, and indirection mechanisms. Shared libraries commonly use this style because the same library may be mapped into different address regions in different processes.
+
+Dynamic linking often uses tables for external references. In ELF systems, mechanisms such as the Global Offset Table and Procedure Linkage Table are used to support access to external data and functions. The exact details are platform-specific, but the idea is simple: rather than hard-coding every external address directly into instructions, the program uses runtime-filled tables or stubs that point to the correct target after loading. Windows PE executables use related import table mechanisms to connect imported functions from DLLs.
+
+Relocation also interacts with memory protection. Code pages are normally mapped as executable and read-only. Data pages are normally writable but not executable. If relocation requires writing corrected addresses into memory, the loader must do this in regions where such writing is allowed, or temporarily adjust permissions in a controlled way. After relocation, some regions may become read-only again. This reduces the possibility that a program or attacker can modify executable code or critical linking structures at runtime.
+
+Once relocation and dynamic symbol resolution have reached the required state, the process image is ready for execution. The loader has mapped executable segments, prepared data segments, created the stack, injected arguments and environment information, mapped shared libraries, and fixed required addresses. The remaining task is to hand control to the initial execution context.
+
+A running program is not started by a vague command such as ``begin running this file''. The processor needs concrete register values. Most importantly, it needs an instruction pointer value. The instruction pointer is the register that tells the processor where the next instruction is located. On x86-64 this role is associated with \texttt{RIP}. Other architectures have their own names for the same concept.
+
+The loader prepares the initial hardware thread context. A hardware thread context includes the instruction pointer, stack pointer, processor mode, and other register state required to begin execution. The stack pointer must point to the prepared initial stack. The instruction pointer must point to the executable entry location or to a dynamic loader entry location that will later transfer control to the program startup code.
+
+This control handover is not the same as an ordinary function call from user code. Before the program starts, there is no caller frame from the program itself. The kernel or loader path constructs the process state and then arranges for the processor to resume execution in user mode at the selected entry address. From that moment onward, the process executes its first user-mode instruction.
+
+The selected entry address is usually not the C function \texttt{main()} directly. In a normal C program, the executable entry point usually belongs to runtime startup code. That startup code is responsible for preparing the C runtime environment. It may initialize runtime structures, process initialization arrays, prepare standard library state, arrange arguments in the form expected by \texttt{main()}, and then call \texttt{main()}.
+
+A simplified handover chain looks like this:
+
+\begin{verbatim}
+kernel / loader
+    prepares process memory and registers
+        |
+        v
+native executable entry point
+        |
+        v
+C runtime startup code
+        |
+        v
+main(argc, argv, envp)
+        |
+        v
+runtime cleanup and process termination
+\end{verbatim}
+
+This is why \texttt{main()} should be understood as the conventional source-level entry point of a C program, not necessarily as the first instruction executed in the process. The operating system loader works with executable entry points. The C runtime bridges from that low-level entry point to the programmer's \texttt{main()} function.
+
+The same model applies when launching Python, but with another layer added. When the command
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+is executed, the loader prepares the process image for the native CPython executable. Relocations are applied to the interpreter executable and its native shared libraries. The instruction pointer is handed to CPython's native startup code. CPython initializes its runtime, reads the command-line argument \texttt{script.py}, opens that file, parses it, compiles it to bytecode, and executes the bytecode inside the interpreter.
+
+Thus, the hardware thread begins by executing native machine instructions from the Python interpreter, not instructions from the Python source file. The Python program's execution begins later, inside the already-running interpreter process.
+
+Relocation and control handover are therefore the final steps that convert a prepared process image into actual CPU execution. Relocation guarantees that all address-dependent structures refer to valid runtime locations. Control handover installs the initial register state and gives the processor an instruction address from which execution can begin. At that moment, the executable stops being only a mapped binary image and becomes an actively executing process.
+
+
+\subsubsection{Native Entry Points: Loader Handover, C Runtime Startup, and the Call to \texttt{main()}}
+
+When an executable file is loaded into memory, execution does not begin in an arbitrary place. The executable format contains an \textbf{entry point}: a virtual address that tells the loader where the first user-mode instruction of the loaded program image should be executed. After memory mappings, relocations, stack preparation, shared library loading, and register initialization are complete, the loader transfers control to this entry point.
+
+This entry point is a native machine-code address. It belongs to the executable image or, in dynamically linked cases, sometimes first to dynamic loader startup code. It is not chosen by scanning the source file for a function named \texttt{main}. The operating system loader does not understand C source-level conventions. It understands executable metadata, virtual addresses, memory permissions, and processor state.
+
+This distinction is important because C programmers often say that ``a C program starts at \texttt{main()}.'' This is true at the source-code programming model level, but it is not exactly true at the native loading level. The operating system does not usually call \texttt{main()} directly. The operating system transfers control to the executable's native entry point. That entry point normally belongs to the \textbf{C runtime startup code}. The C runtime then prepares the environment required by the C program and eventually calls \texttt{main()}.
+
+A simplified execution chain looks like this:
+
+\begin{verbatim}
+operating system loader
+        |
+        v
+native executable entry point
+        |
+        v
+C runtime startup code
+        |
+        v
+main(argc, argv, envp)
+        |
+        v
+return from main
+        |
+        v
+C runtime cleanup
+        |
+        v
+process termination system call
+\end{verbatim}
+
+The C runtime startup code is a small but important layer between the loader and the programmer's function. Its exact implementation depends on the operating system, compiler, standard library, and executable format. On Linux systems using common C toolchains, startup code is commonly associated with symbols such as \texttt{\_start}. On Windows, the corresponding startup path is different, but the architectural idea is the same: there is lower-level startup code before the source-level \texttt{main()} function runs.
+
+The startup code performs several initialization tasks. It must arrange the command-line arguments into the form expected by C. It must prepare the C standard library environment. It may initialize global constructors in C++ or initialization arrays in C toolchains. It may prepare thread-local storage, runtime bookkeeping, environment access, standard streams, and other runtime details. Only after these tasks are ready does it call the programmer's entry function.
+
+In ordinary hosted C programs, that function is usually written as one of the following forms:
+
+\begin{verbatim}
+int main(void)
+\end{verbatim}
+
+or:
+
+\begin{verbatim}
+int main(int argc, char *argv[])
+\end{verbatim}
+
+The first form means the program does not explicitly receive command-line arguments. The second form receives an argument count and an array of pointers to argument strings. Some environments also expose environment variables through an additional parameter or through library functions.
+
+The values passed to \texttt{main()} are prepared before the function is called. For example:
+
+\begin{verbatim}
+int main(int argc, char *argv[]) {
+    return 0;
+}
+\end{verbatim}
+
+does not receive \texttt{argc} and \texttt{argv} from the compiler as compile-time constants. They are runtime values derived from the process startup state. The loader and startup code cooperate to make the command-line arguments available inside the process memory. The C runtime then passes them to \texttt{main()} according to the platform's calling convention.
+
+The call to \texttt{main()} is therefore a normal function call made by runtime startup code, not a magical hardware event. By the time \texttt{main()} begins executing, the process already exists. Its virtual address space has already been built. Its stack already exists. Its executable and libraries have already been mapped. Required relocations have already been handled. The hardware thread is already running user-mode instructions.
+
+The return from \texttt{main()} is also not the immediate destruction of the process by hardware. When \texttt{main()} returns an integer, control returns to the C runtime startup layer. That layer can perform cleanup tasks and then terminate the process through the operating system. A statement such as:
+
+\begin{verbatim}
+return 0;
+\end{verbatim}
+
+inside \texttt{main()} conventionally signals successful program termination. A nonzero return value conventionally signals some kind of error or abnormal result. The exact interpretation is made by the surrounding environment, such as the shell or parent process.
+
+A program can also terminate without returning normally from \texttt{main()}. It may call \texttt{exit()}, abort because of a fatal error, receive a signal, trigger an unhandled hardware fault, or be killed by the operating system or another process with sufficient permission. In these cases, the ordinary return path through \texttt{main()} may not occur.
+
+This layered startup model explains why the source-level view and the operating-system view are different. At source level, \texttt{main()} is the central beginning of the programmer's logic. At executable level, the real first instruction is whatever address the executable header marks as the entry point. At runtime level, the C runtime startup code bridges these two worlds.
+
+The same distinction becomes essential when comparing C and Python. When a command such as
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+is executed, the operating system loader starts the native executable \texttt{python} or \texttt{python.exe}. That executable has its own native entry point and its own runtime startup path, because CPython itself is written largely in C and is built as a native program. The loader does not call a \texttt{main()} function inside \texttt{script.py}. The file \texttt{script.py} is not a native executable and has no operating-system entry point.
+
+Instead, CPython's native process starts first. Its C-level startup code initializes the interpreter runtime, processes command-line arguments, prepares internal memory management, initializes built-in modules and import machinery, and then treats \texttt{script.py} as input to the Python runtime. The Python source file is then parsed, compiled to bytecode, and executed inside the interpreter process.
+
+Therefore, there are two different meanings of ``program start'':
+
+\begin{itemize}
+    \item in native C execution, program startup begins with loader handover to the executable entry point and then proceeds through C runtime startup to \texttt{main()};
+    \item in Python execution, the operating system starts the CPython executable, and the user's Python file starts only later as interpreted runtime input.
+\end{itemize}
+
+This is the final piece of the native loading model. The loader prepares a process and jumps to a native entry point. Runtime startup code prepares language-level execution. Only then does the familiar programmer-defined entry function, such as C's \texttt{main()}, begin. Understanding this separation prevents a common confusion: \texttt{main()} is the beginning of the programmer's C logic, not the first event in the life of the process.
+

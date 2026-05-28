@@ -1,54 +1,135 @@
-# Sequential component data architectures (strings, lists, and tuples)
+# CHAPTER: Sequential Component Data Architectures (Strings, Lists, and Tuples)
 
-## 3.1 Text Encoding Systems, Lexical Escape Maps, and Character Representation
+## The General Sequence Model in Python
 
-### 3.1.1 Character Interoperability Standards
-#### 3.1.1.1 The Classical Domain: The 8-Bit Strict Bounds of ASCII Codepoints (0–255 Limits)
-#### 3.1.1.2 The Universal Map: The Multi-Byte Extended Standard of Unicode Architecture
+### Ordered Component Storage and Positional Access
 
-### 3.1.2 Native Conversion and Boundary Escape Sequences
-#### 3.1.2.1 Octal Literal Parsing Boundaries (`\000` Values through Base-8 Conversions)
-#### 3.1.2.2 Hexadecimal Literal Parsing Boundaries (`\xhh` Values through Base-16 Conversions)
+#### Indexing: Zero-Based Component Addressing with Positive and Negative Offsets
 
-### 3.1.3 Extended Universal Codepoint Escape Access
-#### 3.1.3.1 Formal Lexical Extraction: Querying Literals via System Naming Maps (`\N{...}`)
-#### 3.1.3.2 Planar Transformations: 16-Bit Base-16 Codepoint Jumps via UTF-16 Escape Maps (`\u`)
-#### 3.1.3.3 Absolute Space Mapping: 32-Bit Base-16 Extended Jumps via UTF-32 Absolute Maps (`\U`)
+#### Slicing: Extracting Sub-Sequences with `[start:stop:step]`
 
-## 3.2 CPython String Memory Realities (`str`)
+#### Length, Membership, and Iteration: `len()`, `in`, and Sequential Traversal
 
-### 3.2.1 Structural Abstraction of the Unicode Standard
-#### 3.2.1.1 Distinction Between Abstract Codepoints, Visible Glyphs, and Transmitted Byte Serializations
+### Sequence Operators and Shared Behaviors
 
-### 3.2.2 CPython Memory Optimization Architecture (PEP 393)
-#### 3.2.2.1 The Flexible String Representation Framework: How CPython Alters Character Data Width Dynamically (1, 2, or 4 Bytes per Character) Based on the Maximum Codepoint Value
-#### 3.2.2.2 Core Immutability: Fixed Heap Allocations and Read-Only Object Array Subsystems
-#### 3.2.2.3 Computational and Allocation Overhead of Iterative String Concatenation Modifiers
-#### 3.2.2.4 The Interning Subsystem: Immutable String Optimization and Singly Allocated Literals inside CPython
+#### Concatenation and Repetition: `+` and `*` Across Compatible Sequence Types
 
-### 3.2.3 Structural Extraction and Evaluation
-#### 3.2.3.1 Substring Evaluation Mechanisms: Step-Based Slice Offsets (`[start:stop:step]`) vs. Manual Pointer Offsets
-#### 3.2.3.2 String Formatting Paradigms: Evaluative Bytecode Compilation and Variable Injection via Modern f-strings
+#### Equality and Lexicographic Comparison Rules
 
-## 3.3 Dynamic Pointer Arrays: The Python List Architecture (`list`)
+#### Immutability vs. Mutability as the Major Structural Split
 
-### 3.3.1 The Memory Layout Paradigm Contrast
-#### 3.3.1.1 The C Array Blueprint: Fixed, Contiguous Structures Storing Homogeneous Raw Primitive Values Directly
-#### 3.3.1.2 The Python List Blueprint: A Contiguous Array Storing Heterogeneous `PyObject*` References on the Heap
+## Text Encoding Systems, Lexical Escape Maps, and Character Representation
 
-### 3.3.2 CPython Dynamic Scaling Mechanics
-#### 3.3.2.1 Dynamic Over-allocation Invariants: How CPython Pre-allocates Extra Slots During List Resizing to Guarantee Amortized O(1) Insertion Bounds
-#### 3.3.2.2 Memory Shifting Costs: Analyzing the O(N) Penalty of Arbitrary Index Insertions and Deletions (`.insert()`, `.pop()`)
+### Character Interoperability Standards
 
-### 3.3.3 Deep vs. Shallow Structural Cloning
-#### 3.3.3.1 Shallow Slicing Realities: Copying Pointer References vs. Duplicating the Targeted Heap Object Instances
+#### The Classical Domain: 7-Bit ASCII Codepoints (`0–127`) and the Later Confusion with 8-Bit Extended Encodings
 
-## 3.4 Fixed Structural Contiguity: The Tuple Architecture (`tuple`)
+#### The Universal Map: Unicode Codepoints as Abstract Character Numbers, Separate from Byte Encodings
 
-### 3.4.1 Immutable Sequence Invariants
-#### 3.4.1.1 Structural Definition: Fixed-Size, Read-Only Sequential Storage of `PyObject*` Addresses
-#### 3.4.1.2 The Concept of Transitive Mutability: Why a Tuple is Structurally Unalterable, Yet May Reference Internally Mutable Objects (e.g., a Tuple Containing a Mutable List Instance)
+#### Encoding Boundaries: UTF-8, UTF-16, and UTF-32 as Byte Representations of Unicode Text
 
-### 3.4.2 CPython Allocation Optimizations
-#### 3.4.2.1 Free-List Optimization: How CPython Recycles Dead Tuple Allocations to Accelerate Small Tuple Instantiations
-#### 3.4.2.2 Memory Footprint Metrics: Comparing the Minimal Overhead of Fixed `tuple` Layouts Against the Dynamic Tracking Buffers of `list`
+### Native Conversion and Boundary Escape Sequences
+
+#### Octal Literal Parsing Boundaries (`\000` Values through Base-8 Conversions)
+
+#### Hexadecimal Literal Parsing Boundaries (`\xhh` Values through Base-16 Conversions)
+
+#### Raw String Literals: Suppressing Most Escape Processing with the `r"..."` Prefix
+
+### Extended Universal Codepoint Escape Access
+
+#### Formal Lexical Extraction: Querying Literals via System Naming Maps (`\N{...}`)
+
+#### Planar Transformations: 16-Bit Base-16 Codepoint Escapes via `\u`
+
+#### Absolute Space Mapping: 32-Bit Base-16 Extended Codepoint Escapes via `\U`
+
+## CPython String Memory Realities (`str`)
+
+### Structural Abstraction of the Unicode Standard
+
+#### Distinction Between Abstract Codepoints, Visible Glyphs, and Transmitted Byte Serializations
+
+#### Text vs. Bytes: Why `str` Stores Text and `bytes` Stores Raw Byte Values
+
+### CPython Memory Optimization Architecture (PEP 393)
+
+#### The Flexible String Representation Framework: Dynamic Character Data Width Selection Based on Maximum Codepoint Value
+
+#### Core Immutability: Fixed Heap Allocations and Read-Only Character Storage
+
+#### Computational and Allocation Overhead of Iterative String Concatenation
+
+#### The Interning Subsystem: Immutable String Optimization and Singly Allocated Literals inside CPython
+
+### Structural Extraction and Evaluation
+
+#### Indexing and Slicing: Characters as One-Character String Objects
+
+#### Substring Evaluation Mechanisms: Step-Based Slice Offsets (`[start:stop:step]`) vs. Manual Pointer Offsets
+
+#### String Formatting Paradigms: Variable Injection via Modern f-Strings
+
+### String Sequence Operations
+
+#### Searching and Membership: `in`, `.find()`, `.index()`, `.startswith()`, and `.endswith()`
+
+#### Splitting and Joining: `.split()` and `.join()` as Core Text-Sequence Transformations
+
+#### Replacement and Case Transformation: `.replace()`, `.lower()`, `.upper()`, and `.casefold()`
+
+## Dynamic Pointer Arrays: The Python List Architecture (`list`)
+
+### The Memory Layout Paradigm Contrast
+
+#### The C Array Blueprint: Fixed, Contiguous Structures Storing Homogeneous Raw Primitive Values Directly
+
+#### The Python List Blueprint: A Contiguous Array Storing Heterogeneous `PyObject*` References on the Heap
+
+### CPython Dynamic Scaling Mechanics
+
+#### Dynamic Over-Allocation Invariants: How CPython Pre-Allocates Extra Slots During List Resizing to Support Amortized O(1) Appends
+
+#### Memory Shifting Costs: The O(N) Penalty of Arbitrary Index Insertions and Deletions (`.insert()`, `.pop()`)
+
+### List Mutation Operations
+
+#### Appending and Extending: `.append()` vs. `.extend()`
+
+#### Index Assignment and Slice Assignment
+
+#### Removing Elements: `.remove()`, `.pop()`, and `del`
+
+#### Sorting and Reversing In Place: `.sort()` and `.reverse()`
+
+### Deep vs. Shallow Structural Cloning
+
+#### Assignment Is Not Copying: Shared List References with `b = a`
+
+#### Shallow Copies: `a[:]`, `list(a)`, and `.copy()`
+
+#### Nested Structures: Why Shallow Copying Fails for Lists Inside Lists
+
+#### Deep Copying with `copy.deepcopy()`
+
+## Fixed Structural Contiguity: The Tuple Architecture (`tuple`)
+
+### Tuple Syntax and Structural Role
+
+#### Tuple Packing: Comma-Based Construction with or Without Parentheses
+
+#### Tuple Unpacking: Decomposing Fixed-Length Structures into Multiple Names
+
+#### Single-Element Tuple Syntax: Why `(x,)` Is a Tuple but `(x)` Is Not
+
+### Immutable Sequence Invariants
+
+#### Structural Definition: Fixed-Size, Read-Only Sequential Storage of `PyObject*` Addresses
+
+#### The Concept of Transitive Mutability: Why a Tuple Is Structurally Unalterable, Yet May Reference Internally Mutable Objects
+
+### CPython Allocation Optimizations
+
+#### CPython Allocation Caching: Version-Dependent Recycling Optimizations for Small Tuple Objects
+
+#### Memory Footprint Metrics: Comparing Fixed `tuple` Layouts Against the Dynamic Tracking Buffers of `list`

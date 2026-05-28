@@ -13,19 +13,11 @@ from typing import Any
 from course_synopsis_utils import (
     HEADING_LEVELS,
     assign_preorder_ids_and_depth_types,
-    number_depth,
 )
 
-CHAPTER_HEADING_RE = re.compile(r"^#\s+CHAPTER\s+(\d+):\s*(.+)$", re.IGNORECASE)
-# Real ATX headings: ## / ### / … with numbered title (e.g. ## 6.1 Title, #### 6.1.1.1 …)
-ATX_NUMBERED_HEADING_RE = re.compile(
-    r"^#{1,6}\s+(\d+(?:\.\d+)+)\s+(.+)$",
-)
-SUBSECTION_HEADING_RE = re.compile(r"^\*\s+\*\*(\d+(?:\.\d+)+)\s*(.+)\*\*")
-BULLET_HEADING_RE = re.compile(r"^(\s+)\*\s+(\d+(?:\.\d+)+)\s+(.+)$")
-# Plain ATX `# Title` used as chapter heading when `# CHAPTER n:` is absent (see Chapter2+ files).
-# Allow optional whitespace after `#` (#Title and # Title); exclude `##` via negative lookahead.
-PLAIN_ATX_H1_RE = re.compile(r"^#(?!\#)\s*(.+)$")
+# ATX headings: hierarchy from ``#`` count only; leading outline numbers in titles are stripped.
+ATX_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+)$")
+_CHAPTER_PREFIX_RE = re.compile(r"^CHAPTER\s*(?:\d+)?\s*:\s*", re.IGNORECASE)
 
 CHAPTER_FILES = [
     "Chapter1_Synopsis.md",
@@ -35,6 +27,7 @@ CHAPTER_FILES = [
     "Chapter5_synopsis.md",
     "Chapter6_synopsis.md",
     "Chapter7_synopsis.md",
+    "Chapter8_synopsis.md",
 ]
 
 INTRODUCTION_CHAPTER = {
@@ -97,6 +90,14 @@ def _clean_atx_title(raw: str) -> str:
     return t.strip()
 
 
+def _clean_heading_title(raw: str, *, heading_depth: int) -> str:
+    """Normalize ATX title text; drop optional ``CHAPTER n:`` prefix on H1 lines."""
+    t = _strip_heading_title_numbers(_clean_atx_title(raw))
+    if heading_depth == 1:
+        t = _CHAPTER_PREFIX_RE.sub("", t).strip() or t
+    return t
+
+
 def _infer_placeholder_chapter() -> dict[str, Any]:
     """When parsing needs a chapter root before any title is known (no H1/`# CHAPTER` yet)."""
     return make_outline_node(outline="1", title="Chapter")
@@ -106,22 +107,33 @@ def parse_chapter_file(path: Path) -> dict[str, Any] | None:
     lines = path.read_text(encoding="utf-8").splitlines()
     chapter: dict[str, Any] | None = None
     stack: list[dict[str, Any]] = []
+    sibling_indices: list[int] = []
 
     def ensure_chapter() -> None:
-        nonlocal chapter, stack
+        nonlocal chapter, stack, sibling_indices
         if chapter is None:
             chapter = _infer_placeholder_chapter()
             stack = [chapter]
+            sibling_indices = []
 
-    def attach_by_outline_depth(node: dict[str, Any]) -> None:
-        """Parent is the nearest stack node with depth strictly less than this node's outline."""
-        nonlocal stack
-        ou = str(node.get("_outline") or "")
-        d = number_depth(ou)
-        if d <= 1:
+    def next_synthetic_outline(depth: int) -> str:
+        """Sibling-based placeholder outline (stripped before JSON export)."""
+        while len(sibling_indices) < depth - 1:
+            sibling_indices.append(0)
+        while len(sibling_indices) > depth - 1:
+            sibling_indices.pop()
+        sibling_indices[-1] += 1
+        return ".".join(["1", *[str(n) for n in sibling_indices]])
+
+    def attach_by_heading_depth(node: dict[str, Any], depth: int) -> None:
+        """Parent is the nearest stack node above this heading's ``#`` depth."""
+        nonlocal stack, sibling_indices
+        if depth <= 1:
             return
-        while len(stack) >= d:
+        while len(stack) >= depth:
             stack.pop()
+        while len(sibling_indices) > depth - 1:
+            sibling_indices.pop()
         if not stack:
             return
         stack[-1]["children"].append(node)
@@ -132,41 +144,23 @@ def parse_chapter_file(path: Path) -> dict[str, Any] | None:
         if not line.strip():
             continue
 
-        match = CHAPTER_HEADING_RE.match(line)
-        if match:
-            number, title = match.group(1), match.group(2)
-            chapter = make_outline_node(outline=number, title=title)
+        match = ATX_HEADING_RE.match(line)
+        if not match:
+            continue
+
+        hashes, title_raw = match.group(1), match.group(2)
+        depth = len(hashes)
+        title = _clean_heading_title(title_raw, heading_depth=depth)
+
+        if depth == 1:
+            chapter = make_outline_node(outline="1", title=title)
             stack = [chapter]
+            sibling_indices = []
             continue
 
-        match = PLAIN_ATX_H1_RE.match(line)
-        if match and chapter is None:
-            title_raw = _clean_atx_title(match.group(1))
-            chapter = make_outline_node(outline="1", title=title_raw)
-            stack = [chapter]
-            continue
-
-        match = ATX_NUMBERED_HEADING_RE.match(line)
-        if match:
-            ensure_chapter()
-            num, title_raw = match.group(1), _clean_atx_title(match.group(2))
-            node = make_outline_node(outline=num, title=title_raw)
-            attach_by_outline_depth(node)
-            continue
-
-        match = SUBSECTION_HEADING_RE.match(line)
-        if match:
-            ensure_chapter()
-            node = make_outline_node(outline=match.group(1), title=match.group(2))
-            attach_by_outline_depth(node)
-            continue
-
-        match = BULLET_HEADING_RE.match(line)
-        if match:
-            ensure_chapter()
-            node = make_outline_node(outline=match.group(2), title=match.group(3))
-            attach_by_outline_depth(node)
-            continue
+        ensure_chapter()
+        node = make_outline_node(outline=next_synthetic_outline(depth), title=title)
+        attach_by_heading_depth(node, depth)
 
     return chapter
 

@@ -33,6 +33,7 @@ const synopsisState = {
   sortableInstances: [],
   busy: false,
   exportMdBusy: false,
+  syncContentBusy: false,
 };
 
 /** Session-only: node id → branch children visible (true = expanded). Survives local re-renders; reconciled when tree ids change. */
@@ -135,8 +136,13 @@ const els = {
   synopsisSaveState: document.getElementById("synopsisSaveState"),
   synopsisReloadBtn: document.getElementById("synopsisReloadBtn"),
   synopsisMarkdownBtn: document.getElementById("synopsisMarkdownBtn"),
+  synopsisSyncContentBtn: document.getElementById("synopsisSyncContentBtn"),
   synopsisBusy: document.getElementById("synopsisBusy"),
   synopsisBusyHint: document.getElementById("synopsisBusyHint"),
+  synopsisChapterModal: document.getElementById("synopsisChapterModal"),
+  synopsisChapterCloseBtn: document.getElementById("synopsisChapterCloseBtn"),
+  synopsisChapterTitle: document.getElementById("synopsisChapterTitle"),
+  synopsisChapterViewer: document.getElementById("synopsisChapterViewer"),
 };
 
 function escapeHtml(value) {
@@ -570,12 +576,10 @@ async function synopsisExportMarkdown() {
   if (els.synopsisBusyHint) els.synopsisBusyHint.textContent = "Writing full_content.md…";
   synopsisSetSaveUi("Exporting…");
   try {
-    const branch_expanded = Object.fromEntries(synopsisFoldSession.branchExpanded);
     await api("/api/course-synopsis/export-markdown", {
       method: "POST",
       body: JSON.stringify({
         tree: synopsisState.tree,
-        branch_expanded,
       }),
     });
     synopsisSetSaveUi("Wrote Markdown");
@@ -586,6 +590,60 @@ async function synopsisExportMarkdown() {
   } finally {
     synopsisState.exportMdBusy = false;
     synopsisBindBusy(false);
+    if (els.synopsisBusyHint) els.synopsisBusyHint.textContent = "Saving…";
+  }
+}
+
+async function synopsisSyncContent() {
+  const treeOut = synopsisSerializeDomTree();
+  if (!treeOut.length) {
+    showError("Synopsis tree is empty — open Course synopsis and click Reload first.");
+    return;
+  }
+  if (synopsisState.syncContentBusy) return;
+
+  synopsisState.syncContentBusy = true;
+  synopsisBindBusy(true);
+  if (els.synopsisSyncContentBtn) els.synopsisSyncContentBtn.disabled = true;
+  if (els.synopsisBusyHint) els.synopsisBusyHint.textContent = "Syncing 00_CONTENT…";
+  synopsisSetSaveUi("Syncing…");
+  showError("");
+
+  try {
+    const data = await api("/api/course-synopsis/sync-content", {
+      method: "POST",
+      body: JSON.stringify({ tree: treeOut }),
+    });
+    const pending = data.pending_orphans || [];
+    if (pending.length > 0) {
+      const sample = pending.slice(0, 6).join(", ");
+      const more = pending.length > 6 ? ` (+${pending.length - 6} more)` : "";
+      showError(
+        `${pending.length} folder(s) on disk are not in the synopsis (left unchanged): ${sample}${more}. ` +
+          "Set content_sync_rename_orphans in main_project.json or confirm via API to DELETED_-rename them.",
+      );
+    }
+    const parts = [];
+    if (data.created_dirs) parts.push(`${data.created_dirs} dir(s) created`);
+    if (data.created_files) parts.push(`${data.created_files} file(s) created`);
+    if (data.renamed_orphans?.length) {
+      parts.push(`${data.renamed_orphans.length} orphan(s) renamed`);
+    }
+    const n = data.inspected_folders?.length;
+    if (n) parts.push(`${n} in inspected_folders`);
+    synopsisSetSaveUi(parts.length ? parts.join("; ") : "Synced");
+    await loadState();
+  } catch (err) {
+    let msg = err.message || "Sync failed";
+    if (err.status === 404) {
+      msg += " — restart the project manager (old server has no sync-content route).";
+    }
+    showError(msg);
+    synopsisSetSaveUi("");
+  } finally {
+    synopsisState.syncContentBusy = false;
+    synopsisBindBusy(false);
+    if (els.synopsisSyncContentBtn) els.synopsisSyncContentBtn.disabled = false;
     if (els.synopsisBusyHint) els.synopsisBusyHint.textContent = "Saving…";
   }
 }
@@ -617,6 +675,103 @@ function synopsisDestroySortables() {
   synopsisState.sortableInstances = [];
 }
 
+const SYNOPSIS_HEADING_LEVELS = {
+  chapter: 1,
+  section: 2,
+  subsection: 3,
+  subsubsection: 4,
+};
+
+function synopsisOneLine(text) {
+  return String(text ?? "")
+    .split(/\r?\n/)
+    .join(" ")
+    .trim();
+}
+
+function synopsisHeadingMarkdown(node) {
+  const ntype = String(node.type || "").toLowerCase();
+  const title = synopsisOneLine(node.title ?? "(untitled)");
+  const rawLevel = node.level;
+  let level;
+  if (Number.isInteger(rawLevel)) {
+    level = rawLevel;
+  } else if (typeof rawLevel === "string" && /^\d+$/.test(rawLevel.trim())) {
+    level = Number(rawLevel.trim());
+  } else {
+    level = SYNOPSIS_HEADING_LEVELS[ntype] ?? 1;
+  }
+  level = Math.max(1, Math.min(level, 6));
+  const hashes = "#".repeat(level);
+  if (ntype === "chapter") {
+    return `# CHAPTER: ${title}\n\n`;
+  }
+  return `${hashes} ${title}\n\n`;
+}
+
+function synopsisParagraphsMarkdown(node) {
+  const raw = node.paragraphs;
+  if (!Array.isArray(raw) || !raw.length) return "";
+  const parts = [];
+  for (const item of raw) {
+    let t;
+    if (item && typeof item === "object") {
+      t = String(item.text ?? item.body ?? item.content ?? item.markdown ?? "").trim();
+    } else {
+      t = String(item ?? "").trim();
+    }
+    if (t) parts.push(t.replace(/\s+$/, ""));
+  }
+  if (!parts.length) return "";
+  return `${parts.join("\n\n")}\n\n`;
+}
+
+function synopsisExportNodeTreeToMarkdown(node) {
+  const chunks = [];
+  const walk = (n) => {
+    if (!n || typeof n !== "object") return;
+    chunks.push(synopsisHeadingMarkdown(n));
+    chunks.push(synopsisParagraphsMarkdown(n));
+    for (const child of n.children || []) {
+      walk(child);
+    }
+  };
+  walk(node);
+  const body = chunks.join("").trimEnd();
+  return body ? `${body}\n` : "\n";
+}
+
+function synopsisOpenChapterDisplay(nodeId) {
+  const node = synopsisState.nodeById.get(String(nodeId ?? ""));
+  if (!node || String(node.type || "").toLowerCase() !== "chapter") return;
+  const title = synopsisOneLine(node.title ?? "(untitled)");
+  const markdown = synopsisExportNodeTreeToMarkdown(node);
+  if (els.synopsisChapterTitle) {
+    els.synopsisChapterTitle.textContent = title;
+  }
+  if (els.synopsisChapterViewer) {
+    const code = els.synopsisChapterViewer.querySelector("code");
+    if (code) code.textContent = markdown;
+    else els.synopsisChapterViewer.textContent = markdown;
+  }
+  els.synopsisChapterModal?.classList.remove("hidden");
+  els.synopsisChapterModal?.setAttribute("aria-hidden", "false");
+}
+
+function synopsisCloseChapterDisplay() {
+  if (!els.synopsisChapterModal) return;
+  els.synopsisChapterModal.classList.add("hidden");
+  els.synopsisChapterModal.setAttribute("aria-hidden", "true");
+}
+
+function synopsisOnDisplaySynopsisClick(ev) {
+  const btn = ev.target.closest("[data-synopsis-display]");
+  if (!btn || !els.synopsisTree?.contains(btn)) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  synopsisOpenChapterDisplay(btn.dataset.synopsisDisplay);
+}
+
 function synopsisLiMarkup(node) {
   const rawId = String(node.id ?? "");
   const idEsc = escapeHtml(rawId);
@@ -626,6 +781,10 @@ function synopsisLiMarkup(node) {
   const expanded = !hasKids || synopsisFoldGet(rawId);
   const typ = escapeHtml(String((node.type || "").toLowerCase()));
   const title = escapeHtml(String(node.title ?? "(untitled)"));
+  const isChapter = String(node.type || "").toLowerCase() === "chapter";
+  const displaySynopsisBtn = isChapter
+    ? `<button type="button" class="synopsis-display-btn btn-secondary shrink-0 px-1 py-0 text-xxs ml-auto" data-synopsis-display="${idEsc}" title="Display chapter synopsis as Markdown">display synopsis</button>`
+    : "";
   const collapsedCls = hasKids && !expanded ? " synopsis-branch-collapsed" : "";
   const foldGlyph = expanded ? "▾" : "▸";
   const foldCtl = hasKids
@@ -638,6 +797,7 @@ function synopsisLiMarkup(node) {
         <button type="button" class="synopsis-drag-handle mono select-none shrink-0" title="Drag to reorder">≡</button>
         <span class="structure-kind synopsis-node-type">${typ}</span>
         <span class="synopsis-node-title">${title}</span>
+        ${displaySynopsisBtn}
       </div>
       <ul class="synopsis-children">${inner}</ul>
     </li>
@@ -713,6 +873,9 @@ function synopsisBindBusy(show) {
   if (!els.synopsisBusy) return;
   els.synopsisBusy.classList.toggle("hidden", !show);
   els.synopsisBusy.setAttribute("aria-hidden", show ? "false" : "true");
+  if (els.synopsisSyncContentBtn) {
+    els.synopsisSyncContentBtn.disabled = show && synopsisState.syncContentBusy;
+  }
 }
 
 function synopsisApplyPayload(data) {
@@ -2520,7 +2683,13 @@ els.synopsisReloadBtn?.addEventListener("click", async () => {
   await loadSynopsisTree();
 });
 els.synopsisMarkdownBtn?.addEventListener("click", synopsisExportMarkdown);
+els.synopsisSyncContentBtn?.addEventListener("click", synopsisSyncContent);
 els.synopsisTree?.addEventListener("click", synopsisOnFoldToggleClick);
+els.synopsisTree?.addEventListener("click", synopsisOnDisplaySynopsisClick);
+els.synopsisChapterCloseBtn?.addEventListener("click", synopsisCloseChapterDisplay);
+els.synopsisChapterModal?.addEventListener("click", (event) => {
+  if (event.target === els.synopsisChapterModal) synopsisCloseChapterDisplay();
+});
 els.tabPanelSynopsis?.addEventListener("click", synopsisOnBulkFoldClick);
 
 proofInitModelSelect();
@@ -2597,6 +2766,10 @@ document.addEventListener("keydown", (event) => {
   if (event.key !== "Escape") return;
   if (els.proofApiErrorModal && !els.proofApiErrorModal.classList.contains("hidden")) {
     closeProofApiErrorModal();
+    return;
+  }
+  if (els.synopsisChapterModal && !els.synopsisChapterModal.classList.contains("hidden")) {
+    synopsisCloseChapterDisplay();
     return;
   }
   if (!els.floatInventoryModal.classList.contains("hidden")) {

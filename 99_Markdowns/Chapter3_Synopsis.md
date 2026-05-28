@@ -1,67 +1,129 @@
-# The python memory model, variables, and scalar data types
+# CHAPTER: Variables and Singular Data Types
 
-## 2.1 CPython Memory Management Dynamics and Object Topologies
+## Identifiers and Syntax Rules for Variables
 
-### 2.1.1 The Base Object Framework
-#### 2.1.1.1 The Realization of the "Everything is an Object" Paradigm: Unifying Functions, Types, and Primitives as First-Class Heap Entities
-#### 2.1.1.2 Underlying C Representation: Unpacking the `PyObject` Base Struct (Reference Count Tracker `ob_refcnt` and Type Object Pointer `ob_type`)
+### Legal and Structural Lexer Constraints
 
-### 2.1.2 The Heap Subsystem and Object Allocation
-#### 2.1.2.1 The Managed Runtime Allocation Arena: PyMalloc and Private Heap Segmentation Subsystems
-#### 2.1.2.2 Explicit Dynamic Instantiation: Analyzing Instance Generation on the Heap (The CPython Analogue to C `malloc()`)
-#### 2.1.2.3 Object Persistence Invariants: Reference Counting Foundations and Automated Slot Reclamation Realities
+#### Digit Restrictions: Why Identifiers Cannot Start with a Numerical Character
 
-### 2.1.3 The Stack Subsystem and Reference Storage
-#### 2.1.3.1 High-Speed Virtual Machine Thread Execution Scopes and Evaluation Stacks
-#### 2.1.3.2 Storage Restrictions: Isolating Local Variable Scope References and Object Pointers to Heap Locations
-#### 2.1.3.3 Lifecycle Transitions: Frame Destruction, Stack Pointer Offsets, and Unwinding Call Scopes
+#### Valid Characters: Letters, Digits, Underscore (`_`), and Unicode Identifier Rules
 
-### 2.1.4 Introspection of Core Object Properties
-#### 2.1.4.1 Identity Verification: Memory Address Tracking via the `id()` Function and Native Pointer Disambiguation
-#### 2.1.4.2 Dynamic Metadata Analysis: Runtime Type Descriptor Extraction via the `type()` Framework
-#### 2.1.4.3 The Variable-as-Label Paradigm Shift: Address Aliasing and Binding Multiple Stack Names to an Identical Heap Instance (`a = b`)
+#### Reserved Keywords: Why `def`, `class`, `import`, and Similar Tokens Cannot Be Used as Names
 
+#### Case Sensitivity: `name`, `Name`, and `NAME` as Distinct Bindings
 
-## 2.2 Identifiers and Syntax Rules for Variables
+### Stylistic Coding Conventions
 
-### 2.2.1 Legal and Structural Lexer Constraints
-#### 2.2.1.1 Digit Restrictions: Prohibiting Leading Numerical Character Tokens at the Tokenizer Phase
-#### 2.2.1.2 Valid Character Domains: Alphanumeric Boundaries, Character Sets, and Underscore (`_`) Packaging
-#### 2.2.1.3 Reserved Keyword Collisions: System-Imposed Lexical Protections for Statement Keywords (`def`, `class`, `import`)
-#### 2.2.1.4 Case Sensitivity Matrix: Execution Isolation of Distinct Identifier Registers Inside Local Name Dictionaries
+#### Alignment with the PEP 8 Style Guide
 
-### 2.2.2 Stylistic Coding Conventions
-#### 2.2.2.1 Alignment with the PEP 8 Style Guide Engineering Standards
-#### 2.2.2.2 Semantic Readable Conventions: Variable Implementations using Lowercase `snake_case`
+#### Readable Naming Conventions: Lowercase `snake_case` for Ordinary Variables
 
-## 2.3 Scalar Numeric Domains and Operator Precedence
+#### Underscore Conventions: Internal Names, Throwaway Names, and Special Method Boundaries
 
-### 2.3.1 The Integer Representation Architecture (`int`)
-#### 2.3.1.1 Arbitrary-Precision Math Engine: Eliminating System Integer Overflow and Modulo Boundaries
-#### 2.3.1.2 Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation Upgrades for High-Magnitude Arbitrary Values
+## Assignment and Name Binding
 
-### 2.3.2 The Floating-Point Representation Architecture (`float`)
-#### 2.3.2.1 Architectural Realities: The Direct Mapping of Python Floats to C Doubles via the IEEE 754 Double-Precision Binary Standard
-#### 2.3.2.2 Machine Epsilon and Precision Loss: The Algorithmic Pitfalls of Representing Base-10 Fractions in Base-2 Memory Buffers
+### Simple Assignment: Creating or Rebinding a Name
 
-### 2.3.3 The Complex Representation Architecture (`complex`)
-#### 2.3.3.1 Language-Native Integration via the Mathematical Imaginary Component `j` Literal
-#### 2.3.3.2 Segment Access Mechanisms: Isomorphic Extraction of `.real` and `.imag` Underlying Float Properties
+#### Assignment as Binding, Not Memory Copying
 
-### 2.3.4 Numerical Operator Architecture and Precedence Graphs
-#### 2.3.4.1 Standard Arithmetic: Addition (`+`), Subtraction (`-`), and Multiplication (`*`) Operator Allocation
-#### 2.3.4.2 Division Divergence: Exact Float Division (`/`) vs. Truncating Floor/Integer Division (`//`)
-#### 2.3.4.3 Modular Math (`%`) and Exponentiation (`**`) Mechanics: Bytecode Compilation Precedence and Associativity Rules
+#### Reassignment: Moving a Name from One Object to Another
 
-## 2.4 Structural Typology and Typing Ecosystems
+#### Object Sharing: Binding Multiple Names to the Same Runtime Object (`a = b`)
 
-### 2.4.1 Chronology of Compile-Time vs. Runtime Type Assignment
-#### 2.4.1.1 Static Typing: Early Domain Commitments, Variable Box Allocation, and Type Compilation (C, C++, Java Models)
-#### 2.4.1.2 Dynamic Typing: Late-Binding Runtime Object Attachment and Variable Name Labeling (Python Model)
+### Multiple Assignment and Unpacking
 
-### 2.4.2 Coercion Strictness Metrics
-#### 2.4.2.1 Weak Typing: Implicit Convergent Coercion and Silent Runtime Context Casting (JavaScript Model)
-#### 2.4.2.2 Strong Typing: Rigid Type-Safety Boundaries and the Prohibition of Implicit Heterogeneous Type Operations (Python Model)
+#### Parallel Assignment: Swapping Values with `a, b = b, a`
 
-### 2.4.3 Structural Summary
-#### 2.4.3.1 Categorizing Python as a Dynamically Bound, Strongly Verified Runtime Typing Environment
+#### Sequence Unpacking and Arity Requirements
+
+#### Extended Unpacking with the Star Target (`*rest`)
+
+### Augmented Assignment
+
+#### Numeric Augmented Assignment (`+=`, `-=`, `*=`, `/=`) as Read-Operate-Rebind for Immutable Singular Values
+
+#### Mutation vs. Rebinding Preview for Later Mutable Containers
+
+### Deleting Names
+
+#### Removing a Binding with `del`
+
+#### Name Deletion, Object Reachability, and Possible Reference Count Changes
+
+## Singular Data Domains and Operator Precedence
+
+### The Integer Representation Architecture (`int`)
+
+#### Arbitrary-Precision Math Engine: Eliminating Fixed-Width Integer Overflow Boundaries
+
+#### Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation for High-Magnitude Values
+
+#### Integer Literals: Decimal, Binary, Octal, and Hexadecimal Notation
+
+### The Floating-Point Representation Architecture (`float`)
+
+#### Architectural Realities: Mapping Python Floats to C Doubles via the IEEE 754 Double-Precision Binary Standard
+
+#### Machine Epsilon and Precision Loss: The Pitfalls of Representing Base-10 Fractions in Base-2 Memory Buffers
+
+#### Special Floating-Point Values: Infinity, Negative Infinity, and NaN
+
+### The Complex Representation Architecture (`complex`)
+
+#### Language-Native Integration via the Mathematical Imaginary Component `j` Literal
+
+#### Component Access Mechanisms: Extracting `.real` and `.imag` Floating-Point Parts
+
+#### Complex Arithmetic Boundaries: Why Ordering Comparisons Are Not Defined for Complex Numbers
+
+### The Boolean Representation Architecture (`bool`)
+
+#### Boolean Values as Singleton Objects: `True` and `False`
+
+#### Boolean as a Subclass of Integer: Numeric Compatibility and Practical Warnings
+
+#### Logical Operators vs. Bitwise Operators: `and` / `or` / `not` Compared with `&` / `|` / `~`
+
+### The Null-Sentinel Object (`None`)
+
+#### `None` as a Singleton Object, Not a Null Pointer
+
+#### Absence, Default Return Values, and Missing-Value Signaling
+
+#### Identity Testing with `is None` and `is not None`
+
+### Numerical Operator Architecture and Precedence Graphs
+
+#### Standard Arithmetic: Operator Dispatch and Result Object Creation
+
+#### Division Divergence: Floating-Point Division (`/`) vs. Floor Division (`//`)
+
+#### Modular Math (`%`) and Exponentiation (`**`) Mechanics
+
+#### Unary Operators and Precedence Traps: `-x`, `+x`, and `-2 ** 2`
+
+#### Parentheses as Explicit Precedence Control
+
+## Runtime Typing Consequences in Singular Operations
+
+### Dynamic Typing in Assignment
+
+#### Names Do Not Have Fixed Declared Types
+
+#### Rebinding the Same Name to Objects of Different Types
+
+#### Runtime Type Inspection with `type()` and `isinstance()`
+
+### Strong Typing in Operations
+
+#### Why Heterogeneous Operations Such as `"3" + 4` Fail Instead of Silently Converting
+
+#### Explicit Conversion with `int()`, `float()`, `complex()`, `bool()`, and `str()`
+
+#### Numeric Promotion Boundaries: Integer, Float, Complex, and Boolean Interactions
+
+### Structural Summary
+
+#### Categorizing Python as a Dynamically Bound, Strongly Verified Runtime Typing Environment
+
+#### The Practical Rule: Names Are Flexible, Objects Keep Their Runtime Type
