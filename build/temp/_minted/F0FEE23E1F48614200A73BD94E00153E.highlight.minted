@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nx}{host}\PYG{+w}{ }\PYG{n+nx}{starts}\PYG{+w}{ }\PYG{n+nx}{I}\PYG{o}{/}\PYG{n+nx}{O}\PYG{+w}{ }\PYG{n+nx}{operation}
+\PYG{+w}{    }\PYG{n+nx}{stores}\PYG{+w}{ }\PYG{n+nx}{promise}\PYG{+w}{ }\PYG{n+nx}{continuation}
+
+\PYG{n+nx}{I}\PYG{o}{/}\PYG{n+nx}{O}\PYG{+w}{ }\PYG{n+nx}{completes}
+\PYG{+w}{    }\PYG{n+nx}{host}\PYG{+w}{ }\PYG{n+nx}{queues}\PYG{+w}{ }\PYG{n+nx}{microtask}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{n+nx}{continuation}
+
+\PYG{n+nx}{V8}\PYG{+w}{ }\PYG{n+nx}{executes}\PYG{+w}{ }\PYG{n+nx}{continuation}
+\PYG{+w}{    }\PYG{k}{async}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{+w}{ }\PYG{n+nx}{resumes}\PYG{+w}{ }\PYG{n+nx}{after}\PYG{+w}{ }\PYG{k}{await}
+\end{MintedVerbatim}

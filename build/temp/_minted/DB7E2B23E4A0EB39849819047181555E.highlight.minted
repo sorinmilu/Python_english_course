@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{k}{function} \PYG{n+nf}{make\PYGZus{}counter}\PYG{p}{()} \PYG{p}{\PYGZob{}}
+    \PYG{n+nv}{\PYGZdl{}count} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;}
+
+    \PYG{k}{return} \PYG{k}{function} \PYG{p}{()} \PYG{k}{use} \PYG{p}{(}\PYG{o}{\PYGZam{}}\PYG{n+nv}{\PYGZdl{}count}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n+nv}{\PYGZdl{}count} \PYG{o}{+=} \PYG{l+m+mi}{1}\PYG{p}{;}
+        \PYG{k}{return} \PYG{n+nv}{\PYGZdl{}count}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{};}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nv}{\PYGZdl{}counter} \PYG{o}{=} \PYG{n+nx}{make\PYGZus{}counter}\PYG{p}{();}
+
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}counter}\PYG{p}{();} \PYG{c+c1}{// 1}
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}counter}\PYG{p}{();} \PYG{c+c1}{// 2}
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}counter}\PYG{p}{();} \PYG{c+c1}{// 3}
+\end{MintedVerbatim}

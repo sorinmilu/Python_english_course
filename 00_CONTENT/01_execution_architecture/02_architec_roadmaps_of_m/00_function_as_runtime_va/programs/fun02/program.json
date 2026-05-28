@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: no standard closures, explicit environment structs, and lifetime hazards.",
+  "label": "fun02",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

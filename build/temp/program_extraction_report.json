@@ -1,0 +1,1825 @@
+{
+  "mode": "apply",
+  "total_files": 189,
+  "total_accepted": 55,
+  "total_rejected": 551,
+  "results": [
+    {
+      "file": "00_CONTENT/00_Introduction/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/00_foundationsOfExecutionArchitecture/content.tex",
+      "accepted": [],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/00_foundationsOfExecutionArchitecture/content.tex",
+          "reason": "too_few_lines",
+          "preview": "python script.py"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+      "accepted": [],
+      "rejected_count": 117,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import numpy"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "error while loading shared libraries: libexample.so:"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+          "reason": "unknown_language",
+          "preview": "program executable"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int missing_function(void);"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "/* math_utils.c */"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+      "accepted": [],
+      "rejected_count": 14,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "python script.py"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "return 0;"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int main(int argc, char *argv[]) {"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int main(int argc, char *argv[])"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int main(void)"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+      "accepted": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "slug": "c-the-process-stack-automatic-variable-lifetime-tracking-cal",
+          "language": "c",
+          "title": "The Process Stack: Automatic Variable Lifetime Tracking, Call Chains, and Pus...",
+          "program_dir": "programs/c-the-process-stack-automatic-variable-lifetime-tracking-cal",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "slug": "c-the-data-and-bss-segments-initialized-and-uninitialized-gl",
+          "language": "c",
+          "title": "The Data and BSS Segments: Initialized and Uninitialized Global/Static Variab...",
+          "program_dir": "programs/c-the-data-and-bss-segments-initialized-and-uninitialized-gl",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 49,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "reason": "too_few_lines",
+          "preview": "parse_line()"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int *huge_array = malloc(100000000 * sizeof(int));"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "reason": "too_few_lines",
+          "preview": "void dangerous(void) {"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "reason": "too_few_lines",
+          "preview": "factorial(3)"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
+          "reason": "unknown_language",
+          "preview": "int factorial(int n) {"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+      "accepted": [],
+      "rejected_count": 30,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+          "reason": "too_few_lines",
+          "preview": "async def bad_task():"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+          "reason": "too_few_lines",
+          "preview": "g = numbers()"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def numbers():"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+          "reason": "too_few_lines",
+          "preview": "async def fetch_data():"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
+          "reason": "unknown_language",
+          "preview": "Coroutine A starts async read"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+      "accepted": [],
+      "rejected_count": 47,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "reason": "too_few_lines",
+          "preview": "ls"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "reason": "too_few_lines",
+          "preview": "cd /tmp"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "Bash script text"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "JavaScript source"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": ".class bytecode"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+      "accepted": [],
+      "rejected_count": 54,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "source code"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "T1 = ADD CV(a), CV(b)"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "LOAD a        -> accumulator"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "ADD r3, r1, r2"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "reason": "too_few_lines",
+          "preview": "ADD RAX, RBX"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+      "accepted": [],
+      "rejected_count": 60,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "Python code"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+          "reason": "too_few_lines",
+          "preview": "total = 0"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "JVM bytecode"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "JavaScript source"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "generic bytecode operation"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+      "accepted": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "c-c-no-standard-closures-explicit-environment-structs-and-li",
+          "language": "c",
+          "title": "C: no standard closures, explicit environment structs, and lifetime hazards.",
+          "program_dir": "programs/c-c-no-standard-closures-explicit-environment-structs-and-li",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-closures-with-textttuse",
+          "language": "php",
+          "title": "PHP: closures with \\texttt{use",
+          "program_dir": "programs/php-php-closures-with-textttuse",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-closures-with-textttuse-02",
+          "language": "php",
+          "title": "PHP: closures with \\texttt{use",
+          "program_dir": "programs/php-php-closures-with-textttuse-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "java-java-captured-variables-in-lambdas-and-generated-callab",
+          "language": "java",
+          "title": "Java: captured variables in lambdas and generated callable objects.",
+          "program_dir": "programs/java-java-captured-variables-in-lambdas-and-generated-callab",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "java-java-captured-variables-in-lambdas-and-generated-callab-02",
+          "language": "java",
+          "title": "Java: captured variables in lambdas and generated callable objects.",
+          "program_dir": "programs/java-java-captured-variables-in-lambdas-and-generated-callab-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks",
+          "language": "javascript",
+          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
+          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks-02",
+          "language": "javascript",
+          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
+          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks-03",
+          "language": "javascript",
+          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
+          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks-03",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi",
+          "language": "python",
+          "title": "Python / CPython: closure cells and non-local lexical bindings.",
+          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi-02",
+          "language": "python",
+          "title": "Python / CPython: closure cells and non-local lexical bindings.",
+          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi-03",
+          "language": "python",
+          "title": "Python / CPython: closure cells and non-local lexical bindings.",
+          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi-03",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "c-c-no-standard-lambdas-but-function-pointers-and-nonstandar",
+          "language": "c",
+          "title": "C: no standard lambdas, but function pointers and nonstandard emulations.",
+          "program_dir": "programs/c-c-no-standard-lambdas-but-function-pointers-and-nonstandar",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "c-c-no-standard-lambdas-but-function-pointers-and-nonstandar-02",
+          "language": "c",
+          "title": "C: no standard lambdas, but function pointers and nonstandard emulations.",
+          "program_dir": "programs/c-c-no-standard-lambdas-but-function-pointers-and-nonstandar-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-anonymous-functions-closures-array-processing-and-ro",
+          "language": "php",
+          "title": "PHP: anonymous functions, closures, array processing, and route handlers.",
+          "program_dir": "programs/php-php-anonymous-functions-closures-array-processing-and-ro",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-anonymous-functions-closures-array-processing-and-ro-02",
+          "language": "php",
+          "title": "PHP: anonymous functions, closures, array processing, and route handlers.",
+          "program_dir": "programs/php-php-anonymous-functions-closures-array-processing-and-ro-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "python-anonymous-subroutines-inline-block-definitions-lambda",
+          "language": "python",
+          "title": "Anonymous Subroutines: Inline Block Definitions, Lambda Expressions, and Func...",
+          "program_dir": "programs/python-anonymous-subroutines-inline-block-definitions-lambda",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-array-callbacks-sorting-callbacks-request-hooks-and",
+          "language": "php",
+          "title": "PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.",
+          "program_dir": "programs/php-php-array-callbacks-sorting-callbacks-request-hooks-and",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "php-php-array-callbacks-sorting-callbacks-request-hooks-and-02",
+          "language": "php",
+          "title": "PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.",
+          "program_dir": "programs/php-php-array-callbacks-sorting-callbacks-request-hooks-and-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "javascript-javascript-and-v8-dom-events-ajax-timers-promises",
+          "language": "javascript",
+          "title": "JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.",
+          "program_dir": "programs/javascript-javascript-and-v8-dom-events-ajax-timers-promises",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "javascript-javascript-and-v8-dom-events-ajax-timers-promises-02",
+          "language": "javascript",
+          "title": "JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.",
+          "program_dir": "programs/javascript-javascript-and-v8-dom-events-ajax-timers-promises-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "java-java-listeners-gui-events-stream-operations-and-functio",
+          "language": "java",
+          "title": "Java: listeners, GUI events, stream operations, and functional interfaces.",
+          "program_dir": "programs/java-java-listeners-gui-events-stream-operations-and-functio",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "python-python-sorting-keys-gui-handlers-web-callbacks-and-da",
+          "language": "python",
+          "title": "Python: sorting keys, GUI handlers, web callbacks, and data-processing hooks.",
+          "program_dir": "programs/python-python-sorting-keys-gui-handlers-web-callbacks-and-da",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "slug": "c-c-function-pointers-comparators-signal-handlers-and-c-styl",
+          "language": "c",
+          "title": "C: function pointers, comparators, signal handlers, and C-style event hooks.",
+          "program_dir": "programs/c-c-function-pointers-comparators-signal-handlers-and-c-styl",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 100,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "callable object"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "reason": "too_few_lines",
+          "preview": "outer function returns"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "reason": "too_few_lines",
+          "preview": "outer function returns"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "reason": "too_few_lines",
+          "preview": "prefix=\"inside\""
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "top shell frame"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+      "accepted": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "c-c-non-blocking-file-descriptors-and-explicit-event-loops",
+          "language": "c",
+          "title": "C: non-blocking file descriptors and explicit event loops.",
+          "program_dir": "programs/c-c-non-blocking-file-descriptors-and-explicit-event-loops",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "php-php-request-oriented-execution-fibers-and-async-framewor",
+          "language": "php",
+          "title": "PHP: request-oriented execution, Fibers, and async frameworks.",
+          "program_dir": "programs/php-php-request-oriented-execution-fibers-and-async-framewor",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and",
+          "language": "javascript",
+          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
+          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and-02",
+          "language": "javascript",
+          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
+          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and-03",
+          "language": "javascript",
+          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
+          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and-03",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-cpython-textttasyncio",
+          "language": "python",
+          "title": "Python / CPython: \\texttt{asyncio",
+          "program_dir": "programs/python-python-cpython-textttasyncio",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "c-c-textttselect",
+          "language": "c",
+          "title": "C: \\texttt{select",
+          "program_dir": "programs/c-c-textttselect",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "java-java-single-thread-event-loops-and-callback-dispatch",
+          "language": "java",
+          "title": "Java: single-thread event loops and callback dispatch.",
+          "program_dir": "programs/java-java-single-thread-event-loops-and-callback-dispatch",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "php-php-zend-engine-fibers-and-user-space-async-frameworks",
+          "language": "php",
+          "title": "PHP / Zend Engine: Fibers and user-space async frameworks.",
+          "program_dir": "programs/php-php-zend-engine-fibers-and-user-space-async-frameworks",
+          "has_output": true
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-browser-and-nodejs-event-loops",
+          "language": "javascript",
+          "title": "JavaScript / V8: browser and Node.js event loops.",
+          "program_dir": "programs/javascript-javascript-v8-browser-and-nodejs-event-loops",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-cpython-textttasyncio-02",
+          "language": "python",
+          "title": "Python / CPython: \\texttt{asyncio",
+          "program_dir": "programs/python-python-cpython-textttasyncio-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "c-c-coroutine-emulation-with-explicit-state-machines-or-sepa",
+          "language": "c",
+          "title": "C: coroutine emulation with explicit state machines or separate stacks.",
+          "program_dir": "programs/c-c-coroutine-emulation-with-explicit-state-machines-or-sepa",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "java-java-no-direct-language-coroutine-but-runtime-managed-a",
+          "language": "java",
+          "title": "Java: no direct language coroutine, but runtime-managed alternatives.",
+          "program_dir": "programs/java-java-no-direct-language-coroutine-but-runtime-managed-a",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-lua-classic-coroutine-style-cooperative-transfer",
+          "language": "python",
+          "title": "Lua: classic coroutine-style cooperative transfer.",
+          "program_dir": "programs/python-lua-classic-coroutine-style-cooperative-transfer",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "php-php-generator-coroutines-with-textttsend",
+          "language": "php",
+          "title": "PHP: generator coroutines with \\texttt{send",
+          "program_dir": "programs/php-php-generator-coroutines-with-textttsend",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-generator-coroutines-and-explicit-resu",
+          "language": "javascript",
+          "title": "JavaScript: generator coroutines and explicit resumption.",
+          "program_dir": "programs/javascript-javascript-generator-coroutines-and-explicit-resu",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-generator-based-coroutines-with-textttsend",
+          "language": "python",
+          "title": "Python: generator-based coroutines with \\texttt{send",
+          "program_dir": "programs/python-python-generator-based-coroutines-with-textttsend",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-generator-based-coroutines-with-textttsend-02",
+          "language": "python",
+          "title": "Python: generator-based coroutines with \\texttt{send",
+          "program_dir": "programs/python-python-generator-based-coroutines-with-textttsend-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "c-c-emulating-generators-with-explicit-state-machines",
+          "language": "c",
+          "title": "C: emulating generators with explicit state machines.",
+          "program_dir": "programs/c-c-emulating-generators-with-explicit-state-machines",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "c-c-emulating-generators-with-explicit-state-machines-02",
+          "language": "c",
+          "title": "C: emulating generators with explicit state machines.",
+          "program_dir": "programs/c-c-emulating-generators-with-explicit-state-machines-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "java-java-no-native-generator-syntax-but-iterator-objects-em",
+          "language": "java",
+          "title": "Java: no native generator syntax, but iterator objects emulate lazy production.",
+          "program_dir": "programs/java-java-no-native-generator-syntax-but-iterator-objects-em",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "java-java-no-native-generator-syntax-but-iterator-objects-em-02",
+          "language": "java",
+          "title": "Java: no native generator syntax, but iterator objects emulate lazy production.",
+          "program_dir": "programs/java-java-no-native-generator-syntax-but-iterator-objects-em-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "php-php-zend-engine-generators-with-textttyield",
+          "language": "php",
+          "title": "PHP / Zend Engine: generators with \\texttt{yield",
+          "program_dir": "programs/php-php-zend-engine-generators-with-textttyield",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "php-php-zend-engine-generators-with-textttyield-02",
+          "language": "php",
+          "title": "PHP / Zend Engine: generators with \\texttt{yield",
+          "program_dir": "programs/php-php-zend-engine-generators-with-textttyield-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-generator-functions-and-resumable-f",
+          "language": "javascript",
+          "title": "JavaScript / V8: generator functions and resumable function state.",
+          "program_dir": "programs/javascript-javascript-v8-generator-functions-and-resumable-f",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "javascript-javascript-v8-generator-functions-and-resumable-f-02",
+          "language": "javascript",
+          "title": "JavaScript / V8: generator functions and resumable function state.",
+          "program_dir": "programs/javascript-javascript-v8-generator-functions-and-resumable-f-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-cpython-generator-functions-and-suspended-pyth",
+          "language": "python",
+          "title": "Python / CPython: generator functions and suspended Python frames.",
+          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-cpython-generator-functions-and-suspended-pyth-02",
+          "language": "python",
+          "title": "Python / CPython: generator functions and suspended Python frames.",
+          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth-02",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-python-cpython-generator-functions-and-suspended-pyth-03",
+          "language": "python",
+          "title": "Python / CPython: generator functions and suspended Python frames.",
+          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth-03",
+          "has_output": false
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "slug": "python-generators-lazy-sequence-evaluation-in-flight-stream",
+          "language": "python",
+          "title": "Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-...",
+          "program_dir": "programs/python-generators-lazy-sequence-evaluation-in-flight-stream",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 79,
+      "rejected_sample": [
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "event loop"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "reason": "unknown_language",
+          "preview": "while true; do"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "reason": "unknown_language",
+          "preview": "long_task_one &"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "connection struct"
+        },
+        {
+          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
+          "reason": "unknown_language",
+          "preview": "main event loop"
+        }
+      ]
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/01_execution_architecture/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/00_chronologicalTimelineTheGenesisOriginsAndFormalReleaseOfPythonGuidoVanR_2eb93cae/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/01_designPhilosophyAndTensionsReadingTheZenOfPythonCritically/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/02_whyPythonSpreadScriptingWebFrameworksScientificComputingResearchWorkflo_11d135dd/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/00_pythonAsALanguageVsCpythonAsTheReferenceImplementation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/01_cpythonPypyJythonIronpythonAndAlternativeRuntimeStrategies/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/02_pythonCompilersAcceleratorsAndTranslatorsCythonNuitkaNumbaMypycAndRelatedTools/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/03_thePracticalConsequencePythonCodeCanHaveDifferentExecutionBackendsButOn_299af52d/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/00_fromChapter1SRuntimeModelToCpythonSConcreteImplementation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/01_theConcreteInternalCStructureOfTheCpythonRuntime/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/02_parsingAndCompilingPythonSourceFromPyFilesToAstCodeObjectsBytecodeAndPy_8ea77755/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/03_codeObjectsFrameObjectsAndNamespaceDictionaries/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/04_theCpythonInterpreterLoopAsTheConcreteExecutionSiteOfPythonBytecode/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/00_theBaseObjectFramework/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/01_theHeapSubsystemAndObjectAllocation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/02_theStackSubsystemAndReferenceStorage/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/03_introspectionOfCoreObjectProperties/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/00_visualComparisonPythonCodeShapeVsCStyleBracedCode/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/01_architecturalCaseStudy/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/02_codeBlocksFromExplicitBraces/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/00_classifyingTypeSystemsStaticVsDynamicVariableTypingStrongVsWeakEnforcem_7259aa1b/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/01_pythonSTypeBoundaryDynamicNamesWithStrongRuntimeTypeConstraintVerification/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/02_namesVariablesAndObjectReferencesWhyPythonVariablesAreNotCBoxes/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/03_memoryStorageClassificationsBuiltInSingleValueObjectsVsCompositeReferen_71caef4e/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/04_mutabilityAndIdentityImmutableObjectsMutableObjectsSharedReferencesAndIsVs/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/05_objectInterfacesDunderMethodsInternalSlotsOperatorsConstructionAndRepresentation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/02_intro_to_python/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/00_legalAndStructuralLexerConstraints/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/01_stylisticCodingConventions/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/00_simpleAssignmentCreatingOrRebindingAName/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/01_multipleAssignmentAndUnpacking/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/02_augmentedAssignment/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/03_deletingNames/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/00_theIntegerRepresentationArchitectureInt/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/01_theFloatingPointRepresentationArchitectureFloat/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/02_theComplexRepresentationArchitectureComplex/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/03_theBooleanRepresentationArchitectureBool/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/04_theNullSentinelObjectNone/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/05_numericalOperatorArchitectureAndPrecedenceGraphs/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/00_dynamicTypingInAssignment/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/01_strongTypingInOperations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/02_structuralSummary/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/03_variables/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/00_orderedComponentStorageAndPositionalAccess/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/01_sequenceOperatorsAndSharedBehaviors/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/00_characterInteroperabilityStandards/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/01_nativeConversionAndBoundaryEscapeSequences/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/02_extendedUniversalCodepointEscapeAccess/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/00_structuralAbstractionOfTheUnicodeStandard/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/01_cpythonMemoryOptimizationArchitecturePep393/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/02_structuralExtractionAndEvaluation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/03_stringSequenceOperations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/00_theMemoryLayoutParadigmContrast/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/01_cpythonDynamicScalingMechanics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/02_listMutationOperations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/03_deepVsShallowStructuralCloning/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/00_tupleSyntaxAndStructuralRole/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/01_immutableSequenceInvariants/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/02_cpythonAllocationOptimizations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/04_sequential_components/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/00_from_linear_source_text_to_control_flow_graphs/00_statementsBasicBlocksAndExecutionEdges/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/00_from_linear_source_text_to_control_flow_graphs/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/00_thePhilosophyOfSyntacticWhitespace/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/01_comparativeParadigmAnalysis/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/02_emptyBlocksAndStructuralPlaceholders/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/00_syntaxOfBranchingControlGraphs/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/01_logicEvaluationArchitecture/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/00_theLazyEvaluationInvariant/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/01_sequenceBehaviorMetrics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/00_indefiniteIterationTheWhileLoop/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/01_definiteIterationTheForLoop/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/02_iterableVsIterator/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/03_interruptingExecutionFlowSubsystems/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/04_loopElseCompletionSemantics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/00_enumeratedTraversal/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/01_parallelTraversal/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/02_transformingAndFilteringIterationStreams/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/03_materializationBoundaries/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/00_theArchitectureOfNonLocalJumps/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/01_exceptionClassHierarchiesAndHandlerSelection/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/02_exceptionHandlingInfrastructure/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/03_propagationMechanics/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/05_control_flow/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/00_fromPositionalAccessToHashBasedAccess/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/01_theHashAndEqualityContract/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/00_mathematicalFoundationsAndStructuralSyntax/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/01_constraintsOfElementIngestionAndRuntimeEngines/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/02_coreSetMutationOperations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/03_immutableSetVariants/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/00_fundamentalSetCalculations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/01_inPlaceMemoryMutation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/02_structuralRelationshipEvaluation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/00_foundationsOfAssociativeMapping/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/01_dictionaryConstructionPatterns/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/02_cpythonArchitecturalEvolution/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/03_orderingGuaranteesAndMisconceptions/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/04_queryingManipulatingAndMutatingDictionaryStates/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/06_hash_based_collections/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/00_structuralSyntaxAndFunctionObjectCreation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/01_returnSemanticsAndFrameTermination/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/00_memorySemanticsOfParameterPassing/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/01_functionSignatureArchitecture/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/00_variadicPositionalParameters/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/01_variadicKeywordParameters/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/02_architecturalPitfallsOfArgumentEvaluation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/00_theLegbRuleInvariant/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/01_mutatingExternalScopes/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/00_anatomyOfScopeFailures/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/01_compileTimeScopeDisambiguation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/00_firstClassCitizensAndHigherOrderFunctions/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/01_lexicalClosures/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/02_decorators/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/00_lazyStreamEvaluationGenerators/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/01_generatorDelegation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/02_bidirectionalDataFlowPipelinesGeneratorBasedCoroutines/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/03_nativeCoroutineBridge/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/07_function_execution/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/00_programsAsDataConsumersAndDataProducers/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/01_theOperatingSystemMediationLayer/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/00_theOpenFunctionAndFileObjectConstruction/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/01_resourceManagementInvariants/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/00_readingTextualData/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/01_writingTextualData/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/02_encodingAndDecodingBoundaries/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/00_byteOrientedDataStreams/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/01_binaryAccessPatterns/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/00_pathsAsStructuredFilesystemReferences/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/01_filesystemInspectionAndManipulation/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/00_jsonDataBoundaries/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/01_csvTabularData/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/00_expectedFailureModes/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/01_defensiveIOPatterns/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/00_streamingLargeInputs/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/01_transformingExternalData/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "00_CONTENT/08_input_output/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    }
+  ]
+}

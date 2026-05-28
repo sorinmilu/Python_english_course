@@ -1,0 +1,13 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{min\PYGZus{}length\PYGZus{}validator}\PYG{p}{(}\PYG{n}{min\PYGZus{}length}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{validate}\PYG{p}{(}\PYG{n}{text}\PYG{p}{)}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{text}\PYG{p}{)} \PYG{o}{\PYGZgt{}}\PYG{o}{=} \PYG{n}{min\PYGZus{}length}
+
+    \PYG{k}{return} \PYG{n}{validate}
+
+
+\PYG{n}{password\PYGZus{}validator} \PYG{o}{=} \PYG{n}{min\PYGZus{}length\PYGZus{}validator}\PYG{p}{(}\PYG{l+m+mi}{8}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{password\PYGZus{}validator}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{abc}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{password\PYGZus{}validator}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{long\PYGZhy{}enough}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
+\end{MintedVerbatim}

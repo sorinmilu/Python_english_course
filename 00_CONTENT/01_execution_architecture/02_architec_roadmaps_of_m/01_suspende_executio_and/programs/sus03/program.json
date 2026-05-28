@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: emulating generators with explicit state machines.",
+  "label": "sus03",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

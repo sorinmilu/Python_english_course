@@ -1,0 +1,14 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{n+nv}{\PYGZdl{}users} \PYG{o}{=} \PYG{p}{[}
+    \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{name}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{=\PYGZgt{}} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Ana}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{age}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{=\PYGZgt{}} \PYG{l+m+mi}{30}\PYG{p}{],}
+    \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{name}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{=\PYGZgt{}} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Mihai}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{age}\PYG{l+s+s2}{\PYGZdq{}} \PYG{o}{=\PYGZgt{}} \PYG{l+m+mi}{20}\PYG{p}{],}
+\PYG{p}{];}
+
+\PYG{n+nb}{usort}\PYG{p}{(}\PYG{n+nv}{\PYGZdl{}users}\PYG{p}{,} \PYG{k}{function} \PYG{p}{(}\PYG{n+nv}{\PYGZdl{}a}\PYG{p}{,} \PYG{n+nv}{\PYGZdl{}b}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{k}{return} \PYG{n+nv}{\PYGZdl{}a}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{age}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]} \PYG{o}{\PYGZlt{}=\PYGZgt{}} \PYG{n+nv}{\PYGZdl{}b}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{age}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{];}
+\PYG{p}{\PYGZcb{});}
+
+\PYG{n+nb}{print\PYGZus{}r}\PYG{p}{(}\PYG{n+nv}{\PYGZdl{}users}\PYG{p}{);}
+\end{MintedVerbatim}

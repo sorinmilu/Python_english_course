@@ -1,0 +1,15 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{count\PYGZus{}up\PYGZus{}to}\PYG{p}{(}\PYG{n}{limit}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{current} \PYG{o}{=} \PYG{l+m+mi}{1}
+
+    \PYG{k}{while} \PYG{n}{current} \PYG{o}{\PYGZlt{}}\PYG{o}{=} \PYG{n}{limit}\PYG{p}{:}
+        \PYG{k}{yield} \PYG{n}{current}
+        \PYG{n}{current} \PYG{o}{+}\PYG{o}{=} \PYG{l+m+mi}{1}
+
+
+\PYG{n}{g} \PYG{o}{=} \PYG{n}{count\PYGZus{}up\PYGZus{}to}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{next}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} 1}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{next}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} 2}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{next}\PYG{p}{(}\PYG{n}{g}\PYG{p}{)}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} 3}
+\end{MintedVerbatim}

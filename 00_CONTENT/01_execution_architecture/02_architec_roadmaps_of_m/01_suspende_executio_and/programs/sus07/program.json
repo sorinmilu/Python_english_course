@@ -1,0 +1,9 @@
+{
+  "language": "java",
+  "title": "Java: no native generator syntax, but iterator objects emulate lazy production.",
+  "label": "sus07",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.java"
+}

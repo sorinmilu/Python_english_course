@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: function pointers, comparators, signal handlers, and C-style event hooks.",
+  "label": "fun01",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

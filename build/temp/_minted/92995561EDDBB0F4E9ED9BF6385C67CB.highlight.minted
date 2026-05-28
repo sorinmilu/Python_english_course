@@ -1,0 +1,11 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{n+nv}{\PYGZdl{}values} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{,} \PYG{l+m+mi}{4}\PYG{p}{];}
+
+\PYG{n+nv}{\PYGZdl{}result} \PYG{o}{=} \PYG{n+nb}{array\PYGZus{}map}\PYG{p}{(}\PYG{k}{function} \PYG{p}{(}\PYG{n+nv}{\PYGZdl{}x}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+    \PYG{k}{return} \PYG{n+nv}{\PYGZdl{}x} \PYG{o}{*} \PYG{n+nv}{\PYGZdl{}x}\PYG{p}{;}
+\PYG{p}{\PYGZcb{},} \PYG{n+nv}{\PYGZdl{}values}\PYG{p}{);}
+
+\PYG{n+nb}{print\PYGZus{}r}\PYG{p}{(}\PYG{n+nv}{\PYGZdl{}result}\PYG{p}{);}
+\end{MintedVerbatim}

@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: select/poll/epoll-style event loops.",
+  "label": "sus05",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

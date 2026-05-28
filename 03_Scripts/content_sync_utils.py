@@ -10,7 +10,7 @@ from typing import Any
 
 from course_synopsis_utils import save_text_file_atomic
 
-MAX_SLUG_LEN = 80
+MAX_SLUG_LEN = 24
 INDEXED_DIR_RE = re.compile(r"^\d{2}_")
 DELETED_PREFIX = "DELETED_"
 

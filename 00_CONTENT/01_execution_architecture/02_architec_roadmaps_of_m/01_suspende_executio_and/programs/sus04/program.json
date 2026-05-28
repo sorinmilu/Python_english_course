@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: non-blocking file descriptors and explicit event loops.",
+  "label": "sus04",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

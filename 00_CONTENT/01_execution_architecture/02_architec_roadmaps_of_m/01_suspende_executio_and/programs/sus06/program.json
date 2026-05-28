@@ -1,0 +1,9 @@
+{
+  "language": "java",
+  "title": "Java: no direct language coroutine, but runtime-managed alternatives.",
+  "label": "sus06",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.java"
+}
