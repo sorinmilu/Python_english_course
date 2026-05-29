@@ -1,1 +1,306 @@
-\subsection{Code Blocks: From Explicit Braces (`{}`) to Indentation Tokens and Lexer-Level Whitespace Rules}
+\subsection{Code Blocks: From Explicit Braces (\texttt{\{\}}) to Indentation Tokens and Lexer-Level Whitespace Rules}
+
+A code block is a group of statements treated as one structural unit. In C-style languages, this unit is usually marked by explicit tokens, especially braces. In Python, the same structural role is handled by indentation. This is not a formatting recommendation. It is a lexical and syntactic rule. Python's tokenizer observes changes in indentation and produces structural tokens that the parser uses to build the program.
+
+In C, a block is visibly enclosed:
+
+\begin{verbatim}
+if (x > 0) {
+    y = 1;
+    z = 2;
+}
+\end{verbatim}
+
+The opening brace starts the block. The closing brace ends it. The indentation helps humans read the code, but the compiler follows the braces. This means that the following is still structurally the same program, even though it is badly formatted:
+
+\begin{verbatim}
+if (x > 0) { y = 1; z = 2; }
+\end{verbatim}
+
+Python removes those block delimiters and gives indentation the structural job:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+    z = 2
+\end{verbatim}
+
+Here, the colon announces that a block is expected. The indented lines form the block. The block ends when indentation returns to the previous level.
+
+Conceptually:
+
+\begin{verbatim}
+if x > 0:
+    y = 1      inside block
+    z = 2      inside block
+w = 3          outside block
+\end{verbatim}
+
+The line \texttt{w = 3} is outside the \texttt{if} block because it is dedented. There is no closing brace. The return to the previous indentation level is the closing signal.
+
+This is why Python whitespace is not merely whitespace. At the beginning of logical lines, indentation can become syntax.
+
+A simplified tokenizer view is:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+    z = 2
+w = 3
+\end{verbatim}
+
+becomes conceptually:
+
+\begin{verbatim}
+IF NAME OP NUMBER COLON NEWLINE
+INDENT
+    NAME ASSIGN NUMBER NEWLINE
+    NAME ASSIGN NUMBER NEWLINE
+DEDENT
+NAME ASSIGN NUMBER NEWLINE
+\end{verbatim}
+
+The exact internal tokens are more detailed, but the important point is that \texttt{INDENT} and \texttt{DEDENT} are real structural markers for the parser. Python therefore still has block delimiters, but they are generated from indentation rather than written as braces.
+
+This design has one clear advantage: the program's visual shape and grammatical shape are forced to match. In C, it is possible to write misleading indentation:
+
+\begin{verbatim}
+if (x > 0)
+    y = 1;
+    z = 2;
+\end{verbatim}
+
+A beginner may visually read both assignments as controlled by the \texttt{if}. The compiler does not. Without braces, only \texttt{y = 1;} belongs to the \texttt{if}. The statement \texttt{z = 2;} always executes.
+
+Python prevents this exact mismatch. If both statements are intended to be inside the block, both must be indented:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+    z = 2
+\end{verbatim}
+
+If only the first statement belongs to the block, the second must be dedented:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+z = 2
+\end{verbatim}
+
+The parser and the reader see the same structure.
+
+But this advantage comes with a cost. Python makes layout semantically binding. A misplaced indentation level is not just ugly. It can change the meaning of the program or make it invalid.
+
+For example:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+        z = 2
+\end{verbatim}
+
+This indentation is invalid because \texttt{z = 2} is indented more deeply without a construct that opens a new nested block. Python does not allow arbitrary indentation for visual decoration. Indentation must correspond to syntactic structure.
+
+Nested blocks work by repeated indentation:
+
+\begin{verbatim}
+if user_active:
+    for item in items:
+        if item.enabled:
+            process(item)
+\end{verbatim}
+
+The indentation levels show the nesting:
+
+\begin{verbatim}
+level 0: if user_active:
+level 1:     for item in items:
+level 2:         if item.enabled:
+level 3:             process(item)
+\end{verbatim}
+
+Each increase creates a deeper block. Each decrease closes one or more blocks. This is the indentation equivalent of nested braces:
+
+\begin{verbatim}
+if (user_active) {
+    for (...) {
+        if (...) {
+            process(...);
+        }
+    }
+}
+\end{verbatim}
+
+The difference is that C writes the block stack explicitly with \texttt{\{} and \texttt{\}}, while Python derives it from leading whitespace.
+
+This also explains why Python needs a placeholder statement such as \texttt{pass}. Since a block must contain at least one statement, an intentionally empty block cannot be represented by empty braces as in C.
+
+In C:
+
+\begin{verbatim}
+if (x > 0) {
+}
+\end{verbatim}
+
+In Python:
+
+\begin{verbatim}
+if x > 0:
+    pass
+\end{verbatim}
+
+The \texttt{pass} statement means: this block intentionally does nothing. It exists because Python's block structure is statement-based, not brace-pair-based. A block cannot be only a visual indentation area with no statement inside it.
+
+The same rule appears in class and function definitions:
+
+\begin{verbatim}
+def unfinished_function():
+    pass
+
+class Empty:
+    pass
+\end{verbatim}
+
+The \texttt{pass} statement is not decoration. It is a syntactic placeholder that satisfies the grammar.
+
+Python's indentation rules also explain why tabs and spaces matter. Since indentation is syntax, inconsistent indentation can break the program. Visually similar indentation may not be equivalent if tabs and spaces are mixed. Modern Python rejects inconsistent tab/space indentation in many cases because the parser must be able to determine exact block levels.
+
+The practical rule is simple:
+
+\begin{quote}
+Use spaces consistently for indentation, normally four spaces per level.
+\end{quote}
+
+This is partly style, but it is style aligned with syntax. In Python, indentation convention and parseable structure are joined.
+
+Line endings also matter more than in C. In C, semicolons usually terminate statements:
+
+\begin{verbatim}
+x = 1; y = 2; z = 3;
+\end{verbatim}
+
+Python normally uses the logical newline as the statement boundary:
+
+\begin{verbatim}
+x = 1
+y = 2
+z = 3
+\end{verbatim}
+
+This again reduces punctuation, but it makes the physical shape of the source file more important. Python does allow multi-line expressions inside parentheses, brackets, and braces:
+
+\begin{verbatim}
+values = [
+    1,
+    2,
+    3,
+]
+\end{verbatim}
+
+Inside such open delimiters, line breaks can continue the same logical statement. This is why long function calls and data structures are usually written with parentheses or brackets rather than backslash continuation.
+
+For example:
+
+\begin{verbatim}
+result = compute_value(
+    first_argument,
+    second_argument,
+    third_argument,
+)
+\end{verbatim}
+
+The indentation inside the parenthesized call is not a block indentation in the same sense as an \texttt{if} or \texttt{for} body. It is continuation layout inside an expression. This distinction matters: not every indentation in Python creates an \texttt{INDENT} block. Block indentation is produced after a logical line that opens a suite, such as an \texttt{if}, \texttt{for}, \texttt{while}, \texttt{def}, \texttt{class}, \texttt{try}, or similar construct.
+
+So this:
+
+\begin{verbatim}
+if x > 0:
+    print(x)
+\end{verbatim}
+
+uses indentation to define a block.
+
+But this:
+
+\begin{verbatim}
+print(
+    x
+)
+\end{verbatim}
+
+uses indentation only as visual continuation inside parentheses.
+
+This is one reason Python syntax cannot be understood merely as ``indentation means nesting.'' More precisely:
+
+\begin{quote}
+Indentation at the beginning of logical lines creates block structure only where the grammar expects a suite.
+\end{quote}
+
+The colon is the visible cue for many such suites:
+
+\begin{verbatim}
+if condition:
+    block
+
+while condition:
+    block
+
+for item in collection:
+    block
+
+def function():
+    block
+
+class Name:
+    block
+
+try:
+    block
+except Error:
+    block
+\end{verbatim}
+
+The colon does not itself create the block. It marks the end of the header line and signals that a suite follows. The indentation of the following logical lines then defines the suite.
+
+This design creates a different reading discipline from C. In C, one can often recover block structure by matching braces. In Python, one reads the left margin. The shape of the program is the nesting structure.
+
+That is why Python code tends to have a distinctive vertical form:
+
+\begin{verbatim}
+header:
+    body
+    nested_header:
+        nested_body
+after_block
+\end{verbatim}
+
+The block is not closed by a token. It is closed by returning left.
+
+This has consequences for generated code, copied code, and teaching. Generated Python code must manage indentation precisely. Copying from web pages, PDFs, or formatted documents can introduce broken whitespace. Beginners must learn that moving a line left or right changes the program, not only its appearance.
+
+At the same time, this rule can make Python code easier to audit. There is no hidden disagreement between braces and indentation because there are no braces for ordinary blocks. The structure the eye sees is the structure the parser receives.
+
+The comparison can be summarized as follows:
+
+\begin{verbatim}
+C-style block model:
+    block starts with {
+    block ends with }
+    indentation is conventional
+    semicolons terminate statements
+    layout can lie to the reader
+
+Python block model:
+    block header usually ends with :
+    block starts with increased indentation
+    block ends with dedentation
+    indentation is lexical structure
+    layout cannot be separated from meaning
+\end{verbatim}
+
+The philosophical consequence is that Python treats code layout as part of the language contract. This is one of its most controversial design choices. It creates clean visual structure, but it also makes whitespace carry semantic weight. It removes braces, but it does not remove block delimiters; it converts them into indentation tokens produced by the lexer.
+
+For a programmer coming from C, the correct adjustment is not to think “Python has no block markers.” Python has block markers, but they are implicit in indentation. The lexer sees changes in leading whitespace and turns them into \texttt{INDENT} and \texttt{DEDENT}. The parser then uses those tokens just as seriously as a C parser uses braces.
+
+Thus, Python's block syntax is not informal. It is strict. It only looks lighter because the structural tokens are generated from layout rather than typed as punctuation.

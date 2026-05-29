@@ -1,1 +1,407 @@
 \subsection{Names, Variables, and Object References: Why Python Variables Are Not C Boxes}
+
+The word \emph{variable} is dangerous when moving from C to Python, because it encourages the wrong image. In C, a variable is often naturally imagined as a box: a named storage location with a declared type, placed somewhere in memory, capable of holding a value of that type. This image is not perfect for all C cases, because compilers optimize aggressively, but it is close enough to the ordinary source-level model. An \texttt{int x} behaves like a storage place intended to contain an integer value.
+
+Python does not work this way. A Python name is not a typed box containing an object. A Python name is a binding to an object. The object exists independently in the runtime, usually on CPython's managed heap, and the name is one way to reach it.
+
+This difference is small in syntax but large in meaning.
+
+In C:
+
+\begin{verbatim}
+int x = 10;
+\end{verbatim}
+
+the declaration says that \texttt{x} is an integer variable. The storage associated with \texttt{x} is meant to hold an integer value. The compiler uses that information before the program runs.
+
+In Python:
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+there is no declaration of an integer box. CPython has an integer object representing \texttt{10}, and the name \texttt{x} is bound to that object.
+
+Conceptually:
+
+\begin{verbatim}
+x -> int object 10
+\end{verbatim}
+
+The arrow is the important part. The name points to an object. The name does not contain the object.
+
+This explains why the following is legal:
+
+\begin{verbatim}
+x = 10
+x = "hello"
+x = [1, 2, 3]
+\end{verbatim}
+
+The name \texttt{x} is not changing its storage type. It is being rebound. First it points to an integer object, then to a string object, then to a list object.
+
+Conceptually:
+
+\begin{verbatim}
+after x = 10:
+
+    x -> int object 10
+
+after x = "hello":
+
+    x -> str object "hello"
+
+after x = [1, 2, 3]:
+
+    x -> list object [1, 2, 3]
+\end{verbatim}
+
+The objects carry their types. The name does not have a permanent C-style type.
+
+This is why saying ``\texttt{x} is an integer'' is acceptable in casual speech but imprecise. More accurately:
+
+\begin{quote}
+The name \texttt{x} currently refers to an integer object.
+\end{quote}
+
+That wording matters because a later assignment may make \texttt{x} refer to a different object.
+
+The box image also fails for assignment between names. Consider:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+\end{verbatim}
+
+If variables were boxes containing values, one might imagine that the list inside \texttt{a} is copied into \texttt{b}. That is not what happens. The name \texttt{b} is bound to the same object currently referenced by \texttt{a}.
+
+Conceptually:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+There is one list object and two names pointing to it.
+
+This is why mutation through one name is visible through the other:
+
+\begin{verbatim}
+b.append(4)
+
+print(a)
+\end{verbatim}
+
+The result is:
+
+\begin{verbatim}
+[1, 2, 3, 4]
+\end{verbatim}
+
+The list object was mutated. Both names still point to that same object.
+
+This is not the same as rebinding:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+b = [9, 9, 9]
+\end{verbatim}
+
+After the last line, \texttt{b} no longer points to the original list. It points to a new list object.
+
+Conceptually:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [9, 9, 9]
+\end{verbatim}
+
+The original list was not changed. Only the binding of \texttt{b} changed.
+
+This gives one of the core rules of Python:
+
+\begin{quote}
+Assignment rebinds names. It does not mutate objects unless the assignment target is an object component such as an attribute, item, or slice.
+\end{quote}
+
+For example:
+
+\begin{verbatim}
+x = [1, 2, 3]
+x = [4, 5, 6]
+\end{verbatim}
+
+rebounds the name \texttt{x}.
+
+But:
+
+\begin{verbatim}
+x = [1, 2, 3]
+x[0] = 99
+\end{verbatim}
+
+mutates the list object that \texttt{x} refers to.
+
+Conceptually:
+
+\begin{verbatim}
+rebinding:
+    x -> old list
+    x -> new list
+
+item assignment:
+    x -> same list object, but its internal slot changes
+\end{verbatim}
+
+The same model explains function arguments. A function call does not copy objects into parameter boxes. It creates a new frame with local names bound to the argument objects.
+
+Example:
+
+\begin{verbatim}
+def change(items):
+    items.append(10)
+
+values = []
+change(values)
+\end{verbatim}
+
+During the function call:
+
+\begin{verbatim}
+caller namespace
+    values -> list object []
+
+function frame for change
+    items  -> same list object []
+\end{verbatim}
+
+The function mutates the list object. The caller sees the change because both names point to the same object.
+
+But if the function rebinds the parameter:
+
+\begin{verbatim}
+def change(items):
+    items = [10]
+
+values = []
+change(values)
+\end{verbatim}
+
+then only the local name \texttt{items} changes.
+
+During the call, before rebinding:
+
+\begin{verbatim}
+values ----+
+           |
+           v
+        list object []
+           ^
+           |
+items -----+
+\end{verbatim}
+
+After rebinding:
+
+\begin{verbatim}
+values -> original list object []
+
+items  -> new list object [10]
+\end{verbatim}
+
+The caller's name \texttt{values} is not affected. The function cannot rebind the caller's local name by assigning to its own parameter. It can only rebind its own local name.
+
+This is why the common phrase ``Python passes by reference'' is not precise enough. Python passes object references by assignment. The callee receives new local names bound to the same objects that the caller supplied. Mutation of a shared mutable object is visible. Rebinding a local parameter is not visible to the caller.
+
+The same rule also explains why immutable objects appear to behave differently:
+
+\begin{verbatim}
+def increment(x):
+    x = x + 1
+
+n = 5
+increment(n)
+
+print(n)
+\end{verbatim}
+
+The value of \texttt{n} remains \texttt{5}. Inside the function, \texttt{x} is initially bound to the same integer object as \texttt{n}. But \texttt{x + 1} produces another integer object, and the local name \texttt{x} is rebound to that new object. The caller's name \texttt{n} still points to the original integer object.
+
+Conceptually:
+
+\begin{verbatim}
+before x = x + 1:
+
+n ----+
+      |
+      v
+   int object 5
+      ^
+      |
+x ----+
+
+after x = x + 1:
+
+n -> int object 5
+
+x -> int object 6
+\end{verbatim}
+
+The mechanism is the same as with lists. The difference is that integers are immutable, so there is no operation like \texttt{append} that changes the integer object in place.
+
+The box model also fails for containers. A Python list does not contain raw values directly in the simple C-array sense. It contains references to objects.
+
+For example:
+
+\begin{verbatim}
+items = [10, "hello", []]
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+items -> list object
+             slot 0 -> int object 10
+             slot 1 -> str object "hello"
+             slot 2 -> list object []
+\end{verbatim}
+
+The list can hold mixed types because each slot stores an object reference, and each object carries its own type.
+
+This also explains nested aliasing:
+
+\begin{verbatim}
+inner = []
+a = [inner]
+b = [inner]
+\end{verbatim}
+
+The two outer lists are different objects, but both contain a reference to the same inner list.
+
+Conceptually:
+
+\begin{verbatim}
+a -> outer list
+        slot 0 ----+
+                   |
+                   v
+                inner list []
+                   ^
+                   |
+b -> outer list ----+
+        slot 0
+\end{verbatim}
+
+If the inner list is mutated:
+
+\begin{verbatim}
+inner.append(1)
+\end{verbatim}
+
+both \texttt{a[0]} and \texttt{b[0]} show the change, because both reach the same inner object.
+
+This is why Python programmers must think in object graphs. Names, containers, attributes, frames, and closures all create reference paths between objects. The question is not only what a variable ``contains.'' The better question is:
+
+\begin{quote}
+Which object does this name or slot refer to, and what other references reach the same object?
+\end{quote}
+
+The \texttt{del} statement also becomes clear with this model. It does not necessarily destroy an object. It removes a binding.
+
+Example:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+del a
+\end{verbatim}
+
+After \texttt{del a}, the list object still exists because \texttt{b} still refers to it.
+
+Conceptually:
+
+\begin{verbatim}
+before del:
+
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+
+after del a:
+
+b -> list object [1, 2, 3]
+\end{verbatim}
+
+Only when no references remain can the object become reclaimable.
+
+This connects directly to CPython reference counting. Binding a name to an object creates a reference. Binding another name to the same object creates another reference. Rebinding or deleting a name releases a reference. If the reference count reaches zero, CPython can deallocate the object, except for cyclic structures handled by the cyclic garbage collector.
+
+A compact reference-lifetime example is:
+
+\begin{verbatim}
+a = []
+b = a
+del a
+b = None
+\end{verbatim}
+
+The list survives after \texttt{del a}, because \texttt{b} still points to it. It becomes reclaimable after \texttt{b = None}, assuming no other references exist.
+
+Conceptually:
+
+\begin{verbatim}
+a = []      creates list and binds a
+b = a       binds b to same list
+del a       removes one reference
+b = None    removes last visible reference
+\end{verbatim}
+
+This is the real meaning of Python variable behavior. A variable name is not the owner of an object in a simple absolute sense. It is one reference path among possibly many.
+
+The difference between C boxes and Python bindings can be summarized as follows:
+
+\begin{verbatim}
+C-style mental model:
+    variable has declared type
+    variable corresponds to storage
+    assignment writes into storage
+    copying depends on value/pointer rules
+    object lifetime may be scope-bound or manual
+
+Python mental model:
+    name has no fixed declared type
+    name is a binding in a namespace or frame
+    assignment binds name to object reference
+    multiple names may refer to one object
+    object lifetime follows reference topology
+\end{verbatim}
+
+This does not mean that Python has no memory structure. It means the memory structure is not the one suggested by C variables. Python's structure is an object graph managed by the runtime.
+
+The final practical rules are:
+
+\begin{itemize}
+    \item a Python name points to an object;
+    \item assignment changes bindings;
+    \item assignment between names does not copy the object;
+    \item mutation changes an object reached through a reference;
+    \item rebinding changes which object a name reaches;
+    \item function parameters are local names bound to argument objects;
+    \item containers store references to objects;
+    \item objects survive while some reference path reaches them.
+\end{itemize}
+
+Once these rules are understood, many Python behaviors stop being surprising. List aliasing, function argument effects, object mutation, \texttt{del}, shallow copies, closures, and reference-counted lifetime all follow from the same principle: Python variables are not C boxes. They are names bound to runtime objects.

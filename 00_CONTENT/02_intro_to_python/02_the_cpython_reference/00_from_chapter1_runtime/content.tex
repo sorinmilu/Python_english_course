@@ -1,1 +1,120 @@
-\subsection{From Chapter 1’s Runtime Model to CPython’s Concrete Implementation}
+\subsection{From Chapter 1's Runtime Model to CPython's Concrete Implementation}
+
+\subsection{From Chapter 1's Runtime Model to CPython's Concrete Implementation}
+
+The previous chapter established the general execution model needed for understanding Python seriously. A program does not run as an abstract text. Something concrete must be loaded, memory must be allocated, instructions must be executed, function calls must create execution state, and values must live somewhere. In C, these facts are visible through native compilation, process memory layout, stack frames, heap allocation, pointers, and machine instructions. In Python, the same general questions remain, but the answers move one level upward into the CPython runtime.
+
+When a command such as
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+is executed, the operating system does not load \texttt{script.py} as a native executable. The operating system loads the native executable \texttt{python} or \texttt{python.exe}. That executable is CPython. It is a compiled C program with its own text segment, data segment, heap, stack, native libraries, startup code, and operating-system resources. The Python file is input to this process, not the process itself.
+
+This is the central bridge from the previous chapter:
+
+\begin{quote}
+At the operating-system level, CPython is the running native program. At the language level, the Python source file is the program executed inside that native runtime.
+\end{quote}
+
+This distinction prevents many false explanations. Python is not executed by the processor in the same direct way as compiled C code. The processor executes CPython's native machine instructions. CPython then reads Python source, compiles it into an internal executable representation, creates runtime objects and frames, and executes Python bytecode through its interpreter machinery.
+
+\subsubsection{The Native Layer: CPython as an Ordinary Process}
+
+CPython begins life like any other native executable. The operating system loader maps its executable regions into memory, prepares the process stack, loads required dynamic libraries, resolves startup requirements, and transfers control to CPython's native entry point. Before any user Python code runs, the interpreter process already exists.
+
+This means that CPython is not outside the native execution model. It is built on top of it. It has C functions, C structures, native memory allocations, operating-system calls, file descriptors or handles, dynamic libraries, and platform-specific behavior. When Python code opens a file, creates a socket, starts a subprocess, or imports a native extension module, CPython eventually crosses into the operating system or native library world.
+
+Therefore, Python does not abolish the earlier model. It hosts another execution model inside it.
+
+\subsubsection{The Runtime Layer: Python Code as Managed Execution}
+
+Once CPython is running, it treats the user's \texttt{.py} file as source input. The source text is not executed directly. It passes through a pipeline:
+
+\begin{verbatim}
+.py source text
+    -> tokens
+    -> parse tree / AST
+    -> code object
+    -> bytecode instructions
+    -> frame execution inside CPython
+\end{verbatim}
+
+This pipeline is the Python equivalent of moving from source text toward executable behavior. But the destination is different from C. In C, the pipeline normally produces native machine code before the program runs. In CPython, the source is compiled into bytecode for the Python virtual machine. That bytecode is then executed by CPython's interpreter loop.
+
+The result is that Python source code becomes executable only after CPython has transformed it into runtime objects. Code itself becomes an object. Functions are objects. Classes are objects. Modules are objects. Integers, strings, lists, dictionaries, exceptions, and types are objects. The runtime does not merely store raw values; it stores structured objects with identity, type, value, and implementation-level metadata.
+
+\subsubsection{Replacing C Variables with Python Bindings}
+
+This runtime model explains why Python variables are not C variables. In C, a local variable often corresponds to a typed storage slot in a stack frame. If the programmer writes
+
+\begin{verbatim}
+int x = 10;
+\end{verbatim}
+
+then \texttt{x} names a storage location capable of holding an \texttt{int} value.
+
+In Python, when the programmer writes
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+the name \texttt{x} is bound to an integer object. The name is not a typed box containing the integer bytes directly. It is an entry in a namespace, pointing to a Python object managed by the runtime. If the programmer later writes
+
+\begin{verbatim}
+x = "hello"
+\end{verbatim}
+
+the name \texttt{x} is rebound to a different object. The name changed its binding; the original name slot did not transform from an integer box into a string box.
+
+This is one of the most important consequences of CPython's concrete implementation. Python names are references to objects. They are not C-style typed storage containers.
+
+\subsubsection{Replacing Native Stack Frames with Python Frame Execution}
+
+The previous chapter explained native function calls through stack frames. CPython also needs execution frames, but Python frames are not simply the same as native C stack frames.
+
+A Python function call creates Python-level execution state: local names, references to global and built-in namespaces, a code object, an instruction position, and evaluation state needed to execute bytecode. CPython must represent this state inside its own runtime structures.
+
+So there are several layers that must not be confused:
+
+\begin{itemize}
+    \item the native C stack used by the CPython executable itself;
+    \item CPython's internal machinery for evaluating Python calls;
+    \item Python frame objects or frame-like execution records representing Python-level calls;
+    \item the bytecode evaluation stack used while executing expressions.
+\end{itemize}
+
+When a Python function calls another Python function, the source-level idea resembles an ordinary function call, but the mechanism is runtime-managed. CPython must create or prepare a frame, bind arguments to local names, execute the callee's bytecode, handle returns or exceptions, and then resume the caller.
+
+This is why Python can support introspection, tracebacks, debuggers, exceptions, generators, and coroutines in ways that differ from plain C function execution. The runtime keeps structured information about Python execution.
+
+\subsubsection{Replacing Raw Memory Ownership with Runtime Object Management}
+
+In C, heap allocation is explicit. The programmer may call \texttt{malloc()} and later \texttt{free()}. In Python, ordinary code does not manually free objects. CPython allocates Python objects on its managed heap and tracks their lifetimes mostly through reference counting, with additional garbage-collection support for cyclic object graphs.
+
+This does not mean memory management disappears. It means that memory management becomes a runtime responsibility. Every object must be allocated, referenced, passed, stored, possibly shared, and eventually released. Assignment, function calls, container insertion, exception handling, and return values all affect object reachability and reference ownership internally.
+
+For the Python programmer, the practical effect is simpler source code. For the implementation, the work is substantial. CPython must constantly maintain the object graph that makes Python's high-level behavior possible.
+
+\subsubsection{The Correct Mental Model}
+
+The correct mental model is therefore layered:
+
+\begin{verbatim}
+Operating system
+    runs a native CPython process
+
+CPython runtime
+    parses, compiles, allocates, dispatches, and manages Python execution
+
+Python program
+    exists as source, code objects, bytecode, frames, namespaces, and objects
+\end{verbatim}
+
+This layered view explains why Python feels high-level but still has concrete execution costs. A simple line of Python may require name lookup, object access, type dispatch, method invocation, reference-count updates, exception checks, and bytecode interpretation. The syntax is small because CPython performs the machinery underneath.
+
+The purpose of this section is not to turn the reader into a CPython core developer. We do not need every source file, every C API function, or every internal optimization. But we do need enough of CPython's structure to avoid childish explanations. Python assignment is not copying values into boxes. Python functions are not merely labeled text blocks. Python objects are not vague abstract values. Python execution is not source text being read line by line.
+
+Python code runs because CPython, as a native process, builds a managed runtime world inside itself. The rest of this section opens that world just enough to explain how Python source becomes bytecode, how bytecode is attached to code objects, how function calls create frame state, how namespaces store name bindings, and how the interpreter loop becomes the concrete execution site of Python programs.

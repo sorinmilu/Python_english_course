@@ -1,1 +1,7 @@
-\section{The CPython Reference Implementation as Python’s Concrete Runtime}
+\section{The CPython Reference Implementation as Python's Concrete Runtime}
+
+After separating Python as a language from CPython as its dominant implementation, we can now examine the runtime machinery that makes ordinary Python execution concrete. The goal is not to study CPython as an implementation project in its own right. The goal is to expose the internal structures that a serious Python programmer must understand in order to reason correctly about names, objects, functions, frames, bytecode, memory behavior, and execution cost.
+
+CPython is the bridge between the high-level language and the native machine. The operating system runs a compiled C program; that C program reads Python source files, parses them, compiles them into code objects and bytecode, allocates Python objects, creates execution frames, resolves names through namespaces, and dispatches bytecode instructions through an interpreter loop. Python code therefore runs inside a managed runtime world built inside a native process.
+
+This section opens that world only as far as needed. We will not catalogue CPython source files or C API functions. Instead, we will follow the execution path that matters: from the general runtime model established earlier, to CPython's internal C object structures, to source compilation, to code objects and frames, and finally to the interpreter loop where Python bytecode is actually executed.

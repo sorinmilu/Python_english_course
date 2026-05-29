@@ -27,6 +27,25 @@ _VERBATIM_BLOCK_RE = re.compile(
     r'\\begin\{(?:verbatim|minted|lstlisting|codebox)\}.*?\\end\{(?:verbatim|minted|lstlisting|codebox)\}',
     re.DOTALL,
 )
+_LATEX_QUOTE_RE = re.compile(r"``((?:[^']|'(?![']))*?)''")
+_MARKDOWN_BACKTICK_RE = re.compile(r'(?<!`)`([^`\n]+)`(?!`)')
+
+
+def _protect_latex_quotes(tex):
+    """Temporarily replace LaTeX ``...'' quotes so backtick conversion cannot span them."""
+    quotes = []
+
+    def repl(match):
+        quotes.append(match.group(0))
+        return f"\x00LATEXQUOTE{len(quotes) - 1}\x00"
+
+    return _LATEX_QUOTE_RE.sub(repl, tex), quotes
+
+
+def _restore_latex_quotes(tex, quotes):
+    for i, quote in enumerate(quotes):
+        tex = tex.replace(f"\x00LATEXQUOTE{i}\x00", quote)
+    return tex
 
 
 def _escape_texttt(text):
@@ -49,9 +68,13 @@ def _escape_texttt(text):
 
 
 def _convert_backticks_in_segment(tex):
+    tex, quotes = _protect_latex_quotes(tex)
+
     def repl(match):
         return r'\texttt{' + _escape_texttt(match.group(1)) + '}'
-    return re.sub(r'`([^`]+)`', repl, tex)
+
+    tex = _MARKDOWN_BACKTICK_RE.sub(repl, tex)
+    return _restore_latex_quotes(tex, quotes)
 
 
 def convert_markdown_backticks(tex):

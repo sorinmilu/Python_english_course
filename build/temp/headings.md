@@ -207,7 +207,7 @@ Label: No label
 ### Historical Context and Design Evolution
 Label: No label
 
-#### Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989–1991)
+#### Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989--1991)
 Label: No label
 
 #### Design Philosophy and Tensions: Reading “The Zen of Python” Critically
@@ -216,19 +216,127 @@ Label: No label
 #### Why Python Spread: Scripting, Web Frameworks, Scientific Computing, Research Workflows, and Package Ecosystem Expansion
 Label: No label
 
+##### Scripting: The First Practical Expansion Layer
+Label: No label
+
+##### Web Frameworks: Python as Application Glue
+Label: No label
+
+##### Scientific Computing: Python Above Native Kernels
+Label: No label
+
+##### Research Workflows and Notebooks
+Label: No label
+
+##### Package Ecosystem Expansion
+Label: No label
+
+##### The Cost of Easy Beginnings
+Label: No label
+
+##### Why the Spread Was Durable
+Label: No label
+
 ### Python Implementations and the Role of CPython
 Label: No label
 
 #### Python as a Language vs. CPython as the Reference Implementation
 Label: No label
 
+##### The Language: Rules Visible to the Programmer
+Label: No label
+
+##### The Implementation: The Machine That Realizes the Rules
+Label: No label
+
+##### Why CPython Became the Reference Implementation
+Label: No label
+
+##### The Boundary Between Guaranteed Behavior and CPython Behavior
+Label: No label
+
+##### Why This Course Focuses on CPython
+Label: No label
+
+##### The Practical Rule
+Label: No label
+
 #### CPython, PyPy, Jython, IronPython, and Alternative Runtime Strategies
+Label: No label
+
+##### CPython: The Dominant Reference Runtime
+Label: No label
+
+##### PyPy: Python with a JIT-Oriented Runtime Strategy
+Label: No label
+
+##### Jython: Python on the Java Virtual Machine
+Label: No label
+
+##### IronPython: Python on the .NET Runtime
+Label: No label
+
+##### Alternative Strategies and Specialized Pythons
+Label: No label
+
+##### Compatibility Is Not Only Syntax
+Label: No label
+
+##### Different Runtime Strategies, Different Tradeoffs
+Label: No label
+
+##### The Practical Consequence
 Label: No label
 
 #### Python Compilers, Accelerators, and Translators: Cython, Nuitka, Numba, MyPyC, and Related Tools
 Label: No label
 
+##### Why Python Compilation Is Not C Compilation
+Label: No label
+
+##### Cython: Python Near the C Boundary
+Label: No label
+
+##### Nuitka: Whole-Program Compilation with Runtime Preservation
+Label: No label
+
+##### Numba: Runtime Compilation of Numerical Kernels
+Label: No label
+
+##### MyPyC: Type-Annotated Python Compiled to C Extensions
+Label: No label
+
+##### Packaging Tools Are Not Necessarily Compilers
+Label: No label
+
+##### The Common Pattern: Move the Hot Path Downward
+Label: No label
+
+##### A Practical Comparison
+Label: No label
+
+##### The Conceptual Lesson
+Label: No label
+
 #### The Practical Consequence: Python Code Can Have Different Execution Backends but One Dominant Reference Runtime
+Label: No label
+
+##### The Same Source Surface Can Hide Different Machines
+Label: No label
+
+##### Why CPython Still Dominates Practice
+Label: No label
+
+##### Portability Is Real, but Not Automatic
+Label: No label
+
+##### The False Simplicity of “Compiled vs. Interpreted”
+Label: No label
+
+##### The Teaching Consequence
+Label: No label
+
+##### The Practical Rule for Programmers
 Label: No label
 
 ### The CPython Reference Implementation as Python’s Concrete Runtime

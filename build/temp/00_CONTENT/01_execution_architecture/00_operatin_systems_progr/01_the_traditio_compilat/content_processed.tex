@@ -1534,7 +1534,7 @@ int add(int a, int b) {
 
 When \texttt{main.c} is compiled, the compiler knows that a function named \texttt{add} exists because it has seen the declaration. But it does not see the function body. Therefore, \texttt{main.o} contains an unresolved reference to the symbol \texttt{add}. The file \texttt{math\_utils.o} contains the definition of that symbol. During linking, the linker matches the reference in \texttt{main.o} with the definition in \texttt{math\_utils.o}.
 
-If the linker cannot find a definition for a required external symbol, linking fails. This is the source of common errors such as `\texttt{undefined reference'' on Unix-like toolchains or }`unresolved external symbol'' on Windows toolchains. Such an error usually means that the compiler accepted the source file, but the linker could not find the machine-code implementation of something that was declared or called.
+If the linker cannot find a definition for a required external symbol, linking fails. This is the source of common errors such as ``undefined reference'' on Unix-like toolchains or ``unresolved external symbol'' on Windows toolchains. Such an error usually means that the compiler accepted the source file, but the linker could not find the machine-code implementation of something that was declared or called.
 
 For example:
 

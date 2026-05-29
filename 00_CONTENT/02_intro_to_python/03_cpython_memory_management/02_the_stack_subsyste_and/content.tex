@@ -1,4 +1,811 @@
 \subsection{The Stack Subsystem and Reference Storage}
+
+
 \subsubsection{Native Stack vs. Python Frame Stack vs. Bytecode Evaluation Stack}
+
+The word \emph{stack} appears in several different places when Python execution is discussed, and confusing these places leads to bad mental models. In CPython there is not one single stack that explains everything. There is the native C stack of the CPython process, there is the Python-level chain of frames created by Python calls, and there is the bytecode evaluation stack used inside a frame while expressions are being executed. These three structures are related, but they are not the same object and they do not have the same purpose.
+
+The native stack belongs to CPython as a compiled C program. When the operating system starts the \texttt{python} executable, it creates a normal native process. That process has a native stack, just like any C program. CPython's own C functions use this stack when they call one another. Internal interpreter functions, parser functions, allocator functions, import-system functions, and extension-module functions all execute through ordinary native machine calls. At this level, the stack is the same kind of stack discussed earlier for C: a region of process memory used for native call frames, return addresses, saved registers, and local C execution state.
+
+However, a Python function call is not simply the same thing as a C function call visible to the programmer. When the programmer writes:
+
+\begin{verbatim}
+def f():
+    return 10
+
+def g():
+    return f()
+
+g()
+\end{verbatim}
+
+there is a Python-level call from \texttt{g} to \texttt{f}. CPython must represent that call in its own execution machinery. The runtime needs to know which Python code object is currently executing, where execution is inside that bytecode, what local names exist, what global namespace is available, what built-ins can be searched, and where to continue after the call returns. This information is represented by Python frame machinery.
+
+A Python frame is therefore the runtime record of one active Python code execution. It is similar in purpose to a native stack frame, but it is not the same thing as a raw C stack frame. A native stack frame exists because the CPU and C calling convention need a place to continue native execution. A Python frame exists because CPython needs a structured record for executing Python bytecode. It stores Python-level information: local bindings, the code object, namespace access, instruction position, temporary evaluation data, and exception/control-flow information.
+
+This gives us two different call chains. One call chain is native and internal to the interpreter:
+
+\begin{verbatim}
+C function calls C function calls C function ...
+\end{verbatim}
+
+The other call chain is Python-level and visible to the Python program:
+
+\begin{verbatim}
+module code -> g() -> f()
+\end{verbatim}
+
+The second chain is the one shown in tracebacks. When Python prints an exception traceback, it is not merely dumping the raw native C stack. It is showing the Python frame chain: which Python code blocks were active, which function called which function, and where the exception propagated. This is possible because CPython keeps Python execution state as structured runtime information, not only as machine return addresses.
+
+There is also a third stack: the bytecode evaluation stack. This one is even more specific. It exists inside the execution of a Python frame and is used for temporary values while bytecode instructions are evaluated. Python bytecode is stack-oriented: many instructions push object references onto an evaluation stack, pop object references from it, perform operations, and push results back.
+
+For example, consider:
+
+\begin{verbatim}
+x = a + b * c
+\end{verbatim}
+
+At source level, this is one assignment statement. At bytecode-execution level, CPython must load the object bound to \texttt{a}, load the object bound to \texttt{b}, load the object bound to \texttt{c}, multiply the last two, add the result to the first, and then bind the final result to \texttt{x}. During this process, intermediate object references must be stored somewhere. That temporary storage is the bytecode evaluation stack.
+
+A simplified evaluation sequence looks like this:
+
+\begin{verbatim}
+load a        -> push object referenced by a
+load b        -> push object referenced by b
+load c        -> push object referenced by c
+multiply      -> pop b and c, push multiplication result
+add           -> pop a and multiplication result, push addition result
+store x       -> pop final result and bind x to it
+\end{verbatim}
+
+The important word here is \emph{reference}. The evaluation stack does not normally contain raw C-style integer values or raw object contents. It contains references to Python objects. If the result of \texttt{b * c} is an integer object, the evaluation stack receives a reference to that integer object. If it is a NumPy array object, the stack receives a reference to that array object. If the operation raises an exception, the normal sequence is interrupted and exception machinery takes over.
+
+So the three stacks can be separated like this. The native stack is for CPython's own C execution. The Python frame chain is for Python-level function/module/class/comprehension execution. The bytecode evaluation stack is for temporary operands and results inside one executing Python frame.
+
+The distinction is easier to see with a function call:
+
+\begin{verbatim}
+def square(x):
+    return x * x
+
+def compute():
+    y = square(5)
+    return y + 1
+\end{verbatim}
+
+When \texttt{compute()} runs, CPython has a Python frame for \texttt{compute}. Inside that frame, bytecode loads the function object \texttt{square}, loads the argument object \texttt{5}, and performs a call operation. That call creates or activates another Python frame for \texttt{square}. Inside the \texttt{square} frame, the bytecode evaluation stack temporarily holds references to the two uses of \texttt{x}, performs multiplication, and returns the resulting object reference to the caller frame. Then the \texttt{compute} frame continues and uses its own evaluation stack to add \texttt{1}.
+
+Conceptually:
+
+\begin{verbatim}
+Python frame chain:
+    compute frame
+        calls square frame
+
+inside square frame:
+    evaluation stack handles x * x
+
+inside compute frame:
+    evaluation stack handles returned_value + 1
+\end{verbatim}
+
+Meanwhile, underneath all of this, CPython's C code is running on the native stack. The CPU is not executing Python bytecode directly. It is executing CPython's native interpreter machinery, and that machinery is manipulating Python frames and evaluation stacks.
+
+This separation also explains why Python execution can be introspected. A C program does not normally expose ordinary call frames as first-class runtime objects in the same way. In Python, frame information can appear in tracebacks, debuggers, profilers, inspection tools, and exception reports. That is possible because Python-level execution is represented by managed runtime structures.
+
+It also explains generators and coroutines later. A normal function frame runs and then disappears when the function returns. But a generator must pause and later resume. This means its execution state cannot be understood as a simple native stack frame that vanished after return. CPython must preserve enough Python frame state: the code object, the instruction position, local references, and evaluation state needed to continue later. The fact that Python execution is frame-managed makes this possible.
+
+The practical model is therefore:
+
+\begin{verbatim}
+native C stack
+    CPython's own machine-level execution
+
+Python frame chain
+    Python-level active calls and resumable execution records
+
+bytecode evaluation stack
+    temporary object references during expression execution
+\end{verbatim}
+
+This is the correct basis for understanding local variables in Python. A local name is not a C stack variable holding a raw value. In an executing Python frame, local names correspond to reference slots or namespace entries that point to heap-allocated Python objects. The next subsection follows that idea directly: local names are frame-level reference storage, not boxes containing objects directly.
+
+
 \subsubsection{Local Names as Reference Slots: Frame-Level Storage Pointing to Heap Objects}
+
+Once the difference between the native stack, Python frames, and the bytecode evaluation stack is clear, Python local variables can be described more accurately. A local name inside a Python function is not a C-style variable box that contains the object directly. It is better understood as a reference slot inside the function's active frame. That slot points to a Python object, and that object normally lives in CPython-managed heap memory.
+
+Consider the simple function:
+
+\begin{verbatim}
+def f():
+    x = [1, 2, 3]
+    y = x
+    return y
+\end{verbatim}
+
+A beginner may imagine that \texttt{x} contains the list and that \texttt{y} receives a copy of the list. That is not the Python model. When the list literal is evaluated, CPython creates a list object on the managed heap. The local name \texttt{x} is then bound to that object. When \texttt{y = x} executes, CPython does not copy the list. It binds another local slot, \texttt{y}, to the same heap object.
+
+Conceptually, during the function call, the frame contains local reference slots:
+
+\begin{verbatim}
+frame for f
+    local slot x ----+
+                    |
+                    v
+                list object [1, 2, 3]
+                    ^
+                    |
+    local slot y ----+
+\end{verbatim}
+
+The list object is not inside \texttt{x}. The object exists separately. The local names are ways to reach it.
+
+This is the central idea:
+
+\begin{quote}
+A Python local variable is a name-bound reference to an object, not an object-containing storage box.
+\end{quote}
+
+In C, a local declaration such as
+
+\begin{verbatim}
+int x = 10;
+\end{verbatim}
+
+usually creates a typed storage location in the current stack frame. The compiler knows that \texttt{x} is an integer slot. Operations on \texttt{x} can often be compiled as direct reads and writes to that storage location or even optimized into registers.
+
+In Python, a local assignment such as
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+binds the local name \texttt{x} to an integer object. The integer object carries its own type. The local slot does not become an integer slot in the C sense. It is a place where CPython stores a reference to a Python object.
+
+This is why the following is legal:
+
+\begin{verbatim}
+x = 10
+x = "hello"
+x = [1, 2, 3]
+\end{verbatim}
+
+The local name \texttt{x} is first bound to an integer object, then rebound to a string object, then rebound to a list object. The slot did not change its declared storage type, because it did not have one in the C sense. It remained a reference slot. What changed was the object reference stored in that slot.
+
+A simplified sequence is:
+
+\begin{verbatim}
+x = 10
+
+local slot x -> int object 10
+
+x = "hello"
+
+local slot x -> str object "hello"
+
+x = [1, 2, 3]
+
+local slot x -> list object [1, 2, 3]
+\end{verbatim}
+
+Each rebinding also has reference-count consequences. When \texttt{x} stops pointing to the previous object, CPython releases that reference. If no other reference keeps the old object alive, that object can be reclaimed. If another name, container, frame, or runtime structure still refers to it, the object remains alive.
+
+For example:
+
+\begin{verbatim}
+def f():
+    x = []
+    y = x
+    x = 10
+    return y
+\end{verbatim}
+
+After \texttt{y = x}, both local slots point to the same list. When \texttt{x = 10} executes, only the \texttt{x} slot is rebound. The list object does not disappear, because \texttt{y} still points to it.
+
+Conceptually:
+
+\begin{verbatim}
+after x = [] and y = x:
+
+    x ----+
+          |
+          v
+       list object []
+          ^
+          |
+    y ----+
+
+after x = 10:
+
+    x -> int object 10
+
+    y -> list object []
+\end{verbatim}
+
+The list survives and is returned by the function. Its lifetime is controlled by references, not by the specific name that first received it.
+
+This model also explains mutation. If the object is mutable, changing it through one name changes the object seen through all other references to the same object.
+
+\begin{verbatim}
+def f():
+    x = []
+    y = x
+    y.append(1)
+    return x
+\end{verbatim}
+
+The call to \texttt{append} does not rebind \texttt{y}. It mutates the list object reached through \texttt{y}. Since \texttt{x} reaches the same object, \texttt{x} observes the change.
+
+The frame still looks like this:
+
+\begin{verbatim}
+frame for f
+    x ----+
+          |
+          v
+       list object [1]
+          ^
+          |
+    y ----+
+\end{verbatim}
+
+There are two local names, but only one list object.
+
+This distinction between rebinding and mutation is one of the most important consequences of Python's reference-slot model. Rebinding changes which object a name points to. Mutation changes the object itself.
+
+Compare:
+
+\begin{verbatim}
+x = []
+y = x
+
+x = [1]
+\end{verbatim}
+
+with:
+
+\begin{verbatim}
+x = []
+y = x
+
+x.append(1)
+\end{verbatim}
+
+In the first case, \texttt{x} is rebound to a new list object. \texttt{y} still points to the original empty list:
+
+\begin{verbatim}
+x -> list object [1]
+
+y -> list object []
+\end{verbatim}
+
+In the second case, the original list object is mutated:
+
+\begin{verbatim}
+x ----+
+      |
+      v
+   list object [1]
+      ^
+      |
+y ----+
+\end{verbatim}
+
+The source code difference is small, but the object topology is different.
+
+Inside CPython, ordinary function locals are usually stored more efficiently than a visible dictionary lookup on every access. The frame may use fast local slots indexed by the compiler's local-variable analysis. This is why local variable access is faster than repeated global dictionary lookup. But this optimization does not change the conceptual model. The slots still store references to Python objects. They are not raw C value cells.
+
+A useful simplified picture is:
+
+\begin{verbatim}
+function code object
+    knows local names:
+        x, y, z
+
+active frame
+    local slot 0 for x -> object reference
+    local slot 1 for y -> object reference
+    local slot 2 for z -> object reference
+\end{verbatim}
+
+The compiler determines that these names are local to the function. At runtime, the frame provides storage for their object references. The objects themselves live independently on the heap.
+
+This also explains why local variables exist only while their frame exists, unless their objects are returned, stored elsewhere, or captured by closures.
+
+Consider:
+
+\begin{verbatim}
+def make_list():
+    data = [1, 2, 3]
+    return data
+
+result = make_list()
+\end{verbatim}
+
+During the call:
+
+\begin{verbatim}
+frame for make_list
+    data -> list object [1, 2, 3]
+\end{verbatim}
+
+When the function returns, the frame's local slot \texttt{data} is destroyed or cleared. But the returned object is now referenced by \texttt{result} in the caller's namespace:
+
+\begin{verbatim}
+result -> list object [1, 2, 3]
+\end{verbatim}
+
+The local name disappeared. The object survived. This would be impossible if the object were physically stored inside the local variable slot. The object survives because it is heap-allocated and reference-managed.
+
+Now compare a function that does not return the object:
+
+\begin{verbatim}
+def make_list():
+    data = [1, 2, 3]
+
+make_list()
+\end{verbatim}
+
+Here, when the frame ends, the local slot \texttt{data} releases its reference. If no other reference exists, the list object becomes reclaimable. The object lifetime follows the reference graph, not merely the textual scope.
+
+Closures add one important variation. If a nested function needs a local variable from an enclosing function, CPython cannot store that variable only as an ordinary disappearing local slot. It must preserve the needed binding in a cell object.
+
+Example:
+
+\begin{verbatim}
+def outer():
+    x = 10
+
+    def inner():
+        return x
+
+    return inner
+\end{verbatim}
+
+When \texttt{outer} returns, its ordinary frame is gone. Yet \texttt{inner} can still read \texttt{x}. This is because the binding for \texttt{x} has been placed into closure storage, not lost with the ordinary frame.
+
+Conceptually:
+
+\begin{verbatim}
+inner function object
+    closure cell for x -> int object 10
+\end{verbatim}
+
+Again, the object survives because a reference survives. In this case, the reference is held by a closure cell attached to the returned function object.
+
+This frame-local reference-slot model also explains why function arguments behave as they do. When a function is called, argument passing binds local parameter names to the objects supplied by the caller.
+
+Example:
+
+\begin{verbatim}
+def add_item(items):
+    items.append("new")
+
+data = []
+add_item(data)
+\end{verbatim}
+
+During the call:
+
+\begin{verbatim}
+caller namespace
+    data -> list object []
+
+callee frame
+    items -> same list object []
+\end{verbatim}
+
+The parameter \texttt{items} is a local reference slot in the callee frame. It points to the same list object as \texttt{data}. Therefore, mutating \texttt{items} mutates the object seen through \texttt{data}.
+
+But if the function rebinds the parameter:
+
+\begin{verbatim}
+def replace(items):
+    items = ["new"]
+
+data = []
+replace(data)
+\end{verbatim}
+
+then only the local slot \texttt{items} is changed. The caller's \texttt{data} still points to the original list. Rebinding a local parameter does not rebind the caller's name.
+
+During the call:
+
+\begin{verbatim}
+before rebinding:
+
+    data  ----+
+              |
+              v
+           list object []
+
+    items ----+
+
+after items = ["new"]:
+
+    data  -> original list object []
+
+    items -> new list object ["new"]
+\end{verbatim}
+
+This is why the common phrase ``Python passes by reference'' is not precise enough. Python passes object references by assignment. The callee receives local names bound to the same objects. It can mutate shared mutable objects, but it cannot rebind the caller's names.
+
+The practical rule is:
+
+\begin{quote}
+Function parameters are local reference slots initialized from the argument objects supplied by the caller.
+\end{quote}
+
+This is also why immutable and mutable objects seem to behave differently in functions. The passing mechanism is the same. The difference is whether the object itself can be changed.
+
+For an immutable object:
+
+\begin{verbatim}
+def f(x):
+    x = x + 1
+
+n = 10
+f(n)
+\end{verbatim}
+
+The expression \texttt{x + 1} creates or produces another integer object, and the local slot \texttt{x} is rebound to it. The caller's \texttt{n} is unchanged.
+
+For a mutable object:
+
+\begin{verbatim}
+def f(x):
+    x.append(1)
+
+values = []
+f(values)
+\end{verbatim}
+
+The local slot \texttt{x} points to the same list object as \texttt{values}. The method call mutates that shared object. The caller observes the mutation.
+
+The local-slot model explains both cases without inventing two different parameter-passing mechanisms.
+
+The final picture is:
+
+\begin{verbatim}
+Python frame
+    local slots / local namespace
+        name -> object reference
+        name -> object reference
+        name -> object reference
+
+CPython heap
+    object
+    object
+    object
+\end{verbatim}
+
+The frame stores references. The heap stores objects. Assignment changes references. Mutation changes objects. Function calls create new frames with new local reference slots. Function returns destroy or clear those slots. Objects persist only if some reference survives elsewhere.
+
+This is the level at which Python variables become understandable. A Python local name is not a direct memory box. It is a reference-bearing entry in a frame. Once that is understood, assignment, aliasing, mutation, argument passing, closures, and object lifetime all become one coherent mechanism rather than a collection of special rules.
+
 \subsubsection{Lifecycle Transitions: Frame Destruction, Stack Unwinding, and Reference Count Updates}
+
+A Python frame is not permanent. It exists because some block of Python code is currently executing or must be resumable later. When that execution finishes, the frame's local storage is no longer needed in the ordinary way. This transition is one of the main places where Python's reference model becomes visible: ending a frame means releasing the references held by that frame.
+
+Consider a simple function:
+
+\begin{verbatim}
+def f():
+    data = [1, 2, 3]
+    total = len(data)
+    return total
+
+result = f()
+\end{verbatim}
+
+While \texttt{f} is running, CPython has a frame for \texttt{f}. That frame has local reference slots. One slot named \texttt{data} points to the list object. Another slot named \texttt{total} points to the integer object returned by \texttt{len(data)}.
+
+Conceptually:
+
+\begin{verbatim}
+frame for f
+    data  -> list object [1, 2, 3]
+    total -> int object 3
+\end{verbatim}
+
+When the function returns, the frame is finished. Its local slots are cleared or released. Clearing a slot means that the frame stops holding a reference to the object stored there. If that object has no other references, its reference count can fall to zero and CPython can reclaim it.
+
+In the example above, the list object \texttt{[1, 2, 3]} is not returned and is not stored anywhere else. When the frame releases \texttt{data}, the list may become unreachable and can be deallocated. The integer object returned as \texttt{total}, however, is transferred to the caller and then bound to \texttt{result}. That object survives because a new reference keeps it alive.
+
+The important rule is:
+
+\begin{quote}
+A frame ending does not destroy every object created inside it. It releases the frame's references. Objects survive if some other reference still reaches them.
+\end{quote}
+
+This distinction is essential. The end of a function destroys the local name environment, not necessarily the objects that were mentioned by those names.
+
+For example:
+
+\begin{verbatim}
+def make_list():
+    data = [1, 2, 3]
+    return data
+
+x = make_list()
+\end{verbatim}
+
+During execution:
+
+\begin{verbatim}
+frame for make_list
+    data -> list object [1, 2, 3]
+\end{verbatim}
+
+After return:
+
+\begin{verbatim}
+caller namespace
+    x -> same list object [1, 2, 3]
+\end{verbatim}
+
+The local name \texttt{data} is gone, but the list object remains alive. The reference has moved from the callee's local frame to the caller's namespace. The object was not copied out of the function; a reference to the same heap object was returned.
+
+Now compare:
+
+\begin{verbatim}
+def make_list():
+    data = [1, 2, 3]
+
+make_list()
+\end{verbatim}
+
+Here, no reference escapes the function. When the frame ends, \texttt{data} is released. If nothing else refers to the list, the list becomes reclaimable. The object dies not because it was textually local, but because no surviving reference points to it.
+
+This is the ordinary lifecycle path:
+
+\begin{verbatim}
+function call
+    creates frame
+
+assignment inside function
+    local slots receive object references
+
+function return
+    return value reference is passed to caller
+
+frame cleanup
+    local slots release their references
+
+reference counts update
+    unreachable objects may be deallocated
+\end{verbatim}
+
+The same idea applies when a function exits because of an exception. If an exception is raised and not handled inside the current function, CPython must leave that frame and propagate the exception to the caller. This process is called stack unwinding. In Python terms, stack unwinding means that active Python frames are exited one by one until a matching exception handler is found or the program reaches the top level.
+
+Consider:
+
+\begin{verbatim}
+def inner():
+    data = [1, 2, 3]
+    raise ValueError("bad value")
+
+def outer():
+    inner()
+
+outer()
+\end{verbatim}
+
+The call chain is:
+
+\begin{verbatim}
+module frame
+    outer frame
+        inner frame
+\end{verbatim}
+
+When \texttt{inner} raises the exception, CPython checks whether \texttt{inner} has a handler. If not, the \texttt{inner} frame is exited. Its local references, including \texttt{data}, are released. Then the exception is propagated to \texttt{outer}. If \texttt{outer} also has no handler, the \texttt{outer} frame is exited and its local references are released. The exception continues upward.
+
+Conceptually:
+
+\begin{verbatim}
+exception raised in inner
+    no handler in inner
+        release inner frame references
+        propagate to outer
+
+    no handler in outer
+        release outer frame references
+        propagate to module/top level
+\end{verbatim}
+
+This is not just control flow. It is also object-lifetime flow. Every unwound frame stops holding its local references. Those reference-count decreases may trigger object destruction.
+
+If a handler exists, unwinding stops there:
+
+\begin{verbatim}
+def outer():
+    try:
+        inner()
+    except ValueError:
+        print("handled")
+\end{verbatim}
+
+Now \texttt{inner} still exits, so its frame is cleaned up. But \texttt{outer} continues execution inside the exception handler. The \texttt{outer} frame remains alive because the exception was caught there.
+
+The frame lifecycle is therefore tied to control flow. A frame may end normally through \texttt{return}, abnormally through an exception, or indirectly through generator/coroutine finalization. In each case, the runtime must deal with the references held by that frame.
+
+A normal return is the simplest case:
+
+\begin{verbatim}
+def f():
+    x = object()
+    return 10
+\end{verbatim}
+
+When \texttt{return 10} executes, the return value is prepared for the caller. Then the frame's local references are released. If \texttt{x} was the only reference to its object, that object can be destroyed.
+
+An exception exit is similar, except the outgoing object is the exception state rather than an ordinary return value:
+
+\begin{verbatim}
+def f():
+    x = object()
+    raise RuntimeError()
+\end{verbatim}
+
+The frame exits because control is leaving through an exception. The local \texttt{x} is released. The exception object is propagated.
+
+There is also an important special case: frames may survive longer than a normal call if they are part of generators or coroutines. A generator does not finish when it executes \texttt{yield}. It suspends.
+
+Example:
+
+\begin{verbatim}
+def gen():
+    data = [1, 2, 3]
+    yield data
+    data.append(4)
+    yield data
+\end{verbatim}
+
+After the first \texttt{yield}, the generator frame is not destroyed. It is paused. Its local slot \texttt{data} still points to the list object because the generator may resume later.
+
+Conceptually:
+
+\begin{verbatim}
+generator object
+    suspended frame
+        data -> list object [1, 2, 3]
+        current instruction position -> after first yield
+\end{verbatim}
+
+This is why generators can preserve local state between iterations. The local names are not recreated from nothing each time. The frame remains suspended, carrying references to the objects it needs.
+
+Only when the generator finishes, is closed, or becomes unreachable can its frame release those references. This is a controlled delay of frame destruction.
+
+A similar principle applies to coroutines. A coroutine may suspend while waiting. Its execution frame must remain alive so the coroutine can resume with its local variables and instruction position intact. Again, the runtime preserves references because execution has not truly ended.
+
+So there are three broad frame states:
+
+\begin{verbatim}
+active frame
+    currently executing
+
+suspended frame
+    paused, but may resume later
+
+finished frame
+    execution ended; references can be released
+\end{verbatim}
+
+Only the finished frame follows the ordinary destruction path immediately.
+
+Reference count updates are the memory-management side of all these transitions. When a local slot receives an object reference, the object must be kept alive. When the local slot is cleared, that reference is released. When a return value is passed to the caller, the caller receives a surviving reference. When an exception object is propagated, the exception path keeps the needed exception references alive. When a frame is suspended, its references remain alive.
+
+This can be seen with a return example:
+
+\begin{verbatim}
+def f():
+    a = []
+    b = a
+    return a
+
+x = f()
+\end{verbatim}
+
+Inside the frame:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object []
+      ^
+      |
+b ----+
+\end{verbatim}
+
+At return, the return value is the object referenced by \texttt{a}. The frame then releases \texttt{a} and \texttt{b}. But the caller binds \texttt{x} to the returned list. The list survives.
+
+After return:
+
+\begin{verbatim}
+x -> list object []
+\end{verbatim}
+
+The local names are gone; the object remains.
+
+Now consider:
+
+\begin{verbatim}
+def f():
+    a = []
+    b = a
+
+f()
+\end{verbatim}
+
+Inside the frame, the list has references from \texttt{a} and \texttt{b}. When the frame ends, both local slots are released. If there are no other references, the list becomes reclaimable.
+
+The programmer should not imagine frame destruction as deleting boxes with values inside them. It is better to imagine the frame as a small table of outgoing arrows. When the frame ends, those arrows are removed. Objects with no remaining arrows pointing to them can be reclaimed.
+
+Conceptually:
+
+\begin{verbatim}
+before frame cleanup:
+
+frame
+    a -> object A
+    b -> object B
+    c -> object C
+
+after frame cleanup:
+
+frame removed
+    references a, b, c released
+
+object A survives only if referenced elsewhere
+object B survives only if referenced elsewhere
+object C survives only if referenced elsewhere
+\end{verbatim}
+
+This also explains why tracebacks can affect object lifetime. An exception traceback may keep references to frames, and frames may keep references to their local variables. Therefore, exception objects and traceback chains can sometimes keep objects alive longer than expected. This is not a contradiction of reference counting. It is reference counting doing exactly what it should: if something still references a frame, and the frame still references local objects, those objects are still reachable.
+
+A simplified picture is:
+
+\begin{verbatim}
+exception object
+    -> traceback
+        -> frame
+            -> local variables
+                -> objects
+\end{verbatim}
+
+This is one reason long-lived stored exceptions can accidentally retain memory.
+
+The final lifecycle model is:
+
+\begin{verbatim}
+call creates frame
+    frame owns local reference slots
+
+execution fills slots
+    assignments, arguments, temporaries bind objects
+
+normal return
+    result reference moves to caller
+    frame releases remaining references
+
+exception
+    frames unwind until handler
+    each exited frame releases its references
+    traceback may preserve some frame references
+
+generator/coroutine suspension
+    frame is not destroyed
+    local references remain alive
+
+final frame destruction
+    slots are cleared
+    reference counts decrease
+    objects with no remaining references are reclaimed
+\end{verbatim}
+
+This gives a precise meaning to automatic memory management in Python. CPython does not search source code and decide that a variable is ``out of scope'' in a literary sense. It manages runtime structures. Frames hold references. Ending or unwinding a frame releases those references. Reference counts update. Objects survive if still reachable and disappear when the reference topology no longer keeps them alive.
+
+Thus, stack unwinding and memory management are not separate stories. In CPython, control-flow transitions reshape the object graph. Function returns, exceptions, and suspended execution all decide which references remain alive, and those references decide which heap objects persist.

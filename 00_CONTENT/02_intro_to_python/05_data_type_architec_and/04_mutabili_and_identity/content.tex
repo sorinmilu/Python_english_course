@@ -1,1 +1,551 @@
-\subsection{Mutability and Identity: Immutable Objects, Mutable Objects, Shared References, and `is` vs. `==`}
+\subsection{Mutability and Identity: Immutable Objects, Mutable Objects, Shared References, and \texttt{is} vs. \texttt{==}}
+
+Once Python variables are understood as names bound to objects, the next distinction is mutability. Mutability answers a simple question:
+
+\begin{quote}
+Can this object be changed in place while keeping the same identity?
+\end{quote}
+
+Identity and value must be kept separate. Identity tells us whether two references point to the same object. Value tells us what that object represents or contains. Mutability tells us whether the object's value or internal state can change without replacing the object.
+
+Python exposes identity with \texttt{is} and \texttt{id()}. It exposes value comparison through \texttt{==}. These two operations answer different questions.
+
+\begin{verbatim}
+a is b
+\end{verbatim}
+
+asks:
+
+\begin{quote}
+Do \texttt{a} and \texttt{b} refer to the exact same object?
+\end{quote}
+
+while:
+
+\begin{verbatim}
+a == b
+\end{verbatim}
+
+asks:
+
+\begin{quote}
+Do the objects currently referenced by \texttt{a} and \texttt{b} compare equal by value?
+\end{quote}
+
+For example:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(a == b)   # True
+print(a is b)   # False
+\end{verbatim}
+
+The two lists have the same contents, so they compare equal. But they are two different list objects, so they are not identical.
+
+Conceptually:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [1, 2, 3]
+\end{verbatim}
+
+There are two objects with equal values.
+
+Now compare:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+print(a == b)   # True
+print(a is b)   # True
+\end{verbatim}
+
+Here, both names refer to the same list object.
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+The value comparison is true because the object equals itself. The identity comparison is true because there is only one object.
+
+\subsubsection*{Mutable Objects}
+
+A mutable object can be changed in place. Lists, dictionaries, sets, most user-defined instances, byte arrays, and many other composite objects are mutable.
+
+Example:
+
+\begin{verbatim}
+items = [1, 2, 3]
+print(id(items))
+
+items.append(4)
+print(id(items))
+\end{verbatim}
+
+The identity remains the same. The list object was not replaced. Its internal state changed.
+
+Conceptually:
+
+\begin{verbatim}
+before append:
+
+items -> list object [1, 2, 3]
+
+after append:
+
+items -> same list object [1, 2, 3, 4]
+\end{verbatim}
+
+This is why shared references to mutable objects matter. If two names point to the same mutable object, mutation through one name is visible through the other.
+
+\begin{verbatim}
+a = []
+b = a
+
+b.append("x")
+
+print(a)
+\end{verbatim}
+
+The result is:
+
+\begin{verbatim}
+['x']
+\end{verbatim}
+
+The name \texttt{b} was used to mutate the list, but \texttt{a} observes the same object.
+
+This is not because Python copied the change from \texttt{b} to \texttt{a}. There was only one list object.
+
+\subsubsection*{Immutable Objects}
+
+An immutable object cannot be changed in place after it is created. Integers, floats, Booleans, strings, bytes, tuples, and \texttt{None} are common examples. Some of these are simple single-value objects; tuples are composite but immutable in their own slots.
+
+Example:
+
+\begin{verbatim}
+x = 10
+print(id(x))
+
+x = x + 1
+print(id(x))
+\end{verbatim}
+
+This does not mutate the integer object \texttt{10}. The expression \texttt{x + 1} produces an integer object representing \texttt{11}, and the name \texttt{x} is rebound to that object.
+
+Conceptually:
+
+\begin{verbatim}
+before:
+    x -> int object 10
+
+after:
+    x -> int object 11
+\end{verbatim}
+
+The arrow changed. The old integer object did not become \texttt{11}.
+
+The same applies to strings:
+
+\begin{verbatim}
+s = "py"
+s = s + "thon"
+\end{verbatim}
+
+The string object \texttt{"py"} is not extended in place. A new string object representing \texttt{"python"} is produced, and \texttt{s} is rebound.
+
+This is why repeated string concatenation in loops can be inefficient: many intermediate string objects may be created. A list accumulation followed by \texttt{"".join(...)} is often better when building large strings.
+
+\subsubsection*{Immutability of a Container Is Not Deep Immutability}
+
+A tuple is immutable because its slots cannot be rebound after creation:
+
+\begin{verbatim}
+t = (1, 2, 3)
+t[0] = 99        # invalid
+\end{verbatim}
+
+But if a tuple contains a mutable object, that contained object can still be mutated:
+
+\begin{verbatim}
+t = ([1, 2], "hello")
+t[0].append(3)
+
+print(t)
+\end{verbatim}
+
+The result is:
+
+\begin{verbatim}
+([1, 2, 3], 'hello')
+\end{verbatim}
+
+The tuple itself was not changed by replacing slot \texttt{0}. Slot \texttt{0} still points to the same list object. The list object was mutated.
+
+Conceptually:
+
+\begin{verbatim}
+t -> tuple object
+         slot 0 -> list object [1, 2]
+         slot 1 -> str object "hello"
+
+after append:
+
+t -> same tuple object
+         slot 0 -> same list object [1, 2, 3]
+         slot 1 -> same str object "hello"
+\end{verbatim}
+
+So immutability may be shallow. The tuple's own reference slots are fixed, but the objects reachable through those slots may still be mutable.
+
+\subsubsection*{Shared References and Aliasing}
+
+Aliasing means that two or more names or container positions refer to the same object. Aliasing is harmless with immutable objects in most ordinary cases because the object cannot be changed in place. It becomes important with mutable objects because a mutation through one reference affects all other references to that object.
+
+Example:
+
+\begin{verbatim}
+row = [0, 0, 0]
+matrix = [row, row, row]
+
+matrix[0][0] = 1
+
+print(matrix)
+\end{verbatim}
+
+The result is:
+
+\begin{verbatim}
+[[1, 0, 0], [1, 0, 0], [1, 0, 0]]
+\end{verbatim}
+
+This happens because all three positions in \texttt{matrix} point to the same inner list.
+
+Conceptually:
+
+\begin{verbatim}
+matrix -> outer list
+              slot 0 ----+
+              slot 1 ----+--> inner list [1, 0, 0]
+              slot 2 ----+
+\end{verbatim}
+
+The correct way to create independent rows is:
+
+\begin{verbatim}
+matrix = [[0, 0, 0] for _ in range(3)]
+\end{verbatim}
+
+Now each row expression is evaluated separately, creating separate list objects.
+
+\begin{verbatim}
+matrix -> outer list
+              slot 0 -> list object [0, 0, 0]
+              slot 1 -> list object [0, 0, 0]
+              slot 2 -> list object [0, 0, 0]
+\end{verbatim}
+
+A mutation to one row no longer changes the others.
+
+\subsubsection*{\texttt{is}: Identity Comparison}
+
+The \texttt{is} operator checks identity. It should be used when the question is truly whether two references point to the same object.
+
+The most common correct use is testing for \texttt{None}:
+
+\begin{verbatim}
+if value is None:
+    print("missing value")
+\end{verbatim}
+
+This is correct because \texttt{None} is a singleton object. The question is identity: does \texttt{value} point to the specific object \texttt{None}?
+
+The same applies to \texttt{True} and \texttt{False} in some cases, although ordinary Boolean conditions usually do not require explicit comparison:
+
+\begin{verbatim}
+if flag:
+    ...
+\end{verbatim}
+
+is normally better than:
+
+\begin{verbatim}
+if flag is True:
+    ...
+\end{verbatim}
+
+Identity comparison is also useful for proving aliasing:
+
+\begin{verbatim}
+a = []
+b = a
+c = []
+
+print(a is b)   # True
+print(a is c)   # False
+\end{verbatim}
+
+This tells us that \texttt{a} and \texttt{b} refer to the same list, while \texttt{c} refers to another list.
+
+\subsubsection*{\texttt{==}: Value Equality}
+
+The \texttt{==} operator checks equality according to the object's equality behavior. For built-in containers, this usually means comparing contents.
+
+Example:
+
+\begin{verbatim}
+a = [1, 2]
+b = [1, 2]
+
+print(a == b)   # True
+print(a is b)   # False
+\end{verbatim}
+
+The objects are distinct but equal.
+
+For user-defined classes, equality can be customized through special methods such as \texttt{\_\_eq\_\_}. If no meaningful equality is defined, objects may fall back to identity-based comparison behavior.
+
+Example:
+
+\begin{verbatim}
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p1 = Point(1, 2)
+p2 = Point(1, 2)
+
+print(p1 == p2)
+\end{verbatim}
+
+Without a custom equality method, this may be false because the two instances are distinct objects. To make equality value-based, the class must define how equality should be tested.
+
+Conceptually:
+
+\begin{verbatim}
+identity:
+    are these the same object?
+
+equality:
+    should these objects be considered equal?
+\end{verbatim}
+
+Those are not the same question.
+
+\subsubsection*{Do Not Use \texttt{is} for Numbers and Strings}
+
+Because CPython may reuse some immutable objects, especially small integers and interned strings, identity tests may appear to work accidentally:
+
+\begin{verbatim}
+a = 10
+b = 10
+
+print(a is b)   # may be True in CPython
+\end{verbatim}
+
+But this is not the correct way to compare numbers. The correct comparison is:
+
+\begin{verbatim}
+a == b
+\end{verbatim}
+
+The same warning applies to strings:
+
+\begin{verbatim}
+a = "hello"
+b = "hello"
+
+print(a is b)   # implementation-dependent behavior may appear
+print(a == b)   # correct value comparison
+\end{verbatim}
+
+The fact that two equal immutable values may share identity is an implementation optimization or caching behavior. It is not the right semantic test for ordinary program logic.
+
+The rule is:
+
+\begin{quote}
+Use \texttt{==} when asking whether values are equal. Use \texttt{is} when asking whether references point to the same object.
+\end{quote}
+
+\subsubsection*{Mutation vs. Rebinding}
+
+Many Python bugs come from confusing mutation and rebinding.
+
+Mutation:
+
+\begin{verbatim}
+a = []
+b = a
+
+a.append(1)
+\end{verbatim}
+
+After mutation:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+Rebinding:
+
+\begin{verbatim}
+a = []
+b = a
+
+a = [1]
+\end{verbatim}
+
+After rebinding:
+
+\begin{verbatim}
+a -> new list object [1]
+
+b -> original list object []
+\end{verbatim}
+
+The first program changes the shared object. The second program changes only which object the name \texttt{a} refers to.
+
+This distinction is also visible with augmented assignment. For mutable objects, an operation such as:
+
+\begin{verbatim}
+items += [3]
+\end{verbatim}
+
+may mutate the existing list object in place. For immutable objects, an operation such as:
+
+\begin{verbatim}
+number += 1
+\end{verbatim}
+
+must produce another integer object and rebind the name.
+
+So \texttt{+=} does not always mean the same memory behavior. It depends on the object's type and its operation implementation.
+
+Example:
+
+\begin{verbatim}
+a = []
+b = a
+a += [1]
+
+print(b)
+\end{verbatim}
+
+The list object is mutated, so \texttt{b} sees the change.
+
+But:
+
+\begin{verbatim}
+a = 10
+b = a
+a += 1
+
+print(b)
+\end{verbatim}
+
+The integer object is not mutated. The name \texttt{a} is rebound to another integer object. The name \texttt{b} still refers to the original integer object.
+
+\subsubsection*{Function Arguments Revisited}
+
+Mutability and identity also explain function argument behavior.
+
+Example with mutation:
+
+\begin{verbatim}
+def add_item(items):
+    items.append("x")
+
+data = []
+add_item(data)
+
+print(data)
+\end{verbatim}
+
+The function receives a local name \texttt{items} bound to the same list object as \texttt{data}. The method call mutates the object. The caller observes the mutation.
+
+Example with rebinding:
+
+\begin{verbatim}
+def replace(items):
+    items = ["x"]
+
+data = []
+replace(data)
+
+print(data)
+\end{verbatim}
+
+The local name \texttt{items} is rebound to a new list. The caller's name \texttt{data} still points to the original list.
+
+The rule is not that Python treats mutable and immutable arguments through different passing mechanisms. The passing mechanism is the same. The difference is whether the function mutates a shared object or rebinds a local name.
+
+\subsubsection*{The Practical Model}
+
+The full model is:
+
+\begin{verbatim}
+identity:
+    which exact object is this?
+
+value equality:
+    do these objects compare equal?
+
+mutability:
+    can this object change in place?
+
+shared reference:
+    do multiple names or slots point to the same object?
+\end{verbatim}
+
+These questions combine.
+
+For immutable objects:
+
+\begin{verbatim}
+a = 10
+b = a
+a = a + 1
+\end{verbatim}
+
+The operation produces a new object and rebinds \texttt{a}. The object reached by \texttt{b} is unchanged.
+
+For mutable objects:
+
+\begin{verbatim}
+a = []
+b = a
+a.append(1)
+\end{verbatim}
+
+The operation changes the shared object. Both names observe the change.
+
+The final rules are:
+
+\begin{itemize}
+    \item \texttt{is} checks whether two references point to the same object;
+    \item \texttt{==} checks whether two objects compare equal by value;
+    \item mutable objects can change while keeping identity;
+    \item immutable objects cannot change in place;
+    \item assignment between names shares object references;
+    \item mutation through one reference is visible through all aliases;
+    \item rebinding a name does not change other names that pointed to the old object.
+\end{itemize}
+
+This distinction is one of the foundations of Python programming. Without it, list behavior, function arguments, default mutable parameters, shallow copies, tuples containing lists, and identity comparisons appear inconsistent. With it, they all follow from the same runtime model: Python names and containers hold references to objects, and objects may or may not be mutable.

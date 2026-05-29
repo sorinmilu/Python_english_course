@@ -1,1 +1,311 @@
 \subsection{The CPython Interpreter Loop as the Concrete Execution Site of Python Bytecode}
+
+After source code has been compiled into code objects, and after execution has been placed inside a frame, the remaining question is direct: where does the program actually run?
+
+In CPython, the immediate answer is the interpreter loop. This loop is the part of the runtime that repeatedly reads bytecode instructions from the current frame and performs the corresponding operations on Python objects.
+
+A simplified view is:
+
+\begin{verbatim}
+current frame
+    contains code object
+        contains bytecode instruction stream
+
+interpreter loop
+    fetch next bytecode instruction
+    decode what operation it means
+    perform that operation on Python objects
+    update frame state
+    move to the next instruction
+\end{verbatim}
+
+This is the concrete execution site of Python code in CPython. The CPU is still executing native machine instructions from the CPython executable. But the user's Python program is being executed as CPython bytecode interpreted by this runtime loop.
+
+\subsubsection{The Interpreter Loop Is a Virtual Instruction Engine}
+
+A physical CPU executes machine instructions such as loads, stores, jumps, additions, calls, and returns. CPython's interpreter loop executes virtual instructions: bytecode operations designed for the Python runtime.
+
+A Python expression such as
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+does not become one ordinary CPU addition instruction in the general case. Conceptually, CPython must do something closer to this:
+
+\begin{verbatim}
+load object bound to name a
+load object bound to name b
+perform Python-level addition
+bind result to name x
+\end{verbatim}
+
+Each step is runtime-managed. Loading a name may require namespace lookup. Addition may require type inspection and dynamic dispatch. Binding a name may update a local slot or namespace dictionary. References must be maintained. Exceptions must be possible at almost every stage.
+
+The bytecode instruction stream is therefore not a machine-code replacement. It is an instruction stream for the Python object machine.
+
+\subsubsection{The Evaluation Stack: Temporary Objects During Expression Execution}
+
+CPython bytecode execution uses an evaluation stack. This stack is not the same thing as the native C call stack. It is a Python bytecode evaluation structure used to hold temporary object references while an expression is being evaluated.
+
+For example, the expression
+
+\begin{verbatim}
+a + b * c
+\end{verbatim}
+
+requires intermediate values. CPython must load \texttt{a}, load \texttt{b}, load \texttt{c}, compute \texttt{b * c}, then compute \texttt{a + result}. During this process, temporary object references are pushed onto and popped from the frame's evaluation stack.
+
+A simplified stack-machine view is:
+
+\begin{verbatim}
+load a          -> push object bound to a
+load b          -> push object bound to b
+load c          -> push object bound to c
+multiply        -> pop b and c, push result
+add             -> pop a and previous result, push result
+store x         -> pop result and bind it to x
+\end{verbatim}
+
+This explains why Python bytecode is often described as stack-oriented. Operations commonly take their operands from the evaluation stack and place their result back onto that stack.
+
+The important lesson is not the exact opcode names. Those can change between Python versions. The important lesson is the execution model: bytecode instructions manipulate references to Python objects through a runtime evaluation stack.
+
+\subsubsection{Name Lookup Is Runtime Work}
+
+When bytecode asks for a name, CPython must find the object currently bound to that name. The lookup path depends on how the compiler classified the name.
+
+A local variable in an optimized function may be read from a fast local slot. A global name may be searched in the module's global dictionary and then in the built-in namespace. An attribute access may call descriptor logic or custom attribute access methods. A closure variable may be read from a cell.
+
+For example:
+
+\begin{verbatim}
+def f():
+    return len(items)
+\end{verbatim}
+
+Inside this function, \texttt{len} is usually not a local variable. CPython must resolve it through global and built-in lookup rules. The name \texttt{items} may be local, global, or closed over from another scope depending on the surrounding program.
+
+This is a major difference from C. In C, many variable addresses and storage layouts are resolved by the compiler before execution. In Python, name lookup is often runtime work. CPython can optimize some cases, but the language model remains name-to-object binding, not fixed typed storage.
+
+\subsubsection{Operations Dispatch Through Object Types}
+
+When CPython executes an operation such as addition, comparison, indexing, calling, iteration, or attribute access, it must respect Python's object model.
+
+For example:
+
+\begin{verbatim}
+a + b
+\end{verbatim}
+
+may mean integer addition, floating-point addition, string concatenation, list concatenation, NumPy array addition, or a user-defined operation. CPython cannot assume one fixed operation from the symbol \texttt{+} alone.
+
+The interpreter must inspect the objects and their types, then dispatch to the behavior defined by those types. At the C level, this often means using function pointers and slots stored in type objects.
+
+Conceptually:
+
+\begin{verbatim}
+bytecode says: perform addition
+
+runtime asks:
+    what is the type of a?
+    what is the type of b?
+    which addition behavior applies?
+    did the operation succeed?
+    did it raise an exception?
+\end{verbatim}
+
+This is why Python operators are powerful but expensive compared with fixed native arithmetic. One visible symbol may activate a large amount of runtime machinery.
+
+\subsubsection{Function Calls Create New Execution State}
+
+A Python function call is also executed through bytecode and runtime frame machinery. When CPython calls a Python function, it must prepare a new execution context for that function's code object.
+
+Conceptually, a call requires:
+
+\begin{itemize}
+    \item evaluating the callable object;
+    \item evaluating argument expressions;
+    \item matching arguments to parameters;
+    \item applying default values if needed;
+    \item preparing local bindings;
+    \item creating or activating a frame for the callee;
+    \item executing the callee's bytecode;
+    \item returning a result or propagating an exception.
+\end{itemize}
+
+So this source code:
+
+\begin{verbatim}
+result = f(10, 20)
+\end{verbatim}
+
+does not simply jump to a fixed native address in the C sense. CPython must first determine what object \texttt{f} currently refers to. It may be a Python function, a built-in function, a bound method, a class object, or any object implementing call behavior. Only after resolving that callable can CPython perform the call according to Python's rules.
+
+Again, the source is short because the runtime is doing the work.
+
+\subsubsection{Control Flow Is Bytecode Movement}
+
+Python control flow also becomes bytecode-level movement. An \texttt{if} statement, loop, exception handler, return statement, \texttt{break}, or \texttt{continue} eventually changes which bytecode instruction executes next.
+
+For example:
+
+\begin{verbatim}
+if x > 0:
+    y = 1
+else:
+    y = -1
+\end{verbatim}
+
+compiles into bytecode that evaluates the condition and jumps to the correct block. The source-level branch becomes instruction-position control inside the current frame.
+
+A loop works similarly:
+
+\begin{verbatim}
+for item in items:
+    process(item)
+\end{verbatim}
+
+The interpreter must obtain an iterator, request the next value, bind it to \texttt{item}, execute the loop body, then return to the iteration point until the iterator is exhausted.
+
+The source-level \texttt{for} loop therefore hides a protocol:
+
+\begin{verbatim}
+get iterator from items
+repeat:
+    ask iterator for next object
+    if exhausted, exit loop
+    bind object to item
+    execute loop body
+\end{verbatim}
+
+This is not a C-style index loop unless the object involved happens to implement iteration that way internally.
+
+\subsubsection{Exceptions Are Also Part of the Loop}
+
+Almost every bytecode operation can fail. Name lookup can fail. Attribute access can fail. Addition can fail. Function calls can fail. Iterator access can signal exhaustion. File operations can raise exceptions. User-defined code can raise exceptions directly.
+
+Therefore, the interpreter loop must constantly be prepared for exceptional control flow.
+
+If an operation raises an exception, CPython does not merely print an error immediately. It checks whether the current frame has a matching exception-handling region. If not, the frame is unwound and the exception propagates to the caller. This continues until a handler is found or the exception reaches the top level.
+
+Conceptually:
+
+\begin{verbatim}
+bytecode operation raises exception
+    current frame checks for handler
+        if handler exists:
+            jump to handler bytecode
+        else:
+            leave frame
+            propagate exception to caller frame
+\end{verbatim}
+
+This is why Python exceptions can cross many function calls. They are not local error messages. They are structured non-local control flow managed by the runtime.
+
+\subsubsection{Return Means Leaving the Current Frame}
+
+When a function executes
+
+\begin{verbatim}
+return value
+\end{verbatim}
+
+CPython evaluates \texttt{value}, places the result where the caller can receive it, and ends the current frame's execution. The caller then continues after the call site.
+
+A return is therefore not only a source-level statement. It is a bytecode-level frame transition:
+
+\begin{verbatim}
+callee frame produces return object
+callee frame finishes
+caller frame receives object
+caller frame continues
+\end{verbatim}
+
+The returned object is not copied as a raw memory block. The caller receives a reference to a Python object.
+
+This explains common behavior:
+
+\begin{verbatim}
+def make_list():
+    return []
+
+a = make_list()
+\end{verbatim}
+
+The function creates a list object and returns a reference to it. The list survives after the function frame ends because the caller now has a reference to the object.
+
+\subsubsection{Why Python Has Runtime Overhead}
+
+The interpreter loop explains Python's ordinary runtime overhead. A small Python operation may require several layers of work:
+
+\begin{itemize}
+    \item fetch a bytecode instruction;
+    \item decode or dispatch that instruction;
+    \item read or write frame state;
+    \item look up names;
+    \item manipulate the evaluation stack;
+    \item inspect object types;
+    \item call type-specific behavior;
+    \item update reference counts;
+    \item check for exceptions;
+    \item move to the next bytecode instruction.
+\end{itemize}
+
+In C, an integer addition may compile into a direct CPU instruction when the types and storage are known. In Python, the expression may represent many possible behaviors, so CPython must preserve that flexibility at runtime.
+
+This is the cost of Python's dynamic object model. The programmer writes less machinery. CPython executes more machinery.
+
+\subsubsection{Modern CPython Optimizes, but the Model Remains}
+
+Modern CPython versions include many optimizations. Some bytecode instructions are specialized after CPython observes common runtime patterns. Some call paths are faster than older versions. Some interpreter internals have been reorganized to reduce overhead.
+
+But these optimizations do not change the basic teaching model. CPython is still executing Python through runtime-managed bytecode, frames, objects, namespaces, and type-based behavior. The exact internal opcodes may change, but the conceptual structure remains useful.
+
+Therefore, one should not memorize bytecode listings as if they were stable language law. Bytecode is a CPython implementation detail. It is useful for understanding execution, debugging performance, and seeing how source is lowered, but it is not the Python language itself.
+
+\subsubsection{The Final Mental Model}
+
+The interpreter loop connects all previous machinery:
+
+\begin{verbatim}
+code object
+    provides bytecode
+
+frame
+    provides current execution state
+
+namespace mappings / local slots
+    provide name bindings
+
+evaluation stack
+    stores temporary object references
+
+type objects
+    define operation behavior
+
+interpreter loop
+    repeatedly executes bytecode operations
+\end{verbatim}
+
+This is the concrete execution site of Python code in CPython.
+
+The programmer sees:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+CPython performs:
+
+\begin{verbatim}
+load names
+retrieve objects
+dispatch operation through object types
+manage references
+handle possible exceptions
+store resulting binding
+continue bytecode execution
+\end{verbatim}
+
+This is enough CPython detail for the purpose of this course. We do not need to become CPython implementers. But we do need to know that Python code runs inside a real interpreter loop, manipulating real objects, through real frames and namespaces, inside a native process. That is the level where Python's behavior becomes explainable instead of magical.

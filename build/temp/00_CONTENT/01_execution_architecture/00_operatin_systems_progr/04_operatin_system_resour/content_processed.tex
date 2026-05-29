@@ -546,7 +546,7 @@ Processes avoid many of these accidental sharing problems by default because the
 
 However, process isolation also makes communication more expensive. If two processes need to exchange large amounts of data, the data may need to be copied through kernel buffers, serialized, sent through a socket, written to a pipe, or placed in an explicitly shared memory region. Threads can share data cheaply because it is already in the same address space.
 
-The contrast is therefore not simply `\texttt{processes are better'' or }`threads are better.'' They solve different problems:
+The contrast is therefore not simply ``processes are better'' or ``threads are better.'' They solve different problems:
 
 \begin{itemize}
     \item processes provide isolation, protection, and failure containment;

@@ -1,1 +1,528 @@
 \subsection{Object Interfaces: Dunder Methods, Internal Slots, Operators, Construction, and Representation}
+
+Python objects are not used only by calling ordinary named methods directly. They also participate in a larger interface system defined by the Python data model. This system explains why objects can be added with \texttt{+}, called with parentheses, iterated with \texttt{for}, indexed with square brackets, printed, formatted, compared, constructed, entered with \texttt{with}, and inspected at runtime.
+
+The visible syntax is often short:
+
+\begin{verbatim}
+a + b
+items[0]
+len(items)
+for x in items:
+    ...
+str(obj)
+repr(obj)
+obj()
+\end{verbatim}
+
+but these operations are not primitive in the C sense. They are routed through object interfaces. In Python, much of the language syntax is connected to special methods, often called \emph{dunder methods} because their names begin and end with double underscores: \texttt{\_\_add\_\_}, \texttt{\_\_len\_\_}, \texttt{\_\_iter\_\_}, \texttt{\_\_getitem\_\_}, \texttt{\_\_call\_\_}, \texttt{\_\_repr\_\_}, and so on.
+
+These methods should not be treated as mysterious magic. They are ordinary-looking names with special meaning to the interpreter. They define how an object responds to language-level operations.
+
+For example:
+
+\begin{verbatim}
+a + b
+\end{verbatim}
+
+is connected to addition behavior, commonly through methods such as:
+
+\begin{verbatim}
+a.__add__(b)
+\end{verbatim}
+
+This does not mean that Python literally rewrites every expression in this exact source form. The implementation uses type-level lookup and internal operation slots. But conceptually, the point is correct: the operator \texttt{+} is not one fixed machine operation. It asks the involved objects how addition should work.
+
+This is why the same operator can mean different things:
+
+\begin{verbatim}
+1 + 2              # integer addition
+"py" + "thon"      # string concatenation
+[1, 2] + [3, 4]    # list concatenation
+\end{verbatim}
+
+The syntax is the same, but the involved object types provide different behavior.
+
+The same principle appears in length:
+
+\begin{verbatim}
+len(items)
+\end{verbatim}
+
+The built-in \texttt{len()} function does not inspect every possible object by hand. It asks the object for its length through the object's length protocol, usually associated with \texttt{\_\_len\_\_}.
+
+For example:
+
+\begin{verbatim}
+class Bag:
+    def __init__(self, values):
+        self.values = values
+
+    def __len__(self):
+        return len(self.values)
+
+bag = Bag([1, 2, 3])
+print(len(bag))
+\end{verbatim}
+
+The object \texttt{bag} becomes acceptable to \texttt{len()} because it provides the required interface.
+
+This is the general pattern:
+
+\begin{verbatim}
+visible operation
+    asks object interface for behavior
+\end{verbatim}
+
+Some common mappings are:
+
+\begin{verbatim}
+x + y           -> addition protocol, e.g. __add__
+x == y          -> equality protocol, e.g. __eq__
+x < y           -> ordering protocol, e.g. __lt__
+len(x)          -> length protocol, e.g. __len__
+x[i]            -> item access protocol, e.g. __getitem__
+x[i] = value    -> item assignment protocol, e.g. __setitem__
+for item in x   -> iteration protocol, e.g. __iter__ / __next__
+x()             -> call protocol, e.g. __call__
+str(x)          -> string conversion, e.g. __str__
+repr(x)         -> programmer representation, e.g. __repr__
+\end{verbatim}
+
+This interface system is one reason Python supports behavior-based programming. A function does not always need to demand one exact type. It may need only an object that supports a certain protocol.
+
+For example:
+
+\begin{verbatim}
+def print_all(values):
+    for value in values:
+        print(value)
+\end{verbatim}
+
+This function does not require \texttt{values} to be a list. It requires \texttt{values} to be iterable. A list, tuple, string, generator, file object, dictionary, set, or user-defined iterable may work. The common requirement is not shared inheritance from one visible class, but support for the iteration interface.
+
+A user-defined iterable can expose that behavior:
+
+\begin{verbatim}
+class CountDown:
+    def __init__(self, start):
+        self.current = start
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current <= 0:
+            raise StopIteration
+        value = self.current
+        self.current -= 1
+        return value
+
+for number in CountDown(3):
+    print(number)
+\end{verbatim}
+
+The \texttt{for} loop works because the object supports the iteration protocol. The loop asks for an iterator, repeatedly requests the next value, and stops when \texttt{StopIteration} is raised.
+
+This is not syntactic sugar in the trivial sense. It is a runtime protocol. The syntax is short because the object interface supplies the behavior.
+
+Indexing works the same way:
+
+\begin{verbatim}
+class Box:
+    def __init__(self, values):
+        self.values = values
+
+    def __getitem__(self, index):
+        return self.values[index]
+
+box = Box(["a", "b", "c"])
+
+print(box[1])
+\end{verbatim}
+
+The expression:
+
+\begin{verbatim}
+box[1]
+\end{verbatim}
+
+is accepted because \texttt{box} provides item access behavior.
+
+This also means that Python syntax is extensible through object interfaces. The programmer does not add new operators to the language, but can define how existing language operations behave for new object types.
+
+Construction is also part of this interface system. When a class is called:
+
+\begin{verbatim}
+p = Point(2, 3)
+\end{verbatim}
+
+the class object is invoked. Instance creation normally passes through two main special methods:
+
+\begin{verbatim}
+__new__
+__init__
+\end{verbatim}
+
+The method \texttt{\_\_new\_\_} is responsible for creating and returning the new object. The method \texttt{\_\_init\_\_} initializes that object after it exists.
+
+A simplified example is:
+
+\begin{verbatim}
+class Point:
+    def __new__(cls, x, y):
+        obj = super().__new__(cls)
+        return obj
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+\end{verbatim}
+
+Most ordinary classes do not need to define \texttt{\_\_new\_\_}; they only define \texttt{\_\_init\_\_}. But the separation is important. Initialization is not allocation. The object must exist before \texttt{\_\_init\_\_} can set attributes on it.
+
+Conceptually:
+
+\begin{verbatim}
+Point(2, 3)
+    call class object
+    allocate instance through __new__
+    initialize instance through __init__
+    return reference to initialized object
+\end{verbatim}
+
+This also explains why \texttt{\_\_init\_\_} should not return the new object. Its role is to configure an already created instance.
+
+Representation is another object interface. Python distinguishes between a programmer-oriented representation and a user-oriented string form.
+
+The method \texttt{\_\_repr\_\_} should produce a representation useful for debugging and inspection. The method \texttt{\_\_str\_\_} should produce a more readable human-facing string when such a distinction is useful.
+
+Example:
+
+\begin{verbatim}
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Point({self.x!r}, {self.y!r})"
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+p = Point(2, 3)
+
+print(repr(p))
+print(str(p))
+print(p)
+\end{verbatim}
+
+The output is conceptually:
+
+\begin{verbatim}
+Point(2, 3)
+(2, 3)
+(2, 3)
+\end{verbatim}
+
+The call \texttt{print(p)} uses the string form. Interactive inspection often uses the representation form. If \texttt{\_\_str\_\_} is not defined, Python may fall back to \texttt{\_\_repr\_\_}.
+
+This interface matters because objects should be inspectable. A badly represented object makes debugging harder. A useful \texttt{\_\_repr\_\_} tells the programmer what object exists and what important state it carries.
+
+Comparison is also controlled by object methods. The expression:
+
+\begin{verbatim}
+a == b
+\end{verbatim}
+
+uses equality behavior, commonly \texttt{\_\_eq\_\_}. Without a custom equality definition, user-defined instances often compare by identity-like default behavior.
+
+Example:
+
+\begin{verbatim}
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+p1 = Point(2, 3)
+p2 = Point(2, 3)
+
+print(p1 == p2)
+\end{verbatim}
+
+The two objects may not compare equal because they are distinct instances. To define value equality:
+
+\begin{verbatim}
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        if not isinstance(other, Point):
+            return NotImplemented
+        return self.x == other.x and self.y == other.y
+\end{verbatim}
+
+Now two points with the same coordinates can compare equal.
+
+The value \texttt{NotImplemented} is important in binary operations and comparisons. It tells Python that this method does not know how to handle the other operand, allowing Python to try reflected or alternative behavior. It is not the same as raising \texttt{NotImplementedError}.
+
+There is also a deeper implementation layer behind these special methods: internal slots. CPython's type objects contain slots for categories of behavior: numeric operations, sequence operations, mapping operations, call behavior, attribute access, deallocation, representation, and so on. Special methods at the Python level are connected to these type-level operation slots.
+
+This matters because special method lookup is not always the same as ordinary instance attribute lookup. For many language operations, Python looks for special methods on the type, not merely as arbitrary attributes stored on one instance.
+
+For example:
+
+\begin{verbatim}
+class Number:
+    def __init__(self, value):
+        self.value = value
+
+n = Number(10)
+
+n.__add__ = lambda other: 999
+
+print(n + 5)
+\end{verbatim}
+
+One should not expect this instance-level assignment to make \texttt{n + 5} work. Operator behavior is normally resolved through the object's type, not through a random instance attribute named \texttt{\_\_add\_\_}. The correct place is the class:
+
+\begin{verbatim}
+class Number:
+    def __init__(self, value):
+        self.value = value
+
+    def __add__(self, other):
+        return Number(self.value + other)
+\end{verbatim}
+
+This is a critical distinction. Dunder methods are not just decorative ordinary methods with funny names. They are hooks recognized by the interpreter and connected to type-level behavior.
+
+The word \emph{slot} can also refer to \texttt{\_\_slots\_\_}, which is a different but related object-layout feature. By default, many user-defined instances store attributes in a per-instance dictionary:
+
+\begin{verbatim}
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+Point instance
+    __dict__
+        "x" -> object
+        "y" -> object
+\end{verbatim}
+
+With \texttt{\_\_slots\_\_}:
+
+\begin{verbatim}
+class Point:
+    __slots__ = ("x", "y")
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+\end{verbatim}
+
+the instance can store those attributes in fixed slots instead of an ordinary per-instance attribute dictionary.
+
+Conceptually:
+
+\begin{verbatim}
+Point instance
+    slot x -> object
+    slot y -> object
+\end{verbatim}
+
+This can reduce memory use for many instances and can prevent arbitrary new attributes unless a dictionary slot is explicitly allowed. But \texttt{\_\_slots\_\_} should not be confused with operator slots inside CPython's type object. They are connected by the general idea of fixed places for behavior or data, but they are not the same mechanism.
+
+So there are at least three meanings of ``slot'' that must be kept separate:
+
+\begin{verbatim}
+frame local slots:
+    fast storage for local references inside a frame
+
+instance __slots__:
+    fixed attribute storage for instances
+
+type operation slots:
+    internal behavior entries used for operators and protocols
+\end{verbatim}
+
+All three are reference-oriented runtime storage or dispatch mechanisms, but they operate at different levels.
+
+Attribute access is another important object interface. The expression:
+
+\begin{verbatim}
+obj.name
+\end{verbatim}
+
+may look like direct field access, but in Python it is a protocol-driven operation. Attribute lookup may involve the instance dictionary, the class dictionary, descriptors, properties, inherited attributes, and special methods such as \texttt{\_\_getattribute\_\_} and \texttt{\_\_getattr\_\_}.
+
+For example:
+
+\begin{verbatim}
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+p = Person("Ada")
+print(p.name)
+\end{verbatim}
+
+The simple case finds \texttt{name} in the instance attribute storage. But Python also allows controlled computed attributes:
+
+\begin{verbatim}
+class Person:
+    def __init__(self, first, last):
+        self.first = first
+        self.last = last
+
+    @property
+    def full_name(self):
+        return self.first + " " + self.last
+\end{verbatim}
+
+Now:
+
+\begin{verbatim}
+p.full_name
+\end{verbatim}
+
+looks like attribute access, but it calls descriptor logic behind the property. This is another example of Python syntax being mediated by object interfaces.
+
+The call interface is equally important. Any object can be made callable by defining \texttt{\_\_call\_\_}.
+
+Example:
+
+\begin{verbatim}
+class Multiplier:
+    def __init__(self, factor):
+        self.factor = factor
+
+    def __call__(self, value):
+        return self.factor * value
+
+double = Multiplier(2)
+
+print(double(10))
+\end{verbatim}
+
+The object \texttt{double} is not a function, but it is callable. Parentheses trigger its call behavior.
+
+Conceptually:
+
+\begin{verbatim}
+double(10)
+    asks object double for call behavior
+    invokes __call__
+\end{verbatim}
+
+This explains why Python call syntax is broader than function calls. Classes are callable. Functions are callable. Methods are callable. Some instances are callable. The syntax asks for the call protocol; the object decides whether it supports it.
+
+Context managers show the same interface design:
+
+\begin{verbatim}
+with open("data.txt") as f:
+    text = f.read()
+\end{verbatim}
+
+The \texttt{with} statement uses methods associated with entering and exiting a context, commonly \texttt{\_\_enter\_\_} and \texttt{\_\_exit\_\_}. This allows objects to define setup and cleanup behavior around a block.
+
+A simplified custom context manager:
+
+\begin{verbatim}
+class Announce:
+    def __enter__(self):
+        print("enter")
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        print("exit")
+
+with Announce():
+    print("inside")
+\end{verbatim}
+
+The object interface determines what happens before and after the block. This is not merely syntactic decoration; it is structured resource control.
+
+The practical lesson is that Python objects are defined not only by stored data, but by supported interfaces. An object may be:
+
+\begin{verbatim}
+iterable
+callable
+indexable
+comparable
+hashable
+context-manageable
+representable
+numeric-like
+sequence-like
+mapping-like
+\end{verbatim}
+
+These categories are behavior categories. They are not always tied to one exact class. Python code often works best when it asks for behavior rather than one rigid type.
+
+For example, a function that consumes lines does not need a list:
+
+\begin{verbatim}
+def count_lines(lines):
+    count = 0
+    for line in lines:
+        count += 1
+    return count
+\end{verbatim}
+
+It needs an iterable. A list, tuple, file object, generator, or custom iterable may work. The object interface is the contract.
+
+This is the correct way to understand dunder methods: they are the named hooks through which objects participate in Python syntax and built-in operations. They are not meant to be called constantly by hand in ordinary code. Usually, the programmer writes:
+
+\begin{verbatim}
+len(x)
+x + y
+x[i]
+for item in x:
+    ...
+str(x)
+repr(x)
+\end{verbatim}
+
+rather than directly writing:
+
+\begin{verbatim}
+x.__len__()
+x.__add__(y)
+x.__getitem__(i)
+x.__iter__()
+x.__str__()
+x.__repr__()
+\end{verbatim}
+
+The direct calls are useful for explanation, but the idiomatic code uses the language operation. The operation then dispatches through the object's interface.
+
+The final model is:
+
+\begin{verbatim}
+object
+    identity
+    type
+    value/state
+    references to other objects
+    interface methods / type slots
+
+language syntax
+    requests behavior from object interfaces
+
+runtime
+    dispatches operation through type-defined machinery
+\end{verbatim}
+
+This completes the data-type architecture picture. Python data types are not only memory containers and not only names printed by \texttt{type()}. They are runtime objects with behavior interfaces. Operators, construction, representation, iteration, indexing, calling, comparison, and context management all flow through those interfaces.
+
+This is why Python can be both dynamic and structured. Names are flexible, but objects are not shapeless. Each object has a type, and each type defines what the object can do.

@@ -1,1 +1,342 @@
 \subsection{Classifying Type Systems: Static vs. Dynamic Variable Typing, Strong vs. Weak Enforcement Boundaries}
+
+Before Python's concrete data types can be studied, the word \emph{type} must be separated into several different ideas. Programmers often say that a language is ``typed'', ``untyped'', ``strongly typed'', ``weakly typed'', ``statically typed'', or ``dynamically typed'' as if these labels were simple and self-explanatory. They are not. They describe different questions.
+
+The first question is:
+
+\begin{quote}
+When is type information checked?
+\end{quote}
+
+This separates static typing from dynamic typing.
+
+The second question is:
+
+\begin{quote}
+How strictly are operations prevented when the involved values do not support them?
+\end{quote}
+
+This separates stronger enforcement from weaker enforcement.
+
+These two axes are independent. A language can be statically typed but still allow unsafe conversions. A language can be dynamically typed but still reject invalid operations strictly at runtime. Python belongs to the second category: names are dynamically bound to objects, but operations are strongly checked when they execute.
+
+\subsubsection*{Static Typing: Type Restrictions Before Execution}
+
+In a statically typed language, many type constraints are checked before the program runs. C is the reference example for this course. When the programmer writes:
+
+\begin{verbatim}
+int x = 10;
+\end{verbatim}
+
+the name \texttt{x} is associated with an \texttt{int} storage type. The compiler uses that declaration to decide what kind of values may be stored there, what operations are valid, how much memory is needed, and what machine instructions can be generated.
+
+If the programmer writes:
+
+\begin{verbatim}
+int x = 10;
+x = "hello";
+\end{verbatim}
+
+a C compiler can reject the program because \texttt{x} is an integer variable and \texttt{"hello"} is not an integer value. The failure is detected before normal execution. This is static type checking.
+
+Static typing therefore ties type information to program structure before runtime. The compiler can use this information to detect errors early and to generate efficient code. If the compiler knows that two operands are machine integers, it can often generate direct integer arithmetic instructions. It does not need to inspect runtime object descriptors before every addition.
+
+The advantage is early certainty. The disadvantage is reduced flexibility. A storage location declared as an \texttt{int} cannot later become a string, list, function, or dictionary. The program must respect the declared type structure.
+
+\subsubsection*{Dynamic Typing: Type Information at Runtime Objects}
+
+In a dynamically typed language, type decisions are attached mainly to runtime values, not to fixed variable declarations. Python is dynamically typed in this sense.
+
+When Python executes:
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+the name \texttt{x} is bound to an integer object. Later:
+
+\begin{verbatim}
+x = "hello"
+\end{verbatim}
+
+the same name \texttt{x} is rebound to a string object. This is legal because \texttt{x} is not a fixed typed storage box. It is a name that can be bound to different objects at different moments.
+
+The type belongs to the object:
+
+\begin{verbatim}
+x -> int object
+
+x -> str object
+
+x -> list object
+\end{verbatim}
+
+not to the name as a permanent compile-time declaration.
+
+This is why \texttt{type(x)} may return different results at different points in the same program:
+
+\begin{verbatim}
+x = 10
+print(type(x))      # int
+
+x = "hello"
+print(type(x))      # str
+\end{verbatim}
+
+The name \texttt{x} did not change its declared type. It has no declared type in the C sense. It simply points to different typed objects over time.
+
+Dynamic typing therefore gives the programmer more flexibility. The same function may accept different kinds of objects as long as those objects support the operations used inside the function.
+
+For example:
+
+\begin{verbatim}
+def combine(a, b):
+    return a + b
+\end{verbatim}
+
+This may work for integers:
+
+\begin{verbatim}
+combine(1, 2)
+\end{verbatim}
+
+for strings:
+
+\begin{verbatim}
+combine("py", "thon")
+\end{verbatim}
+
+and for lists:
+
+\begin{verbatim}
+combine([1], [2])
+\end{verbatim}
+
+The function does not declare a fixed parameter type. The operation is checked when the function runs with actual objects.
+
+\subsubsection*{Static vs. Dynamic Does Not Mean Safe vs. Unsafe}
+
+A common mistake is to treat static typing as safe and dynamic typing as unsafe. This is too simple. Static and dynamic typing describe when type constraints are checked, not whether all errors are impossible.
+
+C is statically typed, but it still allows many dangerous operations: pointer misuse, invalid casts, buffer overflows, use-after-free errors, and undefined behavior. The compiler checks many type rules, but it does not make arbitrary memory manipulation safe.
+
+Python is dynamically typed, but it still has strict runtime type enforcement. It does not silently reinterpret most incompatible objects just to continue execution.
+
+For example:
+
+\begin{verbatim}
+"hello" + 5
+\end{verbatim}
+
+raises an error. Python does not silently convert \texttt{5} to \texttt{"5"} and concatenate it. The operation is rejected because the involved object types do not define that operation together.
+
+So dynamic typing means:
+
+\begin{quote}
+The check happens when the operation executes.
+\end{quote}
+
+It does not mean:
+
+\begin{quote}
+There is no check.
+\end{quote}
+
+\subsubsection*{Strong Enforcement: Operations Must Make Sense for the Objects}
+
+The phrase \emph{strong typing} is used inconsistently in programming discussions, but the useful idea for this course is enforcement strength. A strongly enforced type system does not freely treat values of unrelated types as interchangeable. If an operation does not make sense for the objects involved, it is rejected.
+
+Python is strongly enforced at runtime. Examples:
+
+\begin{verbatim}
+1 + 2
+\end{verbatim}
+
+is valid integer addition.
+
+\begin{verbatim}
+"1" + "2"
+\end{verbatim}
+
+is valid string concatenation.
+
+But:
+
+\begin{verbatim}
+"1" + 2
+\end{verbatim}
+
+is rejected.
+
+The string object and the integer object both exist. Python knows their types. It refuses to invent a hidden conversion rule for this operation.
+
+This is different from languages that perform many implicit conversions. In some languages, adding a string and a number may silently convert the number into text or convert the string into a number. That kind of behavior is weaker enforcement because the language crosses type boundaries automatically.
+
+Python usually requires such conversions to be explicit:
+
+\begin{verbatim}
+"1" + str(2)
+\end{verbatim}
+
+or:
+
+\begin{verbatim}
+int("1") + 2
+\end{verbatim}
+
+The programmer must state which domain is intended: text concatenation or numeric addition.
+
+\subsubsection*{Weak Enforcement: Automatic Boundary Crossing}
+
+Weakly enforced systems allow more automatic conversion between types. This can make small programs shorter, but it can also hide mistakes.
+
+For example, in a weakly converting language, an expression similar to:
+
+\begin{verbatim}
+"10" + 5
+\end{verbatim}
+
+might become \texttt{"105"} or \texttt{15}, depending on the language's rules and context. The program continues, but the programmer may not have intended the conversion.
+
+Python rejects this ambiguity. It forces the programmer to choose:
+
+\begin{verbatim}
+"10" + str(5)     # text result: "105"
+
+int("10") + 5     # numeric result: 15
+\end{verbatim}
+
+This is why Python can be dynamically typed and still strict. It permits names to refer to different kinds of objects over time, but it does not usually permit incompatible objects to be combined without a defined operation or explicit conversion.
+
+\subsubsection*{The Four-Part Classification}
+
+The two axes can be combined:
+
+\begin{verbatim}
+static typing:
+    many type rules checked before execution
+
+dynamic typing:
+    type rules checked when objects are used at runtime
+
+strong enforcement:
+    invalid type combinations are rejected
+
+weak enforcement:
+    the language performs many implicit conversions
+\end{verbatim}
+
+Python's position is:
+
+\begin{verbatim}
+dynamic names
+strong runtime enforcement
+\end{verbatim}
+
+C's position is more complicated. It is statically typed, but it also permits casts, pointer conversions, integer promotions, and low-level memory operations that can weaken safety. Therefore, C should not be described simplistically as ``stronger'' than Python. It is more statically declared, but it also gives the programmer escape routes that can bypass safety.
+
+A better comparison is:
+
+\begin{verbatim}
+C:
+    variable declarations carry compile-time type information
+    compiler checks many operations before execution
+    raw memory and casts can bypass or weaken safety
+
+Python:
+    names do not carry fixed declared types
+    objects carry runtime type descriptors
+    operations are checked when executed
+    incompatible operations usually raise exceptions
+\end{verbatim}
+
+\subsubsection*{Why Python Feels Flexible}
+
+Python feels flexible because a function can be written around behavior rather than around declared storage types.
+
+Example:
+
+\begin{verbatim}
+def first_item(collection):
+    return collection[0]
+\end{verbatim}
+
+This function may work for a list, tuple, string, or another object that supports indexing. The function does not need to declare all possible accepted types. It simply uses an operation, and the runtime checks whether the object supports it.
+
+This is often called duck typing: if an object supports the needed behavior, the function can use it. The name is informal, but the mechanism is concrete. The runtime attempts the operation through the object's type-defined interface. If the object supports it, execution continues. If not, an exception is raised.
+
+For example:
+
+\begin{verbatim}
+first_item([10, 20])
+first_item((10, 20))
+first_item("abc")
+\end{verbatim}
+
+all work.
+
+But:
+
+\begin{verbatim}
+first_item(123)
+\end{verbatim}
+
+fails because an integer object is not indexable.
+
+Thus, Python flexibility is not the absence of type rules. It is operation-based runtime checking.
+
+\subsubsection*{Why Python Errors Often Appear Later}
+
+The cost of dynamic typing is that some errors are discovered only when execution reaches the invalid operation.
+
+For example:
+
+\begin{verbatim}
+def add_one(x):
+    return x + 1
+\end{verbatim}
+
+This function can be defined without knowing what \texttt{x} will be. The definition itself is valid. The error appears only if the function is called with an object that cannot be added to \texttt{1}:
+
+\begin{verbatim}
+add_one("hello")
+\end{verbatim}
+
+The failure occurs at runtime. The compiler could not reject the function definition, because there may be valid calls:
+
+\begin{verbatim}
+add_one(10)
+\end{verbatim}
+
+This is one of the tradeoffs of Python. The same flexibility that allows generic behavior also delays certain errors until actual execution paths are tested.
+
+This is why testing, clear interfaces, type hints, assertions, and defensive validation become important in larger Python programs. Dynamic typing gives freedom, but freedom must be disciplined.
+
+\subsubsection*{Type Hints Do Not Turn Python into C}
+
+Modern Python supports type hints:
+
+\begin{verbatim}
+def add_one(x: int) -> int:
+    return x + 1
+\end{verbatim}
+
+These annotations help readers, editors, linters, type checkers, and documentation tools. But ordinary CPython does not use them as C-style enforced declarations during normal execution.
+
+For example, the annotation says that \texttt{x} is intended to be an integer, but CPython still permits a call at runtime unless additional checking is performed by external tools or explicit code. If an invalid object is passed, the error usually appears when the operation fails, not because CPython rejected the call based only on the annotation.
+
+So type hints are not the same as C variable declarations. They are metadata for tools and humans unless a specific runtime validation system uses them.
+
+This distinction will matter later. Python's type-hint system improves maintainability, but it does not erase Python's dynamic runtime object model.
+
+\subsubsection*{The Practical Classification for Python}
+
+The correct classification for Python is therefore:
+
+\begin{quote}
+Python is dynamically typed at the level of names and strongly checked at the level of runtime operations.
+\end{quote}
+
+Names are dynamic because they can be rebound to objects of different types. Operations are strongly checked because Python refuses invalid type combinations unless an explicit conversion or type-defined behavior exists.
+
+This prepares the next subsection. We can now describe Python's type boundary more precisely: Python allows dynamic name binding, but once an operation is attempted, the runtime verifies whether the involved objects actually support it. That boundary is where Python's flexibility meets Python's strictness.

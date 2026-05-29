@@ -1,1 +1,289 @@
-\subsection{Parsing and Compiling Python Source: From `.py` Files to AST, Code Objects, Bytecode, and `.pyc` Marshaled Disk Artifacts}
+\subsection{Parsing and Compiling Python Source: From \texttt{.py} Files to AST, Code Objects, Bytecode, and \texttt{.pyc} Marshaled Disk Artifacts}
+
+A Python source file is not executed as raw text. When CPython runs a file, it first transforms that file into internal structures that the runtime can execute. This is one of the most important corrections to the beginner's mental model. CPython does not simply read a line, understand it as English-like text, and perform it immediately. It performs a compilation pipeline.
+
+The pipeline can be simplified as:
+
+\begin{verbatim}
+.py source file
+    -> token stream
+    -> parser output
+    -> abstract syntax tree
+    -> code object
+    -> bytecode instructions
+    -> frame execution by CPython
+\end{verbatim}
+
+This pipeline resembles the compilation ideas discussed in the previous chapter, but the destination is different. A C compiler normally moves toward native machine code. CPython moves toward bytecode for the CPython virtual machine. The physical CPU still executes CPython's native machine instructions; the Python program is represented as bytecode and runtime objects inside that process.
+
+\subsubsection{The Source File Is Input, Not the Native Program}
+
+When the programmer writes
+
+\begin{verbatim}
+python example.py
+\end{verbatim}
+
+the operating system starts the CPython executable. The file \texttt{example.py} is opened and processed by CPython. It is not loaded by the operating system as an ELF or PE native executable.
+
+This distinction matters because it explains why Python source can be portable while CPython remains platform-specific. The same \texttt{.py} file may run on Linux, Windows, or macOS, but the \texttt{python} executable that reads it is different on each platform. The source file is portable input. CPython is the native program doing the work.
+
+\subsubsection{Tokenization: Characters Become Language Units}
+
+The first stage is lexical. CPython reads characters and groups them into tokens. A token is a classified piece of source code: a name, keyword, operator, literal, newline marker, indentation marker, punctuation symbol, or similar unit.
+
+For example:
+
+\begin{verbatim}
+x = 10 + y
+\end{verbatim}
+
+is not handled as isolated characters. It becomes a sequence of meaningful units:
+
+\begin{verbatim}
+NAME(x)
+OPERATOR(=)
+NUMBER(10)
+OPERATOR(+)
+NAME(y)
+\end{verbatim}
+
+Python's tokenization differs from C in one crucial way: indentation is syntactic. Whitespace at the beginning of lines can produce \texttt{INDENT} and \texttt{DEDENT} structure. This is how Python turns visual block layout into grammatical structure.
+
+So this source:
+
+\begin{verbatim}
+if x > 0:
+    print(x)
+print("done")
+\end{verbatim}
+
+contains an indented block after the condition. CPython's tokenizer and parser must preserve that block structure. In C, braces provide this information. In Python, indentation does.
+
+\subsubsection{Parsing: Tokens Become Program Structure}
+
+After tokenization, CPython parses the token stream according to Python's grammar. Parsing answers the question:
+
+\begin{quote}
+Do these tokens form valid Python structures?
+\end{quote}
+
+The parser recognizes constructs such as assignments, expressions, function definitions, class definitions, loops, conditionals, imports, and exception handlers. If the tokens do not fit Python's grammar, CPython raises a syntax error before the program executes.
+
+For example:
+
+\begin{verbatim}
+if x > 0
+    print(x)
+\end{verbatim}
+
+is not valid Python because the colon is missing after the condition. The error is not a runtime error in the ordinary sense. The code cannot be compiled into executable Python bytecode because it is not syntactically complete.
+
+\subsubsection{The Abstract Syntax Tree: Source Shape Becomes Meaning Shape}
+
+After parsing, CPython builds an abstract syntax tree, usually called an AST. The AST represents the meaningful structure of the program without preserving every surface detail of the original text.
+
+For example:
+
+\begin{verbatim}
+x = a + b * c
+\end{verbatim}
+
+is structurally not a flat sequence. The multiplication belongs inside the addition because multiplication has higher precedence. A simplified AST-like view is:
+
+\begin{verbatim}
+Assignment
+    target: Name(x)
+    value:
+        Add
+            left: Name(a)
+            right:
+                Multiply
+                    left: Name(b)
+                    right: Name(c)
+\end{verbatim}
+
+The exact internal AST is more detailed, but this simplified shape is enough. The AST records what the program means structurally. It is no longer plain text and no longer just tokens.
+
+This stage is important because some errors and transformations can happen before bytecode exists. CPython can analyze scopes, decide which names are local or free, record constants, and prepare the program for bytecode generation.
+
+\subsubsection{Symbol Analysis: Names Are Classified Before Execution}
+
+Python is dynamic, but not everything is postponed until runtime. CPython performs compile-time analysis of name roles.
+
+Consider:
+
+\begin{verbatim}
+x = 10
+
+def f():
+    print(x)
+\end{verbatim}
+
+Inside \texttt{f}, \texttt{x} is read but not assigned. CPython can classify it as a global name lookup.
+
+Now compare:
+
+\begin{verbatim}
+x = 10
+
+def f():
+    print(x)
+    x = 20
+\end{verbatim}
+
+Because \texttt{x} is assigned inside \texttt{f}, CPython classifies \texttt{x} as a local name in that function. The earlier \texttt{print(x)} then tries to read the local \texttt{x} before it has received a value, producing an error when executed.
+
+This surprises beginners because they think Python decides everything line by line while running. It does not. CPython has already classified name roles during compilation.
+
+So Python is dynamic, but not structureless. The compiler still analyzes scopes before execution.
+
+\subsubsection{Code Objects: Executable Descriptions}
+
+After AST and symbol analysis, CPython creates code objects. A code object is a low-level executable description of a block of Python code. It is not the same thing as a function object, and it is not an active call. It is a stored representation of executable Python instructions and metadata.
+
+A code object contains things such as:
+
+\begin{itemize}
+    \item bytecode instructions;
+    \item constants used by the code;
+    \item names referenced by the code;
+    \item local-variable information;
+    \item free-variable and cell-variable information for closures;
+    \item line-number and debugging metadata;
+    \item flags describing execution properties.
+\end{itemize}
+
+For example, the module body has a code object. Each function body has a code object. A nested function has its own code object stored among the constants of the enclosing code object until a function object is created at runtime.
+
+This is the key point:
+
+\begin{quote}
+A code object is executable material, but it is not yet a running execution.
+\end{quote}
+
+To run it, CPython must create a frame and execute the code object's bytecode inside that frame.
+
+\subsubsection{Bytecode: Instructions for the CPython Virtual Machine}
+
+The bytecode inside a code object is an instruction stream for CPython's virtual machine. It is not native CPU machine code. It is not x86-64, ARM64, or RISC-V. It is a CPython-specific instruction format consumed by CPython's interpreter.
+
+For example, Python source like
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+may conceptually compile into operations like:
+
+\begin{verbatim}
+load name a
+load name b
+perform binary addition
+store result in name x
+\end{verbatim}
+
+The exact bytecode instructions differ across Python versions, so the important lesson is not the exact opcode list. The important lesson is that Python source becomes a lower-level instruction stream before execution.
+
+This is why the question ``is Python interpreted or compiled?'' is badly formed. In CPython, Python source is compiled to bytecode, and then that bytecode is interpreted by CPython.
+
+\subsubsection{\texttt{.pyc} Files: Cached Bytecode Artifacts}
+
+CPython may store compiled bytecode artifacts on disk as \texttt{.pyc} files. These files usually live inside a \texttt{\_\_pycache\_\_} directory. The filename encodes information such as the Python implementation and version tag, because bytecode is not a stable cross-version format.
+
+A typical cache path may look like:
+
+\begin{verbatim}
+__pycache__/module.cpython-314.pyc
+\end{verbatim}
+
+The purpose of a \texttt{.pyc} file is not to make Python code execute like C machine code. It is a cache. It lets CPython skip some front-end compilation work on later imports when the cache is valid.
+
+The rough import-time path is:
+
+\begin{verbatim}
+import module
+    -> find module.py
+    -> check for valid cached .pyc
+    -> if valid, load code object from .pyc
+    -> if invalid or absent, compile source
+    -> execute module code object
+\end{verbatim}
+
+This is especially important for imported modules. When a module is imported, CPython commonly creates or uses a \texttt{.pyc} cache file. A top-level script run directly with \texttt{python script.py} is different: CPython normally does not create a \texttt{.pyc} cache for that top-level script merely because it was run directly.
+
+\subsubsection{Marshaling: Storing Code Objects, Not Source Text}
+
+A \texttt{.pyc} file stores a serialized form of a code object plus header metadata. The serialization mechanism is associated with Python's internal \texttt{marshal} format. This should not be confused with \texttt{pickle}.
+
+The distinction matters:
+
+\begin{itemize}
+    \item \texttt{marshal} is an internal serialization format used by Python for objects such as code objects;
+    \item \texttt{pickle} is a general Python object serialization system intended for broader program use;
+    \item \texttt{.pyc} files are implementation artifacts, not portable source-code replacements.
+\end{itemize}
+
+A \texttt{.pyc} file is therefore not a protected binary executable. It is not a secure hiding place for source logic. It is a cached compiled artifact for the interpreter.
+
+\subsubsection{Executing a Module: Compilation Is Not the Same as Running}
+
+A module can be compiled without its top-level code being executed. But when a module is imported normally, CPython executes the module's code object to create the module's runtime contents.
+
+For example, if a file contains:
+
+\begin{verbatim}
+print("loading module")
+
+x = 10
+
+def f():
+    return x + 1
+\end{verbatim}
+
+then importing the module executes the top-level \texttt{print}, binds \texttt{x}, and creates the function object \texttt{f}. The body of \texttt{f} is not executed at import time. Instead, executing the \texttt{def} statement creates a function object whose code object will run later when \texttt{f()} is called.
+
+This distinction is essential:
+
+\begin{itemize}
+    \item compiling creates executable descriptions;
+    \item executing a module creates module-level bindings;
+    \item executing a function call creates a frame for that function's code object.
+\end{itemize}
+
+\subsubsection{The Complete Mental Model}
+
+The complete simplified path is:
+
+\begin{verbatim}
+source file: example.py
+    characters written by programmer
+
+tokenizer
+    groups characters into Python tokens
+
+parser
+    checks grammar and builds structure
+
+AST
+    represents meaningful program form
+
+compiler
+    analyzes scopes and generates code objects
+
+code object
+    stores bytecode and metadata
+
+.pyc cache, sometimes
+    stores marshaled code object for future imports
+
+frame
+    active runtime environment for executing code
+
+interpreter loop
+    reads bytecode and performs operations on objects
+\end{verbatim}
+
+This model gives the right intuition for an effective Python programmer. Python source is not native machine code. It is also not executed as raw text. CPython compiles it into bytecode-bearing code objects, optionally caches those objects in \texttt{.pyc} files, and executes them inside frames through the interpreter loop.
+
+That is the bridge to the next subsection. Once source has become code objects, the next question is: what happens when those code objects run? The answer requires code objects, frame objects, and namespace dictionaries.

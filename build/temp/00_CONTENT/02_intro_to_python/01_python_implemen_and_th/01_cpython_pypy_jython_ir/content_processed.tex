@@ -1,1 +1,102 @@
 \subsection{CPython, PyPy, Jython, IronPython, and Alternative Runtime Strategies}
+
+Once Python is separated from CPython, another fact becomes visible: the same language can be realized through different runtime strategies. Python source code is not tied by nature to one exact execution engine. It can be interpreted by CPython, optimized by PyPy, hosted on the Java Virtual Machine through Jython, hosted on the .NET runtime through IronPython, or adapted to smaller and more specialized environments through other implementations.
+
+This does not mean that all implementations are interchangeable in practice. They are not. The language may be shared, but the execution machinery, package compatibility, memory behavior, native-extension support, performance profile, and host-platform integration can be very different. The phrase ``Python implementation'' therefore means more than ``another program that runs Python files.'' It means a complete answer to the question: how is Python source code made executable on a real machine or host runtime?
+
+\subsubsection{CPython: The Dominant Reference Runtime}
+
+CPython is the standard practical baseline. It is written mostly in C, compiled as a native executable, and normally executes Python code by compiling source files into bytecode and running that bytecode through an interpreter loop. It provides the object model, reference-counting machinery, memory allocators, import system, bytecode format, frame mechanics, and C extension interface most Python programmers implicitly depend on.
+
+Its great advantage is compatibility. Most packages are developed first for CPython. Most tutorials assume CPython. Most debugging tools, profilers, native extensions, and packaging workflows are designed around CPython. When a programmer installs Python from the main Python distribution, they are almost always installing CPython.
+
+Its disadvantage is also architectural. CPython preserves a very dynamic object model and executes most ordinary Python operations through runtime dispatch. This makes the language flexible and inspectable, but it also creates overhead. A Python addition is not simply one CPU addition instruction. CPython must load Python objects, inspect types, dispatch the operation, manage references, and handle possible exceptions. The runtime performs a large amount of work for operations that look small in source code.
+
+CPython is therefore not ``the fastest possible Python.'' It is the most compatible and culturally central Python. It is the machine that defines the ordinary Python experience.
+
+\subsubsection{PyPy: Python with a JIT-Oriented Runtime Strategy}
+
+PyPy takes a different route. Its main idea is not to preserve CPython's internal machinery exactly, but to execute Python through a runtime designed around just-in-time compilation. Instead of only interpreting bytecode instruction by instruction, PyPy observes running code and can compile frequently executed paths into faster machine-level code.
+
+This matters because many Python programs spend time repeatedly executing the same loops, function calls, and object operations. A JIT compiler can notice stable patterns during execution. If a variable repeatedly refers to integers, or a loop repeatedly performs the same operations over similar objects, the runtime may generate optimized code for that observed behavior.
+
+The important point is that PyPy's optimization is runtime-based. It does not require the programmer to write C or to manually compile the Python file ahead of time. The program begins as Python, but the runtime may optimize parts of it while it runs.
+
+This gives PyPy a different performance profile from CPython. Pure Python code, especially long-running code with stable hot paths, may run significantly faster. But programs that depend heavily on CPython-specific C extension modules may not benefit in the same way, because PyPy must preserve compatibility through additional layers. In such cases, the boundary between Python and native CPython extensions can become a problem.
+
+So PyPy is not simply ``CPython but faster.'' It is a different implementation strategy. It trades some CPython-internal compatibility for a runtime that can optimize Python execution more aggressively.
+
+\subsubsection{Jython: Python on the Java Virtual Machine}
+
+Jython implements Python on top of the Java Virtual Machine. Instead of running inside CPython's C-based runtime, Python code runs in a JVM-based environment and can interact with Java classes and libraries.
+
+This changes the meaning of Python's host environment. With CPython, the natural native boundary is the C ABI and the Python/C API. With Jython, the natural boundary is the Java ecosystem. Python code can use Java libraries, Java objects, Java threading models, Java deployment systems, and JVM infrastructure.
+
+The attraction is integration. If an organization already has a large Java system, Jython can make Python behave as a scripting or extension language inside that world. Python becomes a more flexible language surface over JVM-hosted components.
+
+The cost is version and ecosystem distance. Jython historically lagged behind modern Python 3. Its current stable line has remained tied to Python 2.7 semantics. That makes it unsuitable as a normal modern replacement for CPython in most Python 3 projects. Its main interest is architectural: it proves that Python can be implemented over a host virtual machine that is not CPython.
+
+\subsubsection{IronPython: Python on the .NET Runtime}
+
+IronPython plays a similar role in the .NET world. It implements Python for the Common Language Runtime, allowing Python code to interact with .NET libraries and languages such as C\#.
+
+Again, the main advantage is not that IronPython is the universal best way to run Python. Its advantage is host integration. Python code can use .NET objects, call .NET libraries, and participate in .NET application environments. This can be valuable when the surrounding system is already built on that runtime.
+
+The tradeoff is compatibility with the wider CPython-centered ecosystem. Many Python packages assume CPython internals, CPython bytecode behavior, or CPython C extensions. Those assumptions do not automatically transfer to IronPython. Pure Python packages are more portable; packages depending on native CPython extensions are harder.
+
+IronPython therefore shows another implementation strategy: keep Python's language surface, but attach it to a different managed runtime and library universe.
+
+\subsubsection{Alternative Strategies and Specialized Pythons}
+
+Other Python implementations exist because not every environment wants the same kind of runtime. MicroPython, for example, targets microcontrollers and constrained devices. It cannot simply carry the full CPython runtime onto small embedded systems. It must reduce, adapt, and specialize the language environment for limited memory and hardware.
+
+GraalPy takes another direction by placing Python in the GraalVM ecosystem. Some tools compile restricted Python-like code ahead of time. Other systems translate Python-adjacent code into C, C++, or machine code for specific performance or deployment goals.
+
+These systems should not all be placed in one simple category. Some are general Python implementations. Some are restricted subsets. Some are acceleration tools. Some are embedding strategies. Some are compatibility layers. The common idea is that Python source or Python-like semantics can be connected to different execution backends.
+
+\subsubsection{Compatibility Is Not Only Syntax}
+
+A program may be syntactically valid Python and still fail on a different implementation. This happens because real compatibility is larger than grammar.
+
+A Python implementation must deal with many layers:
+
+\begin{itemize}
+    \item language syntax;
+    \item built-in object behavior;
+    \item standard-library behavior;
+    \item exception semantics;
+    \item import behavior;
+    \item memory-management expectations;
+    \item bytecode and frame inspection behavior;
+    \item C extension compatibility;
+    \item package ecosystem assumptions;
+    \item host-platform integration.
+\end{itemize}
+
+For simple pure Python code, many implementations may behave similarly. For programs that inspect frames, depend on object finalization timing, use CPython-specific bytecode, rely on native extensions, or assume CPython memory behavior, portability becomes much weaker.
+
+For example, in CPython an object may be destroyed immediately when its reference count reaches zero. A program should not depend on this as a general Python-language guarantee, because another implementation may use a different garbage-collection strategy. If the program depends on immediate destruction to close a file, that program is really depending on CPython behavior. The portable Python solution is to use explicit resource management, such as a context manager.
+
+\subsubsection{Different Runtime Strategies, Different Tradeoffs}
+
+The important comparison is not ``which implementation is best.'' The important comparison is what each implementation optimizes for.
+
+CPython optimizes for compatibility, simplicity of implementation model, reference behavior, and the central Python ecosystem. PyPy optimizes for faster execution of many pure Python workloads through JIT compilation. Jython optimizes for Java integration. IronPython optimizes for .NET integration. MicroPython optimizes for constrained devices. Other systems optimize for deployment, ahead-of-time compilation, static analysis, or specialized acceleration.
+
+Each strategy pays a price. A JIT runtime may be faster after warm-up but more complex. A JVM-hosted implementation gains Java access but loses CPython extension compatibility. A .NET-hosted implementation gains .NET access but moves away from the CPython package universe. An embedded implementation gains small-device suitability but cannot carry all ordinary Python behavior unchanged.
+
+Thus, alternative implementations are not curiosities. They reveal what Python is made of. They show that Python has a language layer, a runtime layer, a host-platform layer, and an ecosystem layer. CPython combines these in one dominant form, but the combination is not logically forced.
+
+\subsubsection{The Practical Consequence}
+
+For ordinary programming, CPython should be treated as the default. It is what most students, tools, packages, and documentation assume. For understanding architecture, however, alternative implementations are extremely useful because they separate Python-the-language from Python-the-runtime.
+
+The practical rule is:
+
+\begin{quote}
+Python code describes language-level behavior; the implementation decides how that behavior is executed.
+\end{quote}
+
+In CPython, execution means C structures, reference counts, bytecode frames, interpreter dispatch, and native extension modules. In PyPy, it means a JIT-oriented runtime with different internal assumptions. In Jython, it means Python semantics hosted by the JVM. In IronPython, it means Python semantics hosted by .NET.
+
+This prepares the next subsection. Once Python can have different execution backends, we must also distinguish full implementations from compilers, accelerators, translators, and hybrid tools. Not every tool that makes Python faster is a Python implementation. Some tools compile selected code. Some generate C extensions. Some accelerate numerical kernels. Some type-check without executing. The implementation question and the acceleration question are related, but they are not the same.

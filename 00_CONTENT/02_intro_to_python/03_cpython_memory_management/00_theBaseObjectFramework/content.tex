@@ -1,3 +1,502 @@
 \subsection{The Base Object Framework}
-\subsubsection{The Realization of the "Everything is an Object" Paradigm: Unifying Functions, Types, and Primitives as First-Class Runtime Objects}
-\subsubsection{Underlying C Representation: Unpacking the `PyObject` Base Struct (Reference Count Tracker `ob_refcnt` and Type Object Pointer `ob_type`)}
+
+Before discussing heaps, stacks, reference counts, or allocation arenas, we must first clarify what CPython is allocating and managing. CPython does not mainly manage raw integers, raw strings, raw functions, or raw classes as separate unrelated categories. It manages Python objects. These objects may represent numbers, text, containers, functions, modules, classes, exceptions, frames, iterators, files, or user-defined instances, but they all enter the runtime through the same general object model.
+
+This is the concrete foundation beneath the phrase ``everything is an object.'' The phrase should not be read poetically. It means that values visible in Python source code are represented at runtime as objects with identity, type, value, and implementation metadata. The programmer sees simple notation; CPython sees structured runtime entities.
+
+This base object framework is the reason Python can treat values uniformly. A number can be stored in a list. A function can be passed as an argument. A class can be assigned to a variable. A module can be inspected. An exception can be caught as an object. A type can itself have a type. These behaviors are not separate tricks. They follow from the decision to represent program material through a common object system.
+
+\subsubsection{The Realization of the ``Everything is an Object'' Paradigm: Unifying Functions, Types, and Primitives as First-Class Runtime Objects}
+
+In C, there is a strong difference between categories such as integers, functions, structs, pointers, and types. An \texttt{int} value is not a function. A function is not an ordinary value in the same sense as a heap-allocated object. A type declaration is not a runtime object that can normally be passed around, inspected, modified, or stored in a list. C has runtime values, but much of its structure is resolved before execution and disappears into compiled machine code, addresses, layouts, and calling conventions.
+
+Python makes a different decision. It keeps much more program structure alive at runtime. Integers are objects. Strings are objects. Lists are objects. Functions are objects. Classes are objects. Modules are objects. Exceptions are objects. Even compiled code blocks are represented by code objects. This does not mean that all these objects have the same internal layout or the same behavior. It means that they participate in the same runtime object universe.
+
+For example:
+
+\begin{verbatim}
+x = 10
+name = "Python"
+
+def f():
+    return x
+
+class C:
+    pass
+\end{verbatim}
+
+After this code executes, the module namespace contains bindings similar to:
+
+\begin{verbatim}
+"x"    -> integer object
+"name" -> string object
+"f"    -> function object
+"C"    -> class object
+\end{verbatim}
+
+The names do not hold raw values directly. They point to runtime objects. The integer \texttt{10}, the string \texttt{"Python"}, the function \texttt{f}, and the class \texttt{C} are different kinds of objects, but they are all objects.
+
+This is why the following operations are natural in Python:
+
+\begin{verbatim}
+items = [10, "Python", f, C]
+\end{verbatim}
+
+The list does not need to be declared as a list of integers, strings, functions, or classes. It stores references to Python objects. Each referenced object carries its own runtime type information.
+
+This is a decisive difference from a C array such as:
+
+\begin{verbatim}
+int values[4];
+\end{verbatim}
+
+That C array is a contiguous region of storage for integer values of one fixed type. A Python list is not that. A Python list is a container object that stores references to other objects. The elements may point to objects of different types because the object itself carries the type, not the list slot.
+
+\subsubsection*{Primitives Are Not Bare Machine Primitives}
+
+Python integers look like primitive values at the source level:
+
+\begin{verbatim}
+a = 5
+b = 7
+c = a + b
+\end{verbatim}
+
+But in CPython, these are not bare CPU integers stored directly inside variable boxes. They are Python integer objects. The addition operation must operate according to Python object rules. CPython must load the objects referenced by \texttt{a} and \texttt{b}, determine that integer addition applies, produce or reuse an integer result object, and bind \texttt{c} to that object.
+
+This is why Python integers can behave differently from fixed-width C integers. Python integers are arbitrary-precision integer objects. They can grow beyond the size of a C \texttt{int} or \texttt{long}, limited by available memory rather than by one fixed machine word size.
+
+For example:
+
+\begin{verbatim}
+x = 10 ** 100
+\end{verbatim}
+
+This is a normal Python integer. In C, a value of that size would require a special library or a custom representation. In Python, the object model hides that representation behind the ordinary \texttt{int} interface.
+
+The cost is that a Python integer is heavier than a raw C integer. It has object metadata, type information, reference-management overhead, and a variable-sized internal representation. Python gains uniformity and power by giving up the direct simplicity of raw machine values.
+
+\subsubsection*{Functions Are Runtime Objects}
+
+A function definition in Python is executable code that creates a function object. It is not merely a compile-time declaration.
+
+When CPython executes:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+it creates a function object and binds the name \texttt{add} to that object. This is why the function can be assigned to another name:
+
+\begin{verbatim}
+operation = add
+\end{verbatim}
+
+Now \texttt{add} and \texttt{operation} refer to the same function object. No source code was copied. No new function body was created. A second name was bound to the same runtime object.
+
+The function object can also be passed as an argument:
+
+\begin{verbatim}
+def apply(func, x, y):
+    return func(x, y)
+
+result = apply(add, 2, 3)
+\end{verbatim}
+
+This works because \texttt{add} is an object. The parameter \texttt{func} becomes another reference to that same object. The call \texttt{func(x, y)} then invokes the function object currently bound to \texttt{func}.
+
+This is the runtime basis of first-class functions. A function is not only something that can be called. It is a value that can be stored, passed, returned, placed in containers, attached to objects, and inspected.
+
+\subsubsection*{Classes and Types Are Runtime Objects}
+
+Classes are also objects. When Python executes a class statement, it does not merely record a static type declaration. It executes the class body, collects the resulting namespace, and creates a class object.
+
+For example:
+
+\begin{verbatim}
+class Point:
+    x = 0
+    y = 0
+\end{verbatim}
+
+After this executes, \texttt{Point} is a name bound to a class object. That class object can be passed around like any other object:
+
+\begin{verbatim}
+T = Point
+p = T()
+\end{verbatim}
+
+Here, \texttt{T} and \texttt{Point} refer to the same class object. Calling \texttt{T()} creates an instance of that class.
+
+This is why Python can use classes dynamically. A class is not only a compile-time type descriptor. It is a runtime object that can be stored in variables, returned from functions, inspected, subclassed, and used to create instances.
+
+Even types themselves fit into the same model. The expression:
+
+\begin{verbatim}
+type(10)
+\end{verbatim}
+
+returns the type object representing \texttt{int}. The expression:
+
+\begin{verbatim}
+type(Point)
+\end{verbatim}
+
+usually returns \texttt{type}, because user-defined classes are themselves objects created by the metaclass \texttt{type}. This recursive structure is unusual for programmers coming from C, but it is central to Python's runtime design.
+
+\subsubsection*{Containers Store References to Objects}
+
+Because everything visible at the Python level is an object, Python containers store object references.
+
+For example:
+
+\begin{verbatim}
+a = []
+b = [a, a]
+\end{verbatim}
+
+The list \texttt{b} contains two references to the same list object \texttt{a}. It does not contain two independent copies of \texttt{a}. Therefore:
+
+\begin{verbatim}
+a.append(1)
+\end{verbatim}
+
+makes both elements of \texttt{b} appear changed, because both positions refer to the same object.
+
+Conceptually:
+
+\begin{verbatim}
+a --------------+
+                |
+                v
+              list object []
+
+b -> list object [ reference to same list,
+                   reference to same list ]
+\end{verbatim}
+
+This is not a special list trick. It is the normal consequence of Python's object-reference model. Names point to objects. Containers hold references to objects. Assignment copies references, not the entire object graph.
+
+\subsubsection*{Uniformity Does Not Mean Identical Behavior}
+
+Saying that everything is an object does not mean that all objects are mutable, all objects are stored the same way, or all objects allow the same operations.
+
+An integer object is immutable. A list object is mutable. A function object is callable. A module object has a namespace. A class object creates instances. A file object represents an external resource. A code object stores executable bytecode. These objects are different, but CPython can still manage them through the same general object framework.
+
+The type of the object determines its behavior. This is why \texttt{+} has different meanings depending on the objects involved:
+
+\begin{verbatim}
+1 + 2              # integer addition
+"ab" + "cd"        # string concatenation
+[1, 2] + [3, 4]    # list concatenation
+\end{verbatim}
+
+The syntax is the same, but the operation is selected through the runtime types of the objects. This is not possible if values are treated only as raw memory without type metadata.
+
+\subsubsection*{The Practical Consequence}
+
+The practical consequence is that a Python program is an object graph. Names, containers, functions, classes, modules, and frames are connected by references to objects.
+
+A simplified module after execution may look like this:
+
+\begin{verbatim}
+module namespace
+    "x"      -> int object
+    "text"   -> str object
+    "items"  -> list object
+                    -> references to other objects
+    "f"      -> function object
+                    -> code object
+                    -> global namespace
+    "C"      -> class object
+                    -> class namespace
+\end{verbatim}
+
+This object graph is what CPython must allocate, connect, track, and eventually reclaim. Memory management in CPython is therefore not only about bytes. It is about object topology: which objects exist, which objects refer to which other objects, which names or containers keep objects alive, and when an object becomes unreachable.
+
+This prepares the next subsubsection. If everything is represented as an object, then CPython needs a common base representation for objects. That representation begins with the \texttt{PyObject} structure, whose core fields explain both object identity at runtime and CPython's reference-counting memory discipline.
+
+
+\subsubsection{Underlying C Representation: Unpacking the \texttt{PyObject} Base Struct (Reference Count Tracker \texttt{ob\_refcnt} and Type Object Pointer \texttt{ob\_type})}
+
+The Python object model has a concrete C-level foundation in CPython. At the Python level, we say that every object has identity, type, and value. At the CPython level, every object begins with enough internal information for the runtime to treat a pointer as a Python object. In normal release builds, the common base object representation contains two central pieces of information: a reference count and a pointer to the object's type. :contentReference[oaicite:0]{index=0}
+
+A simplified conceptual form is:
+
+\begin{verbatim}
+PyObject
+    ob_refcnt   -> reference count
+    ob_type     -> pointer to type object
+\end{verbatim}
+
+This is not meant as code that students should use directly. The official C API warns that these fields should not be accessed directly; code should use access macros and functions such as \texttt{Py\_REFCNT()}, \texttt{Py\_TYPE()}, \texttt{Py\_INCREF()}, and \texttt{Py\_DECREF()}. :contentReference[oaicite:1]{index=1} The purpose here is conceptual: the base object header explains why CPython can manage very different Python values through one common runtime discipline.
+
+\subsubsection*{Every Python Object Begins with Runtime Metadata}
+
+Consider the Python statement:
+
+\begin{verbatim}
+x = 10
+\end{verbatim}
+
+At the source level, this looks like a simple value assignment. At the CPython level, \texttt{10} is represented by a Python integer object. That object is not only the numeric value. It also has object metadata.
+
+Conceptually:
+
+\begin{verbatim}
+name x
+    |
+    v
+integer object
+    ob_refcnt -> number of active strong references
+    ob_type   -> pointer to int type object
+    value     -> integer-specific stored number data
+\end{verbatim}
+
+The same general pattern applies to other objects:
+
+\begin{verbatim}
+string object
+    object header
+    string-specific data
+
+list object
+    object header
+    list-specific storage of element references
+
+function object
+    object header
+    function-specific references to code, globals, defaults
+
+class object
+    object header
+    type/class-specific data
+\end{verbatim}
+
+The object header is what lets CPython treat all of these as Python objects while still allowing each object kind to have its own specific internal layout.
+
+\subsubsection*{\texttt{ob\_refcnt}: The Reference Count Tracker}
+
+The field usually explained as \texttt{ob\_refcnt} stores the object's reference count. Its purpose is to help CPython decide whether the object is still in use.
+
+When a new strong reference to an object is created, CPython increases the count. When a strong reference is released, CPython decreases the count. When the last strong reference is released, the object's type-specific deallocation function can be invoked. :contentReference[oaicite:2]{index=2}
+
+Conceptually:
+
+\begin{verbatim}
+a = []
+    list object refcount: 1
+
+b = a
+    list object refcount: 2
+
+a = None
+    list object refcount: 1
+
+b = None
+    list object refcount: 0
+    object may be deallocated
+\end{verbatim}
+
+This explains why assignment and rebinding have memory consequences. Rebinding a name does not merely change a symbolic label. It releases one reference and creates another reference.
+
+For example:
+
+\begin{verbatim}
+x = []
+x = 5
+\end{verbatim}
+
+The second assignment removes the reference from \texttt{x} to the list object and binds \texttt{x} to an integer object. If the list had no other references, it becomes eligible for immediate deallocation in CPython.
+
+The reference count is therefore not an optional statistic. It is part of the ordinary object-lifetime machinery of CPython.
+
+\subsubsection*{Reference Count Does Not Always Mean Exact Human-Visible Reachability}
+
+The reference count is useful, but it must not be overinterpreted. Modern CPython has details such as immortal objects, and the official documentation warns that the value returned by \texttt{Py\_REFCNT()} may not always reflect the exact number of actual references in the simple human sense. Some objects may have artificially high reference counts or may not be modified by increment/decrement operations. :contentReference[oaicite:3]{index=3}
+
+For learning Python, the correct rule is:
+
+\begin{quote}
+Reference counting is CPython's main object-lifetime mechanism, but individual reference-count numbers are implementation details, not a normal programming interface.
+\end{quote}
+
+So the student should understand reference counting as a model of persistence, not as something ordinary Python code should depend on numerically.
+
+\subsubsection*{\texttt{ob\_type}: The Pointer to the Type Object}
+
+The second central field is \texttt{ob\_type}. This field points to the type object that describes the object's behavior. The official C API says this is the object's type and recommends using \texttt{Py\_TYPE()} rather than direct field access. :contentReference[oaicite:4]{index=4}
+
+Conceptually:
+
+\begin{verbatim}
+object
+    ob_type ----> type object
+                    name
+                    size information
+                    method table
+                    numeric operation slots
+                    sequence operation slots
+                    mapping operation slots
+                    attribute access behavior
+                    deallocation behavior
+\end{verbatim}
+
+This is the concrete basis of dynamic typing in Python. A Python name does not carry a fixed declared type. The object carries its runtime type.
+
+For example:
+
+\begin{verbatim}
+x = 10
+x = "hello"
+\end{verbatim}
+
+The name \texttt{x} first points to an integer object whose \texttt{ob\_type} points to the integer type object. Later, \texttt{x} points to a string object whose \texttt{ob\_type} points to the string type object. The name is dynamically rebound; the objects themselves carry their types.
+
+This is why \texttt{type(x)} can work at runtime. CPython follows the object's type pointer and exposes the type object at the Python level.
+
+\subsubsection*{The Type Pointer Explains Dynamic Operations}
+
+When CPython evaluates:
+
+\begin{verbatim}
+a + b
+\end{verbatim}
+
+it cannot assume that \texttt{+} means one fixed CPU instruction. It must look at the objects involved and use their type information.
+
+For example:
+
+\begin{verbatim}
+1 + 2              # integer addition
+"ab" + "cd"        # string concatenation
+[1, 2] + [3, 4]    # list concatenation
+\end{verbatim}
+
+The same source operator leads to different behavior because the operands are different objects with different type objects.
+
+Conceptually:
+
+\begin{verbatim}
+bytecode says: add two objects
+
+CPython checks:
+    left object's type
+    right object's type
+    applicable operation slot
+    result object or exception
+\end{verbatim}
+
+This is one reason Python is flexible and one reason Python operations are heavier than fixed C operations. In C, \texttt{int + int} can compile into direct arithmetic because the operand types are known statically. In Python, \texttt{a + b} must preserve runtime dispatch.
+
+\subsubsection*{The Base Header Is Followed by Type-Specific Data}
+
+\texttt{PyObject} is the common beginning, not the whole object. Real object types extend this base with fields appropriate to their own representation.
+
+A simplified integer object might be imagined as:
+
+\begin{verbatim}
+integer object
+    PyObject header
+        reference count
+        type pointer
+    integer-specific storage
+\end{verbatim}
+
+A simplified list object might be imagined as:
+
+\begin{verbatim}
+list object
+    PyObject header
+        reference count
+        type pointer
+    list size
+    allocated capacity
+    pointer to array of element references
+\end{verbatim}
+
+A simplified function object might be imagined as:
+
+\begin{verbatim}
+function object
+    PyObject header
+        reference count
+        type pointer
+    code object reference
+    globals dictionary reference
+    defaults reference
+    closure reference
+\end{verbatim}
+
+The common header allows uniform runtime handling. The type-specific tail allows each kind of object to store what it needs.
+
+\subsubsection*{\texttt{PyVarObject}: Objects with a Size Field}
+
+Some objects need an additional size field because their logical length varies between instances. CPython uses \texttt{PyVarObject} for variable-sized objects. It extends \texttt{PyObject} with an \texttt{ob\_size} field, intended for objects that have some notion of length. :contentReference[oaicite:5]{index=5}
+
+Conceptually:
+
+\begin{verbatim}
+PyVarObject
+    PyObject base
+        ob_refcnt
+        ob_type
+    ob_size
+\end{verbatim}
+
+This kind of structure is useful for objects such as tuples, bytes, and other variable-sized built-in representations. The important idea is that variable-sized objects still begin with the object header. They remain ordinary Python objects from the runtime's point of view.
+
+The size field should not be confused blindly with \texttt{len(obj)} in every possible case. The official documentation treats \texttt{ob\_size} as internal implementation detail and says that public length should be obtained through the proper object API. :contentReference[oaicite:6]{index=6}
+
+\subsubsection*{Why Direct Field Access Is Discouraged}
+
+Although the fields \texttt{ob\_refcnt} and \texttt{ob\_type} are useful for explanation, extension code should not treat them as ordinary public struct fields. CPython documentation recommends using macros and functions instead of direct access, because implementation details may vary by build configuration, platform, version, debug mode, or free-threading work. :contentReference[oaicite:7]{index=7}
+
+For this course, the reason is also pedagogical. We are not teaching students to write CPython internals. We are using CPython internals to correct their Python mental model.
+
+The mental model should be:
+
+\begin{verbatim}
+Python object
+    has lifetime tracking
+    has runtime type information
+    has type-specific storage
+    is manipulated through references
+\end{verbatim}
+
+not:
+
+\begin{verbatim}
+Python variable
+    is a C-style typed box containing a raw value
+\end{verbatim}
+
+\subsubsection*{The Practical Consequence}
+
+The \texttt{PyObject} base structure explains several everyday Python facts:
+
+\begin{itemize}
+    \item assignment binds names to objects rather than copying raw values into typed boxes;
+    \item objects know their type at runtime;
+    \item \texttt{type(obj)} is possible because the object carries a type pointer;
+    \item object lifetime can be tracked because CPython maintains reference counts;
+    \item different object kinds can still participate in one common runtime model;
+    \item containers store references to objects, not raw heterogeneous values directly;
+    \item operations dispatch through object type information rather than fixed source syntax alone.
+\end{itemize}
+
+A compact final picture is:
+
+\begin{verbatim}
+name
+    |
+    v
+PyObject-based runtime object
+    ob_refcnt  -> lifetime bookkeeping
+    ob_type    -> behavior descriptor / type object
+    ...
+    type-specific data
+\end{verbatim}
+
+This is the structural core of CPython's object model. Python's high-level uniformity is possible because CPython gives every object a common runtime beginning. The next memory-management layers build on this: objects are allocated on the managed heap, referenced from frames and containers, and reclaimed when the reference topology no longer keeps them alive.

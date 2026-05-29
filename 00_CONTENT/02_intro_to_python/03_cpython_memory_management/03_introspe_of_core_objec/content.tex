@@ -1,4 +1,988 @@
 \subsection{Introspection of Core Object Properties}
-\subsubsection{Identity Verification: Object Identity Observation via the `id()` Function}
-\subsubsection{Dynamic Metadata Analysis: Runtime Type Descriptor Extraction via the `type()` Framework}
-\subsubsection{The Variable-as-Label Paradigm Shift: Binding Multiple Names to an Identical Runtime Object (`a = b`)}
+
+
+\subsubsection{Identity Verification: Object Identity Observation via the \texttt{id()} Function}
+
+Every Python object has identity, type, and value. The identity is the object's permanent runtime identity during its lifetime. The type determines what operations the object supports. The value is the object's current content or state, if the object has mutable state. Python exposes object identity through the built-in \texttt{id()} function and compares identity through the \texttt{is} operator. The language documentation states that \texttt{id()} returns an integer representing an object's identity, and that this identity is unique and constant for the object during its lifetime. In CPython specifically, this integer is the object's memory address. \cite{python_datamodel_objects} \cite{python_builtin_id}
+
+The \texttt{id()} function is therefore not mainly a normal programming tool for application logic. It is an observation tool. It lets us see whether two names, container positions, attributes, or temporary expressions refer to the same object or to different objects.
+
+Consider:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+\end{verbatim}
+
+The names \texttt{a} and \texttt{b} now refer to the same list object. This can be observed with \texttt{id()}:
+
+\begin{verbatim}
+print(id(a))
+print(id(b))
+\end{verbatim}
+
+Both calls return the same integer, because both names point to the same object.
+
+Conceptually:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+The same identity tells us that there are two references but only one object.
+
+Now compare:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(id(a))
+print(id(b))
+\end{verbatim}
+
+The two lists have equal contents, but they are distinct objects. Their identities are different.
+
+Conceptually:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [1, 2, 3]
+\end{verbatim}
+
+This difference is the difference between equality and identity. Equality asks whether two objects should be considered equal in value. Identity asks whether two references point to the exact same object.
+
+In Python syntax:
+
+\begin{verbatim}
+a == b      # value equality
+a is b      # object identity
+\end{verbatim}
+
+For lists:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(a == b)  # True
+print(a is b)  # False
+\end{verbatim}
+
+The lists are equal because their elements compare equal. They are not identical because they are two different list objects.
+
+The \texttt{id()} function makes this visible:
+
+\begin{verbatim}
+print(id(a) == id(b))  # False
+\end{verbatim}
+
+However, this should normally be written as:
+
+\begin{verbatim}
+print(a is b)
+\end{verbatim}
+
+The \texttt{is} operator is the proper direct identity comparison operator. The \texttt{id()} function is mostly useful for explanation, debugging, and introspection.
+
+This distinction becomes especially important with mutable objects. If two names refer to the same mutable object, mutating through one name changes what the other name observes.
+
+\begin{verbatim}
+a = []
+b = a
+
+b.append(10)
+
+print(a)
+print(id(a) == id(b))
+\end{verbatim}
+
+The output shows that \texttt{a} sees the appended value because \texttt{a} and \texttt{b} refer to the same list object.
+
+Conceptually:
+
+\begin{verbatim}
+before append:
+
+a ----+
+      |
+      v
+   list object []
+      ^
+      |
+b ----+
+
+after append:
+
+a ----+
+      |
+      v
+   list object [10]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+No assignment to \texttt{a} was needed. The object itself changed. Both names still point to the same object identity.
+
+For immutable objects, identity can be more confusing because the visible value cannot be changed. For example:
+
+\begin{verbatim}
+x = 10
+y = 10
+\end{verbatim}
+
+In CPython, \texttt{x} and \texttt{y} may point to the same cached integer object. But the programmer should not build general logic around that implementation detail. Small integers, some strings, and other immutable values may be reused or interned by CPython. Other equal immutable values may or may not share identity depending on implementation details, compiler optimizations, runtime state, and Python version.
+
+Therefore, this is bad reasoning:
+
+\begin{verbatim}
+x = 1000
+y = 1000
+
+if x is y:
+    print("same number")
+\end{verbatim}
+
+For numbers and strings, value comparison should normally use \texttt{==}, not \texttt{is}. Identity comparison should be used when identity is the actual question.
+
+The most common correct everyday use of \texttt{is} is with singleton objects such as \texttt{None}:
+
+\begin{verbatim}
+if value is None:
+    print("no value")
+\end{verbatim}
+
+This checks whether \texttt{value} refers to the specific singleton object \texttt{None}. It does not ask whether \texttt{value} is merely equal to \texttt{None}. In this case identity is exactly the intended test.
+
+The \texttt{id()} function also helps clarify rebinding. Consider:
+
+\begin{verbatim}
+x = []
+print(id(x))
+
+x.append(1)
+print(id(x))
+
+x = [1]
+print(id(x))
+\end{verbatim}
+
+After \texttt{x.append(1)}, the identity of \texttt{x} remains the same because the same list object was mutated. After \texttt{x = [1]}, the identity changes because the name \texttt{x} has been rebound to a new list object.
+
+The difference is:
+
+\begin{verbatim}
+mutation:
+    same name -> same object, changed value
+
+rebinding:
+    same name -> different object
+\end{verbatim}
+
+This is one of the most useful lessons of \texttt{id()}.
+
+The CPython-specific detail that \texttt{id(obj)} is the object's memory address must be handled carefully. It is useful for understanding CPython's object model, but it is not portable Python reasoning. The language only promises that the returned integer is unique and constant for that object during its lifetime. It also permits two objects with non-overlapping lifetimes to have the same \texttt{id()} value. \cite{python_builtin_id}
+
+This means that the following can happen conceptually:
+
+\begin{verbatim}
+object A exists
+    id(A) -> 12345
+
+object A is destroyed
+
+later, object B is created
+    id(B) -> 12345
+\end{verbatim}
+
+There is no contradiction. The uniqueness guarantee applies while objects are alive at the same time. Once an object is gone, its identity value may be reused.
+
+For that reason, storing \texttt{id()} values as long-term object handles is a mistake. An \texttt{id()} value is not a safe persistent pointer, not a database identifier, not a stable address across program runs, and not a portable representation of the object.
+
+The correct role of \texttt{id()} is narrower and more useful:
+
+\begin{quote}
+\texttt{id()} lets us observe whether a live object reference points to the same runtime object as another reference.
+\end{quote}
+
+It is especially useful for explaining aliasing:
+
+\begin{verbatim}
+a = []
+b = a
+c = []
+
+print(id(a))
+print(id(b))
+print(id(c))
+\end{verbatim}
+
+The identities of \texttt{a} and \texttt{b} match. The identity of \texttt{c} differs. Therefore, \texttt{a} and \texttt{b} are aliases for the same object, while \texttt{c} is a separate object with equal-looking contents.
+
+In compact form:
+
+\begin{verbatim}
+same id      -> same object
+different id -> different live objects
+==           -> value equality
+is           -> identity equality
+\end{verbatim}
+
+The practical conclusion is that \texttt{id()} is a window into Python's object-reference model. It proves that names do not contain objects directly. Names point to objects. Several names may point to the same object. One name may later be rebound to another object. Mutable objects may change while preserving identity. Equal objects may still be distinct objects.
+
+Object lifetime, aliasing, mutation, reference counts, and frame-local slots all depend on object identity. CPython manages objects, not variable boxes. The \texttt{id()} function gives the programmer a limited but useful way to observe that object identity from Python code.
+
+
+\subsubsection{Dynamic Metadata Analysis: Runtime Type Descriptor Extraction via the \texttt{type()} Framework}
+
+If \texttt{id()} lets us observe object identity, \texttt{type()} lets us observe the runtime descriptor that tells Python what kind of object we are dealing with. The built-in \texttt{type()} function, when called with one argument, returns the type object of that argument. With three arguments, it can create a new type object dynamically, essentially acting as a dynamic form of the \texttt{class} statement. \cite{python_builtin_type}
+
+For the present discussion, the first form is the most important:
+
+\begin{verbatim}
+type(object)
+\end{verbatim}
+
+This call does not return a string label. It returns an actual type object.
+
+For example:
+
+\begin{verbatim}
+x = 10
+print(type(x))
+\end{verbatim}
+
+prints something like:
+
+\begin{verbatim}
+<class 'int'>
+\end{verbatim}
+
+This means that \texttt{x} currently points to an object whose runtime type is \texttt{int}. The type belongs to the object, not to the name \texttt{x}. If \texttt{x} is rebound, \texttt{type(x)} changes because \texttt{x} now points to a different object.
+
+\begin{verbatim}
+x = 10
+print(type(x))      # <class 'int'>
+
+x = "hello"
+print(type(x))      # <class 'str'>
+
+x = [1, 2, 3]
+print(type(x))      # <class 'list'>
+\end{verbatim}
+
+Nothing mysterious happened to \texttt{x}. It did not change from an integer variable into a string variable and then into a list variable. The name \texttt{x} was rebound to different objects. Each object carried its own type descriptor.
+
+This is the correct interpretation:
+
+\begin{verbatim}
+x -> int object
+     type: int
+
+x -> str object
+     type: str
+
+x -> list object
+     type: list
+\end{verbatim}
+
+The type is runtime metadata attached to the object. In CPython terms, this corresponds to the object's type pointer in its object header. At the Python level, \texttt{type()} exposes that information as a type object.
+
+This is why Python is dynamically typed in a precise sense. It does not mean that Python values have no types. Python values absolutely have types. It means that names do not have fixed declared storage types. Names can be rebound to objects of different types because the type travels with the object, not with the variable name.
+
+Compare this with C:
+
+\begin{verbatim}
+int x = 10;
+x = "hello";   /* invalid */
+\end{verbatim}
+
+The C variable \texttt{x} has a declared storage type. It is an \texttt{int} variable. A string pointer cannot be assigned to it as if the slot had changed its nature.
+
+In Python:
+
+\begin{verbatim}
+x = 10
+x = "hello"
+\end{verbatim}
+
+the name \texttt{x} is a reference-bearing binding. It can point first to an integer object and later to a string object. The objects are typed; the name is dynamically rebound.
+
+The \texttt{type()} function therefore helps expose one of Python's deepest architectural rules:
+
+\begin{quote}
+Python names do not carry fixed type declarations; Python objects carry runtime type descriptors.
+\end{quote}
+
+This runtime type descriptor is not only used for printing. It controls behavior. When Python evaluates an operation, the interpreter uses the involved objects and their types to decide what should happen.
+
+For example:
+
+\begin{verbatim}
+a = 1
+b = 2
+print(a + b)
+\end{verbatim}
+
+Here, \texttt{type(a)} and \texttt{type(b)} are both \texttt{int}, so integer addition is performed.
+
+Now compare:
+
+\begin{verbatim}
+a = "py"
+b = "thon"
+print(a + b)
+\end{verbatim}
+
+Here, \texttt{type(a)} and \texttt{type(b)} are both \texttt{str}, so the \texttt{+} operator performs string concatenation.
+
+And:
+
+\begin{verbatim}
+a = [1, 2]
+b = [3, 4]
+print(a + b)
+\end{verbatim}
+
+Here, the operands are lists, so \texttt{+} performs list concatenation.
+
+The source operator is the same. The runtime behavior changes because the object types are different.
+
+This is the actual mechanism behind many things that are often explained vaguely as ``Python figures it out.'' Python does not guess. CPython follows object metadata and type-defined behavior. The type object contains or points to the operation machinery for that kind of object.
+
+The return value of \texttt{type()} is itself an object. This is where Python's object model becomes recursive in a useful way.
+
+\begin{verbatim}
+print(type(10))        # <class 'int'>
+print(type(int))       # <class 'type'>
+print(type(type))      # <class 'type'>
+\end{verbatim}
+
+The object \texttt{10} has type \texttt{int}. The object \texttt{int} is itself an object, and its type is usually \texttt{type}. The object \texttt{type} is also an object, and it is its own type in the ordinary built-in metaclass structure.
+
+This is not a decorative curiosity. It explains why classes are runtime objects. When the programmer writes:
+
+\begin{verbatim}
+class Point:
+    pass
+\end{verbatim}
+
+the result is not merely a static type declaration. The name \texttt{Point} is bound to a class object. Calling:
+
+\begin{verbatim}
+type(Point)
+\end{verbatim}
+
+usually returns:
+
+\begin{verbatim}
+<class 'type'>
+\end{verbatim}
+
+That means \texttt{Point} is an object whose type is \texttt{type}. In ordinary terms, \texttt{Point} is a class, and classes are instances of the metaclass \texttt{type}.
+
+This gives the class creation model:
+
+\begin{verbatim}
+Point object
+    is a class object
+    type(Point) -> type
+\end{verbatim}
+
+And an instance model:
+
+\begin{verbatim}
+p = Point()
+
+p object
+    is an instance object
+    type(p) -> Point
+\end{verbatim}
+
+So \texttt{type()} lets us see both levels:
+
+\begin{verbatim}
+p = Point()
+
+print(type(p))      # <class '__main__.Point'>
+print(type(Point))  # <class 'type'>
+\end{verbatim}
+
+This helps connect object instances and class objects. An instance points to its class as its type. The class is itself an object, usually created by \texttt{type}.
+
+The three-argument form of \texttt{type()} shows this even more directly:
+
+\begin{verbatim}
+Point = type("Point", (), {"x": 0, "y": 0})
+\end{verbatim}
+
+This dynamically creates a new class object named \texttt{Point}, with no explicit base classes beyond the default object base behavior, and with a namespace containing \texttt{x} and \texttt{y}. The official documentation describes this as essentially a dynamic form of the \texttt{class} statement. \cite{python_builtin_type}
+
+It is conceptually close to:
+
+\begin{verbatim}
+class Point:
+    x = 0
+    y = 0
+\end{verbatim}
+
+This does not mean beginners should normally create classes with \texttt{type()} directly. The ordinary \texttt{class} statement is clearer. But the three-argument form proves an important architectural point: a class is an object constructed at runtime. The \texttt{class} statement is not only a compile-time declaration syntax.
+
+The one-argument \texttt{type()} call should also be distinguished from \texttt{isinstance()}.
+
+\begin{verbatim}
+type(obj) is SomeClass
+\end{verbatim}
+
+asks whether the object's immediate runtime type is exactly \texttt{SomeClass}.
+
+By contrast:
+
+\begin{verbatim}
+isinstance(obj, SomeClass)
+\end{verbatim}
+
+asks whether the object is an instance of \texttt{SomeClass} or of a subclass of it. This distinction matters in object-oriented code.
+
+Example:
+
+\begin{verbatim}
+class Animal:
+    pass
+
+class Dog(Animal):
+    pass
+
+d = Dog()
+
+print(type(d) is Animal)        # False
+print(isinstance(d, Animal))    # True
+\end{verbatim}
+
+The immediate type of \texttt{d} is \texttt{Dog}, not \texttt{Animal}. But \texttt{d} is still an instance of \texttt{Animal} in the inheritance sense. For ordinary program decisions, \texttt{isinstance()} is usually the better test. For introspection and teaching the object model, \texttt{type()} shows the direct runtime type descriptor.
+
+This also matters for duck-typed Python style. In many Python programs, asking for the exact type is less useful than asking whether the object supports the needed operation. For example, instead of requiring exactly a list, a function may accept any iterable. In such cases, \texttt{type()} is too rigid.
+
+For example:
+
+\begin{verbatim}
+def total(values):
+    result = 0
+    for value in values:
+        result += value
+    return result
+\end{verbatim}
+
+This function does not need \texttt{values} to be exactly a list. It only needs an object that can be iterated. A tuple, generator, range, or custom iterable may work. Therefore, \texttt{type()} should not be overused as a gatekeeper.
+
+The role of \texttt{type()} in this chapter is not to encourage type-check-heavy programming. Its role is to expose runtime metadata:
+
+\begin{quote}
+\texttt{type(obj)} reveals the type object that currently governs \texttt{obj}'s behavior.
+\end{quote}
+
+It is a diagnostic and conceptual tool.
+
+Using \texttt{type()} together with \texttt{id()} gives a compact way to observe Python's object model:
+
+\begin{verbatim}
+a = []
+b = a
+c = []
+
+print(id(a), type(a))
+print(id(b), type(b))
+print(id(c), type(c))
+\end{verbatim}
+
+The result shows that \texttt{a} and \texttt{b} have the same identity and the same type because they are two names for the same list object. \texttt{c} has the same type but a different identity because it is a different list object.
+
+Conceptually:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object
+      type -> list
+      ^
+      |
+b ----+
+
+c -> another list object
+     type -> list
+\end{verbatim}
+
+This separates three different questions:
+
+\begin{itemize}
+    \item identity: is it the same object?
+    \item type: what runtime descriptor controls the object?
+    \item value: what contents or state does the object currently have?
+\end{itemize}
+
+For example:
+
+\begin{verbatim}
+a = [1, 2]
+b = [1, 2]
+
+print(a is b)          # identity: False
+print(type(a) is type(b))  # type: True
+print(a == b)          # value equality: True
+\end{verbatim}
+
+The two objects are different identities, have the same type, and compare equal by value.
+
+This gives the correct mental model:
+
+\begin{verbatim}
+object
+    identity -> observed with id() / is
+    type     -> observed with type()
+    value    -> compared with ==, inspected through object behavior
+\end{verbatim}
+
+The practical conclusion is that \texttt{type()} is a runtime metadata extractor. It exposes the type object attached to the object currently reached by a name or expression. It does not tell us the fixed type of a variable, because Python variables do not have fixed C-style types. It tells us what kind of object is currently there.
+
+This is why \texttt{type()} belongs in the memory-management and object-topology discussion. CPython manages a graph of objects. Each object has identity, type, references, and type-specific storage. The \texttt{type()} function lets Python code observe one part of that graph: the runtime descriptor that determines how the object behaves.
+
+
+\subsubsection{The Variable-as-Label Paradigm Shift: Binding Multiple Names to an Identical Runtime Object (\texttt{a = b})}
+
+One of the hardest transitions for a C programmer learning Python is abandoning the idea that a variable is a box containing a value. In Python, a variable name is better understood as a label attached to an object. Assignment does not usually copy an object. It binds a name to an object. A second assignment can bind another name to the same object.
+
+Consider:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+\end{verbatim}
+
+After the first line, CPython has a list object on the managed heap, and the name \texttt{a} refers to it. After the second line, no new list is created. The name \texttt{b} is bound to the same list object.
+
+Conceptually:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+This is the variable-as-label paradigm. The names \texttt{a} and \texttt{b} are two labels attached to one runtime object. They are not two boxes containing two independent lists.
+
+This distinction becomes visible as soon as the object is mutated:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+b.append(4)
+
+print(a)
+\end{verbatim}
+
+The output is:
+
+\begin{verbatim}
+[1, 2, 3, 4]
+\end{verbatim}
+
+The mutation was performed through the name \texttt{b}, but the object reached through \texttt{a} is the same object. Therefore, \texttt{a} observes the changed list. Nothing was copied from \texttt{b} back into \texttt{a}. There was only one list object from the beginning.
+
+The object topology before mutation is:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+After mutation:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object [1, 2, 3, 4]
+      ^
+      |
+b ----+
+\end{verbatim}
+
+The arrows did not change. The object changed.
+
+This is different from rebinding:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+b = [9, 9, 9]
+\end{verbatim}
+
+Now \texttt{b} is not mutating the original list. It is being rebound to a new list object.
+
+After rebinding:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [9, 9, 9]
+\end{verbatim}
+
+The name \texttt{a} still points to the original list. The name \texttt{b} now points to another list. Rebinding changes the arrow. Mutation changes the object at the end of the arrow.
+
+This gives the key distinction:
+
+\begin{quote}
+Assignment changes name-to-object bindings. Mutation changes the object itself.
+\end{quote}
+
+The statement \texttt{a = b} should therefore be read as:
+
+\begin{quote}
+Bind the name \texttt{a} to the same object currently referenced by \texttt{b}.
+\end{quote}
+
+It should not be read as:
+
+\begin{quote}
+Copy the full contents of \texttt{b} into a separate variable named \texttt{a}.
+\end{quote}
+
+This is why identity testing reveals the truth:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+
+print(a is b)
+print(id(a) == id(b))
+\end{verbatim}
+
+Both checks show that \texttt{a} and \texttt{b} refer to the same object. The names are different. The object is identical.
+
+Now compare:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(a == b)
+print(a is b)
+\end{verbatim}
+
+The first comparison is true because the lists have equal values. The second comparison is false because they are different objects.
+
+Conceptually:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [1, 2, 3]
+\end{verbatim}
+
+They look the same by value, but they are not the same by identity.
+
+This distinction is also why copying must be explicit. If a separate list is needed, assignment is not enough:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a.copy()
+\end{verbatim}
+
+Now \texttt{b} refers to a different list object with the same initial contents:
+
+\begin{verbatim}
+a -> list object [1, 2, 3]
+
+b -> list object [1, 2, 3]
+\end{verbatim}
+
+If \texttt{b.append(4)} is executed, \texttt{a} is unchanged because \texttt{a} and \texttt{b} no longer point to the same list.
+
+However, even copying has levels. A shallow copy creates a new outer container, but it does not necessarily copy the objects inside it.
+
+Example:
+
+\begin{verbatim}
+inner = [1, 2]
+a = [inner]
+b = a.copy()
+
+b[0].append(3)
+
+print(a)
+print(b)
+\end{verbatim}
+
+Both lists show the modified inner list, because the outer lists are different but their first element points to the same inner object.
+
+Conceptually:
+
+\begin{verbatim}
+a -> outer list
+        slot 0 ----+
+                   |
+                   v
+                inner list [1, 2, 3]
+                   ^
+                   |
+b -> outer list ----+
+        slot 0
+\end{verbatim}
+
+The shallow copy copied the references inside the outer list. It did not recursively duplicate the entire object graph.
+
+This is why Python programmers must reason in terms of object topology. The question is not only “what value does this variable have?” The better question is:
+
+\begin{quote}
+Which object does this name currently refer to, and who else refers to the same object?
+\end{quote}
+
+The same principle explains function arguments. When an object is passed to a function, the parameter name inside the function is bound to the same object supplied by the caller.
+
+Example:
+
+\begin{verbatim}
+def add_item(items):
+    items.append("x")
+
+data = []
+add_item(data)
+
+print(data)
+\end{verbatim}
+
+During the call:
+
+\begin{verbatim}
+caller namespace
+    data -> list object []
+
+callee frame
+    items -> same list object []
+\end{verbatim}
+
+The function mutates the object through the local name \texttt{items}. The caller sees the change through the name \texttt{data} because both names refer to the same object.
+
+But if the function rebinds the parameter:
+
+\begin{verbatim}
+def replace(items):
+    items = ["x"]
+
+data = []
+replace(data)
+
+print(data)
+\end{verbatim}
+
+the caller's list is unchanged. The assignment inside the function changes only the local binding \texttt{items}. It does not rebind the caller's name \texttt{data}.
+
+During the call, before rebinding:
+
+\begin{verbatim}
+data  ----+
+          |
+          v
+       list object []
+          ^
+          |
+items ----+
+\end{verbatim}
+
+After \texttt{items = ["x"]}:
+
+\begin{verbatim}
+data  -> original list object []
+
+items -> new list object ["x"]
+\end{verbatim}
+
+The parameter was local. Rebinding it changed the local frame, not the caller's namespace.
+
+This also explains why mutable and immutable objects do not require two different argument-passing theories. Python always binds parameter names to objects. The visible difference comes from what operations are possible on the object.
+
+With an immutable integer:
+
+\begin{verbatim}
+def f(x):
+    x = x + 1
+
+n = 10
+f(n)
+print(n)
+\end{verbatim}
+
+The expression \texttt{x + 1} produces another integer object, and the local name \texttt{x} is rebound to it. The caller's name \texttt{n} still points to the original integer object.
+
+With a mutable list:
+
+\begin{verbatim}
+def f(x):
+    x.append(1)
+
+values = []
+f(values)
+print(values)
+\end{verbatim}
+
+The local name \texttt{x} points to the same list object as \texttt{values}. The method call mutates that shared object. The caller observes the mutation.
+
+The passing mechanism is the same. The object behavior differs.
+
+The variable-as-label model is also visible in chained assignment:
+
+\begin{verbatim}
+a = b = []
+\end{verbatim}
+
+This creates one list object and binds both names to it:
+
+\begin{verbatim}
+a ----+
+      |
+      v
+   list object []
+      ^
+      |
+b ----+
+\end{verbatim}
+
+Therefore:
+
+\begin{verbatim}
+a.append(1)
+print(b)
+\end{verbatim}
+
+prints:
+
+\begin{verbatim}
+[1]
+\end{verbatim}
+
+This surprises only if one imagines assignment as copying into boxes. It is natural if assignment is understood as name binding.
+
+The same danger appears in nested structures:
+
+\begin{verbatim}
+rows = [[0] * 3] * 4
+\end{verbatim}
+
+This does not create four independent inner lists. It creates one inner list and repeats references to it:
+
+\begin{verbatim}
+rows -> outer list
+           slot 0 -> inner list [0, 0, 0]
+           slot 1 -> same inner list
+           slot 2 -> same inner list
+           slot 3 -> same inner list
+\end{verbatim}
+
+So:
+
+\begin{verbatim}
+rows[0][0] = 1
+\end{verbatim}
+
+appears to modify all rows, because all rows are the same inner list object.
+
+The correct independent construction is:
+
+\begin{verbatim}
+rows = [[0] * 3 for _ in range(4)]
+\end{verbatim}
+
+This evaluates the inner list expression separately for each row, producing separate inner list objects.
+
+This example is important because it shows that aliasing is not an exotic topic. It is a direct consequence of Python's ordinary assignment and container rules.
+
+The model also explains why object identity survives renaming:
+
+\begin{verbatim}
+original = {"a": 1}
+alias = original
+
+del original
+\end{verbatim}
+
+The object is not destroyed merely because one name was deleted. The name \texttt{alias} still refers to the dictionary. Deleting a name removes one binding. It does not necessarily destroy the object.
+
+Conceptually:
+
+\begin{verbatim}
+before del:
+
+original ----+
+             |
+             v
+          dict object {"a": 1}
+             ^
+             |
+alias -------+
+
+after del original:
+
+alias -> dict object {"a": 1}
+\end{verbatim}
+
+The object persists while at least one reference keeps it alive.
+
+This connects directly to reference counting. Binding another name to the same object increases the number of active references. Rebinding or deleting a name releases a reference. The object is reclaimed only when no remaining references keep it alive, except for cyclic cases handled by the garbage collector.
+
+A compact lifecycle example is:
+
+\begin{verbatim}
+a = []
+b = a
+del a
+b.append(1)
+print(b)
+\end{verbatim}
+
+The list still exists after \texttt{del a} because \texttt{b} still points to it. The name \texttt{a} was removed. The object was not.
+
+The practical rules are:
+
+\begin{itemize}
+    \item \texttt{a = b} makes \texttt{a} refer to the same object as \texttt{b};
+    \item assignment does not deep-copy objects;
+    \item rebinding changes a name-to-object relationship;
+    \item mutation changes the object reached by one or more names;
+    \item containers store references to objects;
+    \item function parameters are local names bound to argument objects;
+    \item objects persist while some reference path reaches them.
+\end{itemize}
+
+The final mental picture is:
+
+\begin{verbatim}
+names are labels
+labels point to objects
+objects live independently of any one label
+several labels may point to the same object
+assignment moves or creates labels
+mutation changes objects
+copying must be requested explicitly
+\end{verbatim}
+
+This paradigm shift is necessary before Python memory behavior makes sense. Without it, assignment, function calls, list mutation, default argument traps, nested container aliasing, closures, and object lifetime all seem like separate special cases. With it, they become one mechanism: Python programs manipulate references to heap-managed runtime objects.

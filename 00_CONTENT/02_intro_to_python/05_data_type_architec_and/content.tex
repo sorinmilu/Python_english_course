@@ -1,1 +1,7 @@
 \section{Data Type Architecture and Runtime Type Systems}
+
+After examining CPython's execution model, memory behavior, object identity, reference topology, and syntax-level divergence from C, we can now describe Python's data types more systematically. Data types in Python are not merely labels attached to values, nor are they equivalent to C declarations. They are runtime object categories: each object has identity, type, value, storage behavior, mutability rules, and a defined interface through which operations are accepted or rejected.
+
+This section therefore treats Python's type system as part of the runtime architecture, not as a list of built-in names to memorize. The central distinction is that Python names are dynamic, while Python objects are strongly typed at runtime. A name can be rebound from an integer to a string to a list, but every operation is checked against the object that is actually present when execution reaches that operation.
+
+The following subsections build this model step by step: first by separating static and dynamic typing from strong and weak enforcement, then by explaining Python's runtime type boundary, then by returning to names and object references, storage categories, mutability, identity, equality, and finally the object interfaces that make operators, construction, representation, indexing, calling, and iteration work. The goal is to replace the C-shaped idea of typed boxes with the Python-shaped idea of typed runtime objects connected by references.

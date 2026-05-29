@@ -1,1 +1,7 @@
 \section{Python Implementations and the Role of CPython}
+
+Python is often spoken about as if it were one concrete program, but this is only partly true. The language defines the visible rules: syntax, objects, assignment, functions, classes, exceptions, modules, and the expected behavior of built-in types. An implementation is the machinery that makes those rules execute on a real machine or on another host runtime.
+
+This distinction matters because Python can be implemented in more than one way. CPython executes Python through a C-based runtime and bytecode interpreter. PyPy uses a different runtime strategy with just-in-time compilation. Jython and IronPython connect Python semantics to the Java and .NET worlds. Other tools compile, translate, specialize, or package Python code for narrower purposes.
+
+However, this plurality should not obscure the practical fact: CPython is the center of ordinary Python. It is the reference implementation, the default runtime for most users, and the target assumed by much of the package ecosystem. Therefore, before we study Python objects, frames, bytecode, memory management, and execution, we must first separate Python as a language from CPython as the concrete runtime that most programmers actually encounter.

@@ -1,1 +1,438 @@
 \subsection{Memory Storage Classifications: Built-in Single-Value Objects vs. Composite Reference Collections}
+
+Python data types should not be understood only by their surface syntax. They should also be understood by the kind of object topology they create in memory. Some built-in objects behave like single conceptual values: an integer, a floating-point number, a Boolean, \texttt{None}, or a string. Other objects behave as composite containers: lists, tuples, dictionaries, sets, user-defined instances, and other structures that hold references to other objects.
+
+This distinction is not the same as ``simple'' versus ``advanced.'' It is a distinction about object structure. A single-value object is usually treated as one conceptual value. A composite object is a container or structured object whose internal state connects to other objects.
+
+At the Python level:
+
+\begin{verbatim}
+x = 10
+name = "Python"
+items = [10, "Python"]
+\end{verbatim}
+
+these assignments look similar. Each binds a name to an object. But the resulting object topologies differ.
+
+Conceptually:
+
+\begin{verbatim}
+x -> int object 10
+
+name -> str object "Python"
+
+items -> list object
+             slot 0 -> int object 10
+             slot 1 -> str object "Python"
+\end{verbatim}
+
+The integer and string are objects, but they are not containers of arbitrary Python object references in the way a list is. The list is a composite object: it stores references to other objects.
+
+\subsubsection*{Single-Value Objects}
+
+Single-value objects represent one conceptual value. Common examples include:
+
+\begin{verbatim}
+int
+float
+complex
+bool
+None
+str
+bytes
+\end{verbatim}
+
+These objects still have identity, type, value, and CPython object metadata. They are not raw C primitives at the Python level. The important point is that they are normally used as individual values rather than as containers of other independently referenced Python objects.
+
+For example:
+
+\begin{verbatim}
+a = 42
+b = 3.14
+c = True
+d = None
+text = "hello"
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+a    -> int object 42
+b    -> float object 3.14
+c    -> bool object True
+d    -> None object
+text -> str object "hello"
+\end{verbatim}
+
+A Python integer object is not a raw machine integer stored inside the name \texttt{a}. It is a heap-managed object. But from the programmer's structural point of view, it behaves as one value.
+
+Most of these single-value objects are immutable. If the apparent value changes, the name is usually rebound to another object.
+
+For example:
+
+\begin{verbatim}
+x = 10
+x = x + 1
+\end{verbatim}
+
+This should not be imagined as modifying the integer object \texttt{10}. Integers are immutable. The expression \texttt{x + 1} produces an integer object representing \texttt{11}, and the name \texttt{x} is rebound to that object.
+
+Conceptually:
+
+\begin{verbatim}
+before:
+    x -> int object 10
+
+after:
+    x -> int object 11
+\end{verbatim}
+
+The old object may be reused, cached, or eventually released depending on CPython's internal rules, but the language-level idea is clear: the integer object was not mutated in place.
+
+The same applies to strings:
+
+\begin{verbatim}
+s = "py"
+s = s + "thon"
+\end{verbatim}
+
+The string \texttt{"py"} is not extended in place. A new string object representing \texttt{"python"} is produced, and \texttt{s} is rebound.
+
+\subsubsection*{Composite Reference Collections}
+
+Composite objects hold references to other objects. Lists, tuples, dictionaries, and sets are the most important built-in examples.
+
+A list:
+
+\begin{verbatim}
+items = [1, "two", []]
+\end{verbatim}
+
+should be understood as:
+
+\begin{verbatim}
+items -> list object
+             slot 0 -> int object 1
+             slot 1 -> str object "two"
+             slot 2 -> list object []
+\end{verbatim}
+
+The list does not contain a raw integer, raw string bytes, and another list physically embedded as complete values in the C-array sense. It contains references to Python objects.
+
+This is why lists can contain heterogeneous elements:
+
+\begin{verbatim}
+items = [10, "hello", print, int, [1, 2]]
+\end{verbatim}
+
+Every element position stores a reference to an object. Since each object carries its own type, the list itself does not need one fixed element type.
+
+A tuple is also a composite reference collection, but its structure is immutable:
+
+\begin{verbatim}
+t = (1, "two", [])
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+t -> tuple object
+         slot 0 -> int object 1
+         slot 1 -> str object "two"
+         slot 2 -> list object []
+\end{verbatim}
+
+The tuple cannot be resized and its slots cannot be rebound after construction. But the objects referenced by the tuple may themselves be mutable. Therefore:
+
+\begin{verbatim}
+t = (1, "two", [])
+t[2].append(3)
+\end{verbatim}
+
+is valid, because the tuple slot still points to the same list object. The tuple was not changed; the list object inside it was mutated.
+
+After mutation:
+
+\begin{verbatim}
+t -> tuple object
+         slot 0 -> int object 1
+         slot 1 -> str object "two"
+         slot 2 -> list object [3]
+\end{verbatim}
+
+This distinction is important. Immutability of a container means its own reference slots cannot be changed. It does not automatically mean every object reachable from it is immutable.
+
+\subsubsection*{Dictionaries as Reference Mappings}
+
+A dictionary is also a composite object, but it is not positional like a list or tuple. It maps keys to values.
+
+Example:
+
+\begin{verbatim}
+record = {
+    "name": "Ada",
+    "age": 36,
+    "skills": ["math", "programming"],
+}
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+record -> dict object
+              key "name"   -> value str object "Ada"
+              key "age"    -> value int object 36
+              key "skills" -> value list object
+                                   slot 0 -> str object "math"
+                                   slot 1 -> str object "programming"
+\end{verbatim}
+
+Both keys and values are object references. Dictionary keys must satisfy hash and equality requirements, which is why mutable lists cannot be used as dictionary keys. A key must remain stable enough for the hash table to find it again.
+
+The dictionary itself is mutable. Adding, removing, or replacing a key-value entry changes the dictionary object:
+
+\begin{verbatim}
+record["age"] = 37
+\end{verbatim}
+
+This does not mutate the integer object \texttt{36}. It changes the dictionary entry so that the key \texttt{"age"} now points to a different integer object.
+
+Conceptually:
+
+\begin{verbatim}
+before:
+    "age" -> int object 36
+
+after:
+    "age" -> int object 37
+\end{verbatim}
+
+Again, the composite object changes by changing references.
+
+\subsubsection*{Sets as Hash-Based Reference Collections}
+
+A set is a collection of unique objects according to hash and equality behavior:
+
+\begin{verbatim}
+numbers = {1, 2, 3}
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+numbers -> set object
+               contains reference to int object 1
+               contains reference to int object 2
+               contains reference to int object 3
+\end{verbatim}
+
+A set does not store elements by position. It stores them through a hash-table structure. This means membership testing is based on hash and equality, not on linear position.
+
+Because set elements must be hashable, mutable containers such as lists cannot normally be inserted into sets:
+
+\begin{verbatim}
+s = set()
+s.add([1, 2, 3])   # invalid
+\end{verbatim}
+
+The problem is not that the list is too large or too complicated. The problem is that a mutable list does not provide the stable hash behavior required by the set.
+
+\subsubsection*{User-Defined Instances as Composite Objects}
+
+User-defined instances are also composite in the ordinary case. They usually hold references through an attribute namespace.
+
+Example:
+
+\begin{verbatim}
+class Person:
+    pass
+
+p = Person()
+p.name = "Ada"
+p.skills = ["math", "programming"]
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+p -> Person instance object
+         attribute namespace
+             "name"   -> str object "Ada"
+             "skills" -> list object
+                              slot 0 -> str object "math"
+                              slot 1 -> str object "programming"
+\end{verbatim}
+
+The instance object does not contain the full string and full list directly as raw embedded fields. Its attribute namespace maps attribute names to object references.
+
+This is why aliasing works through attributes too:
+
+\begin{verbatim}
+skills = ["math"]
+p.skills = skills
+
+skills.append("programming")
+print(p.skills)
+\end{verbatim}
+
+The attribute \texttt{p.skills} and the name \texttt{skills} refer to the same list object.
+
+\subsubsection*{Composite Objects Create Object Graphs}
+
+Once composite objects are introduced, a Python program becomes an object graph. Objects point to other objects. Containers point to elements. Dictionaries point to keys and values. Instances point to attribute values. Functions point to code objects, globals, defaults, and closure cells. Frames point to local objects.
+
+A small example:
+
+\begin{verbatim}
+data = {
+    "numbers": [1, 2, 3],
+    "label": "sample",
+}
+\end{verbatim}
+
+creates a structure like:
+
+\begin{verbatim}
+data -> dict object
+            "numbers" -> list object
+                             slot 0 -> int object 1
+                             slot 1 -> int object 2
+                             slot 2 -> int object 3
+            "label"   -> str object "sample"
+\end{verbatim}
+
+This graph shape matters for memory management. The dictionary keeps the list and string alive. The list keeps the integers alive. If the name \texttt{data} is removed, the dictionary may become unreachable. If no other references point into the graph, the whole structure may become reclaimable.
+
+But if another name points to the inner list:
+
+\begin{verbatim}
+numbers = data["numbers"]
+del data
+\end{verbatim}
+
+then the list survives:
+
+\begin{verbatim}
+numbers -> list object [1, 2, 3]
+\end{verbatim}
+
+The outer dictionary may disappear, but the inner list remains because another reference path reaches it.
+
+\subsubsection*{Single-Value Objects Can Still Be Shared}
+
+Single-value objects may also be shared. This is especially common for immutable objects.
+
+Example:
+
+\begin{verbatim}
+a = 10
+b = 10
+\end{verbatim}
+
+In CPython, \texttt{a} and \texttt{b} may refer to the same integer object for small cached integers. But program logic should not depend on this identity-sharing behavior for numbers or strings. The correct value comparison is:
+
+\begin{verbatim}
+a == b
+\end{verbatim}
+
+not:
+
+\begin{verbatim}
+a is b
+\end{verbatim}
+
+The important point is that immutable sharing is safe because the object cannot be changed in place. If two names refer to the same immutable integer or string object, neither name can mutate it and surprise the other.
+
+Composite mutable sharing is different. If two names refer to the same list, dictionary, set, or instance, mutation through one reference is visible through the other.
+
+\subsubsection*{Why This Distinction Matters}
+
+The distinction between single-value objects and composite reference collections explains many practical Python behaviors.
+
+For a single immutable value:
+
+\begin{verbatim}
+x = 5
+y = x
+y = y + 1
+\end{verbatim}
+
+After this:
+
+\begin{verbatim}
+x -> int object 5
+y -> int object 6
+\end{verbatim}
+
+The operation on \texttt{y} produced a new object and rebound \texttt{y}. The object reached by \texttt{x} was not changed.
+
+For a mutable composite object:
+
+\begin{verbatim}
+x = []
+y = x
+y.append(1)
+\end{verbatim}
+
+After this:
+
+\begin{verbatim}
+x ----+
+      |
+      v
+   list object [1]
+      ^
+      |
+y ----+
+\end{verbatim}
+
+The list object was mutated. Both names observe the change.
+
+This is why Python beginners are often surprised by lists but not by integers. The assignment mechanism is the same. The object category is different. Integers are immutable single-value objects. Lists are mutable composite reference collections.
+
+\subsubsection*{The Practical Classification}
+
+A useful practical classification is:
+
+\begin{verbatim}
+single-value style objects:
+    int
+    float
+    complex
+    bool
+    NoneType
+    str
+    bytes
+
+composite reference collections:
+    list
+    tuple
+    dict
+    set
+    frozenset
+    user-defined instances
+    function objects
+    module objects
+    frame objects
+\end{verbatim}
+
+This classification is not a formal complete taxonomy of Python's entire data model. It is a memory-intuition taxonomy. It helps answer the question:
+
+\begin{quote}
+Is this object mainly one conceptual value, or is it a structure that holds references to other objects?
+\end{quote}
+
+That question matters for copying, aliasing, mutation, function arguments, object lifetime, and memory use.
+
+The final model is:
+
+\begin{verbatim}
+single-value object
+    name -> object
+
+composite object
+    name -> container object
+                internal slots / entries / attributes -> other objects
+\end{verbatim}
+
+Python programs are built by connecting these objects. Simple names point to objects. Composite objects point onward to other objects. Memory management follows this topology. Mutation changes objects or their internal references. Rebinding changes which object a name reaches. Understanding this distinction prepares the next subsection, where mutability and identity must be separated from value equality.

@@ -1,1 +1,413 @@
 \subsection{Code Objects, Frame Objects, and Namespace Dictionaries}
+
+After CPython has parsed and compiled source code, the important runtime question becomes: what exactly is executed? The answer is not “the source text.” CPython executes code objects inside frame objects, using namespace dictionaries to resolve names and store bindings.
+
+These three structures form one of the most important runtime triangles in Python:
+
+\begin{verbatim}
+code object
+    describes what can be executed
+
+frame object
+    represents one active execution of that code
+
+namespace dictionaries
+    map names to objects during that execution
+\end{verbatim}
+
+This distinction is essential because Python code and Python execution are not the same thing. A code object is executable material. A frame is a running activation of that material. A namespace is the name-to-object environment used while that frame executes.
+
+\subsubsection{Code Objects: Stored Executable Descriptions}
+
+A code object is CPython's internal representation of a compiled block of Python code. Module bodies, function bodies, lambdas, comprehensions, class bodies, and nested functions all have code objects.
+
+A code object contains the information needed to execute a block, including:
+
+\begin{itemize}
+    \item bytecode instructions;
+    \item constants used by the code;
+    \item names referenced by the code;
+    \item local variable names;
+    \item free variables and cell variables for closures;
+    \item required evaluation stack size;
+    \item filename, function name, and line-number metadata.
+\end{itemize}
+
+A simplified view is:
+
+\begin{verbatim}
+code object
+    bytecode
+    constants
+    referenced names
+    local variable names
+    closure variable metadata
+    source-location metadata
+\end{verbatim}
+
+A code object is not a function call. It does not by itself have current local variable values, an instruction position, or a live execution stack. It is closer to a compiled recipe: it says what instructions exist and what names and constants those instructions refer to.
+
+For example:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+When this definition is compiled, the body of \texttt{add} has a code object. That code object knows that there are local names such as \texttt{a} and \texttt{b}, and that the function body contains bytecode for loading them, adding them, and returning the result.
+
+But the code object does not yet know the runtime values of \texttt{a} and \texttt{b}. Those values exist only when the function is called.
+
+\subsubsection{Function Objects Wrap Code Objects}
+
+A function object is not the same thing as a code object. A function object wraps a code object together with runtime context.
+
+Conceptually:
+
+\begin{verbatim}
+function object
+    code object
+    global namespace
+    default argument values
+    keyword-only defaults
+    annotations
+    closure cells, if needed
+\end{verbatim}
+
+This explains why Python functions are first-class runtime objects. When CPython executes a \texttt{def} statement, it creates a function object and binds the function name to that object.
+
+So this:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+does not merely “declare” a function in the C sense. It executes a statement that creates a function object and stores it in the current namespace under the name \texttt{add}.
+
+This is why the following works:
+
+\begin{verbatim}
+f = add
+result = f(2, 3)
+\end{verbatim}
+
+Both \texttt{add} and \texttt{f} refer to the same function object. The function object contains the code object that will be executed when the function is called.
+
+\subsubsection{Frame Objects: One Active Execution}
+
+A frame object represents an active execution of a code object. If a code object is the executable recipe, a frame is one running use of that recipe.
+
+When a function is called, CPython prepares a frame for that call. The frame connects:
+
+\begin{itemize}
+    \item the code object being executed;
+    \item the current instruction position;
+    \item the local names or local slots;
+    \item the global namespace;
+    \item the built-in namespace;
+    \item temporary expression values;
+    \item exception and control-flow state.
+\end{itemize}
+
+A simplified view is:
+
+\begin{verbatim}
+frame
+    code object being executed
+    current bytecode position
+    local namespace / local slots
+    global namespace
+    builtins namespace
+    evaluation stack
+    link to caller frame
+\end{verbatim}
+
+This is the Python-level equivalent of an activation record, but it should not be confused with a raw C stack frame. CPython is a C program and it uses the native C stack internally, but Python execution also has its own frame model.
+
+This is why Python tracebacks can show a chain of calls. When an exception propagates, CPython can inspect the active or recorded frames and report which code object, line, and call level were involved.
+
+\subsubsection{The Same Code Object Can Have Many Frames}
+
+A code object can be executed many times. Each execution needs its own frame.
+
+For example:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+
+x = add(1, 2)
+y = add(10, 20)
+\end{verbatim}
+
+The function \texttt{add} has one code object. But the two calls create two separate executions. In the first call, \texttt{a} is bound to \texttt{1} and \texttt{b} to \texttt{2}. In the second call, \texttt{a} is bound to \texttt{10} and \texttt{b} to \texttt{20}.
+
+The code object is shared executable structure. The frame is per-call execution state.
+
+This is the same distinction as:
+
+\begin{verbatim}
+recipe       -> code object
+cooking once -> frame
+\end{verbatim}
+
+The recipe can be reused. Each actual cooking event has its own ingredients, current step, and temporary state.
+
+\subsubsection{Namespace Dictionaries: Names Point to Objects}
+
+Python names live in namespaces. A namespace is a mapping from names to objects. At module level, this mapping is normally a dictionary.
+
+For example:
+
+\begin{verbatim}
+x = 10
+message = "hello"
+\end{verbatim}
+
+creates bindings conceptually like:
+
+\begin{verbatim}
+module namespace
+    "x"       -> int object 10
+    "message" -> str object "hello"
+\end{verbatim}
+
+This is why Python variables are not C boxes. A name does not own a fixed typed storage cell. A name is an entry in a namespace, and that entry points to an object.
+
+When Python executes:
+
+\begin{verbatim}
+x = 10
+x = "hello"
+\end{verbatim}
+
+the binding changes:
+
+\begin{verbatim}
+before:
+    "x" -> int object 10
+
+after:
+    "x" -> str object "hello"
+\end{verbatim}
+
+The name \texttt{x} has been rebound. It did not mutate from an integer storage box into a string storage box.
+
+\subsubsection{Local, Global, and Built-in Name Resolution}
+
+When code executes, CPython must resolve names. The basic lookup chain for ordinary function code is:
+
+\begin{verbatim}
+local namespace
+    then global namespace
+        then builtins namespace
+\end{verbatim}
+
+For example:
+
+\begin{verbatim}
+x = 10
+
+def f():
+    print(x)
+\end{verbatim}
+
+Inside \texttt{f}, the name \texttt{print} is usually found in the built-in namespace. The name \texttt{x} is found in the global namespace, because \texttt{x} is not local to \texttt{f}.
+
+The frame provides access to these namespaces. Conceptually:
+
+\begin{verbatim}
+frame for f
+    locals   -> local names of f
+    globals  -> module dictionary
+    builtins -> built-in names dictionary
+\end{verbatim}
+
+This explains why Python can resolve a name that was not declared inside the function. It is not reading raw storage from the C stack. It is performing namespace lookup according to Python's execution rules.
+
+\subsubsection{Fast Locals: The Practical Optimization}
+
+Although it is useful to explain namespaces as dictionaries, CPython does not always store ordinary function locals as a normal dictionary during execution. For speed, local variables in optimized function scopes are usually stored internally in a faster array-like layout associated with the frame.
+
+The important conceptual point remains the same: local names are bindings to objects. But the implementation may avoid using a normal dictionary for every local variable access because dictionary lookup would be expensive inside every function call.
+
+So the teaching model is:
+
+\begin{quote}
+At the language level, locals behave like a local namespace. At the CPython implementation level, optimized function locals may be stored in faster internal slots and exposed as a mapping when introspection asks for them.
+\end{quote}
+
+This explains why \texttt{locals()} inside a function should not be treated as an ordinary mutable dictionary that directly controls execution in all cases. It is a view or mapping of local state, not the same simple thing as a module dictionary.
+
+\subsubsection{Module Namespaces Are Real Dictionaries}
+
+Module namespaces are easier. A module object has a dictionary that stores its top-level names.
+
+For example, a file:
+
+\begin{verbatim}
+x = 10
+
+def f():
+    return x + 1
+\end{verbatim}
+
+creates a module namespace roughly like:
+
+\begin{verbatim}
+module.__dict__
+    "__name__" -> module name
+    "x"        -> int object 10
+    "f"        -> function object
+\end{verbatim}
+
+The function object \texttt{f} also remembers the global namespace in which it was defined. This is why \texttt{f} can later find \texttt{x}, even if \texttt{f} is passed somewhere else.
+
+For example:
+
+\begin{verbatim}
+g = f
+\end{verbatim}
+
+does not copy the code or copy the global variables. It binds another name, \texttt{g}, to the same function object. That function object still carries a reference to its original global namespace.
+
+\subsubsection{Class Body Execution Uses a Namespace Too}
+
+Class definitions also use namespaces, but they behave differently from ordinary functions.
+
+When Python executes:
+
+\begin{verbatim}
+class Point:
+    x = 0
+    y = 0
+
+    def move(self, dx, dy):
+        self.x += dx
+        self.y += dy
+\end{verbatim}
+
+the class body is executed in a temporary namespace. Names assigned in the class body become entries in that namespace. After the body finishes, Python creates a class object using that namespace.
+
+Conceptually:
+
+\begin{verbatim}
+temporary class namespace
+    "x"    -> int object 0
+    "y"    -> int object 0
+    "move" -> function object
+
+type machinery creates class object Point
+Point.__dict__ contains these entries
+\end{verbatim}
+
+This is why a class definition is executable code, not only a static declaration. The body runs, creates objects, binds names, and then those names become the class object's attributes.
+
+\subsubsection{Closures: When Frames Need Preserved Cells}
+
+Nested functions introduce one more mechanism: closure cells.
+
+Example:
+
+\begin{verbatim}
+def outer():
+    x = 10
+
+    def inner():
+        return x
+
+    return inner
+\end{verbatim}
+
+Here, \texttt{inner} uses \texttt{x} from \texttt{outer}. But \texttt{outer} returns, so its ordinary call frame cannot simply remain active as a normal stack frame forever. CPython solves this by storing captured variables in cell objects. The returned function keeps references to those cells.
+
+Conceptually:
+
+\begin{verbatim}
+inner function object
+    code object
+    globals
+    closure cells
+        cell for x -> int object 10
+\end{verbatim}
+
+This is the concrete runtime basis of closures. A closure is not a mystical memory of the past. It is a function object carrying references to cells that preserve needed bindings from an enclosing scope.
+
+\subsubsection{Why This Matters for Python Programming}
+
+This machinery explains several everyday Python facts.
+
+First, function definitions create objects:
+
+\begin{verbatim}
+def f():
+    pass
+\end{verbatim}
+
+After this executes, \texttt{f} is a name bound to a function object.
+
+Second, assignment binds names:
+
+\begin{verbatim}
+a = []
+b = a
+\end{verbatim}
+
+Both names point to the same list object.
+
+Third, function calls create frames:
+
+\begin{verbatim}
+f()
+\end{verbatim}
+
+Calling \texttt{f} does not copy the source text. It creates execution state for \texttt{f}'s code object.
+
+Fourth, globals are namespace entries:
+
+\begin{verbatim}
+x = 5
+\end{verbatim}
+
+At module level, this stores \texttt{x} in the module dictionary.
+
+Fifth, closures preserve selected bindings:
+
+\begin{verbatim}
+def outer():
+    x = 5
+    def inner():
+        return x
+    return inner
+\end{verbatim}
+
+The returned \texttt{inner} function can still access \texttt{x} because the needed binding is preserved in closure machinery.
+
+\subsubsection{The Mental Model}
+
+The complete model is:
+
+\begin{verbatim}
+source code
+    is compiled into code objects
+
+function definitions
+    create function objects that wrap code objects
+
+function calls
+    create frames that execute code objects
+
+frames
+    contain or access local, global, and built-in namespaces
+
+namespaces
+    bind names to objects
+
+objects
+    carry identity, type, value, and implementation metadata
+\end{verbatim}
+
+This is the correct level of detail for learning Python effectively. We do not need to memorize CPython's source files, but we must understand the architecture.
+
+Python execution is not text being read casually. It is compiled code objects running inside frame state, resolving names through namespace mappings, and manipulating objects through the CPython runtime.
