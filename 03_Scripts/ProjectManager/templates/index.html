@@ -16,9 +16,18 @@
     </script>
     <link rel="stylesheet" href="/static/styles.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-    <script defer src="/static/app.js?v=29"></script>
+    <script defer src="/static/app.js?v=30"></script>
   </head>
   <body class="bg-neutral-100 text-neutral-900 min-h-screen">
+    <div
+      id="projectToolbar"
+      class="project-toolbar border-b border-neutral-300 bg-neutral-50 px-2 py-1 flex items-center gap-2 flex-wrap"
+      role="toolbar"
+      aria-label="Active project"
+    >
+      <span class="text-xxs text-neutral-600 font-medium shrink-0">Project</span>
+      <div id="projectToolbarButtons" class="flex items-center gap-1 flex-wrap"></div>
+    </div>
     <header class="border-b border-neutral-300 bg-white px-2 py-1 flex items-center gap-2 flex-wrap">
       <span class="font-semibold text-xxs">Project Manager</span>
       <span id="projectRoot" class="text-xxs text-neutral-500 mono truncate max-w-[40vw]"></span>
@@ -65,7 +74,7 @@
 
     <main
       id="tabPanelMain"
-      class="grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      class="grid grid-cols-2 gap-2 p-2 h-[calc(100vh-4.25rem)] min-h-0"
     >
       <section class="space-y-2 min-w-0 overflow-auto pr-1">
         <div class="panel">
@@ -142,7 +151,7 @@
 
     <div
       id="tabPanelProof"
-      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-4.25rem)] min-h-0"
       aria-labelledby="tabProofBtn"
     >
       <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
@@ -178,7 +187,7 @@
 
     <div
       id="tabPanelParagraphStyle"
-      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      class="hidden grid grid-cols-2 gap-2 p-2 h-[calc(100vh-4.25rem)] min-h-0"
       aria-labelledby="tabParagraphStyleBtn"
     >
       <section class="panel min-w-0 min-h-0 flex flex-col overflow-hidden">
@@ -214,7 +223,7 @@
 
     <div
       id="tabPanelSynopsis"
-      class="hidden p-2 h-[calc(100vh-2.75rem)] min-h-0"
+      class="hidden p-2 h-[calc(100vh-4.25rem)] min-h-0"
       aria-labelledby="tabSynopsisBtn"
     >
       <div class="panel min-w-0 min-h-0 flex flex-col overflow-hidden relative h-full">

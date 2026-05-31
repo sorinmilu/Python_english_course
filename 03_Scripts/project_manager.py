@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+from dataclasses import dataclass
 import codecs
 import json
 import os
@@ -2071,6 +2072,158 @@ class ProjectManager:
                 pass
 
 
+@dataclass(frozen=True)
+class _RegisteredProject:
+    id: str
+    name: str
+    config_path: Path
+
+
+class MultiProjectManager:
+    """Registry of multiple ``ProjectManager`` instances with one active project."""
+
+    def __init__(self, manager_config_path: Path) -> None:
+        self.manager_config_path = manager_config_path.expanduser().resolve()
+        self.registry_dir = self.manager_config_path.parent
+        self._projects = self._load_registry(self.manager_config_path)
+        self._managers: dict[str, ProjectManager] = {}
+        self._lock = threading.RLock()
+        default_id = self._resolve_default_project_id(
+            self._read_registry_json(self.manager_config_path)
+        )
+        self.active_project_id = default_id
+
+    @staticmethod
+    def _read_registry_json(path: Path) -> dict[str, Any]:
+        if not path.is_file():
+            raise FileNotFoundError(f"Manager config not found: {path}")
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            raise ValueError("Manager config root must be a JSON object")
+        return data
+
+    @staticmethod
+    def _project_id_from_config_stem(config_name: str) -> str:
+        stem = Path(config_name).stem
+        if stem.endswith("_project"):
+            return stem[: -len("_project")]
+        return stem
+
+    def _load_registry(self, path: Path) -> list[_RegisteredProject]:
+        data = self._read_registry_json(path)
+        raw_projects = data.get("projects")
+        if not isinstance(raw_projects, list) or not raw_projects:
+            raise ValueError("Manager config must contain non-empty projects array")
+
+        seen_ids: set[str] = set()
+        projects: list[_RegisteredProject] = []
+        for idx, entry in enumerate(raw_projects):
+            if not isinstance(entry, dict):
+                raise ValueError(f"projects[{idx}] must be an object")
+            config_raw = entry.get("config")
+            if not isinstance(config_raw, str) or not config_raw.strip():
+                raise ValueError(f"projects[{idx}] must contain string config")
+            config_path = (self.registry_dir / config_raw.strip()).resolve()
+            if not config_path.is_file():
+                raise FileNotFoundError(
+                    f"Project config not found for projects[{idx}]: {config_path}"
+                )
+            project_id = entry.get("id")
+            if project_id is None or (isinstance(project_id, str) and not project_id.strip()):
+                project_id = self._project_id_from_config_stem(config_raw)
+            if not isinstance(project_id, str) or not project_id.strip():
+                raise ValueError(f"projects[{idx}] id must be a non-empty string")
+            project_id = project_id.strip()
+            if project_id in seen_ids:
+                raise ValueError(f"Duplicate project id: {project_id}")
+            seen_ids.add(project_id)
+            name = entry.get("name")
+            if not isinstance(name, str) or not name.strip():
+                name = project_id
+            projects.append(
+                _RegisteredProject(
+                    id=project_id,
+                    name=name.strip(),
+                    config_path=config_path,
+                )
+            )
+        return projects
+
+    def _resolve_default_project_id(self, data: dict[str, Any]) -> str:
+        default_raw = data.get("default_project")
+        ids = [p.id for p in self._projects]
+        if isinstance(default_raw, str) and default_raw.strip():
+            default_id = default_raw.strip()
+            if default_id not in ids:
+                raise ValueError(
+                    f"default_project {default_id!r} not found; available: {', '.join(ids)}"
+                )
+            return default_id
+        return ids[0]
+
+    def _get_registered(self, project_id: str) -> _RegisteredProject:
+        for project in self._projects:
+            if project.id == project_id:
+                return project
+        allowed = ", ".join(p.id for p in self._projects)
+        raise ValueError(f"Unknown project id {project_id!r}; available: {allowed}")
+
+    def _get_manager(self, project_id: str) -> ProjectManager:
+        with self._lock:
+            if project_id not in self._managers:
+                reg = self._get_registered(project_id)
+                self._managers[project_id] = ProjectManager(reg.config_path)
+            return self._managers[project_id]
+
+    def active(self) -> ProjectManager:
+        return self._get_manager(self.active_project_id)
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.active(), name)
+
+    def projects_payload(self) -> list[dict[str, Any]]:
+        active = self.active_project_id
+        return [
+            {
+                "id": p.id,
+                "name": p.name,
+                "config_path": str(p.config_path),
+                "is_active": p.id == active,
+            }
+            for p in self._projects
+        ]
+
+    def switch_project(self, project_id: str) -> dict[str, Any]:
+        pid = str(project_id or "").strip()
+        if not pid:
+            raise ValueError("project id is required")
+        self._get_registered(pid)
+        with self._lock:
+            self.active_project_id = pid
+            self._get_manager(pid)
+        return {
+            "ok": True,
+            "active_project_id": pid,
+            "projects": self.projects_payload(),
+        }
+
+    def state_payload(self) -> dict[str, Any]:
+        payload = self.active().state_payload()
+        payload["active_project_id"] = self.active_project_id
+        payload["projects"] = self.projects_payload()
+        return payload
+
+    def stop_all_tools(self) -> None:
+        with self._lock:
+            managers = list(self._managers.values())
+        for mgr in managers:
+            try:
+                mgr.stop_all_tools()
+            except Exception:
+                pass
+
+
 def _proof_analyze_error_payload(exc: BaseException) -> dict[str, Any]:
     import traceback
 
@@ -2087,7 +2240,7 @@ def _proof_analyze_error_payload(exc: BaseException) -> dict[str, Any]:
     }
 
 
-def create_app(manager: ProjectManager) -> Flask:
+def create_app(manager: MultiProjectManager) -> Flask:
     app = Flask(
         __name__,
         template_folder=str(UI_DIR / "templates"),
@@ -2107,6 +2260,24 @@ def create_app(manager: ProjectManager) -> Flask:
     @app.get("/api/state")
     def api_state():
         return jsonify(manager.state_payload())
+
+    @app.get("/api/projects")
+    def api_projects():
+        return jsonify(
+            {
+                "ok": True,
+                "active_project_id": manager.active_project_id,
+                "projects": manager.projects_payload(),
+            }
+        )
+
+    @app.post("/api/projects/switch")
+    def api_projects_switch():
+        body = request.get_json(silent=True) or {}
+        try:
+            return jsonify(manager.switch_project(body.get("id")))
+        except ValueError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 400
 
     @app.post("/api/actions/<action>")
     def api_action(action: str):
@@ -2332,16 +2503,26 @@ def create_app(manager: ProjectManager) -> Flask:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("config", type=Path, help="Path to main_project.json")
+    parser.add_argument(
+        "--manager-config",
+        type=Path,
+        default=SCRIPT_DIR / "project_manager.json",
+        help="Path to project_manager.json registry",
+    )
     parser.add_argument("--host", default="127.0.0.1", help="Host for this manager")
     parser.add_argument("--port", type=int, default=5055, help="Port for this manager")
     args = parser.parse_args(argv)
 
-    manager = ProjectManager(args.config)
+    manager = MultiProjectManager(args.manager_config)
     atexit.register(manager.stop_all_tools)
     app = create_app(manager)
     print(f"Project manager: http://{args.host}:{args.port}")
-    print(f"Config: {manager.config_path}")
+    print(f"Registry: {manager.manager_config_path}")
+    for project in manager.projects_payload():
+        marker = "*" if project["is_active"] else " "
+        print(
+            f"  {marker} {project['id']}: {project['name']} ({project['config_path']})"
+        )
     app.run(host=args.host, port=args.port, debug=False, threaded=True)
     return 0
 

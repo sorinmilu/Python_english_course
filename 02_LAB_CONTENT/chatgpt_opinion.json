@@ -1,0 +1,288 @@
+[
+    {
+        "lab_number": 1,
+        "title": "Running Python Interactively: Jupyter, REPL, Scripts, and the CPython Runtime",
+        "description": "Students begin in Jupyter Notebook or JupyterLab, execute cells, observe persistent notebook state, compare notebook execution with the Python REPL and with running a .py script from the command line, and identify CPython as the runtime process behind all three forms.",
+        "objective": "Understand that Python code may be executed through notebooks, the REPL, or scripts, but in each case CPython hosts the program state and executes compiled runtime representations.",
+        "themes": [
+          "Jupyter Notebook",
+          "JupyterLab",
+          "notebook cells",
+          "cell execution order",
+          "persistent kernel state",
+          "Python kernel",
+          "REPL execution",
+          "script execution",
+          "CPython executable",
+          "Python source as runtime input",
+          "bytecode idea",
+          "__pycache__",
+          "print",
+          "simple expressions",
+          "process versus runtime"
+        ]
+      },
+    {
+      "lab_number": 2,
+      "title": "From C to Python: Translating Small Procedural Programs",
+      "description": "Students start with small C programs and rewrite them in Python while preserving the original procedural logic: calculators, maximum/minimum, factorial, primality test, summation, and simple menus.",
+      "objective": "Learn Python syntax by mapping already-known C structures to Python structures.",
+      "themes": [
+        "C to Python translation",
+        "input",
+        "print",
+        "int",
+        "float",
+        "indentation",
+        "if",
+        "while",
+        "for",
+        "range",
+        "simple lists",
+        "absence of declarations"
+      ]
+    },
+    {
+      "lab_number": 3,
+      "title": "Names, Objects, Types, and Operators",
+      "description": "Students examine assignment, rebinding, identity, equality, mutability, and runtime type checking through small experiments and memory diagrams.",
+      "objective": "Understand that Python variables are name bindings to objects, not C-style storage boxes.",
+      "themes": [
+        "names",
+        "objects",
+        "binding",
+        "rebinding",
+        "type",
+        "id",
+        "is",
+        "==",
+        "mutable objects",
+        "immutable objects",
+        "operator precedence",
+        "strong runtime typing"
+      ]
+    },
+    {
+      "lab_number": 4,
+      "title": "Control Flow as an Execution Graph",
+      "description": "Students write branching and loop programs while also drawing the execution route: conditional branches, loop back-edges, early exits, and fall-through paths.",
+      "objective": "Learn to read control structures as execution routes, not only as syntax forms.",
+      "themes": [
+        "if",
+        "elif",
+        "else",
+        "nested conditions",
+        "while",
+        "for",
+        "range",
+        "break",
+        "continue",
+        "loop tracing",
+        "control-flow graph",
+        "indentation errors"
+      ]
+    },
+    {
+      "lab_number": 5,
+      "title": "String Processing and Text Boundaries",
+      "description": "Students parse and transform names, dates, simple CSV-like lines, log fragments, and formatted output while treating strings as immutable sequences of text data.",
+      "objective": "Learn to process text through indexing, slicing, searching, splitting, joining, formatting, and encoding awareness.",
+      "themes": [
+        "str",
+        "indexing",
+        "slicing",
+        "immutability",
+        "split",
+        "join",
+        "replace",
+        "find",
+        "strip",
+        "f-strings",
+        "escape sequences",
+        "Unicode",
+        "UTF-8"
+      ]
+    },
+    {
+      "lab_number": 6,
+      "title": "Sequential Collections: Lists, Tuples, and Range Objects",
+      "description": "Students implement classic C-array-style exercises in Python: search, count, reverse, manual sorting, deletion, table construction, and fixed record representation with tuples.",
+      "objective": "Learn how Python stores and manipulates ordered collections of object references.",
+      "themes": [
+        "list",
+        "tuple",
+        "range",
+        "indexing",
+        "slicing",
+        "append",
+        "extend",
+        "mutation",
+        "tuple packing",
+        "tuple unpacking",
+        "nested lists",
+        "shallow copy",
+        "C arrays versus Python lists"
+      ]
+    },
+    {
+      "lab_number": 7,
+      "title": "Hash-Based Collections, Iterators, and Comprehensions",
+      "description": "Students solve duplicate removal, membership testing, frequency counting, grouping, and index-building problems first with explicit loops, then with selected comprehensions.",
+      "objective": "Learn when positional traversal is the wrong model and hash-based access is better.",
+      "themes": [
+        "set",
+        "dict",
+        "hashability",
+        "membership testing",
+        "frequency tables",
+        "keys",
+        "values",
+        "items",
+        "enumerate",
+        "zip",
+        "iterable",
+        "iterator",
+        "list comprehension",
+        "set comprehension",
+        "dictionary comprehension"
+      ]
+    },
+    {
+      "lab_number": 8,
+      "title": "Functions: Calls, Arguments, Returns, Scope, and Recursion",
+      "description": "Students refactor earlier programs into functions and trace how calls create local execution frames, bind arguments, return values, and resolve names.",
+      "objective": "Learn how functions package execution, receive bindings, return values, and create local scope.",
+      "themes": [
+        "def",
+        "function call",
+        "parameters",
+        "arguments",
+        "return",
+        "default arguments",
+        "positional arguments",
+        "keyword arguments",
+        "local scope",
+        "global lookup",
+        "recursion",
+        "call stack"
+      ]
+    },
+    {
+      "lab_number": 9,
+      "title": "Procedural Extensions: Callbacks, Closures, Generators, and Simple Coroutines",
+      "description": "Students extend ordinary procedural code by passing functions as values, creating closures, writing generators for lazy streams, and observing simple coroutine-style suspension.",
+      "objective": "Learn how Python extends procedural programming by making executable behavior and execution state runtime-managed.",
+      "themes": [
+        "first-class functions",
+        "callbacks",
+        "lambda",
+        "closures",
+        "decorator idea",
+        "yield",
+        "generators",
+        "lazy evaluation",
+        "next",
+        "send",
+        "simple async demonstration"
+      ]
+    },
+    {
+      "lab_number": 10,
+      "title": "Modules and Code Organization",
+      "description": "Students split earlier single-file programs into a main script, utility module, parser module, and demonstration runner while observing import-time execution.",
+      "objective": "Learn to move from isolated scripts to organized multi-file Python programs.",
+      "themes": [
+        "import",
+        "module files",
+        "module namespace",
+        "from import",
+        "__name__",
+        "__main__",
+        "package folder",
+        "project paths",
+        "separating parsing from processing",
+        "separating processing from output"
+      ]
+    },
+    {
+      "lab_number": 11,
+      "title": "Input/Output Operations and External Data Boundaries",
+      "description": "Students read and write text files, binary files, CSV, and JSON while building small read-transform-write pipelines and processing larger files line by line.",
+      "objective": "Learn how Python objects cross the boundary into files, byte streams, and structured external formats.",
+      "themes": [
+        "open",
+        "close",
+        "with",
+        "text mode",
+        "binary mode",
+        "encoding",
+        "line iteration",
+        "chunked reading",
+        "pathlib",
+        "CSV",
+        "JSON",
+        "serialization",
+        "temporary output files"
+      ]
+    },
+    {
+      "lab_number": 12,
+      "title": "Specialized Standard Library Types and Program Reliability",
+      "description": "Students replace fragile manual code with standard library tools, then deliberately introduce invalid input, missing files, bad paths, and malformed data to practice controlled failure handling.",
+      "objective": "Learn to use standard library components together with explicit error handling.",
+      "themes": [
+        "collections.Counter",
+        "collections.defaultdict",
+        "collections.deque",
+        "namedtuple",
+        "dataclass",
+        "datetime",
+        "re",
+        "pathlib",
+        "try",
+        "except",
+        "else",
+        "finally",
+        "raise",
+        "defensive validation"
+      ]
+    },
+    {
+      "lab_number": 13,
+      "title": "Data Processing with NumPy and Pandas",
+      "description": "Students process numerical and tabular data first with plain Python loops, then with NumPy arrays and Pandas data frames to see the shift from Python-level iteration to library-backed computation.",
+      "objective": "Learn how Python acts as a controller for efficient array and table processing.",
+      "themes": [
+        "NumPy arrays",
+        "vectorized operations",
+        "shape",
+        "dtype",
+        "array slicing",
+        "Pandas DataFrame",
+        "CSV loading",
+        "row filtering",
+        "column selection",
+        "grouping",
+        "aggregation",
+        "missing values"
+      ]
+    },
+    {
+      "lab_number": 14,
+      "title": "Visualization, Images, and Final Reliability Pipeline",
+      "description": "Students build a small complete pipeline: load data, clean it, compute summaries, create plots, optionally load/process an image with OpenCV, save outputs, and handle expected failures.",
+      "objective": "Learn to build a small complete Python data program with visualization, modular structure, and reliability boundaries.",
+      "themes": [
+        "Matplotlib",
+        "plot creation",
+        "figure saving",
+        "Pandas plotting flow",
+        "OpenCV image loading",
+        "basic image processing",
+        "output files",
+        "exception handling",
+        "project structure",
+        "final mini-project"
+      ]
+    }
+  ]

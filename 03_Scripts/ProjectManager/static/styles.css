@@ -31,6 +31,27 @@ textarea {
     "Courier New", monospace;
 }
 
+.project-toolbar {
+  min-height: 1.5rem;
+}
+
+.project-toolbar-btn-active {
+  border-color: rgb(64 64 64);
+  background: rgb(38 38 38);
+  color: white;
+}
+
+.project-toolbar-btn-inactive {
+  border-color: rgb(212 212 212);
+  background: white;
+  color: rgb(23 23 23);
+}
+
+.project-toolbar-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .panel {
   border: 1px solid rgb(212 212 212);
   border-radius: 0.25rem;

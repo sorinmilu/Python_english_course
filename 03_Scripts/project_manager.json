@@ -1,0 +1,7 @@
+{
+  "default_project": "main",
+  "projects": [
+    { "id": "main", "name": "Main course", "config": "main_project.json" },
+    { "id": "reduced", "name": "Reduced content", "config": "reduced_project.json" }
+  ]
+}

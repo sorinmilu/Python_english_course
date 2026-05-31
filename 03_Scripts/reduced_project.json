@@ -170,7 +170,7 @@
     "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/00_streamingLargeInputs/",
     "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/01_transformingExternalData/"
   ],
-  "temp_dir": "build/temp",
+  "temp_dir": "build/temp_reduced",
   "papers_dir": "05_Papers",
   "templates": "templates",
   "papers_port": 8080,

@@ -1,0 +1,161 @@
+[
+  {
+    "title": "Lab 1: Program Execution, Runtime Models, and Interactive Environments",
+    "description": "Introduces the conceptual shift from C's native machine-compilation pipeline to Python's runtime-hosted execution model. Students will configure their development environments, balancing traditional terminal-based script execution with interactive, cell-based exploration via Jupyter Notebooks.",
+    "objective": "The student will learn how to navigate both script-based and Jupyter-backed interactive execution models, tracing how code transitions from raw source or live cells into a persistent kernel process and bytecode.",
+    "themes": [
+      "The native C compilation blueprint vs. the Python interpreter loop",
+      "CPython reference runtime architecture, bytecode generation, and virtual machine abstractions",
+      "Traditional script invocation via the command-line interface vs. the interactive REPL paradigm",
+      "Jupyter Architecture: The decoupled relationship between the frontend interface, server mediation, and the background IPython kernel process",
+      "Working with Jupyter Notebooks: State persistence across cell execution, execution order tracking, and notebook lifecycle management"
+    ]
+  },
+  {
+    "title": "Lab 2: From C to Python: Syntax Translation and Structural Layout",
+    "description": "Directly contrasts fundamental C programs with their exact Python equivalents, highlighting Python's unique enforcement of semantic whitespace through side-by-side translation maps.[cite: 1]",
+    "objective": "The student will learn how to translate basic imperative C code structures into syntax-compliant Python programs by replacing curly-brace parsing rules with rigid visual indentation constraints.[cite: 1]",
+    "themes": [
+      "Side-by-side structural translations (C blocks vs. Python lines)[cite: 1]",
+      "Syntactic whitespace, indentation rules, and structural tokens[cite: 1]",
+      "Spiral Introduction: Practical usage of simple while loops and if branches for basic scripts[cite: 1]",
+      "Console stream interaction (print() and basic type casting)[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 3: Data Types, Variables, and Name Binding Mechanics",
+    "description": "Focuses on Python's underlying singular object storage types, contrasting Python's dynamic heap-reference model directly with C's fixed-width physical memory boxes.[cite: 1]",
+    "objective": "The student will learn how Python references memory using name-to-object bindings instead of allocating named physical memory boxes like C.[cite: 1]",
+    "themes": [
+      "Name binding vs. classic memory variables[cite: 1]",
+      "Object identity tracking and verification using id() and is[cite: 1]",
+      "Singular data representations (int arbitrary precision, IEEE-754 float, bool, and the None sentinel)[cite: 1]",
+      "Dynamic typing vs. strong typing runtime consequences[cite: 1]",
+      "Numerical operator architecture and precedence graphs[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 4: Control Flow Structures: Decision Trees and Branching Graphs",
+    "description": "Deepens structural knowledge of conditional logic by mapping execution routes into control flow graphs, using Python's logical evaluation systems.[cite: 1]",
+    "objective": "The student will learn how to implement layered multi-branch conditional paths using Pythonic conditional logic, comparison chaining, and truth-value evaluations.[cite: 1]",
+    "themes": [
+      "if-elif-else statement syntax and execution edge maps[cite: 1]",
+      "The logic evaluation architecture of truthy and falsy states[cite: 1]",
+      "Short-circuit execution behavior (and / or)[cite: 1]",
+      "Comparison chaining for natural mathematical interval boundaries[cite: 1]",
+      "Using pass as an explicit empty structural placeholder[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 5: Control Flow Structures: Iterative Loops and the Iterator Protocol",
+    "description": "Explores iterative execution loops, comparing traditional index-tracked loops to Python's built-in iterator rules and its lazy memory-allocation systems.[cite: 1]",
+    "objective": "The student will learn how to execute repetitive control flow graphs cleanly using the iterable-iterator engine and memory-insulated arithmetic collections.[cite: 1]",
+    "themes": [
+      "Loop tracking mechanics: Python for loops vs. C-style index counters[cite: 1]",
+      "The lazy evaluation invariant of the arithmetic range() object[cite: 1]",
+      "Loop control directives (break, continue)[cite: 1]",
+      "The unique loop-else completion branch and its exhaustion pathways[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 6: String Processing and Underlying Memory Realities",
+    "description": "Examines text parsing and processing, highlighting the profound distinction between Python's immutable str objects and C's mutable null-terminated character arrays.[cite: 1]",
+    "objective": "The student will learn how to perform efficient text manipulation and string injection routines while remaining aware of CPython's internal memory alignment optimization strategies.[cite: 1]",
+    "themes": [
+      "Character interoperability standards (Unicode/UTF-8 vs. ASCII pointers)[cite: 1]",
+      "Immutability invariants vs. in-place array character replacements[cite: 1]",
+      "Advanced sequence slicing, indexing boundaries, and stepping strides[cite: 1]",
+      "String formatting paradigms (modern compiled f-strings vs. method lookups)[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 7: Collections I: Sequential Structures and Pointer Arrays",
+    "description": "Introduces linear sequences, analyzing the memory layout differences between Python’s dynamic pointer arrays and fixed structural contiguity.[cite: 1]",
+    "objective": "The student will learn how to declare, alter, and securely slice linear sequences while identifying potential mutation side-effects across shared references.[cite: 1]",
+    "themes": [
+      "CPython dynamic scaling pointer array layouts (list) vs. fixed allocations (tuple)[cite: 1]",
+      "In-place mutation side effects vs. immutable sequence structures[cite: 1]",
+      "Deep vs. shallow structural cloning mechanics (copy module)[cite: 1]",
+      "Multiple assignments, sequence unpacking, and variable packing techniques[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 8: Collections II: Associative Mappings and Hash-Based Collections",
+    "description": "Transitions from position-based index collections to high-speed associative mapping models powered by internal open-addressed hash tables.[cite: 1]",
+    "objective": "The student will learn how to optimize search, retrieval, and deduplication tasks by structuring key-value data models within hash-constrained dictionary and set parameters.[cite: 1]",
+    "themes": [
+      "Hash tables as non-sequential data access models[cite: 1]",
+      "Key hashability invariants and the explicit hash-equality contract[cite: 1]",
+      "Dictionary construction patterns and querying/manipulating values[cite: 1]",
+      "Unordered unique domains (set), mathematical operators, and CPython density optimizations[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 9: Collections III: Comprehension Techniques and Lazy Stream Helpers",
+    "description": "Introduces compact and expressive methods for pipeline generation, enabling students to filter and convert data collections concisely without heavy nested loop structures.[cite: 1]",
+    "objective": "The student will learn how to optimize local transformations by replacing manual accumulator arrays with data comprehensions and lazy evaluation helpers.[cite: 1]",
+    "themes": [
+      "List, set, and dictionary comprehension syntax and performance profiles[cite: 1]",
+      "Indexed element tracking during traversal via enumerate()[cite: 1]",
+      "Multi-sequence parallel iterations using zip()[cite: 1]",
+      "Stream transformations and materialization boundaries (map(), filter() vs. eager lists)[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 10: Functions: Signature Parameters, Scopes, and Frame Execution",
+    "description": "Covers function instantiation mechanics, scope isolation rules, and Python's call-by-object-sharing model, contrasting it directly with C's stack frame variable tracking.[cite: 1]",
+    "objective": "The student will learn how to write robust, reusable abstractions by configuring functional inputs and tracing execution frame bindings across local or global boundaries.[cite: 1]",
+    "themes": [
+      "Function object creation semantics and stack frame return boundaries[cite: 1]",
+      "Parameter passing mechanics (evaluating shared references on the heap)[cite: 1]",
+      "Flexible signatures: default parameters, variadic positional (*args), and keyword arguments (**kwargs)[cite: 1]",
+      "Namespace isolation and the LEGB scope resolution invariant[cite: 1]",
+      "Compile-time scope disambiguation and mutable default argument pitfalls[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 11: Extensions of the Procedural Programming Paradigm: Closures and Generators",
+    "description": "Focuses on advanced functional concepts where functions act as first-class citizens, allowing students to design custom control streams and freeze frame states.[cite: 1]",
+    "objective": "The student will learn how to implement non-preemptive multitasking pipelines and build enclosed operational state machines using closures and lazy data generators.[cite: 1]",
+    "themes": [
+      "First-class function objects and higher-order functions[cite: 1]",
+      "Lexical closures and capturing free variables in heap-preserved execution frames[cite: 1]",
+      "Function transformations using Python decorators[cite: 1]",
+      "Non-preemptive stream evaluations via yield generator suspension mechanics[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 12: Exception Handling and Program Reliability Architecture",
+    "description": "Studies program resilience and error isolation structures, contrasting Python's proactive exception-routing tables with classic C manual error code checking.[cite: 1]",
+    "objective": "The student will learn how to intercept operational faults gracefully and guarantee resource cleanup through structured try-except execution flows.[cite: 1]",
+    "themes": [
+      "The architecture of non-local exception jumps and routing tables[cite: 1]",
+      "Exception class hierarchies and matching rules[cite: 1]",
+      "Defensive error styles: Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness (EAFP)[cite: 1]",
+      "Complete fault orchestration using try, except, else, and finally execution paths[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 13: Modules, Package Organization, and External I/O Boundaries",
+    "description": "Demonstrates how to split complex programs into clean multi-file modules, handle persistent filesystem records, and process data streams without overwhelming physical RAM limits.[cite: 1]",
+    "objective": "The student will learn how to assemble decoupled packages and maintain reliable data ingestion pipelines across external operating system storage boundaries.[cite: 1]",
+    "themes": [
+      "Code organization, search pathways (sys.path), and module namespace imports[cite: 1]",
+      "The operating system mediation layer and file handling[cite: 1]",
+      "Explicit resource lifetime management using context managers (with statements)[cite: 1]",
+      "Text encodings vs. raw byte-oriented binary streams[cite: 1]",
+      "Filesystem path references via pathlib and serialization protocols (JSON / pickle)[cite: 1]"
+    ]
+  },
+  {
+    "title": "Lab 14: Specialized Components, Vectorized Processing, and Data Visualization",
+    "description": "Introduces key standard library modules alongside industry-standard scientific frameworks, culminating in an end-to-end data processing and multi-modal rendering pipeline.[cite: 1]",
+    "objective": "The student will learn how to bypass standard iterative loops using optimized vectorized operations and translate complex data inputs into clean, multi-modal visual plots.[cite: 1]",
+    "themes": [
+      "Specialized standard containers (collections utilities and itertools stream engines)[cite: 1]",
+      "Vectorized array programming vs. C-style matrix loops using NumPy[cite: 1]",
+      "Structural analysis, alignment, and dataset sorting using Pandas DataFrames[cite: 1]",
+      "Multi-modal data visualization and array output mapping via Matplotlib graphs and OpenCV frames[cite: 1]"
+    ]
+  }
+]

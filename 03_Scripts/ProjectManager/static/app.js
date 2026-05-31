@@ -1,5 +1,8 @@
 const state = {
   project: null,
+  projects: [],
+  activeProjectId: null,
+  projectSwitchBusy: false,
   runs: [],
   tools: {},
   busy: new Set(),
@@ -50,6 +53,7 @@ let cachedToolsPanelLayoutKey = null;
 
 const els = {
   error: document.getElementById("errorBox"),
+  projectToolbarButtons: document.getElementById("projectToolbarButtons"),
   projectRoot: document.getElementById("projectRoot"),
   buildPath: document.getElementById("buildPath"),
   toolsPanel: document.getElementById("toolsPanel"),
@@ -623,7 +627,7 @@ async function synopsisSyncContent() {
       const more = pending.length > 6 ? ` (+${pending.length - 6} more)` : "";
       showError(
         `${pending.length} folder(s) on disk are not in the synopsis (left unchanged): ${sample}${more}. ` +
-          "Set content_sync_rename_orphans in main_project.json or confirm via API to DELETED_-rename them.",
+          "Set content_sync_rename_orphans in the active project config or confirm via API to DELETED_-rename them.",
       );
     }
     const parts = [];
@@ -964,7 +968,7 @@ async function loadSynopsisTree() {
       const detail = err.message ? escapeHtml(err.message) : "";
       els.synopsisTree.innerHTML =
         `<p class="text-xxs text-neutral-600 px-1 leading-relaxed">Course synopsis JSON not found at the resolved path (default is <span class="mono">{root_dir}/00_CONTENT/course_synopsis.json</span>). If the file lives elsewhere (for example in this teaching repo while <span class="mono">root_dir</span> points at another LaTeX project), set ` +
-        `<span class="mono">initial_project_structure</span> (e.g. <span class="mono">relative_path</span> + <span class="mono">course_synopsis</span>) in <span class="mono">main_project.json</span>, resolved next to that config file. Or set a single ` +
+        `<span class="mono">initial_project_structure</span> (e.g. <span class="mono">relative_path</span> + <span class="mono">course_synopsis</span>) in the active project config, resolved next to that config file. Or set a single ` +
         `<span class="mono">course_synopsis_path</span> string. Generate or refresh the file with ` +
         `<span class="mono">conda activate python312 &amp;&amp; python 03_Scripts/build_course_synopsis.py</span>.</p>` +
         (detail
@@ -1533,10 +1537,39 @@ async function reloadApp() {
   await loadSynopsisTree();
 }
 
+async function switchProject(projectId) {
+  if (!projectId || projectId === state.activeProjectId || state.projectSwitchBusy) {
+    return;
+  }
+  state.projectSwitchBusy = true;
+  renderProjectToolbar();
+  try {
+    await api("/api/projects/switch", {
+      method: "POST",
+      body: JSON.stringify({ id: projectId }),
+    });
+    proofState.session = null;
+    proofState.treeItems = [];
+    paragraphStyleState.session = null;
+    paragraphStyleState.treeItems = [];
+    synopsisState.tree = [];
+    synopsisState.nodeById = new Map();
+    await reloadApp();
+    showError("");
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    state.projectSwitchBusy = false;
+    renderProjectToolbar();
+  }
+}
+
 async function loadState() {
   try {
     const data = await api("/api/state");
     state.project = data.project;
+    state.projects = data.projects || [];
+    state.activeProjectId = data.active_project_id || null;
     state.runs = [...(data.runs || [])].sort((a, b) => a.started_at - b.started_at);
     if (state.openRunId && !state.runs.some((run) => run.id === state.openRunId)) {
       state.openRunId = null;
@@ -1550,9 +1583,32 @@ async function loadState() {
 }
 
 function render() {
+  renderProjectToolbar();
   renderProject();
   syncToolsPanel();
   syncRunsPanel();
+}
+
+function renderProjectToolbar() {
+  if (!els.projectToolbarButtons) return;
+  const projects = state.projects || [];
+  if (!projects.length) {
+    els.projectToolbarButtons.innerHTML =
+      '<span class="text-xxs text-neutral-500">No projects registered</span>';
+    return;
+  }
+  els.projectToolbarButtons.innerHTML = projects
+    .map((project) => {
+      const active = project.id === state.activeProjectId;
+      const btnClass = active
+        ? "project-toolbar-btn project-toolbar-btn-active"
+        : "project-toolbar-btn project-toolbar-btn-inactive";
+      const title = project.config_path
+        ? `${project.name} — ${project.config_path}`
+        : project.name;
+      return `<button type="button" class="px-2 py-0.5 rounded text-xxs border ${btnClass}" data-project-id="${escapeHtml(project.id)}" title="${escapeHtml(title)}" ${state.projectSwitchBusy ? "disabled" : ""}>${escapeHtml(project.name)}</button>`;
+    })
+    .join("");
 }
 
 function selectionSpansElement(el) {
@@ -1571,7 +1627,10 @@ function selectionSpansElement(el) {
 
 function renderProject() {
   if (!state.project) return;
-  els.projectRoot.textContent = state.project.root_dir || "";
+  const configHint = state.project.config_path
+    ? ` · ${state.project.config_path}`
+    : "";
+  els.projectRoot.textContent = `${state.project.root_dir || ""}${configHint}`;
   els.buildPath.textContent = `Build: ${state.project.build_dir || ""}`;
   els.latexSourceBtn.disabled = !state.project.processed_tex_exists;
   els.bibtexSourceBtn.disabled = !state.project.processed_bib_exists;
@@ -2807,6 +2866,14 @@ document.querySelectorAll("[data-action]").forEach((button) => {
 
 els.clearBtn.addEventListener("click", clearRuns);
 els.reloadBtn.addEventListener("click", reloadApp);
+
+if (els.projectToolbarButtons) {
+  els.projectToolbarButtons.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-project-id]");
+    if (!btn || state.projectSwitchBusy) return;
+    switchProject(btn.dataset.projectId);
+  });
+}
 
 els.tabMainBtn.addEventListener("click", () => {
   switchAssistTab("main");
