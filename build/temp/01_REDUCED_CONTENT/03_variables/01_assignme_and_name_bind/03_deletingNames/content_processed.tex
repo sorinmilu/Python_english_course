@@ -1,0 +1,38 @@
+\subsection{Deleting Names}
+
+The statement \texttt{del name} removes a binding from the current namespace. It does not mean: destroy the object immediately. It means: remove this name's entry from the active namespace dictionary or fast-local slot.
+
+\subsubsection{Removing a Binding with \texttt{del}}
+
+After \texttt{del line}, the name \texttt{line} no longer exists in the current scope. Reading it raises \texttt{NameError: name 'line' is not defined}. The object formerly referenced may still be reachable through other names.
+
+The object and the name are different things. \texttt{del line} deletes the binding named \texttt{line}; it does not directly invoke memory reclamation on the string object.
+
+Compare reassignment to \texttt{None}:
+
+\begin{verbatim}
+value = None   # name exists; bound to None singleton
+del value      # name no longer exists in this namespace
+\end{verbatim}
+
+\subsubsection{Name Deletion, Object Reachability, and Possible Reference Count Changes}
+
+Deleting one name does not necessarily make the object unreachable:
+
+\begin{verbatim}
+a = "text"
+b = a
+del a
+# b still references the string object; object remains alive
+\end{verbatim}
+
+In CPython, object lifetime is strongly connected to reference counting (\texttt{ob\_refcnt} in \texttt{PyObject\_HEAD}). Removing a binding decreases the count. When the count reaches zero and no cyclic references exist, the object is reclaimed immediately. The programmer should not read \texttt{del name} as a direct \texttt{free()} instruction.
+
+The practical mental model:
+
+\begin{verbatim}
+assignment   -> create or change a name-to-object binding
+reassignment -> move a name to another object
+a = b        -> bind another name to the same object
+del name     -> remove one name-to-object binding
+\end{verbatim}

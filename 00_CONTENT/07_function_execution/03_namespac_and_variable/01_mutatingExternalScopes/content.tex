@@ -1,5 +1,928 @@
 \subsection{Mutating External Scopes}
+
+Reading a name from an outer scope and assigning to a name in an outer scope are different operations. Python allows ordinary read access through the LEGB chain, but assignment has stricter rules.
+
+By default, assignment inside a function creates or updates a local binding in that function frame. It does not automatically rewrite a global name or an enclosing function's name.
+
+There are two explicit declarations for overriding this default:
+
+\begin{itemize}
+    \item \texttt{global} targets the module namespace;
+    \item \texttt{nonlocal} targets an enclosing function scope.
+\end{itemize}
+
+These declarations do not change the object-passing model. They change which namespace receives the binding operation.
+
 \subsubsection{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}
-\subsubsection{Overriding Module Scope: The `global` Declaration Syntax and Module Namespace Mutation}
-\subsubsection{Overriding Nested Intermediary Scopes: The `nonlocal` Declaration Syntax and Cell Reference Mutation}
-\subsubsection{`locals()` Caveats: Why the Displayed Local Namespace Is Not Always a Directly Writable Control Surface}
+
+A function can read a global name without a declaration.
+
+\begin{verbatim}
+answer = 42
+
+def show_answer():
+    print(f"answer inside function: {answer}")
+
+show_answer()
+print(f"answer outside function: {answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer inside function: 42
+answer outside function: 42
+\end{verbatim}
+
+The function body does not define a local \texttt{answer}, so Python searches outward and finds the global \texttt{answer}.
+
+Assignment is different.
+
+\begin{verbatim}
+answer = 42
+
+def set_answer():
+    answer = 100
+    print(f"inside function: {answer}")
+
+set_answer()
+print(f"outside function: {answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside function: 100
+outside function: 42
+\end{verbatim}
+
+The assignment inside \texttt{set\_answer()} creates a local name. It does not mutate the module-level name.
+
+The structure is:
+
+\begin{verbatim}
+module namespace:
+    answer -> 42
+
+set_answer() local frame:
+    answer -> 100
+\end{verbatim}
+
+The two names are separate bindings.
+
+This is shadowing: the local name hides the outer name during lookup inside the function.
+
+\begin{verbatim}
+message = "global message"
+
+def show_shadowing():
+    message = "local message"
+
+    print(f"local lookup: {message}")
+    print(f"'message' in locals():  {'message' in locals()}")
+    print(f"'message' in globals(): {'message' in globals()}")
+
+show_shadowing()
+
+print(f"global lookup: {message}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+local lookup: local message
+'message' in locals():  True
+'message' in globals(): True
+global lookup: global message
+\end{verbatim}
+
+The name \texttt{message} exists in both namespaces. Inside the function, the local binding wins because Local comes before Global in LEGB.
+
+The local namespace display is a dictionary-like object.
+
+\begin{verbatim}
+message = "global message"
+
+def show_shadowing():
+    message = "local message"
+    local_map = locals()
+
+    print(f"type(local_map): {type(local_map)}")
+    print()
+
+    selected_names = [
+        "keys",
+        "values",
+        "items",
+        "get",
+        "__contains__",
+        "__getitem__",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<14} {name in dir(local_map)}")
+
+    print()
+    print(f"local_map: {local_map}")
+
+show_shadowing()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(local_map): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__contains__   True
+__getitem__    True
+
+local_map: {'message': 'local message'}
+\end{verbatim}
+
+Reading an outer mutable object and mutating that object in place does not require rebinding the outer name.
+
+\begin{verbatim}
+quotes = ["D'oh!"]
+
+def add_quote():
+    quotes.append("No soup for you!")
+
+add_quote()
+
+print(f"quotes: {quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: ["D'oh!", 'No soup for you!']
+\end{verbatim}
+
+The function did not assign to the name \texttt{quotes}. It read the global binding, obtained the list object, and called the list object's \texttt{append()} method.
+
+The list object is mutable.
+
+\begin{verbatim}
+quotes = ["D'oh!"]
+
+print(f"type(quotes): {type(quotes)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "insert",
+    "pop",
+    "clear",
+    "__len__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(quotes)}")
+
+print()
+quotes.append("The answer is 42.")
+print(f"after append: {quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(quotes): <class 'list'>
+
+append         True
+extend         True
+insert         True
+pop            True
+clear          True
+__len__        True
+__getitem__    True
+__setitem__    True
+
+after append: ["D'oh!", 'The answer is 42.']
+\end{verbatim}
+
+This operation changes the shared list object. It does not reassign the global name.
+
+This does reassign the local name:
+
+\begin{verbatim}
+quotes = ["D'oh!"]
+
+def replace_quotes():
+    quotes = ["This is an ex-list."]
+    print(f"inside function: {quotes}")
+
+replace_quotes()
+
+print(f"outside function: {quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside function: ['This is an ex-list.']
+outside function: ["D'oh!"]
+\end{verbatim}
+
+So the basic distinction is:
+
+\begin{verbatim}
+quotes.append(x)
+    read outer name
+    mutate shared list object
+
+quotes = [...]
+    bind local name unless global or nonlocal says otherwise
+\end{verbatim}
+
+This distinction explains why some functions appear to ``change globals'' without \texttt{global}. They are not changing the global binding. They are mutating an object reached through that binding.
+
+\subsubsection{Overriding Module Scope: The \texttt{global} Declaration Syntax and Module Namespace Mutation}
+
+The \texttt{global} declaration tells Python that assignments to a name inside the function should target the module namespace.
+
+\begin{verbatim}
+answer = 42
+
+def set_global_answer():
+    global answer
+
+    answer = 100
+    print(f"inside function: {answer}")
+
+print(f"before call: {answer}")
+
+set_global_answer()
+
+print(f"after call:  {answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before call: 42
+inside function: 100
+after call:  100
+\end{verbatim}
+
+The assignment:
+
+\begin{verbatim}
+answer = 100
+\end{verbatim}
+
+does not create a local binding here. Because of \texttt{global answer}, it updates the module namespace binding.
+
+The module namespace can be inspected with \texttt{globals()}.
+
+\begin{verbatim}
+answer = 42
+
+def set_global_answer():
+    global answer
+
+    print(f"before assignment in globals: {globals()['answer']}")
+    answer = 100
+    print(f"after assignment in globals:  {globals()['answer']}")
+
+set_global_answer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before assignment in globals: 42
+after assignment in globals:  100
+\end{verbatim}
+
+The object returned by \texttt{globals()} is the actual module namespace dictionary.
+
+\begin{verbatim}
+answer = 42
+
+global_map = globals()
+
+print(f"type(global_map): {type(global_map)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "__contains__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(global_map)}")
+
+print()
+print(f"global_map['answer']: {global_map['answer']}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(global_map): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__contains__   True
+__getitem__    True
+__setitem__    True
+
+global_map['answer']: 42
+\end{verbatim}
+
+The \texttt{global} declaration is needed only for rebinding the name. It is not needed for mutating an already reachable object.
+
+\begin{verbatim}
+quotes = ["D'oh!"]
+
+def mutate_global_list():
+    quotes.append("No soup for you!")
+
+def rebind_global_list():
+    global quotes
+    quotes = ["It is only a model."]
+
+print(f"start: {quotes}")
+
+mutate_global_list()
+print(f"after mutation: {quotes}")
+
+rebind_global_list()
+print(f"after rebinding: {quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start: ["D'oh!"]
+after mutation: ["D'oh!", 'No soup for you!']
+after rebinding: ['It is only a model.']
+\end{verbatim}
+
+The first function changes the list object. The second function changes the module-level binding \texttt{quotes} itself.
+
+The \texttt{global} declaration must appear before the name is used in a way that conflicts with the declaration inside the same function body.
+
+This is valid:
+
+\begin{verbatim}
+score = 42
+
+def set_score():
+    global score
+    score = 100
+
+set_score()
+print(score)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+100
+\end{verbatim}
+
+A \texttt{global} declaration should be used sparingly. It creates hidden coupling between the function body and the module state. When possible, it is usually clearer to return a value and let the caller decide whether to rebind the global name.
+
+\begin{verbatim}
+score = 42
+
+def make_new_score(old_score):
+    return old_score + 58
+
+score = make_new_score(score)
+
+print(score)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+100
+\end{verbatim}
+
+This version makes the state transfer explicit:
+
+\begin{verbatim}
+caller passes old value
+function returns new value
+caller rebinds module name
+\end{verbatim}
+
+The \texttt{global} version directly mutates the module namespace from inside the function.
+
+\subsubsection{Overriding Nested Intermediary Scopes: The \texttt{nonlocal} Declaration Syntax and Cell Reference Mutation}
+
+The \texttt{nonlocal} declaration targets a name in an enclosing function scope. It does not target the module namespace.
+
+Without \texttt{nonlocal}, assignment inside an inner function creates a new local binding.
+
+\begin{verbatim}
+def outer():
+    count = 0
+
+    def inner():
+        count = 1
+        print(f"inner count: {count}")
+
+    inner()
+    print(f"outer count: {count}")
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inner count: 1
+outer count: 0
+\end{verbatim}
+
+The \texttt{count = 1} assignment creates a local \texttt{count} inside \texttt{inner()}. It does not modify \texttt{outer()}'s \texttt{count}.
+
+With \texttt{nonlocal}, the assignment targets the nearest enclosing function scope that already has that name.
+
+\begin{verbatim}
+def outer():
+    count = 0
+
+    def inner():
+        nonlocal count
+
+        count = count + 1
+        print(f"inner count: {count}")
+
+    inner()
+    inner()
+    inner()
+
+    print(f"outer count: {count}")
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inner count: 1
+inner count: 2
+inner count: 3
+outer count: 3
+\end{verbatim}
+
+The inner function modifies the binding preserved in the enclosing scope.
+
+This is especially important for closures.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+
+print(counter())
+print(counter())
+print(counter())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+1
+2
+3
+\end{verbatim}
+
+The outer function has already returned, but the inner function still carries access to \texttt{count} through a closure cell.
+
+The closure can be inspected.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+
+print(f"counter.__closure__: {counter.__closure__}")
+print(f"counter.__code__.co_freevars: {counter.__code__.co_freevars}")
+print()
+
+cell = counter.__closure__[0]
+
+print(f"cell:       {cell}")
+print(f"type(cell): {type(cell)}")
+print(f"contents:   {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+counter.__closure__: (<cell at 0x...: int object at 0x...>,)
+counter.__code__.co_freevars: ('count',)
+
+cell:       <cell at 0x...: int object at 0x...>
+type(cell): <class 'cell'>
+contents:   0
+\end{verbatim}
+
+After calls, the cell contents change.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+cell = counter.__closure__[0]
+
+print(f"before: {cell.cell_contents}")
+
+print(counter())
+print(counter())
+
+print(f"after:  {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: 0
+1
+2
+after:  2
+\end{verbatim}
+
+The cell object can be inspected.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+cell = counter.__closure__[0]
+
+print(f"type(cell): {type(cell)}")
+print()
+
+selected_names = [
+    "cell_contents",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(cell)}")
+
+print()
+print(f"cell.cell_contents: {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(cell): <class 'cell'>
+
+cell_contents    True
+__class__        True
+__eq__           True
+__repr__         True
+
+cell.cell_contents: 0
+\end{verbatim}
+
+The \texttt{nonlocal} declaration changes which binding is updated. It does not mean that integers become mutable. In the counter example, this line:
+
+\begin{verbatim}
+count = count + 1
+\end{verbatim}
+
+creates or obtains a new integer object, then updates the enclosing cell so that \texttt{count} refers to the new object.
+
+A mutable object in an enclosing scope can be mutated without \texttt{nonlocal}, just like a global mutable object can be mutated without \texttt{global}.
+
+\begin{verbatim}
+def outer():
+    lines = []
+
+    def inner():
+        lines.append("Ni!")
+
+    inner()
+    inner()
+
+    print(lines)
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+['Ni!', 'Ni!']
+\end{verbatim}
+
+The inner function reads the enclosing binding \texttt{lines}, obtains the list object, and mutates the list.
+
+But rebinding the enclosing name requires \texttt{nonlocal}.
+
+\begin{verbatim}
+def outer():
+    lines = []
+
+    def inner():
+        nonlocal lines
+
+        lines = ["This is an ex-list."]
+
+    inner()
+
+    print(lines)
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+['This is an ex-list.']
+\end{verbatim}
+
+The difference is the same as before:
+
+\begin{verbatim}
+lines.append("Ni!")
+    mutate the shared list object
+
+lines = [...]
+    rebind the enclosing name because nonlocal was declared
+\end{verbatim}
+
+The \texttt{nonlocal} name must already exist in an enclosing function scope. It cannot create a new enclosing name, and it does not refer to the global namespace.
+
+A useful practical rule is:
+
+\begin{quote}
+Use \texttt{nonlocal} only when an inner function must rebind a name from an enclosing function. For ordinary data flow, prefer returning values unless closure state is intentionally part of the design.
+\end{quote}
+
+\subsubsection{\texttt{locals()} Caveats: Why the Displayed Local Namespace Is Not Always a Directly Writable Control Surface}
+
+The function \texttt{locals()} returns a mapping that represents the current local namespace. At module level, local and global namespace are the same namespace.
+
+\begin{verbatim}
+answer = 42
+
+print(f"locals() is globals(): {locals() is globals()}")
+
+locals()["answer"] = 100
+
+print(f"answer: {answer}")
+\end{verbatim}
+
+Possible output at module level:
+
+\begin{verbatim}
+locals() is globals(): True
+answer: 100
+\end{verbatim}
+
+At module level, \texttt{locals()} and \texttt{globals()} usually refer to the same dictionary. Mutating that dictionary mutates the module namespace.
+
+Inside an ordinary function, this should not be treated as a reliable way to create or rebind local variables.
+
+\begin{verbatim}
+def try_write_locals():
+    x = 42
+
+    local_map = locals()
+    local_map["x"] = 100
+    local_map["y"] = "D'oh!"
+
+    print(f"local_map: {local_map}")
+    print(f"x:         {x}")
+
+    try:
+        print(f"y:         {y}")
+    except NameError as err:
+        print(f"error type: {type(err)}")
+        print(f"message:    {err}")
+
+try_write_locals()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+local_map: {'x': 100, 'y': "D'oh!"}
+x:         42
+error type: <class 'NameError'>
+message:    name 'y' is not defined
+\end{verbatim}
+
+The displayed dictionary changed, but the actual fast-local variable \texttt{x} used by the function body did not necessarily change. The name \texttt{y} did not become a normal local variable.
+
+This is the caveat: inside optimized function frames, \texttt{locals()} is mainly an inspection surface, not a dependable write-control surface.
+
+The map returned by \texttt{locals()} may look writable because it is dictionary-like.
+
+\begin{verbatim}
+def inspect_locals_map():
+    x = 42
+    local_map = locals()
+
+    print(f"type(local_map): {type(local_map)}")
+    print()
+
+    selected_names = [
+        "keys",
+        "values",
+        "items",
+        "get",
+        "__getitem__",
+        "__setitem__",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<14} {name in dir(local_map)}")
+
+inspect_locals_map()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(local_map): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__getitem__    True
+__setitem__    True
+\end{verbatim}
+
+But dictionary-like appearance does not guarantee that assigning into it rewires the optimized local slots of the running function.
+
+The reason connects to the code object's local-variable layout.
+
+\begin{verbatim}
+def sample_func():
+    x = 42
+    y = "D'oh!"
+    return x, y
+
+code_obj = sample_func.__code__
+
+print(f"co_varnames: {code_obj.co_varnames}")
+print(f"co_nlocals:  {code_obj.co_nlocals}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+co_varnames: ('x', 'y')
+co_nlocals:  2
+\end{verbatim}
+
+CPython knows the ordinary local variable slots ahead of time. The actual execution of \texttt{x} and \texttt{y} uses that optimized local layout, not necessarily a live dictionary lookup for every access.
+
+This is why writing into \texttt{locals()} inside a function is not a normal assignment substitute.
+
+Use ordinary assignment for local names:
+
+\begin{verbatim}
+def correct_local_assignment():
+    x = 42
+    x = 100
+    print(f"x: {x}")
+
+correct_local_assignment()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x: 100
+\end{verbatim}
+
+Use \texttt{global} for module-level rebinding:
+
+\begin{verbatim}
+answer = 42
+
+def correct_global_assignment():
+    global answer
+
+    answer = 100
+
+correct_global_assignment()
+print(answer)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+100
+\end{verbatim}
+
+Use \texttt{nonlocal} for enclosing-function rebinding:
+
+\begin{verbatim}
+def outer():
+    answer = 42
+
+    def inner():
+        nonlocal answer
+
+        answer = 100
+
+    inner()
+    print(answer)
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+100
+\end{verbatim}
+
+The rule is:
+
+\begin{quote}
+Use \texttt{locals()} to inspect local bindings. Do not use it as the normal mechanism for changing local variables inside an optimized function frame.
+\end{quote}
+
+The scope-mutation summary is:
+
+\begin{center}
+\begin{tabular}{|p{0.30\linewidth}|p{0.32\linewidth}|p{0.28\linewidth}|}
+\hline
+\textbf{Goal} & \textbf{Correct mechanism} & \textbf{Typical effect} \\
+\hline
+Create or update a local name & ordinary assignment & updates current function frame \\
+\hline
+Rebind a module-level name & \texttt{global} declaration & updates module namespace dictionary \\
+\hline
+Rebind an enclosing function name & \texttt{nonlocal} declaration & updates closure cell / enclosing binding \\
+\hline
+Mutate a reachable mutable object & method call or item assignment & changes the shared object, not the name binding \\
+\hline
+Inspect current locals & \texttt{locals()} & displays local namespace information \\
+\hline
+\end{tabular}
+\end{center}
+
+The central distinction remains unchanged:
+
+\begin{quote}
+Name rebinding changes a namespace entry. Object mutation changes an object reached through a name.
+\end{quote}

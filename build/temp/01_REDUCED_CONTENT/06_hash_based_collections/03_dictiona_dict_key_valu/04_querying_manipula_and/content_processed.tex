@@ -1,0 +1,19 @@
+\subsection{Querying, Manipulating, and Mutating Dictionary States}
+
+Dictionary operations partition into read-only probes, in-place mutations of the same \texttt{PyDictObject}, and constructors that allocate a fresh mapping.
+
+\subsubsection{Explicit Lookups and the \texttt{KeyError} Boundary vs. Safe Access via \texttt{.get()}}
+
+\texttt{d[key]} dispatches \texttt{\_\_getitem\_\_}: hash probe, equality check, value fetch. Absent keys raise \texttt{KeyError}---the strict contract for required keys. \texttt{d.get(key)} and \texttt{d.get(key, default)} share the probe path but return \texttt{None} or a supplied default without inserting a new entry.
+
+\subsubsection{Default Insertion Patterns with \texttt{.setdefault()}}
+
+\texttt{setdefault(key, default)} returns the existing value when \texttt{key} is present; otherwise it stores \texttt{(key, default)} and returns \texttt{default}. The returned object is the live heap reference in the dict---mutating a mutable default (for example appending to a list) mutates the stored value. Each key that needs an independent container must receive a fresh object (for example \texttt{setdefault(k, [])} creates one list per missing key when called separately).
+
+\subsubsection{Dynamic Views: Why Dictionary Views Reflect Later Dictionary Mutations}
+
+\texttt{keys()}, \texttt{values()}, and \texttt{items()} return lightweight view objects (\texttt{dict\_keys}, \texttt{dict\_values}, \texttt{dict\_items}) backed by the parent dict. They are not snapshots: insertions, updates, and deletions on the dict are visible through the view. Freeze with \texttt{list(d.keys())} when iteration must survive concurrent mutation of the key set.
+
+\subsubsection{The Mutation Trap: Why Mutating Dictionary Geometry During Iteration Triggers Runtime Exceptions}
+
+Iterating \texttt{for k in d} tracks the dict's internal traversal state. Adding or removing keys during that loop changes \texttt{ma\_used} / the key count and raises \texttt{RuntimeError: dictionary changed size during iteration}. Replacing values for existing keys is safe because the key geometry is unchanged. Safe patterns: iterate \texttt{list(d)} or build a new dict via comprehension.

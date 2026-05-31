@@ -1,0 +1,75 @@
+\subsection{Architectural Pitfalls of Argument Evaluation}
+
+Default arguments are evaluated when the \texttt{def} statement executes, not on each call. The resulting object is stored on the function object. Immutable defaults are safe; mutable defaults persist and accumulate state across calls.
+
+\subsubsection{The Mutable Default Arguments Trap: Why \texttt{def func(x=[])} Reuses One Persistent Mutable Object}
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+a = add_quote("D'oh!")
+b = add_quote("No soup for you!")
+
+print(f"a={a}")
+print(f"b={b}, a is b: {a is b}")
+print(f"stored default: {add_quote.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a=["D'oh!", 'No soup for you!']
+b=["D'oh!", 'No soup for you!'], a is b: True
+stored default: (["D'oh!", 'No soup for you!'],)
+\end{verbatim}
+
+One list object is created at definition time and reused whenever \texttt{lines} is omitted.
+
+\subsubsection{Static Expression Evaluation: Why Default Values Are Created at Function Definition Time}
+
+\begin{verbatim}
+def make_default_tag():
+    print("make_default_tag() running")
+    return "D'oh!"
+
+def show_tag(text=make_default_tag()):
+    return text
+
+show_tag()
+show_tag("other")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+make_default_tag() running
+D'oh!
+other
+\end{verbatim}
+
+\texttt{make\_default\_tag()} runs once during \texttt{def}, not on every call.
+
+\subsubsection{Defending Against State Contamination Using the Immutable \texttt{None} Idiom and Sentinel Guard Clauses}
+
+\begin{verbatim}
+def add_quote(text, lines=None):
+    if lines is None:
+        lines = []
+    lines.append(text)
+    return lines
+
+a = add_quote("D'oh!")
+b = add_quote("Ni!")
+
+print(f"a={a}, b={b}, a is b: {a is b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a=["D'oh!"], b=['Ni!'], a is b: False
+\end{verbatim}
+
+Use \texttt{None} as the default sentinel; allocate mutable state inside the function body on each call.

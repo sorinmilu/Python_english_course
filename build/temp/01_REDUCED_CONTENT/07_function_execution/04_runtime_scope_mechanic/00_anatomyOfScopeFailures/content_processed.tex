@@ -1,0 +1,36 @@
+\subsection{Anatomy of Scope Failures}
+
+Scope failures reveal how the compiler classified names before runtime. Each error type corresponds to a specific mismatch between programmer expectation and static binding rules.
+
+\subsubsection{Runtime Execution Traces and Bytecode Analysis of \texttt{UnboundLocalError}}
+
+If a name is assigned anywhere in a function, the compiler marks it local for the entire function. A read before that assignment executes \texttt{LOAD\_FAST} on an uninitialized slot.
+
+\begin{verbatim}
+value = 42
+
+def broken():
+    print(value)
+    value = 100
+
+try:
+    broken()
+except UnboundLocalError as err:
+    print(err)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+local variable 'value' referenced before assignment
+\end{verbatim}
+
+Bytecode uses \texttt{LOAD\_FAST} for \texttt{value}, not \texttt{LOAD\_GLOBAL}, because the assignment later in the body forced local classification.
+
+\subsubsection{Analyzing the Mechanics of Conflicting Local and Global Names}
+
+The same name cannot serve as both an unread global and a written local without \texttt{global} declaration. The compiler chooses local when any assignment exists; global reads of that name then fail unless \texttt{global name} is declared.
+
+\subsubsection{Name Resolution Failure: \texttt{NameError} vs. \texttt{UnboundLocalError}}
+
+\texttt{NameError}: no binding exists in any searched namespace. \texttt{UnboundLocalError}: a local slot exists but has not been assigned yet. Both occur during name resolution, before the intended operation runs.

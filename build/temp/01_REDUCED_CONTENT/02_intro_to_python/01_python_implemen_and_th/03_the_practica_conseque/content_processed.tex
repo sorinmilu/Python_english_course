@@ -1,0 +1,31 @@
+\subsection{The Practical Consequence: Python Code Can Have Different Execution Backends but One Dominant Reference Runtime}
+
+Python source can be consumed by CPython bytecode interpretation, PyPy JIT specialization, JVM or CLR hosting, Cython/Numba native kernels, or Nuitka-compiled executables---yet everyday practice still orbits CPython. Documentation, packaging, teaching, and \texttt{pip} assume the reference interpreter unless stated otherwise.
+
+\subsubsection{The Same Source Surface Can Hide Different Machines}
+
+The statement \texttt{x = a + b} has stable language meaning: resolve names, add according to object types, bind \texttt{x}. Under CPython it becomes opcode dispatch; under Numba on a numeric path it may become machine arithmetic; under PyPy it may begin interpreted and later specialize. The line is identical; the machinery is not.
+
+\subsubsection{Why CPython Still Dominates Practice}
+
+CPython is the default download, the reference for language changes, the target of most binary wheels, and the source of habits programmers mistake for universal Python rules---reference counting immediacy, \texttt{.pyc} layout, traceback shape.
+
+\subsubsection{Portability Is Real, but Not Automatic}
+
+Pure-Python code using standard semantics travels well. Code depending on C extensions, destruction timing, bytecode details, or address-like identity is anchored to CPython.
+
+\subsubsection{The False Simplicity of “Compiled vs. Interpreted”}
+
+CPython compiles to bytecode, then interprets it. PyPy may JIT. Cython and Numba compile selected regions. The useful question is not ``compiled or interpreted?'' but \emph{which backend executes this file, and what runtime does it assume?}
+
+\subsubsection{The Teaching Consequence}
+
+This course explains Python as a language and CPython as the machine most students actually run. Alternate backends clarify the boundary; they do not replace the need to understand reference counts, frames, and object headers.
+
+\subsubsection{The Practical Rule for Programmers}
+
+\begin{quote}
+Write Python according to the language model, but understand performance, memory, packaging, and debugging through the implementation model.
+\end{quote}
+
+Whether \texttt{b = a} aliases a list is language semantics. When the list is reclaimed is CPython reference topology. Why a loop is slow is bytecode and object dispatch. Why NumPy is fast is native code beneath Python references.

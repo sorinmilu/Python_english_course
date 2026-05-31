@@ -1,0 +1,59 @@
+\subsection{Dynamic Typing in Assignment}
+
+Python is dynamically typed in the sense that names do not have fixed declared types. The object has a type through \texttt{ob\_type}; the name is only a binding to an object.
+
+\subsubsection{Names Do Not Have Fixed Declared Types}
+
+In C, \texttt{int score;} fixes the storage type for the lifetime of that declaration. In Python, \texttt{score = 42} binds \texttt{score} to a \texttt{PyLongObject}. Rebinding \texttt{score = "text"} replaces the binding with a string object. The name carries no type annotation unless the programmer adds one (and even annotations do not enforce runtime behavior by default).
+
+The practical rule:
+
+\begin{quote}
+Do not ask what type a Python name has permanently. Ask what object the name currently references.
+\end{quote}
+
+Available methods come from the current object's type, not from the spelling of the name. After \texttt{score = 42}, \texttt{bit\_length} exists; after \texttt{score = "text"}, \texttt{upper} exists instead.
+
+\subsubsection{Rebinding the Same Name to Objects of Different Types}
+
+The same name can traverse the singular type domains within one scope:
+
+\begin{verbatim}
+value = 42        # int
+value = 3.14      # float
+value = True      # bool
+value = None      # NoneType
+\end{verbatim}
+
+Each assignment replaces the namespace entry. Python does not require separate names for separate roles, though separate names improve human readability when each binding represents a distinct pipeline stage (\texttt{raw\_score} -> \texttt{score} -> \texttt{passed}).
+
+\subsubsection{Runtime Type Inspection with \texttt{type()} and \texttt{isinstance()}}
+
+\texttt{type(x)} returns the exact type object of \texttt{x}. \texttt{isinstance(x, T)} asks whether \texttt{x} belongs to type \texttt{T} or a subclass.
+
+The \texttt{bool}/\texttt{int} inheritance makes the distinction architecturally important:
+
+\begin{verbatim}
+flag = True
+type(flag) is bool           # True
+type(flag) is int            # False
+isinstance(flag, bool)       # True
+isinstance(flag, int)        # True  (subclass membership)
+\end{verbatim}
+
+Use \texttt{type()} for exact runtime type. Use \texttt{isinstance()} for category tests, but exclude \texttt{bool} explicitly when ``integer and not boolean'' is intended:
+
+\begin{verbatim}
+isinstance(x, (int, float)) and not isinstance(x, bool)
+\end{verbatim}
+
+The structural summary:
+
+\begin{verbatim}
+name = 42       -> references int object
+name = "text"   -> same name, str object
+type(name)      -> exact current type
+isinstance(...) -> category including subclasses
+\end{verbatim}
+
+Python assignment is dynamic because the name can move. Python objects remain typed because each object carries its runtime type and behavior.

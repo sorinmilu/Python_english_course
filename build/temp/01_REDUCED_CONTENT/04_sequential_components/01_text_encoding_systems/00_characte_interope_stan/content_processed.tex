@@ -1,0 +1,19 @@
+\subsection{Character Interoperability Standards}
+
+Text exchange requires numeric character conventions before software can store, compare, or transmit strings. Python separates \texttt{str} (text) from \texttt{bytes} (integer values 0--255). \texttt{str.encode()} crosses from text to bytes; \texttt{bytes.decode()} reverses the direction. These types must not be mixed in ordinary operations without an explicit encoding choice.
+
+\subsubsection{The Classical Domain: 7-Bit ASCII Codepoints (\texttt{0--127}) and the Later Confusion with 8-Bit Extended Encodings}
+
+Classical ASCII maps 7-bit values \texttt{0--127} to basic Latin letters, digits, and control characters. \texttt{ord()} and \texttt{chr()} expose this mapping on one-character strings. Unicode preserves ASCII compatibility for \texttt{U+0000}--\texttt{U+007F}.
+
+The eighth bit of a byte (\texttt{128--255}) historically carried \emph{different} local extensions---Latin-1, CP1252, CP437---not one universal standard. The same byte \texttt{0xE9} decodes to \texttt{'é'} under Latin-1 but to \texttt{'Θ'} under CP437; strict ASCII decoding rejects it. Outside the \texttt{0--127} core, a byte value alone does not identify text without a declared encoding.
+
+\subsubsection{The Universal Map: Unicode Codepoints as Abstract Character Numbers, Separate from Byte Encodings}
+
+Unicode assigns each character an abstract codepoint (\texttt{U+XXXX}). Python \texttt{str} stores codepoint sequences; \texttt{len(text)} counts codepoints, not bytes. The same character \texttt{π} (\texttt{U+03C0}) encodes to two UTF-8 bytes (\texttt{0xCF 0x80}), to a BOM-prefixed 16-bit form in UTF-16, and to a wider form in UTF-32---identical text, different octet layouts.
+
+\subsubsection{Encoding Boundaries: UTF-8, UTF-16, and UTF-32 as Byte Representations of Unicode Text}
+
+UTF-8, UTF-16, and UTF-32 are \emph{encodings} of the same Unicode repertoire, not separate alphabets. For ASCII-range text, UTF-8 coincides with ASCII bytes. Non-ASCII codepoints expand to multi-byte UTF-8 sequences; \texttt{len(text)} and \texttt{len(text.encode('utf-8'))} diverge accordingly.
+
+Decoding must match the encoding used at encode time. Wrong strict decoding raises \texttt{UnicodeDecodeError}; wrong permissive decoding (e.g.\ Latin-1 on UTF-8 bytes) may succeed silently and produce corrupted text---often worse than an exception. At file, socket, and protocol boundaries, text becomes \texttt{bytes}; inside the interpreter, ordinary reasoning uses \texttt{str}.

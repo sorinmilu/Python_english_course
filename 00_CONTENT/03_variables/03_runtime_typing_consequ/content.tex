@@ -1,1 +1,15 @@
 \section{Runtime Typing Consequences in Singular Operations}
+
+At this point, the basic pieces are in place: names are bindings, singular values are objects, and operators are dispatched according to object behavior. This section brings those ideas together and states their direct consequence for Python's type system.
+
+Python is dynamic at the level of names. A name can first refer to an integer, later to a string, later to \texttt{None}, and Python will allow that rebinding. But Python is not loose at the level of operations. Once an expression executes, the actual objects involved must support that operation.
+
+This is why the same name can legally move from \texttt{42} to \texttt{"42"}, but the expression \texttt{"42" + 1} still fails. Python does not silently guess whether the programmer wanted numeric addition or string concatenation. The programmer must make the conversion explicit.
+
+The purpose of this section is to make that boundary precise:
+
+\begin{quote}
+Names are flexible. Objects are typed. Operations are checked.
+\end{quote}
+
+This distinction explains much of Python's everyday behavior: why reassignment is easy, why \texttt{type()} and \texttt{isinstance()} inspect runtime objects, why mixed numerical operations can promote toward \texttt{float} or \texttt{complex}, and why unrelated combinations such as text plus number raise errors instead of being silently coerced.

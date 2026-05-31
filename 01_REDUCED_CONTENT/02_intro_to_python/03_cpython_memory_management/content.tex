@@ -1,0 +1,3 @@
+\section{CPython Memory Management Dynamics and Object Topologies}
+
+CPython memory management is best understood through two linked metaphors. Every Python value is \emph{wrapped cargo}: a small native payload carried inside a uniform heap object with headers and type metadata. The allocator behind those objects is a \emph{real estate developer}: it buys large tracts from the OS, subdivides them into pools and blocks, and reuses plots rapidly instead of calling \texttt{malloc()} for every shipment.

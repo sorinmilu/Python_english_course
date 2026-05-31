@@ -1,0 +1,20 @@
+\subsection{Memory Layout in Bare-Metal Compiled Processes}
+
+\subsubsection{The Text Segment: Read-Only Machine Instructions and Instruction Pointer Tracking}
+
+The \textbf{text segment} stores machine instructions mapped read-only/executable. The instruction pointer advances through this region during normal control flow. Self-modifying user code is forbidden by design: code and data occupy separate protection domains so corruption cannot silently rewrite the instruction stream.
+
+\subsubsection{The Data and BSS Segments: Initialized and Uninitialized Global/Static Variable Storage Boundaries}
+
+\textbf{Data} holds initialized globals and statics with known startup bits. \textbf{BSS} reserves zero-initialized storage described by the executable but not fully stored on disk. Both live in writable regions with fixed addresses chosen at link time. This is the ``zoning plan'' of the grid: permanent city blocks whose sizes are known before the program runs.
+
+\subsubsection{The Process Heap: Dynamic Manual Memory Allocation and Deallocation Schemes (\texttt{malloc()} and \texttt{free()})}
+
+Beyond static districts lies the \textbf{heap}: an uncharted desert where the program requests variable-sized blocks via \texttt{malloc()} and must fence them with \texttt{free()}. Leaks and double-frees are architectural failures, not syntax errors. In C, ownership is contractual; the runtime does not infer lifetimes.
+
+\subsubsection{The Process Stack: Automatic Variable Lifetime Tracking, Call Chains, and Push/Pop Stack Frames}
+
+The \textbf{stack} is a rigid mechanical assembly line driven by a hardware stack pointer. Each call pushes a frame containing return addresses, saved registers, and automatic locals; returns pop frames in LIFO order. Locals die when their frame is popped. This model is fast and cache-friendly because consecutive frames are adjacent in address space.
+
+\paragraph{The Grid vs. The Luxury Hotel (preview).}
+Bare-metal C memory is a \textbf{cold grid of wooden boxes}: fixed code and data districts, a manual desert heap, and a hardware-controlled stack conveyor. CPython later builds a \textbf{luxury hotel inside that same heap desert}: objects are furnished rooms; Python names are luggage tags pointing to rooms; reference counting and cyclic collectors are concierge staff reclaiming unused suites. The OS still sees one native process, but user-level semantics are mediated entirely through reference-rich object graphs rather than raw variable slots.

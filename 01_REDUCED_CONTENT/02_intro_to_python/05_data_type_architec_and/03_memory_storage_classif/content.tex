@@ -1,0 +1,7 @@
+\subsection{Memory Storage Classifications: Built-in Single-Value Objects vs. Composite Reference Collections}
+
+Types differ by object topology, not merely by spelling. \emph{Single-value} objects (\texttt{int}, \texttt{float}, \texttt{bool}, \texttt{None}, \texttt{str}, \texttt{bytes}) present one conceptual payload behind the header, usually immutable: changing ``value'' means rebinding to new cargo. \emph{Composite} objects (\texttt{list}, \texttt{tuple}, \texttt{dict}, \texttt{set}, user instances) store references to other objects in internal tables, slots, or attribute namespaces.
+
+A list is not a C array of ints; it is a header plus a dynamic array of \texttt{PyObject*} elements. Heterogeneity is natural because each slot is a pointer to separately typed cargo. Memory cost includes headers, pointer arrays, hash tables, or attribute dicts---not just raw payload bytes.
+
+Classification guides prediction: mutating a composite may alias through shared references; ``changing'' an int means allocating new int cargo and rebinding a name or slot.

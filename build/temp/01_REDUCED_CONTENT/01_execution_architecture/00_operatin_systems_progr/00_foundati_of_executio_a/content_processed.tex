@@ -1,0 +1,147 @@
+\subsection{Foundations of Execution Architecture}
+\subsubsection{What is a Program? The Static Binary Blueprint and Executable Formats (ELF on Linux, PE/COFF on Windows)}
+
+A program is a stored description of future execution. Before it runs, it is not yet an active computation. It is only data placed somewhere in persistent storage: on a disk, inside an archive, inside a package, or inside another executable container. In the native compiled model, such as the model normally used by C, the final program is usually an executable binary file. This file contains machine instructions, static data, metadata, relocation information, and structural descriptions that tell the operating system how the file must be loaded into memory.
+
+This distinction is important. A program is not the same thing as a process. A program is the static object. A process is the active execution instance created from that object. The same executable file can be launched many times, producing many independent processes. Each process receives its own execution state: virtual memory mappings, stack, heap, open resources, CPU register state, and scheduling identity. The executable file is therefore only the blueprint from which the operating system constructs a running process.
+
+In C, after preprocessing, parsing, compilation, assembly, and linking, the final result is commonly a binary executable. This binary is not just a flat sequence of CPU instructions. It has a formal file format. The operating system loader must be able to read this format, validate it, and map its parts into the future process address space. Two major executable format families are especially relevant:
+
+\begin{itemize}
+    \item \textbf{ELF} (\emph{Executable and Linkable Format}), used mainly on Linux and other Unix-like systems;
+    \item \textbf{PE/COFF} (\emph{Portable Executable / Common Object File Format}), used on Windows.
+\end{itemize}
+
+These formats solve the same basic problem: they describe how a compiled program is organized so that the operating system can load it and the processor can execute it. The file must contain enough information for the loader to answer questions such as:
+
+\begin{itemize}
+    \item What processor architecture is this program compiled for?
+    \item Where is the machine code stored inside the file?
+    \item Which parts of the file must become readable, writable, or executable memory?
+    \item What dynamic libraries are required?
+    \item Where is the initial entry point of execution?
+    \item What symbols or relocations must be resolved before execution can begin?
+\end{itemize}
+
+In an ELF executable, for example, the file contains an ELF header, program headers, sections, and segments. Sections are mainly useful during linking and analysis. Segments are especially important during execution because they describe what the operating system must map into memory. A typical executable contains a code area, often called the \texttt{text} segment, together with areas for initialized data, uninitialized data, read-only constants, dynamic linking information, and other runtime metadata.
+
+On Windows, PE/COFF plays a similar role. A Windows executable file, usually ending in \texttt{.exe} or \texttt{.dll}, contains headers and tables that describe code sections, data sections, imported libraries, exported symbols, relocation information, and the program entry point. The exact structure is different from ELF, but the purpose is the same: the file is a structured contract between the compiler toolchain, the operating system loader, and the processor architecture.
+
+The processor cannot execute an ELF file or a PE file as a whole. The file format is not itself the instruction stream. Instead, the operating system reads the file, interprets its metadata, maps selected parts into virtual memory, prepares the stack and other process structures, resolves required dynamic dependencies, and then transfers control to the program's entry point. Only after this loading phase do the machine instructions begin to execute.
+
+This also explains why a native executable is tied to both an operating system format and a processor instruction set. A Linux ELF binary compiled for x86-64 cannot normally be launched directly as a Windows PE executable. A Windows PE executable compiled for x86-64 cannot directly run on an ARM processor without a compatibility or emulation layer. A native program must match both sides of the execution environment:
+
+\begin{itemize}
+    \item the \textbf{operating system}, because the loader must understand the executable format and system call conventions;
+    \item the \textbf{processor architecture}, because the machine instructions must belong to the processor's instruction set.
+\end{itemize}
+
+This native model is the reference point for understanding why Python behaves differently. A Python source file, such as \texttt{script.py}, is also a program in the broad sense: it is a stored description of future execution. However, it is not normally an executable binary containing native machine instructions for the processor. The operating system does not load \texttt{script.py} in the same way it loads a C executable. Instead, the operating system loads the Python interpreter executable, such as \texttt{python} or \texttt{python.exe}. That interpreter is the native program. The Python source file becomes input data for that running interpreter process.
+
+Therefore, in the C model, the programmer's source code is transformed into the native executable that the operating system loads. In the Python model, the interpreter is the native executable, while the user's Python file is interpreted, compiled to bytecode, and executed inside the runtime environment created by that interpreter. This difference is one of the central architectural transitions between C programming and Python programming.
+
+\subsubsection{What is a Process? A Running Program with Its Own Virtual Address Space}
+
+A process is a running instance of a program. If the program is the static blueprint stored on disk, the process is the active object created when the operating system loads that blueprint and gives it execution resources. A process is therefore not just the executable file copied into memory. It is a complete runtime container: it has memory mappings, an execution state, open resources, scheduling information, and a relationship with the operating system kernel.
+
+The same program file can produce many processes. If the user starts the same executable three times, the disk file is still one file, but the operating system creates three separate processes. Each process has its own identity, usually represented by a process identifier, or PID. Each process also has its own execution state. One instance may be waiting for keyboard input, another may be writing to a file, and another may already be finished. They all come from the same program, but they are different runtime entities.
+
+The most important property of a modern process is its \textbf{virtual address space}. From the point of view of the running program, memory appears as a large private address range. The program uses addresses as if it owned this memory directly. In reality, the operating system and the memory management unit (MMU) translate those virtual addresses into physical memory locations or into other backing storage mechanisms.
+
+This gives every process an isolated view of memory. One process cannot normally read or write the memory of another process just by using an address. The address \texttt{0x100000} inside one process does not mean the same physical location as \texttt{0x100000} inside another process. The same virtual address can exist in many processes at the same time, but the operating system maps it differently for each one.
+
+This isolation is one of the main differences between a simple program image and a real process. The executable file contains descriptions of code and data. The process contains mapped memory regions created from those descriptions, plus additional runtime regions created by the operating system and by the runtime libraries. A typical process address space contains regions such as:
+
+\begin{itemize}
+    \item a \textbf{text} or code region, containing executable machine instructions;
+    \item read-only constant data;
+    \item initialized global and static data;
+    \item uninitialized global and static data, often called BSS;
+    \item the \textbf{heap}, used for dynamic allocation;
+    \item one or more \textbf{stacks}, used for function calls and local execution state;
+    \item memory-mapped libraries;
+    \item kernel-provided or runtime-provided auxiliary regions.
+\end{itemize}
+
+In a C program, this structure is visible through concepts such as global variables, local variables, pointers, \texttt{malloc()}, \texttt{free()}, and function call stack frames. A global variable may live in the data or BSS region. A local automatic variable usually lives in a stack frame. A dynamically allocated object usually lives on the heap. A pointer stores an address inside the process virtual address space.
+
+The processor does not execute an entire process at once. At any exact moment, a hardware thread executes one instruction stream. For a process to run, the operating system scheduler assigns CPU time to it. The process then executes for a while, may be interrupted, may block while waiting for input or output, or may voluntarily give control back to the kernel through a system call.
+
+To suspend and later resume a process, the operating system must preserve its execution context. This includes, among other things, the current instruction pointer, stack pointer, register values, scheduling state, and memory mapping information. When the scheduler later chooses the process again, this saved state is restored, and execution continues as if the process had not stopped. This save-and-restore operation is part of what makes multitasking possible.
+
+A process also owns or references external resources. These resources are not only memory. A process may have:
+
+\begin{itemize}
+    \item open file descriptors or file handles;
+    \item network sockets;
+    \item environment variables;
+    \item command-line arguments;
+    \item loaded shared libraries;
+    \item child processes;
+    \item security credentials and permissions.
+\end{itemize}
+
+These resources are managed by the operating system. The process can request operations on them, but it normally does so through system calls or library wrappers around system calls. User code does not directly control the disk controller, network card, or physical memory. It asks the kernel to perform controlled operations.
+
+This explains why the process is an operating-system object, not only a programming-language object. A C function, a Python function, or a Java method exists inside some runtime model, but the process itself is created and supervised by the operating system. The process is the boundary at which the operating system gives a running program memory isolation, resource ownership, and scheduling identity.
+
+The process model also helps clarify what happens when Python code is executed. When the command
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+is launched, the operating system does not create a process directly from \texttt{script.py}. The file \texttt{script.py} is not normally a native executable file. Instead, the operating system creates a process from the native Python interpreter executable: \texttt{python} on Linux or \texttt{python.exe} on Windows. That interpreter process then opens the Python source file, parses it, compiles it to bytecode, and executes it inside the CPython runtime.
+
+Therefore, in the Python case, there are two different levels that must not be confused. At the operating-system level, the running process is the CPython interpreter process. At the language level, the user's Python program is being executed inside that process. The Python program has its own Python-level objects, frames, namespaces, and bytecode execution state, but all of these live inside the memory and resource boundary of the interpreter process created by the operating system.
+
+This is the key transition from C to Python. In C, the programmer's source code is compiled and linked into the native executable that becomes the process. In Python, the interpreter is the native executable that becomes the process, while the user's source file becomes input to a managed runtime already running inside that process.
+
+\subsubsection{The Role of the Operating System Kernel: Supervisor Mode, Hardware Traps, System Calls, and Resource Isolation}
+
+The operating system kernel is the privileged core of the operating system. It is the software layer that stands between ordinary programs and the physical machine. A user program does not normally control the processor, memory, disk, keyboard, network card, or display directly. Instead, it runs under restrictions imposed by the kernel and must request privileged operations through controlled entry points.
+
+Modern processors usually separate execution into at least two privilege levels. The exact names differ across architectures, but the conceptual distinction is stable:
+
+\begin{itemize}
+    \item \textbf{user mode}, where ordinary application code runs with restricted permissions;
+    \item \textbf{kernel mode} or \textbf{supervisor mode}, where the operating system kernel runs with privileged access to hardware and process management structures.
+\end{itemize}
+
+A C program, a Python interpreter process, a browser, or a text editor normally runs in user mode. User-mode code cannot directly modify page tables, program the disk controller, access arbitrary physical memory, or take control of another process. These restrictions are not just software conventions. They are enforced by the processor and the memory management unit.
+
+The kernel runs in supervisor mode because it must perform operations that affect the whole system. It creates processes, schedules CPU time, maps virtual memory, handles files, communicates with devices, enforces permissions, and responds to hardware events. If every program could perform these operations directly, one incorrect pointer, one malicious write, or one infinite loop could damage the whole machine.
+
+The transition from user mode to kernel mode happens through controlled mechanisms. One of the most important mechanisms is the \textbf{system call}. A system call is a request made by a user program to the kernel. For example, when a program wants to open a file, allocate more memory, write to the console, create a process, or send data through a socket, it eventually performs a system call.
+
+From the programmer's point of view, this request is often hidden behind a library function. In C, a call such as \texttt{printf()} may eventually lead to a lower-level write operation. In Python, a call such as \texttt{print()} or \texttt{open()} eventually reaches operating-system services through the CPython runtime and the C standard library or platform APIs. The programmer does not normally write the raw system call instruction directly.
+
+A system call requires a controlled change of privilege level. The processor must stop executing ordinary user code and enter kernel code at a known, valid entry point. This transition is not a normal function call. A normal function call stays inside the same privilege level and the same program address space. A system call crosses the boundary between the user program and the operating system kernel.
+
+This boundary crossing is usually implemented using a special processor instruction or a similar architecture-specific mechanism. Conceptually, the program places a request number and arguments in agreed locations, then triggers the transition. The processor switches into supervisor mode and transfers control to the kernel. The kernel validates the request, checks permissions, performs the operation if allowed, places a result or error code where the user program can retrieve it, and then returns control to user mode.
+
+Another important mechanism is the \textbf{hardware trap}. A trap is a controlled transfer of execution to the kernel caused by a special event. Some traps are intentionally triggered by programs, such as system calls. Others are caused by exceptional conditions during execution. Examples include division by zero, invalid memory access, illegal instructions, page faults, and breakpoints used by debuggers.
+
+For example, if a C program dereferences an invalid pointer, the processor may detect that the virtual address is not mapped or is not accessible with the requested permissions. The processor then traps into the kernel. The kernel examines the situation. If the access is invalid, it may terminate the process and report a segmentation fault or access violation. If the access corresponds to a valid page that must be loaded or mapped, the kernel may repair the situation and resume the process.
+
+This trap mechanism is central to virtual memory. A process believes it is using a private address space, but the mapping from virtual addresses to physical memory is controlled by the kernel and the MMU. When a process touches a memory page that is not currently available, the hardware can trap into the kernel. The kernel then decides whether the access is legal, whether the page should be loaded, or whether the process must be stopped.
+
+The kernel therefore enforces \textbf{resource isolation}. Each process receives the illusion of private memory and controlled access to external resources. One process cannot normally overwrite another process's stack, corrupt another process's heap, close another process's files, or steal another process's network connection. The kernel maintains tables that describe which resources belong to which process and what operations are allowed.
+
+Resource isolation applies to several major areas:
+
+\begin{itemize}
+    \item \textbf{memory isolation}: each process receives its own virtual address space;
+    \item \textbf{CPU scheduling}: the kernel decides which process or thread runs and for how long;
+    \item \textbf{file access}: the kernel checks permissions and manages file handles or descriptors;
+    \item \textbf{device access}: programs use kernel-mediated interfaces instead of controlling hardware directly;
+    \item \textbf{inter-process boundaries}: communication between processes must use approved mechanisms such as pipes, sockets, shared memory, or signals.
+\end{itemize}
+
+This model also explains why a process can fail without necessarily destroying the whole system. If a user program crashes, the kernel can tear down that process, reclaim its memory, close its resources, and continue running other processes. The process boundary acts as a containment boundary.
+
+Coming from C, this distinction is essential. C gives the programmer direct access to addresses inside the current process. A pointer can refer to memory in the process address space, and incorrect pointer use can corrupt that process. But this does not mean the C program has direct access to all physical memory. Its pointers are still interpreted inside a virtual address space controlled by the operating system. The kernel and MMU decide which addresses are valid for that process.
+
+The same operating-system boundary exists when Python code runs. Python code executes inside the CPython interpreter process. The Python program may create objects, lists, dictionaries, frames, and bytecode-level execution state, but all of these live inside the virtual address space of the interpreter process. When Python code opens a file, prints to the terminal, reads from the keyboard, or creates a network connection, the operation eventually crosses into the kernel through system calls made by the runtime or its libraries.
+
+Thus, the kernel is not merely background software. It is the authority that transforms a static executable into a protected process, gives that process memory and resources, controls transitions to hardware services, and prevents ordinary programs from damaging each other. The programming language runtime, whether C's runtime library or CPython's interpreter, operates inside the boundaries that the kernel creates and enforces.

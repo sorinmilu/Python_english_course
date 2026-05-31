@@ -1,0 +1,16 @@
+\subsection{Mutability and Identity: Immutable Objects, Mutable Objects, Shared References, and \texttt{is} vs. \texttt{==}}
+
+Mutability asks whether an object's state can change in place while its identity---the address of its header on the heap---remains constant. Mutable cargo (lists, dicts, most user instances) supports in-place change; immutable cargo (ints, strings, tuples of immutables) requires rebinding to new objects to reflect new values.
+
+Identity and equality answer different engineering questions:
+
+\begin{itemize}
+    \item \textbf{\texttt{is}}: compare pointer addresses of the wrapped objects---blindingly fast native pointer equality in CPython.
+    \item \textbf{\texttt{==}}: invoke rich comparison (\texttt{\_\_eq\_\_}) that may traverse nested fields to decide value agreement.
+\end{itemize}
+
+Two distinct list objects with the same elements satisfy \texttt{==} but not \texttt{is}. Aliased names satisfy both. Immutable interning caches may make some equal ints share identity, but logic must never rely on that implementation detail.
+
+Shared references to mutable cargo make aliasing bugs possible: mutation through one label visible through another until rebinding splits the arrows. Copy operations (\texttt{copy}, \texttt{list.copy}) create new outer containers; shallow copies still share inner references.
+
+For C programmers: treat \texttt{is} like comparing addresses of structs; treat \texttt{==} like calling a typed comparator function that inspects contents.

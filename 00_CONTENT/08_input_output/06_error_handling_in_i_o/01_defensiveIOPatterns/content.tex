@@ -1,4 +1,240 @@
 \subsection{Defensive I/O Patterns}
+
+Defensive I/O code accepts that the filesystem is external state. A path may exist, disappear, become inaccessible, become a directory, or be changed by another process. The program therefore needs patterns that handle failure cleanly instead of assuming that every file operation will succeed.
+
+Python commonly uses two styles: try the operation and handle the exception, or check conditions before attempting the operation. Both are useful, but they do not provide the same guarantees.
+
 \subsubsection{EAFP File Access: Trying the Operation and Handling the Exception}
+
+EAFP means ``easier to ask forgiveness than permission''. In file access, this means the program attempts the operation directly and catches the exception if the operating system refuses it.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("missing_eafp_demo.txt")
+
+print("Path object:")
+print(f"path       = {path}")
+print(f"type(path) = {type(path)}")
+
+print()
+print("Selected names from dir(path):")
+for name in ["exists", "is_file", "is_dir", "name", "parent", "resolve"]:
+    print(f"{name:10} -> {name in dir(path)}")
+
+print()
+print("EAFP pattern: try to read, then handle failure.")
+
+try:
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+
+    print("File content:")
+    print(content)
+
+except FileNotFoundError as err:
+    print("The file does not exist.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+except PermissionError as err:
+    print("The file exists, but access was denied.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+except OSError as err:
+    print("Another operating-system I/O error occurred.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+This pattern is strong because the attempted operation is the same operation whose failure is being handled. The program does not merely ask whether the file looked usable a moment earlier. It asks the operating system to actually perform the read.
+
+EAFP is especially useful when failure can happen for many external reasons. The path may be missing, permission may be denied, the path may point to a directory, the file may be locked, or the filesystem may reject the operation.
+
+A successful EAFP example looks ordinary:
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("existing_eafp_demo.txt")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Serenity now!\n")
+    file_obj.write("The answer is 42.\n")
+
+try:
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+
+    print("Read succeeded:")
+    print(content)
+
+    print("Object inspection:")
+    print(f"type(content) = {type(content)}")
+    print(f"len(content)  = {len(content)}")
+
+except OSError as err:
+    print("Read failed.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+The \texttt{except OSError} branch is broader than \texttt{FileNotFoundError} or \texttt{PermissionError}. This is useful when the program wants to handle general filesystem failure at one boundary.
+
 \subsubsection{LBYL File Access: Checking Conditions Before Opening}
+
+LBYL means ``look before you leap''. In file access, this means the program checks conditions before attempting the operation.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("lbyl_demo.txt")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("No soup for you!\n")
+
+print("LBYL pattern: check before opening.")
+
+exists_result = path.exists()
+file_result = path.is_file()
+
+print(f"path.exists()  = {exists_result}")
+print(f"path.is_file() = {file_result}")
+
+print()
+print("Object types:")
+print(f"type(exists_result) = {type(exists_result)}")
+print(f"type(file_result)   = {type(file_result)}")
+
+print()
+print("Selected names from dir(exists_result):")
+for name in ["bit_length", "to_bytes", "real", "imag"]:
+    print(f"{name:12} -> {name in dir(exists_result)}")
+
+if path.exists() and path.is_file():
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+
+    print()
+    print("File content:")
+    print(content)
+else:
+    print("The path is not currently a readable file candidate.")
+\end{verbatim}
+
+The checks are clear and readable. They are useful when the program wants to choose different branches based on current filesystem state.
+
+However, the checks do not open the file. They only report what appeared to be true when the checks were made. The later \texttt{open()} call is still a separate operation that can fail.
+
+LBYL is also useful when producing clearer messages for a human user:
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("lbyl_missing_demo.txt")
+
+if not path.exists():
+    print(f"Cannot read {path}: the path does not exist.")
+elif not path.is_file():
+    print(f"Cannot read {path}: the path is not a file.")
+else:
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+
+    print(content)
+\end{verbatim}
+
+This style makes the decision tree visible. It is often helpful in scripts, teaching examples, command-line utilities, and validation code.
+
+The weakness is that the checks and the operation are not one indivisible action.
+
 \subsubsection{Atomicity Concerns: Why Existence Checks Can Become Invalid Before Use}
+
+The filesystem can change between two Python statements. Another process can create, delete, rename, or replace a file after the program checks it but before the program opens it. This is often called a check-then-use problem.
+
+The following example shows the shape of the issue without needing another process.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("atomicity_demo.txt")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("This file exists for the first check.\n")
+
+print("First check:")
+print(f"path.exists() = {path.exists()}")
+
+print()
+print("Simulating an external change by deleting the file before open().")
+path.unlink()
+
+print(f"path.exists() = {path.exists()}")
+
+print()
+print("Now the earlier check is no longer useful:")
+
+try:
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+
+    print(content)
+
+except FileNotFoundError as err:
+    print("The file disappeared before it was opened.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+The first existence check was true, but it did not reserve the file. It did not lock the file. It did not guarantee that a later read would succeed. The external state changed before the actual operation.
+
+This is why EAFP is often preferred for the final file operation. The program still may use LBYL for user-friendly diagnostics, but the real operation should remain protected by exception handling.
+
+A safer creation pattern uses exclusive creation mode \texttt{"x"}. It asks the operating system to create the file only if it does not already exist.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("exclusive_create_demo.txt")
+
+print("Trying exclusive creation:")
+
+try:
+    with open(path, "x", encoding="utf-8") as file_obj:
+        file_obj.write("Created exactly once. D'oh!\n")
+
+    print("File was created.")
+
+except FileExistsError as err:
+    print("File already exists; it was not overwritten.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+print()
+print("Trying exclusive creation again:")
+
+try:
+    with open(path, "x", encoding="utf-8") as file_obj:
+        file_obj.write("This should not replace the old file.\n")
+
+    print("File was created.")
+
+except FileExistsError as err:
+    print("Second creation failed safely.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+This is better than checking \texttt{exists()} and then opening with \texttt{"w"}, because \texttt{"w"} would replace existing content. The mode \texttt{"x"} combines the existence condition with the creation operation.
+
+The practical rule is:
+
+\begin{itemize}
+    \item use EAFP when performing the actual file operation;
+    \item use LBYL when clear pre-checks help produce better messages;
+    \item do not treat existence checks as permanent guarantees;
+    \item use operation-level safeguards such as \texttt{"x"} when overwriting would be unsafe.
+\end{itemize}
+
+Filesystem state belongs to the operating system and may be shared with other processes. Defensive I/O code must therefore protect the actual operation, not only the condition checked before it.

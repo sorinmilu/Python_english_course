@@ -702,6 +702,12 @@ def main():
         # silent if missing
         pass
 
+    # Copy UTF-8 support file for pdfLaTeX (referenced by main_document.tex)
+    if latex_root:
+        unicode_support_src = os.path.join(root_dir, latex_root, "unicode_support.tex")
+        if os.path.isfile(unicode_support_src):
+            shutil.copy2(unicode_support_src, os.path.join(temp_dir, "unicode_support.tex"))
+
     # Process main LaTeX document with placeholder replaced by merged content
     if not latex_root or not main_latex_file:
         # skipping main document merge silently

@@ -1,0 +1,16 @@
+\subsection{Code Blocks: From Explicit Braces (\texttt{\{\}}) to Indentation Tokens and Lexer-Level Whitespace Rules}
+
+A block is a suite of statements treated as one unit. C marks suites with \texttt{\{} \texttt{\}}; Python derives suite boundaries from indentation deltas tokenized as \texttt{INDENT}/\texttt{DEDENT}.
+
+Mechanical contrast:
+
+\begin{itemize}
+    \item \textbf{C front-end}: characters \texttt{\{} and \texttt{\}} enter the token stream; newlines and spaces are mostly irrelevant to grammar.
+    \item \textbf{Python front-end}: after \texttt{if}, \texttt{for}, \texttt{def}, \texttt{class}, \texttt{try}, and similar headers ending in \texttt{:}, the next lines with greater indentation become block tokens; dedent closes the innermost open block.
+\end{itemize}
+
+Empty suites require \texttt{pass} because Python blocks are statement sequences, not brace pairs enclosing nothing. Parenthesized line breaks inside expressions may indent for readability without opening a new grammar block---only suite indentation after headers produces \texttt{INDENT}.
+
+Tabs versus spaces matter because the lexer counts indentation columns exactly; inconsistent mixing raises \texttt{TabError}. PEP~8's four-space rule aligns human habit with parse requirements.
+
+For engineers from C, the adjustment is conceptual: Python did not remove block delimiters---it moved them into whitespace measured by the tokenizer. The parser's control-flow tree is isomorphic to the left margin the reader sees. That isomorphism is deliberate policy, not accidental formatting taste.

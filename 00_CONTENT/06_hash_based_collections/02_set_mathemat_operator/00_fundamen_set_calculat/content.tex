@@ -1,5 +1,365 @@
 \subsection{Fundamental Set Calculations}
-\subsubsection{The Union Operator (`|`) and Method Equivalent (`.union()`)}
-\subsubsection{The Intersection Operator (`&`) and Method Equivalent (`.intersection()`)}
-\subsubsection{The Difference Operator (`-`) and Method Equivalent (`.difference()`)}
-\subsubsection{The Symmetric Difference Operator (`^`) and Method Equivalent (`.symmetric_difference()`)}
+
+Set calculations combine or compare membership domains. These operations do not care about positions, because a set has no positional structure. They care about membership: which elements are present in the left set, which elements are present in the right set, and which elements should appear in the result.
+
+The four fundamental calculations are:
+
+\begin{itemize}
+    \item union: everything from both sets;
+    \item intersection: only what appears in both sets;
+    \item difference: what appears in the first set but not the second;
+    \item symmetric difference: what appears in exactly one of the two sets.
+\end{itemize}
+
+Each operation has an operator form and a method form. The operator form is compact. The method form is more explicit and can accept general iterables in more cases.
+
+\subsubsection{The Union Operator \texttt{|} and Method Equivalent \texttt{.union()}}
+
+Union builds a new set containing every distinct element from both input sets.
+
+\begin{verbatim}
+python_lines = {"spam", "eggs", "larch"}
+tv_lines = {"D'oh!", "spam", "Serenity now!"}
+
+result1 = python_lines | tv_lines
+result2 = python_lines.union(tv_lines)
+
+print(f"python_lines: {python_lines!r}")
+print(f"tv_lines:     {tv_lines!r}")
+print()
+print(f"result1: {result1!r}")
+print(f"result2: {result2!r}")
+print(f"same result: {result1 == result2}")
+print(f"type(result1): {type(result1)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+python_lines: {'eggs', 'larch', 'spam'}
+tv_lines:     {"D'oh!", 'Serenity now!', 'spam'}
+
+result1: {'Serenity now!', 'eggs', "D'oh!", 'larch', 'spam'}
+result2: {'Serenity now!', 'eggs', "D'oh!", 'larch', 'spam'}
+same result: True
+type(result1): <class 'set'>
+\end{verbatim}
+
+The value \texttt{"spam"} appears in both input sets, but it appears only once in the result. Union preserves the set uniqueness rule.
+
+The original sets are not changed.
+
+\begin{verbatim}
+left = {"Arthur", "Brian"}
+right = {"Brian", "Lancelot"}
+
+result = left | right
+
+print(f"left:   {left!r}")
+print(f"right:  {right!r}")
+print(f"result: {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left:   {'Arthur', 'Brian'}
+right:  {'Lancelot', 'Brian'}
+result: {'Arthur', 'Lancelot', 'Brian'}
+\end{verbatim}
+
+The operator \texttt{|} expects set-like operands. The method \texttt{.union()} can accept other iterable objects.
+
+\begin{verbatim}
+base = {"Homer", "Marge"}
+more_names = ["Lisa", "Bart", "Homer"]
+
+result = base.union(more_names)
+
+print(f"base: {base!r}")
+print(f"more_names: {more_names!r}")
+print(f"result: {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base: {'Homer', 'Marge'}
+more_names: ['Lisa', 'Bart', 'Homer']
+result: {'Lisa', 'Homer', 'Bart', 'Marge'}
+\end{verbatim}
+
+Here \texttt{more\_names} is a list, not a set. The method reads its elements and inserts them into the resulting set.
+
+\subsubsection{The Intersection Operator \texttt{\&} and Method Equivalent \texttt{.intersection()}}
+
+Intersection builds a new set containing only elements that appear in both input sets.
+
+\begin{verbatim}
+python_lines = {"spam", "eggs", "larch", "ni"}
+famous_words = {"spam", "D'oh!", "ni", "yada yada"}
+
+result1 = python_lines & famous_words
+result2 = python_lines.intersection(famous_words)
+
+print(f"python_lines: {python_lines!r}")
+print(f"famous_words: {famous_words!r}")
+print()
+print(f"result1: {result1!r}")
+print(f"result2: {result2!r}")
+print(f"same result: {result1 == result2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+python_lines: {'eggs', 'larch', 'spam', 'ni'}
+famous_words: {'yada yada', "D'oh!", 'spam', 'ni'}
+
+result1: {'spam', 'ni'}
+result2: {'spam', 'ni'}
+same result: True
+\end{verbatim}
+
+The result contains \texttt{"spam"} and \texttt{"ni"} because those values appear in both sets.
+
+Intersection is useful when two independent domains must both approve the same value.
+
+\begin{verbatim}
+allowed_users = {"Jerry", "Elaine", "George", "Kramer"}
+present_users = {"Elaine", "Newman", "Kramer"}
+
+active_allowed = allowed_users & present_users
+
+print(f"allowed_users:  {allowed_users!r}")
+print(f"present_users:  {present_users!r}")
+print(f"active_allowed: {active_allowed!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+allowed_users:  {'George', 'Elaine', 'Jerry', 'Kramer'}
+present_users:  {'Elaine', 'Newman', 'Kramer'}
+active_allowed: {'Elaine', 'Kramer'}
+\end{verbatim}
+
+The method form can also accept a general iterable.
+
+\begin{verbatim}
+known = {"Homer", "Marge", "Lisa", "Bart"}
+incoming = ["Lisa", "Maggie", "Bart", "Burns"]
+
+result = known.intersection(incoming)
+
+print(f"known: {known!r}")
+print(f"incoming: {incoming!r}")
+print(f"result: {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+known: {'Lisa', 'Homer', 'Bart', 'Marge'}
+incoming: ['Lisa', 'Maggie', 'Bart', 'Burns']
+result: {'Lisa', 'Bart'}
+\end{verbatim}
+
+Again, the result is a set. The list is only used as a source of candidate values.
+
+\subsubsection{The Difference Operator \texttt{-} and Method Equivalent \texttt{.difference()}}
+
+Difference builds a new set containing elements from the left set that do not appear in the right set.
+
+\begin{verbatim}
+all_items = {"spam", "eggs", "larch", "beans"}
+blocked_items = {"eggs", "beans"}
+
+result1 = all_items - blocked_items
+result2 = all_items.difference(blocked_items)
+
+print(f"all_items:     {all_items!r}")
+print(f"blocked_items: {blocked_items!r}")
+print()
+print(f"result1: {result1!r}")
+print(f"result2: {result2!r}")
+print(f"same result: {result1 == result2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+all_items:     {'eggs', 'beans', 'larch', 'spam'}
+blocked_items: {'eggs', 'beans'}
+
+result1: {'larch', 'spam'}
+result2: {'larch', 'spam'}
+same result: True
+\end{verbatim}
+
+The result keeps only the elements that belong to \texttt{all\_items} and do not belong to \texttt{blocked\_items}.
+
+Difference is directional. Reversing the operands changes the question.
+
+\begin{verbatim}
+a = {"Arthur", "Brian", "Lancelot"}
+b = {"Brian", "Galahad"}
+
+print(f"a - b: {a - b}")
+print(f"b - a: {b - a}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a - b: {'Arthur', 'Lancelot'}
+b - a: {'Galahad'}
+\end{verbatim}
+
+The first expression asks: what is in \texttt{a} but not in \texttt{b}? The second expression asks: what is in \texttt{b} but not in \texttt{a}? These are not the same question.
+
+The method form can accept an iterable.
+
+\begin{verbatim}
+seen = {"Homer", "Marge", "Lisa", "Bart"}
+already_processed = ["Homer", "Lisa"]
+
+remaining = seen.difference(already_processed)
+
+print(f"seen: {seen!r}")
+print(f"already_processed: {already_processed!r}")
+print(f"remaining: {remaining!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+seen: {'Lisa', 'Homer', 'Bart', 'Marge'}
+already_processed: ['Homer', 'Lisa']
+remaining: {'Bart', 'Marge'}
+\end{verbatim}
+
+The original set is not changed. A new set is produced.
+
+\subsubsection{The Symmetric Difference Operator \texttt{\textasciicircum{}} and Method Equivalent \texttt{.symmetric\_difference()}}
+
+Symmetric difference builds a new set containing elements that appear in exactly one of the two sets. It excludes elements that appear in both.
+
+\begin{verbatim}
+left = {"spam", "eggs", "larch"}
+right = {"eggs", "beans", "larch", 42}
+
+result1 = left ^ right
+result2 = left.symmetric_difference(right)
+
+print(f"left:  {left!r}")
+print(f"right: {right!r}")
+print()
+print(f"result1: {result1!r}")
+print(f"result2: {result2!r}")
+print(f"same result: {result1 == result2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left:  {'eggs', 'larch', 'spam'}
+right: {42, 'eggs', 'beans', 'larch'}
+
+result1: {42, 'beans', 'spam'}
+result2: {42, 'beans', 'spam'}
+same result: True
+\end{verbatim}
+
+The values \texttt{"eggs"} and \texttt{"larch"} are excluded because they appear in both sets. The values \texttt{"spam"}, \texttt{"beans"}, and \texttt{42} remain because each appears on only one side.
+
+Symmetric difference is useful when the program needs disagreement between two domains.
+
+\begin{verbatim}
+expected = {"Jerry", "Elaine", "George"}
+actual = {"Jerry", "Elaine", "Kramer"}
+
+mismatch = expected ^ actual
+
+print(f"expected: {expected!r}")
+print(f"actual:   {actual!r}")
+print(f"mismatch: {mismatch!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+expected: {'Elaine', 'George', 'Jerry'}
+actual:   {'Elaine', 'Jerry', 'Kramer'}
+mismatch: {'George', 'Kramer'}
+\end{verbatim}
+
+The mismatch contains \texttt{"George"} because he was expected but not actual, and \texttt{"Kramer"} because he was actual but not expected.
+
+The method form can accept an iterable.
+
+\begin{verbatim}
+base = {"Arthur", "Brian", "Lancelot"}
+other = ["Brian", "Galahad", "Arthur"]
+
+result = base.symmetric_difference(other)
+
+print(f"base: {base!r}")
+print(f"other: {other!r}")
+print(f"result: {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base: {'Arthur', 'Brian', 'Lancelot'}
+other: ['Brian', 'Galahad', 'Arthur']
+result: {'Galahad', 'Lancelot'}
+\end{verbatim}
+
+The values \texttt{"Arthur"} and \texttt{"Brian"} are removed from the result because they appear in both sources. The values \texttt{"Lancelot"} and \texttt{"Galahad"} remain because each appears only on one side.
+
+The four calculations can be summarized compactly:
+
+\begin{center}
+\begin{tabular}{llll}
+\textbf{Calculation} & \textbf{Operator} & \textbf{Method} & \textbf{Meaning} \\
+\hline
+Union & \texttt{|} & \texttt{.union()} & In either set \\
+Intersection & \texttt{\&} & \texttt{.intersection()} & In both sets \\
+Difference & \texttt{-} & \texttt{.difference()} & In left, not in right \\
+Symmetric difference & \texttt{\textasciicircum{}} & \texttt{.symmetric\_difference()} & In exactly one set \\
+\end{tabular}
+\end{center}
+
+All four operations produce new sets. They do not mutate the left operand.
+
+\begin{verbatim}
+a = {"spam", "eggs"}
+b = {"eggs", "larch"}
+
+union_result = a | b
+intersection_result = a & b
+difference_result = a - b
+symmetric_result = a ^ b
+
+print(f"a after calculations: {a!r}")
+print(f"b after calculations: {b!r}")
+print()
+print(f"union_result:        {union_result!r}")
+print(f"intersection_result: {intersection_result!r}")
+print(f"difference_result:   {difference_result!r}")
+print(f"symmetric_result:    {symmetric_result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a after calculations: {'eggs', 'spam'}
+b after calculations: {'eggs', 'larch'}
+
+union_result:        {'eggs', 'larch', 'spam'}
+intersection_result: {'eggs'}
+difference_result:   {'spam'}
+symmetric_result:    {'larch', 'spam'}
+\end{verbatim}

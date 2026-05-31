@@ -1,0 +1,81 @@
+\subsection{Memory Semantics of Parameter Passing}
+
+Python parameter passing is call-by-object-reference (call-by-sharing): the caller evaluates expressions, the callee binds new local names to the same objects, reassignment rebinding stays local, and in-place mutation of mutable objects is visible through all references.
+
+\subsubsection{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object References into New Local Bindings}
+
+\begin{enumerate}
+    \item the caller evaluates the argument expression;
+    \item the result is an object reference;
+    \item the callee frame is created;
+    \item the parameter name is bound to that object;
+    \item reassignment of the parameter name affects only the callee's local binding;
+    \item in-place mutation of a shared mutable object is visible through all names referencing it.
+\end{enumerate}
+
+\begin{verbatim}
+def change_number(n):
+    n = n + 1
+
+def add_line(lines):
+    lines.append("extra")
+
+x = 42
+quotes = ["D'oh!"]
+
+change_number(x)
+add_line(quotes)
+
+print(f"x={x}, quotes={quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x=42, quotes=["D'oh!", 'extra']
+\end{verbatim}
+
+Immutable objects cannot change in place; \texttt{n = n + 1} creates a new integer and rebinds \texttt{n}. Mutable objects can be mutated through shared references.
+
+\subsubsection{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Names Bound to Shared Heap Objects}
+
+C passes values or pointer copies into callee storage. Python creates a new local binding to the same heap object. The callee cannot rebind the caller's name slot; it can only mutate a shared object or rebind its own local name.
+
+\begin{verbatim}
+def bad_swap(a, b):
+    a, b = b, a
+
+x, y = "Arthur", "Patsy"
+bad_swap(x, y)
+print(f"after bad_swap: x={x!r}, y={y!r}")
+
+x, y = y, x  # caller must rebind explicitly
+print(f"after caller rebind: x={x!r}, y={y!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x='Arthur', y='Patsy'
+after caller rebind: x='Patsy', y='Arthur'
+\end{verbatim}
+
+\subsubsection{Side Effects Matrix: Mutating Mutable Objects In Place vs. Reassigning Local Names}
+
+\begin{center}
+\begin{tabular}{|p{0.22\linewidth}|p{0.24\linewidth}|p{0.24\linewidth}|p{0.20\linewidth}|}
+\hline
+\textbf{Operation inside function} & \textbf{Object kind} & \textbf{What changes?} & \textbf{Caller sees it?} \\
+\hline
+\texttt{n = n + 1} & immutable \texttt{int} & local name rebound & no \\
+\hline
+\texttt{text = text.upper()} & immutable \texttt{str} & local name rebound & no \\
+\hline
+\texttt{items.append(x)} & mutable \texttt{list} & shared object mutated & yes \\
+\hline
+\texttt{items = []} & mutable \texttt{list} & local name rebound & no \\
+\hline
+\end{tabular}
+\end{center}
+
+Function calls share objects, not caller variable slots. Mutation changes a shared object. Reassignment changes only the local name.

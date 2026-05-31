@@ -1,0 +1,9 @@
+\subsection{Object Interfaces: Dunder Methods, Internal Slots, Operators, Construction, and Representation}
+
+Visible Python syntax routes through object interfaces defined by the data model. Operators map to slot functions and special methods (\texttt{\_\_add\_\_}, \texttt{\_\_getitem\_\_}, \texttt{\_\_call\_\_}, \texttt{\_\_iter\_\_}). Built-ins like \texttt{len} delegate to \texttt{\_\_len\_\_}; \texttt{print} uses \texttt{\_\_str\_\_} or \texttt{\_\_repr\_\_}.
+
+This is not magic syntax---it is the same \texttt{ob\_type} indirection described earlier exposed at the language surface. Classes customize behavior by filling slots; instances inherit those tables. Construction flows through \texttt{\_\_new\_\_} (allocation) and \texttt{\_\_init\_\_} (initialization). Context managers, iterators, and context-dependent operators extend the same pattern.
+
+Understanding dunder methods clarifies why Python remains strongly typed while looking permissive: the interpreter always asks the objects involved whether an operation is defined; undefined operations fail loudly rather than silently reinterpreting memory.
+
+For implementation readers, C-level slots (\texttt{tp\_as\_number}, \texttt{sq\_item}, etc.) are the function-pointer tables Python source code sees as protocols. Syntax is thin; the type object is thick.

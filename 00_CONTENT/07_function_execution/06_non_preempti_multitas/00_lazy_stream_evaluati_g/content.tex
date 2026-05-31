@@ -1,5 +1,941 @@
 \subsection{Lazy Stream Evaluation: Generators}
-\subsubsection{The `yield` Keyword Architecture: Pausing Function Execution Without Destroying Local State}
+
+A generator is a function-like object that produces values over time instead of computing and returning one final value immediately. The source-level difference is the presence of \texttt{yield}. Once a function body contains \texttt{yield}, calling that function does not execute the body immediately. It creates a generator object.
+
+That generator object can later be resumed. Each resumption continues execution until the next \texttt{yield}, a \texttt{return}, or the end of the function body.
+
+So a generator is not simply a function that returns a list slowly. It is a suspended execution mechanism.
+
+\subsubsection{The \texttt{yield} Keyword Architecture: Pausing Function Execution Without Destroying Local State}
+
+A normal function starts, runs, and terminates when it reaches \texttt{return} or the end of the body.
+
+\begin{verbatim}
+def normal_func():
+    print("normal function starts")
+    return "D'oh!"
+
+result = normal_func()
+
+print(f"result:       {result!r}")
+print(f"type(result): {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal function starts
+result:       "D'oh!"
+type(result): <class 'str'>
+\end{verbatim}
+
+A generator function contains \texttt{yield}.
+
+\begin{verbatim}
+def generator_func():
+    print("generator body starts")
+    yield "D'oh!"
+
+gen = generator_func()
+
+print(f"gen:       {gen}")
+print(f"type(gen): {type(gen)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+gen:       <generator object generator_func at 0x...>
+type(gen): <class 'generator'>
+\end{verbatim}
+
+Notice that \texttt{"generator body starts"} was not printed yet. Calling \texttt{generator\_func()} created a generator object. It did not run the function body immediately.
+
+The body starts when the generator is advanced.
+
+\begin{verbatim}
+def generator_func():
+    print("generator body starts")
+    yield "D'oh!"
+
+gen = generator_func()
+
+print("before next()")
+value = next(gen)
+print("after next()")
+print(f"value: {value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before next()
+generator body starts
+after next()
+value: "D'oh!"
+\end{verbatim}
+
+The \texttt{yield} statement sends one value outward and pauses the generator frame. It does not destroy the local state.
+
+\begin{verbatim}
+def count_quotes():
+    print("step 1")
+    yield "D'oh!"
+
+    print("step 2")
+    yield "No soup for you!"
+
+    print("step 3")
+    yield "The answer is 42."
+
+gen = count_quotes()
+
+print(next(gen))
+print(next(gen))
+print(next(gen))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+step 1
+D'oh!
+step 2
+No soup for you!
+step 3
+The answer is 42.
+\end{verbatim}
+
+Each call to \texttt{next(gen)} resumes the same suspended execution. The function body does not restart from the top each time. It continues after the previous \texttt{yield}.
+
+A generator can keep local variables alive between yields.
+
+\begin{verbatim}
+def counter():
+    n = 40
+
+    print(f"before first yield: n={n}")
+    yield n
+
+    n = n + 1
+    print(f"before second yield: n={n}")
+    yield n
+
+    n = n + 1
+    print(f"before third yield: n={n}")
+    yield n
+
+gen = counter()
+
+print(f"first:  {next(gen)}")
+print(f"second: {next(gen)}")
+print(f"third:  {next(gen)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before first yield: n=40
+first:  40
+before second yield: n=41
+second: 41
+before third yield: n=42
+third:  42
+\end{verbatim}
+
+The local name \texttt{n} survives across suspension points. The generator frame is paused, not discarded.
+
+The important contrast is:
+
+\begin{verbatim}
+return:
+    sends a value outward
+    terminates the current function frame
+
+yield:
+    sends a value outward
+    suspends the current generator frame
+    allows later resumption
+\end{verbatim}
+
+A generator object is inspectable.
+
+\begin{verbatim}
+def counter():
+    yield 42
+
+gen = counter()
+
+print(f"type(gen): {type(gen)}")
+print()
+
+selected_names = [
+    "__iter__",
+    "__next__",
+    "send",
+    "throw",
+    "close",
+    "gi_frame",
+    "gi_code",
+    "gi_running",
+    "gi_yieldfrom",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(gen)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(gen): <class 'generator'>
+
+__iter__       True
+__next__       True
+send           True
+throw          True
+close          True
+gi_frame       True
+gi_code        True
+gi_running     True
+gi_yieldfrom   True
+\end{verbatim}
+
+Some crucial attributes and methods are:
+
+\begin{itemize}
+    \item \texttt{\_\_next\_\_}: resumes the generator until the next yielded value;
+    \item \texttt{send}: resumes the generator and can send a value into it;
+    \item \texttt{throw}: injects an exception into the suspended generator;
+    \item \texttt{close}: requests generator shutdown;
+    \item \texttt{gi\_frame}: exposes the suspended frame, while it exists;
+    \item \texttt{gi\_code}: exposes the generator's code object.
+\end{itemize}
+
+Only \texttt{\_\_next\_\_}, \texttt{gi\_frame}, and \texttt{gi\_code} are needed for the current subsection. The bidirectional methods \texttt{send}, \texttt{throw}, and \texttt{close} will be studied later.
+
 \subsubsection{Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Execution State}
+
+A generator object contains the machinery needed to resume execution later.
+
+\begin{verbatim}
+def small_gen():
+    x = "D'oh!"
+    yield x
+
+gen = small_gen()
+
+print(f"gen:          {gen}")
+print(f"gen.gi_code:  {gen.gi_code}")
+print(f"gen.gi_frame: {gen.gi_frame}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+gen:          <generator object small_gen at 0x...>
+gen.gi_code:  <code object small_gen at 0x..., file "...", line 1>
+gen.gi_frame: <frame at 0x..., file "...", line 1, code small_gen>
+\end{verbatim}
+
+The generator has a code object and a frame object. The code object describes the compiled instructions. The frame stores the current execution state.
+
+The code object can be inspected.
+
+\begin{verbatim}
+def small_gen():
+    x = "D'oh!"
+    yield x
+
+gen = small_gen()
+code_obj = gen.gi_code
+
+print(f"type(code_obj): {type(code_obj)}")
+print()
+
+selected_names = [
+    "co_name",
+    "co_varnames",
+    "co_consts",
+    "co_names",
+    "co_code",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(code_obj)}")
+
+print()
+print(f"co_name:     {code_obj.co_name}")
+print(f"co_varnames: {code_obj.co_varnames}")
+print(f"co_consts:   {code_obj.co_consts}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(code_obj): <class 'code'>
+
+co_name        True
+co_varnames    True
+co_consts      True
+co_names       True
+co_code        True
+
+co_name:     small_gen
+co_varnames: ('x',)
+co_consts:   (None, "D'oh!")
+\end{verbatim}
+
+The frame object can also be inspected.
+
+\begin{verbatim}
+def small_gen():
+    x = "D'oh!"
+    yield x
+
+gen = small_gen()
+frame = gen.gi_frame
+
+print(f"type(frame): {type(frame)}")
+print()
+
+selected_names = [
+    "f_code",
+    "f_locals",
+    "f_globals",
+    "f_lineno",
+    "f_lasti",
+]
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(frame)}")
+
+print()
+print(f"frame.f_code.co_name: {frame.f_code.co_name}")
+print(f"frame.f_locals:       {frame.f_locals}")
+print(f"frame.f_lasti:        {frame.f_lasti}")
+\end{verbatim}
+
+Possible output before first resumption:
+
+\begin{verbatim}
+type(frame): <class 'frame'>
+
+f_code       True
+f_locals     True
+f_globals    True
+f_lineno     True
+f_lasti      True
+
+frame.f_code.co_name: small_gen
+frame.f_locals:       {}
+frame.f_lasti:        0
+\end{verbatim}
+
+Before the first \texttt{next()}, the generator body has not yet assigned \texttt{x}. The local namespace display is still empty.
+
+After the first yield, the local state exists.
+
+\begin{verbatim}
+def small_gen():
+    x = "D'oh!"
+    yield x
+
+gen = small_gen()
+
+print("before next()")
+print(f"locals: {gen.gi_frame.f_locals}")
+
+value = next(gen)
+
+print()
+print("after next()")
+print(f"value:  {value!r}")
+print(f"locals: {gen.gi_frame.f_locals}")
+print(f"lasti:  {gen.gi_frame.f_lasti}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before next()
+locals: {}
+
+after next()
+value:  "D'oh!"
+locals: {'x': "D'oh!"}
+lasti:  12
+\end{verbatim}
+
+The exact value of \texttt{f\_lasti} is version-dependent. It represents the current bytecode position. The important idea is that the frame remembers where execution stopped.
+
+A generator can be disassembled.
+
+\begin{verbatim}
+import dis
+
+def small_gen():
+    x = "D'oh!"
+    yield x
+    y = "No soup for you!"
+    yield y
+
+dis.dis(small_gen)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+... RETURN_GENERATOR
+... RESUME
+... LOAD_CONST               ... ("D'oh!")
+... STORE_FAST               ... (x)
+... LOAD_FAST                ... (x)
+... YIELD_VALUE
+... RESUME
+... LOAD_CONST               ... ('No soup for you!')
+... STORE_FAST               ... (y)
+... LOAD_FAST                ... (y)
+... YIELD_VALUE
+...
+\end{verbatim}
+
+The exact instruction list differs across Python versions, but \texttt{YIELD\_VALUE} is the critical operation. It is the point where execution produces a value and suspends.
+
+A completed generator has no active frame.
+
+\begin{verbatim}
+def one_value():
+    yield 42
+
+gen = one_value()
+
+print(f"before first next: {gen.gi_frame}")
+
+print(next(gen))
+
+try:
+    next(gen)
+except StopIteration:
+    pass
+
+print(f"after completion:  {gen.gi_frame}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before first next: <frame at 0x..., file "...", line 1, code one_value>
+42
+after completion:  None
+\end{verbatim}
+
+After the generator is exhausted, \texttt{gi\_frame} becomes \texttt{None}. There is no suspended execution state left to resume.
+
+The generator object may still exist, but it is exhausted.
+
+\begin{verbatim}
+def one_value():
+    yield 42
+
+gen = one_value()
+
+print(next(gen))
+
+for attempt in [1, 2]:
+    try:
+        print(next(gen))
+    except StopIteration as err:
+        print(f"attempt {attempt}: {type(err).__name__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+attempt 1: StopIteration
+attempt 2: StopIteration
+\end{verbatim}
+
+Once exhausted, repeated advancement raises \texttt{StopIteration} again.
+
 \subsubsection{Execution State Resumption: Re-Entering Suspended Function Frames Across Iteration Steps}
-\subsubsection{Returning from Generators: `StopIteration` and Generator Completion Values}
+
+A generator can be advanced manually with \texttt{next()} or automatically by a \texttt{for} loop.
+
+Manual advancement shows the resumption points clearly.
+
+\begin{verbatim}
+def quotes():
+    print("A")
+    yield "D'oh!"
+
+    print("B")
+    yield "No soup for you!"
+
+    print("C")
+    yield "The answer is 42."
+
+gen = quotes()
+
+print("created generator")
+print()
+
+print(f"next 1 -> {next(gen)!r}")
+print()
+print(f"next 2 -> {next(gen)!r}")
+print()
+print(f"next 3 -> {next(gen)!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+created generator
+
+A
+next 1 -> "D'oh!"
+
+B
+next 2 -> 'No soup for you!'
+
+C
+next 3 -> 'The answer is 42.'
+\end{verbatim}
+
+The generator resumes after the previous \texttt{yield}. It does not restart from the first line.
+
+A \texttt{for} loop performs repeated \texttt{next()} calls and stops when \texttt{StopIteration} is raised.
+
+\begin{verbatim}
+def quotes():
+    yield "D'oh!"
+    yield "No soup for you!"
+    yield "The answer is 42."
+
+for quote in quotes():
+    print(f"quote: {quote}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: D'oh!
+quote: No soup for you!
+quote: The answer is 42.
+\end{verbatim}
+
+The loop is roughly equivalent to this manual structure:
+
+\begin{verbatim}
+gen = quotes()
+
+while True:
+    try:
+        quote = next(gen)
+    except StopIteration:
+        break
+
+    print(f"quote: {quote}")
+\end{verbatim}
+
+A generator is its own iterator.
+
+\begin{verbatim}
+def quotes():
+    yield "D'oh!"
+
+gen = quotes()
+iterator = iter(gen)
+
+print(f"gen:              {gen}")
+print(f"iterator:         {iterator}")
+print(f"gen is iterator:  {gen is iterator}")
+print(f"type(iterator):   {type(iterator)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+gen:              <generator object quotes at 0x...>
+iterator:         <generator object quotes at 0x...>
+gen is iterator:  True
+type(iterator):   <class 'generator'>
+\end{verbatim}
+
+The generator object implements both \texttt{\_\_iter\_\_} and \texttt{\_\_next\_\_}. This is why it can be used directly in a \texttt{for} loop.
+
+The generator remembers local state across loop steps.
+
+\begin{verbatim}
+def running_total(values):
+    total = 0
+
+    for value in values:
+        total = total + value
+        print(f"inside generator: value={value}, total={total}")
+        yield total
+
+nums = [10, 20, 12]
+
+for total in running_total(nums):
+    print(f"outside loop:     total={total}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside generator: value=10, total=10
+outside loop:     total=10
+inside generator: value=20, total=30
+outside loop:     total=30
+inside generator: value=12, total=42
+outside loop:     total=42
+\end{verbatim}
+
+The local variable \texttt{total} survives across yields. Each resumed step continues with the previous value of \texttt{total}.
+
+A generator can produce an unbounded stream because it does not need to build a complete list before returning.
+
+\begin{verbatim}
+def count_up(start):
+    n = start
+
+    while True:
+        yield n
+        n = n + 1
+
+gen = count_up(40)
+
+print(next(gen))
+print(next(gen))
+print(next(gen))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+40
+41
+42
+\end{verbatim}
+
+This generator has no natural end. The caller decides how many values to request.
+
+A list-building version would need to decide the full size in advance.
+
+\begin{verbatim}
+def make_three_numbers(start):
+    numbers = []
+
+    numbers.append(start)
+    numbers.append(start + 1)
+    numbers.append(start + 2)
+
+    return numbers
+
+def generate_numbers(start):
+    yield start
+    yield start + 1
+    yield start + 2
+
+list_result = make_three_numbers(40)
+gen_result = generate_numbers(40)
+
+print(f"list_result:       {list_result}")
+print(f"type(list_result): {type(list_result)}")
+print()
+print(f"gen_result:        {gen_result}")
+print(f"type(gen_result):  {type(gen_result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+list_result:       [40, 41, 42]
+type(list_result): <class 'list'>
+
+gen_result:        <generator object generate_numbers at 0x...>
+type(gen_result):  <class 'generator'>
+\end{verbatim}
+
+The list contains all values immediately. The generator contains suspended execution that can produce values later.
+
+This is why generators are useful for lazy stream evaluation:
+
+\begin{quote}
+A generator produces the next value when asked, while preserving enough execution state to continue later.
+\end{quote}
+
+\subsubsection{Returning from Generators: \texttt{StopIteration} and Generator Completion Values}
+
+A generator ends when execution reaches the end of its body or when it executes \texttt{return}.
+
+When a generator ends, advancing it raises \texttt{StopIteration}.
+
+\begin{verbatim}
+def one_quote():
+    yield "D'oh!"
+
+gen = one_quote()
+
+print(next(gen))
+
+try:
+    next(gen)
+except StopIteration as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+    print(f"err.args:   {err.args}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+D'oh!
+error type: <class 'StopIteration'>
+message:    
+err.args:   ()
+\end{verbatim}
+
+The \texttt{StopIteration} object is the signal that the stream has no next value.
+
+It can be inspected.
+
+\begin{verbatim}
+err = StopIteration("finished")
+
+print(f"err:       {err}")
+print(f"type(err): {type(err)}")
+print()
+
+selected_names = [
+    "args",
+    "value",
+    "__class__",
+    "__str__",
+    "__repr__",
+    "with_traceback",
+]
+
+for name in selected_names:
+    print(f"{name:<18} {name in dir(err)}")
+
+print()
+print(f"err.args:  {err.args}")
+print(f"err.value: {err.value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+err:       finished
+type(err): <class 'StopIteration'>
+
+args               True
+value              True
+__class__          True
+__str__            True
+__repr__           True
+with_traceback     True
+
+err.args:  ('finished',)
+err.value: 'finished'
+\end{verbatim}
+
+A generator can use \texttt{return} with a value. That value does not appear as a normal yielded item. It becomes the \texttt{value} attribute of the \texttt{StopIteration} exception.
+
+\begin{verbatim}
+def gen_with_return():
+    yield "D'oh!"
+    return "finished with 42"
+
+gen = gen_with_return()
+
+print(next(gen))
+
+try:
+    next(gen)
+except StopIteration as err:
+    print(f"StopIteration.value: {err.value!r}")
+    print(f"StopIteration.args:  {err.args}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+D'oh!
+StopIteration.value: 'finished with 42'
+StopIteration.args:  ('finished with 42',)
+\end{verbatim}
+
+The return value is a completion value, not a stream value.
+
+A \texttt{for} loop consumes \texttt{StopIteration} internally and does not expose the completion value.
+
+\begin{verbatim}
+def gen_with_return():
+    yield "D'oh!"
+    yield "No soup for you!"
+    return "finished with 42"
+
+for item in gen_with_return():
+    print(f"item: {item}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+item: D'oh!
+item: No soup for you!
+\end{verbatim}
+
+The string \texttt{"finished with 42"} is not printed because it was not yielded. It was carried by \texttt{StopIteration} when the generator completed.
+
+Manual iteration can observe it.
+
+\begin{verbatim}
+def gen_with_return():
+    yield "D'oh!"
+    yield "No soup for you!"
+    return "finished with 42"
+
+gen = gen_with_return()
+
+while True:
+    try:
+        item = next(gen)
+        print(f"yielded: {item!r}")
+    except StopIteration as err:
+        print(f"completion value: {err.value!r}")
+        break
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+yielded: "D'oh!"
+yielded: 'No soup for you!'
+completion value: 'finished with 42'
+\end{verbatim}
+
+A bare \texttt{return} in a generator is equivalent to completing with \texttt{None}.
+
+\begin{verbatim}
+def gen_bare_return():
+    yield "Ni!"
+    return
+
+gen = gen_bare_return()
+
+print(next(gen))
+
+try:
+    next(gen)
+except StopIteration as err:
+    print(f"value: {err.value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Ni!
+value: None
+\end{verbatim}
+
+Reaching the end of the generator body also completes with \texttt{None}.
+
+\begin{verbatim}
+def gen_end():
+    yield "It is only a model."
+
+gen = gen_end()
+
+print(next(gen))
+
+try:
+    next(gen)
+except StopIteration as err:
+    print(f"value: {err.value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+It is only a model.
+value: None
+\end{verbatim}
+
+The completion model is:
+
+\begin{verbatim}
+yield value:
+    produce value to caller
+    suspend generator
+
+return final_value:
+    terminate generator
+    raise StopIteration(final_value) to the advancing mechanism
+
+fall off end:
+    terminate generator
+    raise StopIteration(None)
+\end{verbatim}
+
+A final example shows the full lifecycle.
+
+\begin{verbatim}
+def lifecycle():
+    print("start")
+    yield 40
+
+    print("middle")
+    yield 41
+
+    print("end")
+    return 42
+
+gen = lifecycle()
+
+print(f"created: {gen}")
+print()
+
+while True:
+    try:
+        value = next(gen)
+        print(f"caller received yield: {value}")
+        print(f"frame still exists:    {gen.gi_frame is not None}")
+        print()
+    except StopIteration as err:
+        print(f"generator completed")
+        print(f"completion value: {err.value}")
+        print(f"frame still exists: {gen.gi_frame is not None}")
+        break
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+created: <generator object lifecycle at 0x...>
+
+start
+caller received yield: 40
+frame still exists:    True
+
+middle
+caller received yield: 41
+frame still exists:    True
+
+end
+generator completed
+completion value: 42
+frame still exists: False
+\end{verbatim}
+
+The generator frame exists while the generator is suspended. After completion, the frame is gone.
+
+The final rule is:
+
+\begin{quote}
+A generator call creates a generator object. Each \texttt{yield} pauses that object's frame and returns one stream value. A generator \texttt{return} terminates the frame and exposes its value only through \texttt{StopIteration.value}.
+\end{quote}

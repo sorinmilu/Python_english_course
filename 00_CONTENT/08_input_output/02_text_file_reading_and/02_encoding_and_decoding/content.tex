@@ -1,4 +1,263 @@
 \subsection{Encoding and Decoding Boundaries}
-\subsubsection{Text Encoding Revisited: Translating Between `str` Objects and Stored Byte Sequences}
+
+A text file is not stored as Python \texttt{str} objects. A Python \texttt{str} object exists inside the runtime as Unicode text. A file stores bytes. Text file input/output therefore requires translation at the boundary.
+
+When Python writes text, it encodes a \texttt{str} object into bytes. When Python reads text, it decodes stored bytes into a \texttt{str} object. Text mode performs this translation through the file object's encoding.
+
+\subsubsection{Text Encoding Revisited: Translating Between \texttt{str} Objects and Stored Byte Sequences}
+
+Encoding means converting text into bytes. Decoding means converting bytes back into text. The two operations are inverse only when the same compatible encoding rules are used.
+
+\begin{verbatim}
+text = "D'oh! The answer is 42. Știință."
+
+print("Original runtime text:")
+print(f"text       = {text}")
+print(f"type(text) = {type(text)}")
+
+print()
+print("Selected names from dir(text):")
+for name in ["encode", "upper", "replace", "split", "strip"]:
+    print(f"{name:10} -> {name in dir(text)}")
+
+data = text.encode("utf-8")
+
+print()
+print("Encoded byte sequence:")
+print(f"data       = {data}")
+print(f"type(data) = {type(data)}")
+print(f"len(text)  = {len(text)}")
+print(f"len(data)  = {len(data)}")
+
+print()
+print("Selected names from dir(data):")
+for name in ["decode", "hex", "split", "replace", "startswith"]:
+    print(f"{name:10} -> {name in dir(data)}")
+
+decoded_text = data.decode("utf-8")
+
+print()
+print("Decoded back into text:")
+print(f"decoded_text       = {decoded_text}")
+print(f"type(decoded_text) = {type(decoded_text)}")
+print(f"text == decoded_text -> {text == decoded_text}")
+\end{verbatim}
+
+The string and the byte sequence are different objects. The \texttt{str} object represents text. The \texttt{bytes} object represents byte values. Some visible characters require one byte in UTF-8, while others require several bytes. That is why \texttt{len(text)} and \texttt{len(data)} may differ.
+
+The same boundary appears when writing and reading a text file.
+
+\begin{verbatim}
+path = "encoding_boundary_demo.txt"
+
+text = "Nobody expects the Spanish Inquisition. Și totuși apare.\n"
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    print("Text file object while writing:")
+    print(f"type(file_obj) = {type(file_obj)}")
+    print(f"encoding       = {file_obj.encoding}")
+
+    file_obj.write(text)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    restored_text = file_obj.read()
+
+print()
+print("Text restored from file:")
+print(restored_text)
+
+print("Object inspection:")
+print(f"type(restored_text) = {type(restored_text)}")
+print(f"text == restored_text -> {text == restored_text}")
+\end{verbatim}
+
+At Python level, the program writes and reads strings. At storage level, the file contains bytes. The text file object is the managed translation layer between those two forms.
+
 \subsubsection{Common Encoding Choices: UTF-8 as the Default Modern Interchange Encoding}
-\subsubsection{Encoding Failure Modes: `UnicodeDecodeError`, `UnicodeEncodeError`, and Error Handling Strategies}
+
+UTF-8 is the normal modern choice for text interchange. It can represent ordinary ASCII text, Romanian characters, mathematical symbols, many writing systems, and emoji without switching encodings. It is also compatible with ASCII for the first 128 character codes, which makes simple English text look byte-for-byte familiar.
+
+For course code, the practical rule is simple: when opening a text file, specify \texttt{encoding="utf-8"} unless there is a concrete reason to use something else.
+
+\begin{verbatim}
+path = "utf8_demo.txt"
+
+lines = [
+    "English: The Ministry of Silly Walks.\n",
+    "Romanian: Ș, ț, ă, î, â.\n",
+    "Number: 42.\n",
+]
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.writelines(lines)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print("Content read with UTF-8:")
+print(content)
+
+print("Object inspection:")
+print(f"type(content) = {type(content)}")
+print(f"len(content)  = {len(content)}")
+
+print()
+print("Visible lines:")
+for line_number, line in enumerate(content.splitlines(), start=1):
+    print(f"{line_number:02d}: {line}")
+\end{verbatim}
+
+Different encodings store the same text using different byte rules. For plain ASCII characters, many encodings look identical. For non-ASCII characters, the difference becomes visible.
+
+\begin{verbatim}
+text = "Știință"
+
+utf8_data = text.encode("utf-8")
+utf16_data = text.encode("utf-16")
+
+print("Same text, different byte encodings:")
+print(f"text       = {text}")
+print(f"utf8_data  = {utf8_data}")
+print(f"utf16_data = {utf16_data}")
+
+print()
+print("Types:")
+print(f"type(text)       = {type(text)}")
+print(f"type(utf8_data)  = {type(utf8_data)}")
+print(f"type(utf16_data) = {type(utf16_data)}")
+
+print()
+print("Lengths:")
+print(f"len(text)       = {len(text)}")
+print(f"len(utf8_data)  = {len(utf8_data)}")
+print(f"len(utf16_data) = {len(utf16_data)}")
+\end{verbatim}
+
+The text is logically the same, but the stored byte representation is different. Therefore, reading text correctly requires knowing the encoding used when the bytes were written.
+
+\subsubsection{Encoding Failure Modes: \texttt{UnicodeDecodeError}, \texttt{UnicodeEncodeError}, and Error Handling Strategies}
+
+Encoding and decoding can fail. A \texttt{UnicodeEncodeError} occurs when Python is asked to encode a character that cannot be represented in the chosen encoding. A \texttt{UnicodeDecodeError} occurs when Python is asked to decode bytes that do not form valid text under the chosen encoding.
+
+\begin{verbatim}
+text = "Știință and 42"
+
+print("Trying to encode Romanian text as ASCII:")
+
+try:
+    data = text.encode("ascii")
+except UnicodeEncodeError as err:
+    print("Encoding failed.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "encoding", "object", "start", "end", "reason"]:
+        print(f"{name:10} -> {name in dir(err)}")
+\end{verbatim}
+
+ASCII cannot represent characters such as \texttt{Ș} and \texttt{ă}. UTF-8 can.
+
+\begin{verbatim}
+text = "Știință and 42"
+
+data = text.encode("utf-8")
+
+print("Encoding with UTF-8 succeeds:")
+print(f"data       = {data}")
+print(f"type(data) = {type(data)}")
+
+restored = data.decode("utf-8")
+
+print()
+print("Decoded text:")
+print(f"restored       = {restored}")
+print(f"type(restored) = {type(restored)}")
+\end{verbatim}
+
+Decoding can fail when byte data is interpreted with the wrong encoding.
+
+\begin{verbatim}
+data = "Știință".encode("utf-8")
+
+print("Valid UTF-8 bytes:")
+print(data)
+
+print()
+print("Trying to decode those bytes as ASCII:")
+
+try:
+    text = data.decode("ascii")
+except UnicodeDecodeError as err:
+    print("Decoding failed.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "encoding", "object", "start", "end", "reason"]:
+        print(f"{name:10} -> {name in dir(err)}")
+\end{verbatim}
+
+Python also allows explicit error-handling strategies. These should be used deliberately, not as a way to hide misunderstanding about the file's real encoding.
+
+\begin{verbatim}
+text = "Știință and 42"
+
+print("Encoding with error handling:")
+
+ascii_replace = text.encode("ascii", errors="replace")
+ascii_ignore = text.encode("ascii", errors="ignore")
+ascii_xml = text.encode("ascii", errors="xmlcharrefreplace")
+
+print(f"replace         = {ascii_replace}")
+print(f"ignore          = {ascii_ignore}")
+print(f"xmlcharrefreplace = {ascii_xml}")
+
+print()
+print("Decoding invalid bytes with error handling:")
+
+bad_data = b"Valid ASCII first. \xff\xfe Broken bytes later."
+
+try:
+    normal_text = bad_data.decode("utf-8")
+except UnicodeDecodeError as err:
+    print("Normal UTF-8 decoding failed.")
+    print(f"err = {err}")
+
+replace_text = bad_data.decode("utf-8", errors="replace")
+ignore_text = bad_data.decode("utf-8", errors="ignore")
+
+print()
+print(f"replace_text = {replace_text}")
+print(f"ignore_text  = {ignore_text}")
+\end{verbatim}
+
+The common error strategies are:
+
+\begin{itemize}
+    \item \texttt{"strict"}: fail on invalid data; this is the default;
+    \item \texttt{"replace"}: replace invalid characters with a marker;
+    \item \texttt{"ignore"}: drop invalid data;
+    \item \texttt{"xmlcharrefreplace"}: when encoding, replace unsupported characters with XML-style character references.
+\end{itemize}
+
+The safest default for course programs is still explicit UTF-8 with strict error behavior:
+
+\begin{verbatim}
+path = "safe_utf8_text.txt"
+
+text = "UTF-8 keeps the text boundary explicit. Și asta contează.\n"
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write(text)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print(content)
+print(f"type(content) = {type(content)}")
+\end{verbatim}
+
+The practical rule is this: \texttt{str} is runtime text, \texttt{bytes} is byte data, encoding moves from \texttt{str} to \texttt{bytes}, and decoding moves from \texttt{bytes} to \texttt{str}. Text files sit exactly on that boundary.

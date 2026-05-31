@@ -1,0 +1,13 @@
+\subsection{CPython Allocation Optimizations}
+
+Fixed arity lets CPython allocate \texttt{PyTupleObject} with exactly \texttt{n} reference slots---no overallocation field, unlike \texttt{PyListObject}. Structural immutability makes aggressive reuse safe.
+
+\subsubsection{CPython Allocation Caching: Version-Dependent Recycling Optimizations for Small Tuple Objects}
+
+CPython maintains a private free list for small tuples (historically sizes 1--20 on many builds). When a tuple's refcount drops to zero, the object may return to this pool instead of the general allocator; a subsequent tuple of the same size can be resurrected from the cache with pointer slots rewritten. The empty tuple \texttt{()} is a permanent singleton---every \texttt{()} expression references the same object (\texttt{is} always true).
+
+This bypasses repeated \texttt{malloc}/\texttt{free} churn for short-lived tuples in tight loops (e.g.\ function returns, \texttt{enumerate} pairs). Rules are version-specific implementation details: \texttt{is} between separately constructed equal tuples must never drive program logic; only \texttt{==} is semantic. \texttt{tuple(existing\_tuple)} may return the same object when no copy is needed.
+
+\subsubsection{Memory Footprint Metrics: Comparing Fixed \texttt{tuple} Layouts Against the Dynamic Tracking Buffers of \texttt{list}}
+
+\texttt{sys.getsizeof()} on equal-length \texttt{list} vs.\ \texttt{tuple} typically shows smaller tuples: lists carry allocated-capacity overhead beyond \texttt{ob\_size}; tuples store only live slots. List size jumps in steps as \texttt{list\_resize} expands; tuple size grows linearly with arity. Choose \texttt{tuple} for fixed-shape records and hashable keys; choose \texttt{list} when the sequence must grow or mutate in place---memory difference is a consequence of that semantic split, not the primary design driver.

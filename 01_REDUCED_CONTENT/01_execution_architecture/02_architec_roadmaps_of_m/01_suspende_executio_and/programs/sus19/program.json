@@ -1,0 +1,9 @@
+{
+  "language": "php",
+  "title": "PHP / Zend Engine: Fibers and user-space async frameworks.",
+  "label": "sus19",
+  "linenos": true,
+  "input": null,
+  "output": "A start\nB start\nA done\nB done",
+  "file": "main.php"
+}

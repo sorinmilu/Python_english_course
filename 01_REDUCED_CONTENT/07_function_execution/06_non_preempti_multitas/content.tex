@@ -1,0 +1,3 @@
+\section{Non-Preemptive Multitasking: Generators and Coroutines}
+
+Ordinary functions run to completion. Generators and coroutines suspend execution, preserve frame state on the heap, and resume under caller or scheduler control. \texttt{yield} exposes suspension; \texttt{yield from} delegates through generator chains; \texttt{send}/\texttt{throw}/\texttt{close} enable bidirectional flow; \texttt{async def}/\texttt{await} provide native coroutine objects scheduled by event loops.

@@ -1,0 +1,15 @@
+\subsection{From Chapter 1's Runtime Model to CPython's Concrete Implementation}
+
+Chapter~1 established the native baseline: executables, segments, stacks, heaps, and machine instructions. CPython inherits that baseline completely. The \texttt{python} binary is a normal process with text, data, BSS, heap, and native stack regions. Python source is input to that process, not an ELF or PE image the kernel executes directly.
+
+The layered model is therefore fixed:
+
+\begin{verbatim}
+Operating system runs CPython (native C program)
+    CPython builds managed runtime (objects, bytecode, frames)
+        Python program executes inside that runtime
+\end{verbatim}
+
+Python names are not C variables: assignment binds identifiers to heap objects recorded in namespaces. Python calls are not bare native jumps: they activate frame records carrying bytecode position, local slots, and namespace links. Memory is not manually freed: object lifetimes follow reference topology maintained by CPython.
+
+The rest of this section opens that runtime just enough to explain compilation products and the ledger that tracks which name currently points to which object during execution.

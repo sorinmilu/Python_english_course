@@ -1,0 +1,49 @@
+\subsection{The Boolean Representation Architecture (\texttt{bool})}
+
+Python's \texttt{bool} type represents truth values: \texttt{True} and \texttt{False}. These are not strings and not numeric literals with special spelling. They are boolean objects---singleton instances of \texttt{bool} allocated once per interpreter process.
+
+\subsubsection{Boolean Values as Singleton Objects: \texttt{True} and \texttt{False}}
+
+Every ordinary use of \texttt{True} refers to the same object; every ordinary use of \texttt{False} refers to the same object. \texttt{a is True} and \texttt{b is True} imply identical heap addresses. The constructor \texttt{bool(x)} does not allocate a new truth object; it returns the existing singleton based on truth-value testing of \texttt{x}.
+
+\subsubsection{Boolean as a Subclass of Integer: Numeric Compatibility and Practical Warnings}
+
+Here lies one of Python's most consequential historical compromises. In the class hierarchy:
+
+\begin{verbatim}
+bool <: int <: object
+\end{verbatim}
+
+\texttt{bool} inherits directly from \texttt{int} because early-1990s Python code and C extension modules already treated truth values as numeric \texttt{0}/\texttt{1} before \texttt{bool} existed as a distinct type (introduced in Python~2.3). Backward compatibility mandated that \texttt{True} and \texttt{False} remain integer-compatible:
+
+\begin{verbatim}
+isinstance(True, int)    # True
+True + True == 2         # True
+True + False == 1        # True
+int(True), int(False)    # 1, 0
+\end{verbatim}
+
+This is architecturally valid---\texttt{bool} \emph{is} an \texttt{int} subclass---but semantically treacherous. Counting true conditions via \texttt{sum([a, b, c])} or \texttt{flag1 + flag2} exploits integer inheritance deliberately. Writing \texttt{total = True + 41} to produce \texttt{42} exploits it accidentally.
+
+The inheritance explains why booleans expose integer methods (\texttt{bit\_length()}, \texttt{to\_bytes()}) and why \texttt{isinstance(True, int)} succeeds while \texttt{type(True) is int} fails. Exact type is \texttt{bool}; numeric family membership includes \texttt{int}.
+
+For systems engineers, the rule is: treat booleans as truth values in control flow; treat their integer compatibility as a legacy artifact to be understood, not relied upon without explicit intent.
+
+\subsubsection{Logical Operators vs. Bitwise Operators: \texttt{and} / \texttt{or} / \texttt{not} Compared with \texttt{\&} / \texttt{|} / \texttt{\textasciitilde{}}}
+
+Logical operators (\texttt{and}, \texttt{or}, \texttt{not}) perform truth-value logic, short-circuit evaluation, and may return operands unchanged rather than coercing to \texttt{bool}. Bitwise operators (\texttt{\&}, \texttt{|}, \texttt{\textasciitilde{}}) operate on integer bit patterns.
+
+Because \texttt{bool} is integer-compatible, \texttt{True \& False} and \texttt{True and False} may yield the same result for simple cases, but the mechanisms differ:
+
+\begin{itemize}
+    \item \texttt{and}/\texttt{or} short-circuit; \texttt{\&}/\texttt{|} evaluate both operands;
+    \item \texttt{not True} yields \texttt{False}; \texttt{\textasciitilde{}True} yields \texttt{-2} because \texttt{\textasciitilde{}1 == -2} in two's-complement integer arithmetic.
+\end{itemize}
+
+Use logical operators for conditions. Reserve bitwise operators for intentional bit-level manipulation on integer domains.
+
+The practical summary:
+
+\begin{quote}
+Python booleans are singleton truth-value objects that inherit from \texttt{int} due to early backward-compatibility mandates. Operations such as \texttt{True + True == 2} are valid by design, not bugs. Logical and bitwise operators must not be conflated despite surface similarities on boolean operands.
+\end{quote}

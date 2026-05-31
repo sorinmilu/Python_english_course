@@ -1,1 +1,7 @@
 \section{Runtime Scope Mechanics and Variable Binding Analysis}
+
+Scope errors are not exceptions to Python's name-resolution model. They are direct consequences of it. Once a function body is compiled, Python has already classified many names as local, global, free, or built-in lookups. Runtime execution then follows those classifications when loading and storing objects.
+
+This section examines the failure cases that reveal the machinery most clearly. \texttt{UnboundLocalError}, conflicting local and global names, and ordinary \texttt{NameError} are not vague lookup problems. Each one corresponds to a specific binding situation: a missing name, a local slot read before assignment, or a namespace selected differently than the programmer expected.
+
+The section then moves from runtime symptoms to compile-time preparation. Python scans assignment targets, builds symbol information, chooses local-slot or global-lookup behavior, and preserves closure variables through cells. Understanding this separation between static name classification and dynamic value lookup is necessary before closures, decorators, generators, and coroutine state can be explained correctly.

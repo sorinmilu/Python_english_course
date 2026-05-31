@@ -1,0 +1,80 @@
+\subsection{Code Objects, Frame Objects, and Namespace Dictionaries}
+
+\emph{The Ledger of Names} is the central runtime triangle of CPython:
+
+\begin{verbatim}
+code object     -> static ledger template (bytecode + name tables)
+frame object    -> active ledger page for one call
+namespace dict  -> dynamic name -> object mapping
+\end{verbatim}
+
+\subsubsection{Code Objects: Stored Executable Descriptions}
+
+A \texttt{PyCodeObject} is immutable once created. It stores the bytecode stream, \texttt{co\_consts}, \texttt{co\_names}, \texttt{co\_varnames}, free/cell variable metadata, and stack requirements. It records \emph{which} identifiers and constants appear, not their current values. Module bodies, functions, comprehensions, and class bodies each receive code objects during compilation.
+
+Mechanically, contrast this with a running activation. The code object is like a read-only blueprint filed in the object heap; it can be shared by unbounded calls.
+
+\subsubsection{Function Objects Wrap Code Objects}
+
+A function object adds runtime context to a code object: a reference to the defining module's global namespace, default argument objects, keyword-only defaults, annotations, and closure cells. Executing \texttt{def} creates this object and binds the function name in the current namespace. Calls later retrieve the shared code object while supplying fresh argument bindings.
+
+\subsubsection{Frame Objects: One Active Execution}
+
+A \texttt{PyFrameObject} (or frame-like structure in optimized builds) is allocated on the heap when execution begins. It points at the code object, tracks \texttt{f\_lasti} (instruction offset), holds the evaluation stack, links to caller frames, and stores exception handler state. Locals receive values here during the call.
+
+The mechanical distinction matters for C programmers:
+
+\begin{itemize}
+    \item \textbf{Code object}: static, shared, immutable instruction/metadata bundle.
+    \item \textbf{Frame object}: dynamic, per-invocation record of ``where we are'' in that bundle.
+\end{itemize}
+
+One code object, many possible frames across recursive or repeated calls---each frame with its own local bindings and stack depth.
+
+\subsubsection{Namespace Dictionaries: Names Point to Objects}
+
+Module-level and many class-level names live in dictionary mappings (\texttt{PyDictObject}). Lookup is hash-based: \texttt{LOAD\_GLOBAL} and \texttt{STORE\_GLOBAL} consult the module dict (with a cached fast path in modern CPython). This is the fully dynamic ledger model familiar from scripting symbol tables.
+
+\subsubsection{Fast Locals: The Practical Optimization}
+
+Function locals are ledger entries, but CPython optimizes the common case. For ordinary functions, local names known at compile time are assigned fixed indices into a parallel array stored inside the frame (\texttt{f\_localsplus} in C sources). Bytecodes \texttt{LOAD\_FAST} and \texttt{STORE\_FAST} use raw array indexing---pointer arithmetic on a contiguous slot table---instead of hashing a dict on every access.
+
+Contrast:
+
+\begin{verbatim}
+module global x   -> dict hash lookup in namespace
+function local x  -> slot LOAD_FAST / STORE_FAST by index
+\end{verbatim}
+
+Globals remain dynamically open: any module code may insert new keys. Locals in optimized functions are closed sets known at compile time, enabling the C-level shortcut. Introspection may expose locals through a mapping view, but hot execution paths use the fast array.
+
+\subsubsection{Local, Global, and Built-in Name Resolution}
+
+Unqualified reads inside functions follow the LEGB rule conceptually: local slots first, then global dict, then builtins. The frame carries links to the relevant namespaces; the compiler emits different opcodes depending on how each name was classified during compilation.
+
+\subsubsection{Module Namespaces Are Real Dictionaries}
+
+\texttt{module.\_\_dict\_\_} is the authoritative module ledger. Import executes the module body once (unless reload intervenes), populating that dict with functions, classes, and constants.
+
+\subsubsection{Class Body Execution Uses a Namespace Too}
+
+Class statements execute their bodies in a temporary namespace whose entries become class attributes when the class object is constructed. A class definition is runtime code, not a static C struct declaration.
+
+\subsubsection{Closures: When Frames Need Preserved Cells}
+
+Nested functions referencing enclosing locals store those bindings in \emph{cell} objects referenced from the inner function's closure tuple. Outer frames may end, but cells preserve the needed object references---another ledger page kept alive because inner code still reads it.
+
+\subsubsection{Why This Matters for Python Programming}
+
+Assignment binds names in a namespace or fast local slot. Calls create frames executing shared code objects. Shared mutability is alias propagation across ledger entries pointing at one heap object. Closures are functions carrying extra pointers to cells.
+
+\subsubsection{The Mental Model}
+
+\begin{verbatim}
+compile -> code object (static ledger schema)
+call    -> frame object (active ledger page + fast local array)
+lookup  -> dict or LOAD_FAST index
+bind    -> STORE_GLOBAL / STORE_FAST writes object pointer
+\end{verbatim}
+
+Python execution is not text interpreted line by line. It is ledger updates driven by bytecode inside frame state.

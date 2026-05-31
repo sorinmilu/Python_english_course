@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: coroutine emulation with explicit state machines or separate stacks.",
+  "label": "sus01",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

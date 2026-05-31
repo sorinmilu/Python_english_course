@@ -1,0 +1,3 @@
+\section{The CPython Reference Implementation as Python's Concrete Runtime}
+
+CPython is the bridge between readable Python source and a native process executing C code. The operating system runs the compiled interpreter; the interpreter parses modules, emits bytecode-bearing code objects, allocates heap objects, constructs frames, resolves names through namespace machinery, and dispatches opcodes. This section follows that path through one organizing metaphor: \emph{The Ledger of Names}---how CPython maps identifiers to memory structures for engineers who already understand C compilation and dynamic symbol tables.

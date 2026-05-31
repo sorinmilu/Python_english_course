@@ -1,7 +1,1285 @@
 \subsection{Function Signature Architecture}
+
+A function signature is the visible call contract of a function. It tells the caller how arguments may be supplied and how those argument objects will be bound to local parameter names when the call frame is created.
+
+The signature does not describe the whole function body. It describes the entrance gate into the function frame.
+
+A Python signature can specify:
+
+\begin{itemize}
+    \item positional parameters;
+    \item keyword parameters;
+    \item default values;
+    \item positional-only parameters;
+    \item keyword-only parameters;
+    \item annotations.
+\end{itemize}
+
+The previous subsection explained what is passed across the call boundary: object references are bound to new local parameter names. This subsection explains how Python decides which argument object is bound to which parameter name.
+
 \subsubsection{Positional Parameters and Positional Argument Binding}
+
+The simplest function signature lists parameters in order.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+show_line("Homer", 42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+\end{verbatim}
+
+The call:
+
+\begin{verbatim}
+show_line("Homer", 42)
+\end{verbatim}
+
+binds arguments by position:
+
+\begin{verbatim}
+first argument  -> name
+second argument -> score
+\end{verbatim}
+
+So the function call creates a frame whose local parameter bindings begin like this:
+
+\begin{verbatim}
+name  -> "Homer"
+score -> 42
+\end{verbatim}
+
+The order matters.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+show_line(42, "Homer")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name=42
+score='Homer'
+\end{verbatim}
+
+Python does not know that the programmer probably meant the opposite order. It follows the signature and binds positionally.
+
+The objects received by the function are ordinary objects.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name:        {name!r}")
+    print(f"type(name):  {type(name)}")
+    print(f"score:       {score!r}")
+    print(f"type(score): {type(score)}")
+
+show_line("Homer", 42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name:        'Homer'
+type(name):  <class 'str'>
+score:       42
+type(score): <class 'int'>
+\end{verbatim}
+
+The string object bound to \texttt{name} has string behavior.
+
+\begin{verbatim}
+name = "Homer"
+
+print(f"type(name): {type(name)}")
+print()
+
+selected_names = [
+    "upper",
+    "lower",
+    "replace",
+    "__len__",
+    "__getitem__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(name)}")
+
+print()
+print(f"name.upper():       {name.upper()}")
+print(f"name.replace(...):  {name.replace('H', 'B')}")
+print(f"len(name):          {len(name)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(name): <class 'str'>
+
+upper          True
+lower          True
+replace        True
+__len__        True
+__getitem__    True
+
+name.upper():       HOMER
+name.replace(...):  Bomer
+len(name):          5
+\end{verbatim}
+
+The integer object bound to \texttt{score} has integer behavior.
+
+\begin{verbatim}
+score = 42
+
+print(f"type(score): {type(score)}")
+print()
+
+selected_names = [
+    "__add__",
+    "__sub__",
+    "__mul__",
+    "__eq__",
+    "bit_length",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(score)}")
+
+print()
+print(f"score + 8:              {score + 8}")
+print(f"score.bit_length():     {score.bit_length()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(score): <class 'int'>
+
+__add__        True
+__sub__        True
+__mul__        True
+__eq__         True
+bit_length     True
+
+score + 8:              50
+score.bit_length():     6
+\end{verbatim}
+
+The binding mechanism is not affected by these object types. The first argument is bound to the first parameter. The second argument is bound to the second parameter.
+
+If the caller supplies too few positional arguments, Python raises \texttt{TypeError} before the function body runs.
+
+\begin{verbatim}
+def show_line(name, score):
+    print("this line will not run if binding fails")
+    print(f"{name}: {score}")
+
+try:
+    show_line("Homer")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() missing 1 required positional argument: 'score'
+\end{verbatim}
+
+If the caller supplies too many positional arguments, Python also raises \texttt{TypeError} before entering the function body.
+
+\begin{verbatim}
+def show_line(name, score):
+    print("this line will not run if binding fails")
+    print(f"{name}: {score}")
+
+try:
+    show_line("Homer", 42, "D'oh!")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() takes 2 positional arguments but 3 were given
+\end{verbatim}
+
+The important detail is that these failures happen during argument binding. The callee frame is not allowed to begin normal body execution with an incomplete or inconsistent parameter setup.
+
+The standard \texttt{inspect} module can show the function signature as a runtime object.
+
+\begin{verbatim}
+import inspect
+
+def show_line(name, score):
+    print(f"{name}: {score}")
+
+sig = inspect.signature(show_line)
+
+print(f"signature: {sig}")
+print(f"type(sig): {type(sig)}")
+print()
+
+selected_names = [
+    "parameters",
+    "return_annotation",
+    "bind",
+    "bind_partial",
+    "replace",
+]
+
+for attr in selected_names:
+    print(f"{attr:<20} {attr in dir(sig)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (name, score)
+type(sig): <class 'inspect.Signature'>
+
+parameters           True
+return_annotation    True
+bind                 True
+bind_partial         True
+replace              True
+\end{verbatim}
+
+The \texttt{Signature} object is not needed for ordinary calls. It is useful for inspection, teaching, decorators, frameworks, and tools that need to reason about how a function can be called.
+
+Its \texttt{parameters} attribute is an ordered mapping-like object that describes the parameters.
+
+\begin{verbatim}
+import inspect
+
+def show_line(name, score):
+    print(f"{name}: {score}")
+
+sig = inspect.signature(show_line)
+
+print(f"sig.parameters:       {sig.parameters}")
+print(f"type(sig.parameters): {type(sig.parameters)}")
+print()
+
+for param_name, param_obj in sig.parameters.items():
+    print(f"name:            {param_name}")
+    print(f"parameter obj:   {param_obj}")
+    print(f"type:            {type(param_obj)}")
+    print(f"kind:            {param_obj.kind}")
+    print(f"default:         {param_obj.default}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+sig.parameters:       OrderedDict([('name', <Parameter "name">), ('score', <Parameter "score">)])
+type(sig.parameters): <class 'mappingproxy'>
+
+name:            name
+parameter obj:   name
+type:            <class 'inspect.Parameter'>
+kind:            POSITIONAL_OR_KEYWORD
+default:         <class 'inspect._empty'>
+
+name:            score
+parameter obj:   score
+type:            <class 'inspect.Parameter'>
+kind:            POSITIONAL_OR_KEYWORD
+default:         <class 'inspect._empty'>
+\end{verbatim}
+
+The exact display of the mapping type may differ by Python version, but the useful idea is stable: the signature can be inspected as structured runtime data.
+
+A parameter object also has inspectable attributes.
+
+\begin{verbatim}
+import inspect
+
+def show_line(name, score):
+    print(f"{name}: {score}")
+
+sig = inspect.signature(show_line)
+param_obj = sig.parameters["name"]
+
+print(f"type(param_obj): {type(param_obj)}")
+print()
+
+selected_names = [
+    "name",
+    "default",
+    "annotation",
+    "kind",
+    "replace",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(param_obj)}")
+
+print()
+print(f"param_obj.name:        {param_obj.name}")
+print(f"param_obj.kind:        {param_obj.kind}")
+print(f"param_obj.default:     {param_obj.default}")
+print(f"param_obj.annotation:  {param_obj.annotation}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(param_obj): <class 'inspect.Parameter'>
+
+name           True
+default        True
+annotation     True
+kind           True
+replace        True
+
+param_obj.name:        name
+param_obj.kind:        POSITIONAL_OR_KEYWORD
+param_obj.default:     <class 'inspect._empty'>
+param_obj.annotation:  <class 'inspect._empty'>
+\end{verbatim}
+
+This inspection object makes visible what the source already implies: each parameter has a name, a binding kind, possibly a default value, and possibly an annotation.
+
 \subsubsection{Keyword Arguments and Explicit Name-Based Binding}
+
+Keyword arguments bind by parameter name instead of by position.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+show_line(name="Homer", score=42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+\end{verbatim}
+
+Because the arguments are named, they can be supplied in a different order.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+show_line(score=42, name="Homer")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+\end{verbatim}
+
+The call:
+
+\begin{verbatim}
+show_line(score=42, name="Homer")
+\end{verbatim}
+
+binds like this:
+
+\begin{verbatim}
+parameter named name  -> "Homer"
+parameter named score -> 42
+\end{verbatim}
+
+The order of the keyword arguments in the call is not what determines the binding. The explicit names determine the binding.
+
+Positional and keyword arguments can be mixed, but positional arguments must come first.
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+    print(f"mood={mood!r}")
+
+show_line("Homer", score=42, mood="hungry")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+mood='hungry'
+\end{verbatim}
+
+The first positional argument binds to the first available positional parameter:
+
+\begin{verbatim}
+"Homer" -> name
+\end{verbatim}
+
+The remaining keyword arguments bind by name:
+
+\begin{verbatim}
+score="42"     is not used here; the actual object is integer 42
+score -> 42
+mood  -> "hungry"
+\end{verbatim}
+
+A parameter cannot receive two values.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"{name}: {score}")
+
+try:
+    show_line("Homer", name="Bart")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() got multiple values for argument 'name'
+\end{verbatim}
+
+The positional argument already supplied a value for \texttt{name}. The keyword argument tries to supply another value for the same parameter. Python rejects the call before the function body runs.
+
+An unknown keyword is also rejected unless the function explicitly accepts arbitrary keyword arguments, which will be discussed in the later section on flexible parametrization systems.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"{name}: {score}")
+
+try:
+    show_line(name="Homer", score=42, mood="hungry")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() got an unexpected keyword argument 'mood'
+\end{verbatim}
+
+Keyword binding is especially useful when several arguments have the same primitive type and their order would otherwise be easy to confuse.
+
+\begin{verbatim}
+def make_box(left, top, width, height):
+    print(f"left={left:>3} top={top:>3} width={width:>3} height={height:>3}")
+
+make_box(left=10, top=20, width=300, height=80)
+make_box(width=300, height=80, left=10, top=20)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left= 10 top= 20 width=300 height= 80
+left= 10 top= 20 width=300 height= 80
+\end{verbatim}
+
+Both calls bind to the same local parameter names.
+
+Keyword arguments are not a different kind of object being passed. They are a different binding route. The same object-reference passing model still applies.
+
+\begin{verbatim}
+def add_fact(lines, fact):
+    lines.append(fact)
+
+facts = ["The answer is 42."]
+
+add_fact(lines=facts, fact="Chuck Norris can slam a revolving door.")
+
+print(facts)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+['The answer is 42.', 'Chuck Norris can slam a revolving door.']
+\end{verbatim}
+
+The keyword \texttt{lines=} chooses the parameter. The object referenced by \texttt{facts} is still the same list object shared with the function frame.
+
 \subsubsection{Default Parameter Values and Definition-Time Evaluation}
-\subsubsection{Positional-Only Parameters Using `/`}
-\subsubsection{Keyword-Only Parameters Using `*`}
+
+A parameter may have a default value. If the caller does not provide an argument for that parameter, Python uses the default object stored in the function object.
+
+\begin{verbatim}
+def show_line(name, score=42):
+    print(f"{name:<10} score={score:04d}")
+
+show_line("Homer")
+show_line("Bart", 7)
+show_line("Lisa", score=100)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042
+Bart       score=0007
+Lisa       score=0100
+\end{verbatim}
+
+The default belongs to the function object. It is visible through \texttt{\_\_defaults\_\_}.
+
+\begin{verbatim}
+def show_line(name, score=42):
+    print(f"{name:<10} score={score:04d}")
+
+print(f"show_line.__defaults__: {show_line.__defaults__}")
+print(f"type(__defaults__):     {type(show_line.__defaults__)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+show_line.__defaults__: (42,)
+type(__defaults__):     <class 'tuple'>
+\end{verbatim}
+
+The defaults for positional-or-keyword parameters are stored as a tuple.
+
+That tuple can be inspected.
+
+\begin{verbatim}
+def show_line(name, score=42):
+    print(f"{name:<10} score={score:04d}")
+
+defaults = show_line.__defaults__
+
+print(f"type(defaults): {type(defaults)}")
+print()
+
+selected_names = [
+    "count",
+    "index",
+    "__len__",
+    "__getitem__",
+    "__contains__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(defaults)}")
+
+print()
+print(f"len(defaults):        {len(defaults)}")
+print(f"defaults[0]:          {defaults[0]}")
+print(f"42 in defaults:       {42 in defaults}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(defaults): <class 'tuple'>
+
+count          True
+index          True
+__len__        True
+__getitem__    True
+__contains__   True
+
+len(defaults):        1
+defaults[0]:          42
+42 in defaults:       True
+\end{verbatim}
+
+Default values are evaluated when the \texttt{def} statement executes, not each time the function is called.
+
+\begin{verbatim}
+default_score = 42
+
+def show_line(name, score=default_score):
+    print(f"{name:<10} score={score:04d}")
+
+default_score = 999
+
+show_line("Homer")
+show_line("Bart", 7)
+
+print()
+print(f"default_score now:       {default_score}")
+print(f"show_line.__defaults__:  {show_line.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042
+Bart       score=0007
+
+default_score now:       999
+show_line.__defaults__:  (42,)
+\end{verbatim}
+
+The name \texttt{default\_score} was used when the function object was created. At that time, it referred to the integer object \texttt{42}. The function stored that object as its default. Later rebinding \texttt{default\_score} to \texttt{999} does not rewrite the function object's stored default.
+
+This can be made even more visible with a function call used as a default expression.
+
+\begin{verbatim}
+def make_default_tag():
+    print("make_default_tag() is running")
+    return "D'oh!"
+
+def show_tag(text=make_default_tag()):
+    print(f"text={text!r}")
+
+print("after function definitions")
+print()
+
+show_tag()
+show_tag()
+show_tag("No soup for you!")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+make_default_tag() is running
+after function definitions
+
+text="D'oh!"
+text="D'oh!"
+text='No soup for you!'
+\end{verbatim}
+
+The function \texttt{make\_default\_tag()} ran once, while Python was executing the \texttt{def show\_tag(...)} statement. It did not run again for every call to \texttt{show\_tag()}.
+
+So the signature:
+
+\begin{verbatim}
+def show_tag(text=make_default_tag()):
+\end{verbatim}
+
+does not mean:
+
+\begin{verbatim}
+call make_default_tag() every time text is omitted
+\end{verbatim}
+
+It means:
+
+\begin{verbatim}
+execute make_default_tag() now
+store its returned object as the default value for text
+\end{verbatim}
+
+This fact becomes dangerous when the default object is mutable. That specific trap will be studied later in the section on architectural pitfalls of argument evaluation. For now, the rule is enough:
+
+\begin{quote}
+Default values are objects stored in the function object at definition time.
+\end{quote}
+
+Keyword-only defaults are stored separately in \texttt{\_\_kwdefaults\_\_}.
+
+\begin{verbatim}
+def show_line(name, *, score=42, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+print(f"__defaults__:   {show_line.__defaults__}")
+print(f"__kwdefaults__: {show_line.__kwdefaults__}")
+print(f"type:           {type(show_line.__kwdefaults__)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+__defaults__:   None
+__kwdefaults__: {'score': 42, 'mood': 'calm'}
+type:           <class 'dict'>
+\end{verbatim}
+
+The dictionary stores default values for parameters that must be supplied by keyword.
+
+The dictionary can be inspected.
+
+\begin{verbatim}
+def show_line(name, *, score=42, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+kw_defaults = show_line.__kwdefaults__
+
+print(f"type(kw_defaults): {type(kw_defaults)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "__getitem__",
+    "__setitem__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(kw_defaults)}")
+
+print()
+print(f"keys:              {list(kw_defaults.keys())}")
+print(f"score default:     {kw_defaults.get('score')}")
+print(f"items:             {list(kw_defaults.items())}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(kw_defaults): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__getitem__    True
+__setitem__    True
+
+keys:              ['score', 'mood']
+score default:     42
+items:             [('score', 42), ('mood', 'calm')]
+\end{verbatim}
+
+This again shows the same object model: the function object stores references to default objects.
+
+\subsubsection{Positional-Only Parameters Using \texttt{/}}
+
+A slash in the function signature marks all parameters before it as positional-only.
+
+\begin{verbatim}
+def divide(a, b, /):
+    return a / b
+
+print(divide(84, 2))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42.0
+\end{verbatim}
+
+The parameters \texttt{a} and \texttt{b} can be supplied positionally, but not by keyword.
+
+\begin{verbatim}
+def divide(a, b, /):
+    return a / b
+
+try:
+    print(divide(a=84, b=2))
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    divide() got some positional-only arguments passed as keyword arguments: 'a, b'
+\end{verbatim}
+
+The exact wording of the error message may differ across Python versions. The rule is stable: parameters before \texttt{/} cannot be bound by keyword.
+
+This is visible in the inspected signature.
+
+\begin{verbatim}
+import inspect
+
+def divide(a, b, /):
+    return a / b
+
+sig = inspect.signature(divide)
+
+print(f"signature: {sig}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<6} kind={param.kind}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (a, b, /)
+
+a      kind=POSITIONAL_ONLY
+b      kind=POSITIONAL_ONLY
+\end{verbatim}
+
+Positional-only parameters are useful when the parameter names are implementation details or when the function is trying to match built-in function behavior.
+
+For example, many built-in functions do not accept certain arguments by keyword.
+
+\begin{verbatim}
+print(len("D'oh!"))
+
+try:
+    print(len(obj="D'oh!"))
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+5
+error type: <class 'TypeError'>
+message:    len() takes no keyword arguments
+\end{verbatim}
+
+A user-defined function can express similar call restrictions with \texttt{/}.
+
+Parameters after the slash are not positional-only unless another marker restricts them.
+
+\begin{verbatim}
+def scale(value, /, factor=2):
+    return value * factor
+
+print(scale(21))
+print(scale(21, 2))
+print(scale(21, factor=2))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+42
+42
+\end{verbatim}
+
+Here \texttt{value} is positional-only. \texttt{factor} may be supplied positionally or by keyword.
+
+\begin{verbatim}
+def scale(value, /, factor=2):
+    return value * factor
+
+try:
+    print(scale(value=21, factor=2))
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    scale() got some positional-only arguments passed as keyword arguments: 'value'
+\end{verbatim}
+
+The slash affects binding rules only. It does not change what object is passed. It only says how the object may be connected to the parameter name.
+
+\subsubsection{Keyword-Only Parameters Using \texttt{*}}
+
+A bare star in the function signature marks all following parameters as keyword-only.
+
+\begin{verbatim}
+def make_card(name, *, score=42, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+make_card("Homer")
+make_card("Lisa", score=100)
+make_card("Bart", mood="restless", score=7)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+Lisa       score=0100 mood=calm
+Bart       score=0007 mood=restless
+\end{verbatim}
+
+The parameter \texttt{name} can be positional. The parameters after \texttt{*} must be supplied by keyword if the caller supplies them at all.
+
+This call fails:
+
+\begin{verbatim}
+def make_card(name, *, score=42, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+try:
+    make_card("Homer", 100, "hungry")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    make_card() takes 1 positional argument but 3 were given
+\end{verbatim}
+
+Python sees only one parameter before the bare star that can accept positional arguments. The later parameters are keyword-only.
+
+Keyword-only parameters are useful when positional order would be unclear.
+
+\begin{verbatim}
+def save_report(title, *, overwrite=False, verbose=False):
+    print(f"title={title!r}")
+    print(f"overwrite={overwrite}")
+    print(f"verbose={verbose}")
+
+save_report("annual report", overwrite=True, verbose=True)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+title='annual report'
+overwrite=True
+verbose=True
+\end{verbatim}
+
+The call is clearer than this would be:
+
+\begin{verbatim}
+save_report("annual report", True, True)
+\end{verbatim}
+
+With booleans especially, positional arguments can become unreadable. The keyword-only marker forces the call site to say what the flags mean.
+
+Keyword-only parameters can be required by omitting a default value.
+
+\begin{verbatim}
+def connect(host, *, port):
+    print(f"host={host!r}")
+    print(f"port={port!r}")
+
+connect("localhost", port=8080)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+host='localhost'
+port=8080
+\end{verbatim}
+
+The caller must use the keyword.
+
+\begin{verbatim}
+def connect(host, *, port):
+    print(f"host={host!r}")
+    print(f"port={port!r}")
+
+try:
+    connect("localhost", 8080)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    connect() takes 1 positional argument but 2 were given
+\end{verbatim}
+
+If the required keyword-only argument is missing, that is also a binding error.
+
+\begin{verbatim}
+def connect(host, *, port):
+    print(f"host={host!r}")
+    print(f"port={port!r}")
+
+try:
+    connect("localhost")
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    connect() missing 1 required keyword-only argument: 'port'
+\end{verbatim}
+
+The inspected signature shows the keyword-only kind.
+
+\begin{verbatim}
+import inspect
+
+def connect(host, *, port):
+    print(f"host={host!r}")
+    print(f"port={port!r}")
+
+sig = inspect.signature(connect)
+
+print(f"signature: {sig}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<8} kind={param.kind} default={param.default}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (host, *, port)
+
+host     kind=POSITIONAL_OR_KEYWORD default=<class 'inspect._empty'>
+port     kind=KEYWORD_ONLY default=<class 'inspect._empty'>
+\end{verbatim}
+
+A full signature may combine positional-only, normal positional-or-keyword, and keyword-only parameters.
+
+\begin{verbatim}
+def build_line(name, /, score=42, *, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+build_line("Homer")
+build_line("Lisa", 100)
+build_line("Bart", score=7, mood="restless")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+Lisa       score=0100 mood=calm
+Bart       score=0007 mood=restless
+\end{verbatim}
+
+The structure is:
+
+\begin{verbatim}
+name:
+    positional-only
+
+score:
+    positional or keyword
+
+mood:
+    keyword-only
+\end{verbatim}
+
+Inspection makes that structure explicit.
+
+\begin{verbatim}
+import inspect
+
+def build_line(name, /, score=42, *, mood="calm"):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+sig = inspect.signature(build_line)
+
+print(f"signature: {sig}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<8} kind={param.kind} default={param.default}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (name, /, score=42, *, mood='calm')
+
+name     kind=POSITIONAL_ONLY default=<class 'inspect._empty'>
+score    kind=POSITIONAL_OR_KEYWORD default=42
+mood     kind=KEYWORD_ONLY default=calm
+\end{verbatim}
+
+The markers \texttt{/} and \texttt{*} are not parameters. They are separators that change the binding rules for the real parameters around them.
+
 \subsubsection{Function Annotations: Metadata for Tools, Not Automatic Runtime Type Enforcement}
+
+Function annotations attach metadata to parameters and to the return value.
+
+\begin{verbatim}
+def build_line(name: str, score: int = 42) -> str:
+    return f"{name:<10} score={score:04d}"
+
+text = build_line("Homer")
+
+print(text)
+print()
+print(f"annotations: {build_line.__annotations__}")
+print(f"type:        {type(build_line.__annotations__)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042
+
+annotations: {'name': <class 'str'>, 'score': <class 'int'>, 'return': <class 'str'>}
+type:        <class 'dict'>
+\end{verbatim}
+
+The annotations are stored in the function object's \texttt{\_\_annotations\_\_} dictionary.
+
+That dictionary is ordinary dictionary-like data.
+
+\begin{verbatim}
+def build_line(name: str, score: int = 42) -> str:
+    return f"{name:<10} score={score:04d}"
+
+ann = build_line.__annotations__
+
+print(f"type(ann): {type(ann)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "__getitem__",
+    "__contains__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(ann)}")
+
+print()
+print(f"keys:              {list(ann.keys())}")
+print(f"ann['name']:       {ann['name']}")
+print(f"ann.get('return'): {ann.get('return')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(ann): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__getitem__    True
+__contains__   True
+
+keys:              ['name', 'score', 'return']
+ann['name']:       <class 'str'>
+ann.get('return'): <class 'str'>
+\end{verbatim}
+
+Annotations do not automatically enforce types at runtime.
+
+\begin{verbatim}
+def echo_count(value: int) -> str:
+    return f"value={value!r}"
+
+print(echo_count(42))
+print(echo_count("No soup for you!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value=42
+value='No soup for you!'
+\end{verbatim}
+
+The function annotation says that \texttt{value} is intended to be an \texttt{int}. Python still allows the string argument because no automatic runtime type check is performed.
+
+The function body may later fail if it performs an operation that the actual object does not support.
+
+\begin{verbatim}
+def double_count(value: int) -> int:
+    return value + value
+
+print(double_count(21))
+print(double_count("Ni!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+Ni!Ni!
+\end{verbatim}
+
+Even here, no type error occurs. String addition with another string is valid concatenation. The annotation did not force integer addition.
+
+A clearer failure appears when the function uses an integer-specific operation.
+
+\begin{verbatim}
+def show_bits(value: int) -> int:
+    return value.bit_length()
+
+print(show_bits(42))
+
+try:
+    print(show_bits("D'oh!"))
+except AttributeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+6
+error type: <class 'AttributeError'>
+message:    'str' object has no attribute 'bit_length'
+\end{verbatim}
+
+The failure occurs because the string object does not have the method used by the function body. The failure does not occur because Python enforced the annotation.
+
+The inspected signature also stores annotation data.
+
+\begin{verbatim}
+import inspect
+
+def build_line(name: str, score: int = 42) -> str:
+    return f"{name:<10} score={score:04d}"
+
+sig = inspect.signature(build_line)
+
+print(f"signature: {sig}")
+print(f"return annotation: {sig.return_annotation}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<8} annotation={param.annotation} default={param.default}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (name: str, score: int = 42) -> str
+return annotation: <class 'str'>
+
+name     annotation=<class 'str'> default=<class 'inspect._empty'>
+score    annotation=<class 'int'> default=42
+\end{verbatim}
+
+Annotations are therefore part of the function's inspectable interface. They are useful for documentation, static analysis, editors, linters, type checkers, validation libraries, and framework code. They are not automatic guards placed at the function entrance.
+
+The runtime rule is:
+
+\begin{quote}
+A function signature controls argument binding. Annotations describe intended meaning for tools and readers. They do not, by themselves, change the runtime object-passing model.
+\end{quote}

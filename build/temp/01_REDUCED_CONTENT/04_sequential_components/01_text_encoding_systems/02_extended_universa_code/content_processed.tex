@@ -1,0 +1,3 @@
+\subsection{Extended Universal Codepoint Escape Access}
+
+Lexical escapes for codepoints above the two-digit hex range (\texttt{\textbackslash N\{...\}}, \texttt{\textbackslash u}, \texttt{\textbackslash U}) are reference-map spellings resolved entirely at compile time. For production code, prefer literal Unicode characters or explicit \texttt{chr()}/\texttt{unicodedata} lookups at runtime; the exhaustive escape tables add lexer complexity without deepening runtime architecture understanding.

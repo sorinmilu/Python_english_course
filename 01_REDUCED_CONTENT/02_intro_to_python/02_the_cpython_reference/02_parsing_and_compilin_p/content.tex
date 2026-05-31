@@ -1,0 +1,15 @@
+\subsection{Parsing and Compiling Python Source: From \texttt{.py} Files to AST, Code Objects, Bytecode, and \texttt{.pyc} Marshaled Disk Artifacts}
+
+Source text becomes executable only through a front-end pipeline:
+
+\begin{verbatim}
+.py source -> tokens -> AST -> code object -> bytecode -> frame execution
+\end{verbatim}
+
+The tokenizer classifies characters into names, operators, literals, and---critically---indentation events. After a suite-introducing header ending in \texttt{:}, increased leading whitespace yields \texttt{INDENT}; returning to a prior margin yields \texttt{DEDENT}. Block structure is therefore fixed before bytecode exists.
+
+The parser and AST builder record program shape: bindings, control flow, expression precedence. Compile-time scope analysis classifies names as local, global, or free \emph{before} execution, which is why an assignment anywhere in a function makes a name local for the entire function body.
+
+A \emph{code object} is the static product of compilation: immutable bytecode, constants tuple, name tuples, stack depth, line-number table, and flags. It is executable material but not yet a running call. Function definitions at runtime wrap code objects inside callable function objects. Import may cache marshaled code objects in \texttt{\_\_pycache\_\_/*.pyc} to skip recompilation; bytecode remains version-specific and implementation-specific, not a portable binary substitute for source.
+
+Compilation creates ledgers-in-waiting: tables of names and constants attached to frozen instruction streams. Execution instantiates those ledgers into live frames.

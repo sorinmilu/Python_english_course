@@ -1,0 +1,17 @@
+\subsection{Structural Extraction and Evaluation}
+
+A \texttt{str} is a sequence whose components are themselves one-character \texttt{str} objects (length 1 each). There is no separate \texttt{char} type. Item access routes through \texttt{\_\_getitem\_\_}; scalar indexing and slicing share the general sequence projection rules introduced earlier, with results always typed as \texttt{str}.
+
+\subsubsection{Indexing and Slicing: Characters as One-Character String Objects}
+
+Scalar indexing returns a new \texttt{str} of length 1 referencing one codepoint slot. Slicing applies the index projection machinery and always materializes a (possibly empty) substring object on the heap. Invalid scalar indices raise \texttt{IndexError}; out-of-range slice bounds clamp.
+
+\subsubsection{Substring Evaluation Mechanisms: Step-Based Slice Offsets (\texttt{[start:stop:step]}) vs. Manual Pointer Offsets}
+
+Slice evaluation computes a normalized index sequence from \texttt{start}, \texttt{stop}, and \texttt{step}---including negative strides for reverse extraction---then copies selected code units into a fresh \texttt{str}. This is positional iteration with allocation, not C-style pointer arithmetic exposed to the programmer. Manual loops that concatenate indexed characters reproduce the result but inherit the same per-append allocation costs as repeated \texttt{+}.
+
+\subsubsection{String Formatting Paradigms: Variable Injection via Modern f-Strings}
+
+Older \texttt{str.format()} and \texttt{\%} templates parse format strings at runtime, building output through method dispatch and field lookup. f-strings (\texttt{f"..."}) are parsed at \emph{compile time}: expressions inside \texttt{\{\}} become bytecode that evaluates the expression, applies optional conversion flags (\texttt{!r}, \texttt{!s}, \texttt{!a}), and emits \texttt{FORMAT\_VALUE} plus \texttt{BUILD\_STRING} opcodes for stack-based assembly of the final \texttt{str}.
+
+The VM therefore avoids repeated interpretation of a template literal on each call; values are formatted directly on the evaluation stack. Runtime cost shifts from template parsing to per-value formatting of the embedded expressions---the dominant win on hot paths with static format structure. Cosmetic padding and float precision tables are secondary; the architectural point is compile-time lowering to specialized bytecode rather than generic format-method dispatch.

@@ -1,0 +1,19 @@
+\subsection{Foundations of Associative Mapping}
+
+A \texttt{dict} maps hashable keys to arbitrary value objects through the same open-addressed engine described for sets, with a parallel value array indexed by dense entry offset.
+
+\subsubsection{Structural Syntax: The Key-Value Paradigm and Curly-Brace \texttt{\{\}} Literals}
+
+Literals and \texttt{d[key] = value} invoke \texttt{\_\_setitem\_\_}, which hashes the key, probes for an existing equal key, and either replaces the value pointer or appends a new dense entry. \texttt{\_\_getitem\_\_} and \texttt{\_\_contains\_\_} operate on the key domain only.
+
+\subsubsection{Integrity Constraints: Why Dictionary Keys Must Be Hashable and Hash-Stable}
+
+Keys must supply stable \texttt{\_\_hash\_\_} and \texttt{\_\_eq\_\_} for the duration of storage. Equal keys identify one slot; a second insert replaces the value. Mutable containers set \texttt{\_\_hash\_\_} to \texttt{None}.
+
+\subsubsection{Value Flexibility: Storing Arbitrary, Nested Data Types and Mutable Heap Objects}
+
+Values impose no hash constraint. The dict stores \texttt{PyObject*} references; mutating a mutable value in place is visible through every alias, including \texttt{d[key]}, because the dict holds a pointer, not a deep copy.
+
+\subsubsection{Membership Testing: Why \texttt{x in d} Checks Keys, Not Values}
+
+\texttt{x in d} delegates to \texttt{\_\_contains\_\_} on the key table. Value membership requires \texttt{x in d.values()}, which scans the value array---$O(n)$---because values are not hashed.

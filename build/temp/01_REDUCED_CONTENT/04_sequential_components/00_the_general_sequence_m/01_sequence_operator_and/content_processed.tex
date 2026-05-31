@@ -1,0 +1,16 @@
+\subsection{Sequence Operators and Shared Behaviors}
+
+Sequence types expose operator hooks (\texttt{\_\_add\_\_}, \texttt{\_\_mul\_\_}, \texttt{\_\_eq\_\_}, \texttt{\_\_lt\_\_}) checked at runtime. Python's strong typing means an operator succeeds only when both operands participate in a defined protocol for that operation; mixed-type concatenation (e.g.\ list + tuple) fails rather than coercing.
+
+\subsubsection{Immutability vs. Mutability as the Major Structural Split}
+
+The structural partition that matters for systems reasoning:
+
+\begin{itemize}
+    \item \texttt{str} and \texttt{tuple}: immutable---slot contents and length fixed after construction;
+    \item \texttt{list}: mutable---reference slots can be replaced, inserted, or deleted in place.
+\end{itemize}
+
+Index assignment on a list mutates the existing \texttt{PyListObject}; the object's \texttt{id()} is preserved. Index assignment on \texttt{str} or \texttt{tuple} is rejected at runtime because the character or reference array is read-only. Concatenation (\texttt{+}) on any sequence type always produces a \emph{new} object; it never extends the left operand in place. For lists, in-place growth uses mutation methods that write into the existing slot buffer (when spare capacity exists) rather than rebinding the name to a concatenation result.
+
+Identity inspection with \texttt{id()} makes the pattern visible: \texttt{text = text + suffix} binds \texttt{text} to a newly allocated string; \texttt{items.append(x)} keeps \texttt{id(items)} stable while changing logical length. This split explains why strings and tuples can be hashed, interned, and shared safely, while lists require separate copy semantics when independence is required.

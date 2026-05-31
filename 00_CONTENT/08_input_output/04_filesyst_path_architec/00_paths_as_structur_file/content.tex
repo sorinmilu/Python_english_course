@@ -1,4 +1,191 @@
 \subsection{Paths as Structured Filesystem References}
-\subsubsection{String Paths vs. `pathlib.Path` Objects}
+
+A path is not the file itself. A path is a reference that tells the operating system where a filesystem object should be found or created. That object may be a file, a directory, a symbolic link, or some other platform-specific filesystem entry.
+
+Earlier file examples used simple string paths such as \texttt{"demo.txt"}. That works, but a path has internal structure: parent directories, final names, suffixes, roots, drives, separators, and resolution rules. Python can represent paths as ordinary strings, but it also provides \texttt{pathlib.Path}, which exposes that structure through object methods and attributes.
+
+\subsubsection{String Paths vs. \texttt{pathlib.Path} Objects}
+
+A string path is just a \texttt{str} object whose content happens to describe a filesystem location. Python does not automatically understand its pieces as path components. It can still be passed to \texttt{open()}, but string methods such as \texttt{split()} and \texttt{replace()} are general text methods, not filesystem-aware path operations.
+
+\begin{verbatim}
+from pathlib import Path
+
+str_path = "data/chuck_facts.txt"
+path_obj = Path("data") / "chuck_facts.txt"
+
+print("Two path representations:")
+print(f"str_path = {str_path}")
+print(f"path_obj = {path_obj}")
+
+print()
+print("Object types:")
+print(f"type(str_path) = {type(str_path)}")
+print(f"type(path_obj) = {type(path_obj)}")
+
+print()
+print("Selected names from dir(str_path):")
+for name in ["split", "replace", "startswith", "endswith", "upper"]:
+    print(f"{name:12} -> {name in dir(str_path)}")
+
+print()
+print("Selected names from dir(path_obj):")
+for name in ["name", "parent", "suffix", "stem", "parts", "exists", "is_file"]:
+    print(f"{name:12} -> {name in dir(path_obj)}")
+
+print()
+print("Path object components:")
+print(f"path_obj.name   = {path_obj.name}")
+print(f"path_obj.parent = {path_obj.parent}")
+print(f"path_obj.stem   = {path_obj.stem}")
+print(f"path_obj.suffix = {path_obj.suffix}")
+print(f"path_obj.parts  = {path_obj.parts}")
+\end{verbatim}
+
+The string path and the \texttt{Path} object may print similarly, but they are not the same kind of object. The string exposes text behavior. The \texttt{Path} object exposes filesystem-reference behavior.
+
+The operator \texttt{/} is overloaded for \texttt{Path} objects. It does not mean division here. It means path composition. The expression \texttt{Path("data") / "chuck\_facts.txt"} creates a new path by joining a directory-like component with a final filename component.
+
+A \texttt{Path} object can still be converted to a string when necessary.
+
+\begin{verbatim}
+from pathlib import Path
+
+path_obj = Path("quotes") / "monty_python.txt"
+path_text = str(path_obj)
+
+print("Path object:")
+print(f"path_obj       = {path_obj}")
+print(f"type(path_obj) = {type(path_obj)}")
+
+print()
+print("Converted string:")
+print(f"path_text       = {path_text}")
+print(f"type(path_text) = {type(path_text)}")
+\end{verbatim}
+
+For modern Python code, \texttt{Path} objects are usually clearer than manually assembled string paths. They keep path construction separate from ordinary text manipulation.
+
 \subsubsection{Absolute Paths, Relative Paths, and Current Working Directory Resolution}
+
+A relative path is interpreted from some starting directory. For ordinary script execution, that starting point is usually the current working directory. An absolute path already contains enough information to identify a location from the filesystem root or drive root.
+
+This distinction matters because the same relative path can point to different files when the program is started from different directories.
+
+\begin{verbatim}
+from pathlib import Path
+
+cwd = Path.cwd()
+
+rel_path = Path("data") / "answer.txt"
+abs_path = rel_path.resolve()
+
+print("Current working directory:")
+print(f"cwd       = {cwd}")
+print(f"type(cwd) = {type(cwd)}")
+
+print()
+print("Relative path:")
+print(f"rel_path       = {rel_path}")
+print(f"type(rel_path) = {type(rel_path)}")
+print(f"rel_path.is_absolute() = {rel_path.is_absolute()}")
+
+print()
+print("Resolved absolute path:")
+print(f"abs_path       = {abs_path}")
+print(f"type(abs_path) = {type(abs_path)}")
+print(f"abs_path.is_absolute() = {abs_path.is_absolute()}")
+
+print()
+print("Selected names from dir(rel_path):")
+for name in ["resolve", "absolute", "is_absolute", "parent", "name", "parts"]:
+    print(f"{name:14} -> {name in dir(rel_path)}")
+\end{verbatim}
+
+The method \texttt{Path.cwd()} returns the current working directory as a \texttt{Path} object. The method \texttt{resolve()} returns an absolute version of a path. In normal use, this means the relative path is interpreted against the current working directory.
+
+A relative path is not incomplete text. It is a valid reference whose meaning depends on where the process is currently positioned in the filesystem.
+
+\begin{verbatim}
+from pathlib import Path
+
+rel_path = Path("logs") / "seinfeld.txt"
+
+print("Relative path parts:")
+print(f"rel_path.parts = {rel_path.parts}")
+
+print()
+print("If the current working directory changes,")
+print("the same relative path may refer to another external location.")
+
+print()
+print(f"current directory = {Path.cwd()}")
+print(f"relative path     = {rel_path}")
+print(f"resolved path     = {rel_path.resolve()}")
+\end{verbatim}
+
+The practical rule is simple: relative paths are convenient inside a known project directory; absolute paths are clearer when the program must identify one specific location regardless of where it was launched.
+
 \subsubsection{Platform Separators: Windows Backslashes, POSIX Slashes, and Portable Path Construction}
+
+Different operating systems display paths differently. POSIX-style systems, such as Linux and macOS, normally use forward slashes. Windows paths commonly use backslashes and may include drive names.
+
+Hard-coding separators manually is fragile. Python can build portable paths with \texttt{pathlib.Path} instead.
+
+\begin{verbatim}
+from pathlib import Path, PureWindowsPath, PurePosixPath
+
+portable_path = Path("course_data") / "quotes" / "simpsons.txt"
+
+print("Portable path built with pathlib:")
+print(f"portable_path       = {portable_path}")
+print(f"type(portable_path) = {type(portable_path)}")
+print(f"portable_path.parts = {portable_path.parts}")
+
+print()
+print("Pure path examples, without touching the real filesystem:")
+
+win_path = PureWindowsPath("course_data") / "quotes" / "simpsons.txt"
+posix_path = PurePosixPath("course_data") / "quotes" / "simpsons.txt"
+
+print(f"win_path       = {win_path}")
+print(f"type(win_path) = {type(win_path)}")
+print(f"win_path.parts = {win_path.parts}")
+
+print()
+print(f"posix_path       = {posix_path}")
+print(f"type(posix_path) = {type(posix_path)}")
+print(f"posix_path.parts = {posix_path.parts}")
+\end{verbatim}
+
+\texttt{PureWindowsPath} and \texttt{PurePosixPath} are useful for demonstrating path syntax rules without actually requiring the program to run on that operating system. They model path structure, but they do not access the filesystem.
+
+Backslashes inside ordinary Python string literals also have a second problem: backslash begins escape sequences such as \texttt{\textbackslash n} and \texttt{\textbackslash t}. This can accidentally corrupt a Windows-style path if it is written carelessly.
+
+\begin{verbatim}
+bad_path = "C:\new\text.txt"
+raw_path = r"C:\new\text.txt"
+
+print("Careless Windows-style string:")
+print(bad_path)
+print(repr(bad_path))
+
+print()
+print("Raw string version:")
+print(raw_path)
+print(repr(raw_path))
+\end{verbatim}
+
+In the first string, \texttt{\textbackslash n} becomes a newline and \texttt{\textbackslash t} becomes a tab. The string no longer contains the visible path the programmer probably intended. A raw string avoids that escape processing, but \texttt{pathlib} is usually cleaner because it reduces manual separator work.
+
+\begin{verbatim}
+from pathlib import Path
+
+path_obj = Path("C:/new") / "text.txt"
+
+print("Path constructed without manual backslash escaping:")
+print(path_obj)
+print(f"type(path_obj) = {type(path_obj)}")
+\end{verbatim}
+
+The practical rule is direct: use \texttt{Path(...)} and the \texttt{/} composition operator for path construction. Let Python represent the path according to the current platform, and avoid treating filesystem references as ordinary string concatenation problems.

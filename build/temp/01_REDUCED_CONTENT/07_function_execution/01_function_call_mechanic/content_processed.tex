@@ -1,0 +1,3 @@
+\section{Function Call Mechanics and Parameter Binding}
+
+A call evaluates argument expressions, collects object references, allocates a frame, and binds parameter names according to the function signature. The callee receives references to objects, not copies and not the caller's name slots. Reassignment inside the function stays local; in-place mutation of shared mutable objects is visible to the caller.

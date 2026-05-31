@@ -1,0 +1,74 @@
+\subsection{Multiple Assignment and Unpacking}
+
+Python assignment can bind several names from several produced values in one statement. The form \texttt{a, b = 10, 20} should be read as: evaluate the right side first, then bind the left-side names to the resulting values. The right side of a comma-separated expression list produces a tuple (or, in some contexts, a list) whose elements are distributed to the targets on the left.
+
+Unpacking is not syntactic sugar for multiple independent assignments. It is a coordinated operation with defined evaluation order.
+
+\subsubsection{Parallel Assignment: Swapping Values with \texttt{a, b = b, a}}
+
+In C, swapping two variables typically requires a temporary:
+
+\begin{verbatim}
+temp = a;  a = b;  b = temp;
+\end{verbatim}
+
+Python expresses the swap directly: \texttt{a, b = b, a}. The critical architectural detail is that the right side is fully evaluated \emph{before} any left-side name is rebound. CPython implements this by building an intermediate tuple on the evaluation stack.
+
+For \texttt{a, b = b, a}, the compiler emits bytecode approximately equivalent to:
+
+\begin{enumerate}
+    \item \texttt{LOAD\_FAST} \texttt{b} --- push current object referenced by \texttt{b};
+    \item \texttt{LOAD\_FAST} \texttt{a} --- push current object referenced by \texttt{a};
+    \item \texttt{BUILD\_TUPLE} 2 --- construct anonymous tuple \texttt{(old\_b, old\_a)} on the stack;
+    \item \texttt{UNPACK\_SEQUENCE} 2 --- pop tuple, bind first element to \texttt{a}, second to \texttt{b}.
+\end{enumerate}
+
+Conceptually:
+
+\begin{verbatim}
+before:
+    a ---> "Jerry"
+    b ---> "George"
+
+right side produces anonymous tuple:
+    ("George", "Jerry")
+
+after:
+    a ---> "George"
+    b ---> "Jerry"
+\end{verbatim}
+
+The objects themselves were not mutated. The names were rebound to objects that previously had the opposite bindings. No temporary variable name is required because the anonymous stack tuple holds both values during the transition. This is one of the clearest examples of how Python's evaluation model differs from in-place register or memory manipulation.
+
+\subsubsection{Sequence Unpacking and Arity Requirements}
+
+Unpacking distributes values from an ordered iterable into names:
+
+\begin{verbatim}
+name, age, city = ("Bart", 10, "Springfield")
+\end{verbatim}
+
+Arity must match unless extended unpacking is used. \texttt{x, y = [10, 20, 30]} raises \texttt{ValueError: too many values to unpack (expected 2)} because the compiler-generated unpack sequence expects exactly two targets.
+
+The rule without a starred target:
+
+\begin{quote}
+The number of receiving names must equal the number of produced values.
+\end{quote}
+
+\subsubsection{Extended Unpacking with the Star Target (\texttt{*rest})}
+
+Extended unpacking allows one left-side target to collect a variable number of values into a \emph{list}:
+
+\begin{verbatim}
+first, *middle, last = [10, 20, 30, 40]
+# first=10, middle=[20, 30], last=40
+\end{verbatim}
+
+Only one starred target is permitted per assignment; two starred targets make the split ambiguous and produce \texttt{SyntaxError: multiple starred expressions in assignment}. The starred name may receive an empty list when no elements remain after ordinary targets are satisfied.
+
+The practical summary:
+
+\begin{quote}
+Multiple assignment evaluates the right side first---often materializing an anonymous tuple on the stack---then binds several names. Unpacking distributes ordered values into names. Without a star target, arity must match exactly. With one star target, that name receives a list containing the flexible remainder.
+\end{quote}

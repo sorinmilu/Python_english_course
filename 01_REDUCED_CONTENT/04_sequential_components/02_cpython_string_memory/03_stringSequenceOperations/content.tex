@@ -1,0 +1,9 @@
+\subsection{String Sequence Operations}
+
+String methods implement text algorithms on immutable objects: every mutating-sounding operation (\texttt{.replace()}, \texttt{.lower()}, etc.) returns a new \texttt{str} and leaves the receiver unchanged. Method dispatch is ordinary attribute lookup on the \texttt{str} type object.
+
+\subsubsection{Splitting and Joining: \texttt{.split()} and \texttt{.join()} as Core Text-Sequence Transformations}
+
+\texttt{.split()} scans the receiver and returns a \texttt{list} of \texttt{str} pieces---by default splitting on arbitrary whitespace runs; an explicit separator removes that delimiter from the output. \texttt{.join()} is the inverse pipeline: a separator \texttt{str} receives an iterable of \texttt{str} elements and allocates one concatenated result in a single pass (after verifying element types). Non-\texttt{str} iterables must be mapped through \texttt{str()} first.
+
+Architecturally, \texttt{split}/\texttt{join} form the boundary between flat text and pointer arrays of text fragments---the same pattern used to avoid quadratic concatenation when assembling large strings from many pieces. \texttt{join} computes total output size before copying; repeated \texttt{+} on fragments does not.

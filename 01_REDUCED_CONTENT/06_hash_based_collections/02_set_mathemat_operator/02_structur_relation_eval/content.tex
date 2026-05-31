@@ -1,0 +1,11 @@
+\subsection{Structural Relationship Evaluation}
+
+Relationship methods return \texttt{bool} without allocating a new set or mutating operands.
+
+\subsubsection{Containment and Scope Testing: Identifying Subsets \texttt{.issubset()} and Supersets \texttt{.issuperset()}}
+
+\texttt{a.issubset(b)} is true when every element of \texttt{a} probes successfully in \texttt{b}. Empty sets are subsets of all sets. Operators \texttt{<=} and \texttt{>=} mirror the same partial order.
+
+\subsubsection{Intersection Disjoint Verification via \texttt{.isdisjoint()}}
+
+\texttt{isdisjoint} returns \texttt{False} on the first hash-confirmed equal element; otherwise \texttt{True}. Equivalent to testing whether intersection would be empty without constructing it.

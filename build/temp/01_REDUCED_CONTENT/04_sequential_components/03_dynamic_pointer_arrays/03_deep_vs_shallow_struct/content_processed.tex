@@ -1,0 +1,19 @@
+\subsection{Deep vs. Shallow Structural Cloning}
+
+Copying a list is a pointer-graph operation, not a value duplicate. Three levels matter: shared reference (\texttt{b = a}), shallow copy (new outer pointer array, shared element objects), and deep copy (recursive independent graph).
+
+\subsubsection{Assignment Is Not Copying: Shared List References with \texttt{b = a}}
+
+\texttt{b = a} binds another name to the same \texttt{PyListObject}. In-place mutation through either name is visible to both; \texttt{a is b} is true. No allocation occurs.
+
+\subsubsection{Deep vs. Shallow Structural Cloning}
+
+A \emph{shallow} copy (\texttt{a[:]}, \texttt{list(a)}, \texttt{a.copy()}) allocates a fresh \texttt{PyListObject} and duplicates the top-level \texttt{PyObject*} array---each slot copies the same pointer value as the original. Outer structures are independent (\texttt{a is not b}), but \texttt{a[i] is b[i]} for every index. Replacing a top-level slot in one list does not affect the other; mutating a shared mutable element (nested \texttt{list}, \texttt{dict}) is visible through both outer lists because the downstream object is shared.
+
+A \emph{deep} copy (\texttt{copy.deepcopy(a)}) recursively traverses the reference graph, cloning container objects and descending into nested mutables until it builds a fully independent tree. Required when nested structures must not share state; expensive on large graphs and unnecessary for flat lists of immutables (\texttt{int}, \texttt{str}, \texttt{tuple} of immutables).
+
+The shallow-copy failure mode appears in \texttt{[row] * n}: one inner list referenced $n$ times; mutating \texttt{grid[0][1]} updates every row slot pointing at that list. Safe grids allocate a new row list per append in a loop.
+
+\begin{quote}
+Assignment: shared outer object. Shallow copy: independent outer array, shared element targets. Deep copy: independent outer array and recursively independent element subgraphs.
+\end{quote}

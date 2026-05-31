@@ -1,0 +1,34 @@
+\subsection{Constraints of Element Ingestion and Runtime Engines}
+
+Set ingestion is governed by the hash/equality contract: each candidate must be hashable, and equal values must map to one stored member.
+
+\subsubsection{CPython Open-Addressing Architecture: Hash Table Slots, Collision Probing, Empty Slots, and Deleted-Entry Markers}
+
+CPython hash tables use \textbf{open addressing}---no separate chaining buckets. Each slot holds hash metadata plus a key reference (plus value for \texttt{dict}). Lookup starts at index \texttt{i = hash \& mask} and walks forward with a perturbed stride until it finds an equal entry, an empty slot (miss), or exhausts the table.
+
+Collision resolution does not use linear probing alone. CPython maintains a recurrence that mixes high-order hash bits into the probe sequence:
+
+\begin{verbatim}
+perturb = hash
+loop:
+    j = (5*j + 1 + perturb) mod 2**i    # conceptual form
+    perturb >>= PERTURB_SHIFT           # typically 5 bits per step
+\end{verbatim}
+
+The published recurrence \texttt{j = (j << 2) + j + 1 + perturb} (equivalent to $5j + 1 + \text{perturb}$) scatters clustered keys across the index array instead of piling them into adjacent slots. Each iteration right-shifts \texttt{perturb}, injecting fresh hash entropy into later probes.
+
+Slot states matter for correctness:
+
+\begin{itemize}
+    \item \textbf{empty} --- terminates a failed search;
+    \item \textbf{active} --- hash field compared, then \texttt{\_\_eq\_\_} if hashes match;
+    \item \textbf{dummy/deleted marker} --- not a match, but probing continues (unlike empty) so entries inserted during earlier collisions remain reachable.
+\end{itemize}
+
+Set deletion must leave dummy markers when later probes could depend on the removed slot; list-style compaction would break existing probe chains.
+
+\subsubsection{Algorithmic Efficiency Matrix: Amortized O(1) Membership Lookups vs. O(N) Sequential Traversal}
+
+Membership in a list scans until \texttt{\_\_eq\_\_} succeeds or the sequence ends---worst case $O(n)$. Hash-table membership computes one hash, follows the perturbed probe chain, and stops at the first empty slot on miss; with bounded load factor the expected probe count is $O(1)$, though pathological collision patterns (mitigated by SipHash seeding) can force long chains.
+
+Resizing the underlying index array is an occasional $O(n)$ rehash that amortizes across many insertions. The engineering trade is explicit: pay sparse table overhead and rare rehash spikes to avoid linear scans on every membership test.

@@ -1,0 +1,33 @@
+\subsection{Python as a Language vs. CPython as the Reference Implementation}
+
+Python and CPython are not the same thing, any more than C and GCC are the same thing. Python is the language contract: indentation-defined blocks, name binding, first-class functions, exceptions, modules, and the data model. CPython is the dominant C program---the \texttt{python} executable---that tokenizes source, builds ASTs, emits bytecode, allocates \texttt{PyObject} structures, and dispatches opcodes in an interpreter loop.
+
+When documentation says ``Python uses reference counting,'' the precise statement is that \emph{CPython} uses reference counting as its primary reclamation strategy. The language specification does not require that mechanism. Another conforming implementation may use tracing collection exclusively and still honor Python semantics for ordinary code.
+
+\subsubsection{The Language: Rules Visible to the Programmer}
+
+The language answers questions visible in source and observable behavior: what assignment means, how names resolve, how containers mutate when shared, how exceptions propagate. If \texttt{b = a} binds two names to one list and \texttt{b.append(4)} mutates that list, every serious implementation must preserve that behavior. It does not require one exact C struct layout or one exact allocator path.
+
+\subsubsection{The Implementation: The Machine That Realizes the Rules}
+
+An implementation answers how those rules happen on silicon. When the operating system runs \texttt{python script.py}, it loads the CPython binary, not the \texttt{.py} file as native machine code. CPython opens the script, compiles it, creates code objects and frames, and executes bytecode. At the OS layer CPython is the process; at the language layer \texttt{script.py} is the program inside that process.
+
+\subsubsection{Why CPython Became the Reference Implementation}
+
+CPython is maintained alongside the language's evolution. New features appear here first; tutorials, debuggers, packaging, and wheels assume its object layout, \texttt{.pyc} bytecode caches, Global Interpreter Lock behavior, and C extension API. Many ``Python facts'' programmers learn are CPython facts: immediate destruction when reference counts hit zero, \texttt{id()} often tracking object addresses, native extensions compiled against \texttt{Python.h}.
+
+\subsubsection{The Boundary Between Guaranteed Behavior and CPython Behavior}
+
+Guaranteed behavior includes arbitrary-precision integers, mutable lists, dict key--value mapping, and exception propagation until caught. CPython-specific realization includes \texttt{PyObject\_HEAD}, list internals as dynamic arrays of pointers, frame objects, arena allocators, and import caches. Students from C should not ask where Python ``stores the int in the variable.'' They should ask which object a name currently references and how CPython represents that object on the heap.
+
+\subsubsection{Why This Course Focuses on CPython}
+
+Studying only abstract semantics leaves the same gap as a syntax-first course: the student knows notation but not the machine. CPython is that machine for most practitioners. It turns Python from a specification into a process with memory, frames, bytecode, and extension boundaries.
+
+\subsubsection{The Practical Rule}
+
+\begin{quote}
+Python is the language contract; CPython is the dominant machine that realizes that contract.
+\end{quote}
+
+Syntax, binding, and mutability belong to Python. \texttt{PyObject}, bytecode dispatch, arenas, and the GIL belong to CPython. The rest of this chapter follows that split deliberately.

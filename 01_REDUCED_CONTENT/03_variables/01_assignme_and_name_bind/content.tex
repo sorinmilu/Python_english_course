@@ -1,0 +1,13 @@
+\section{Assignment and Name Binding}
+
+Assignment is the operation that connects source-code names to runtime objects. In Python, this connection is not the same as declaring a typed storage box, as a C programmer might expect. A name is not an integer slot, a floating-point slot, or a character buffer. A name is a binding---an entry in a namespace dictionary or a fast-local array slot---that allows the program to reach a heap-allocated object.
+
+This section develops that idea through ordinary assignment, reassignment, object sharing, unpacking, augmented assignment, and deletion. The goal is to expose what happens to names, objects, and memory when those statements execute under CPython.
+
+The central rule:
+
+\begin{quote}
+Python assignment does not copy values into variables. It binds names to objects.
+\end{quote}
+
+This rule explains why the same name can later refer to an object of another type, why two names can refer to the same object, why rebinding one name does not automatically affect another name, and why deleting a name is not the same thing as directly destroying an object. It also explains why augmented assignment on immutable types is far more expensive than its syntax suggests.

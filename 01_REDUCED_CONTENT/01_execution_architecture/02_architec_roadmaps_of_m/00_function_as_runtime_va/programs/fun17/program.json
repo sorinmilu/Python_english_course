@@ -1,0 +1,9 @@
+{
+  "language": "php",
+  "title": "PHP: closures with use, captured values, and captured references.",
+  "label": "fun17",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.php"
+}

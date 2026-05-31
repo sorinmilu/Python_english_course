@@ -1,0 +1,31 @@
+\subsection{Suspended Execution and Runtime-Managed Control Flow}
+
+Native C call chains live on a hardware stack; when a function returns, its frame vanishes. Generators, coroutines, and async tasks move \textbf{unfinished control state} into heap objects the runtime can resume later. This enables lazy sequences and concurrent I/O multiplexing without materializing entire collections or spawning one OS thread per connection.
+
+\subsubsection{Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-Preserving Suspended Subroutines}
+
+A generator function compiles to a code object like any function, but invocation builds a generator object instead of running to completion. Each \texttt{yield} emits \texttt{YIELD\_VALUE}: the interpreter preserves the \texttt{PyFrameObject} (locals, stack, instruction pointer) on the heap while returning control to the caller. Resuming via \texttt{send()} or \texttt{\_\_next\_\_()} re-enters that frame without reconstructing the native C stack depth of a full call chain for every element.
+
+Architectural payoff: $O(1)$ memory footprint for conceptually infinite streams when consumers keep pace. Cost: every step pays interpreter dispatch and object bookkeeping versus a tight C pointer walk.
+
+\subsubsection{Coroutines and the Async Event Loop: Cooperative Scheduling Inside One OS Thread}
+
+Blocking C I/O typically ties up a thread in the kernel until data arrives---fine when threads are cheap, expensive at thousands of connections. Python's \texttt{asyncio} pattern runs many coroutines on \textbf{one native thread}: socket/file descriptors are registered with non-blocking pollers (\texttt{epoll}, \texttt{kqueue}, IOCP). When a coroutine \texttt{await}s, its frame is frozen and the loop schedules another ready task.
+
+Contrast with OS-thread concurrency:
+\begin{itemize}
+    \item \textbf{C pthread model}: preemptive kernel scheduling, per-thread stacks (MB scale), mutex-heavy shared memory.
+    \item \textbf{asyncio model}: cooperative yields at \texttt{await}, micro-stacks in heap frames, GIL not fought across Python threads because bytecode often stays single-threaded.
+\end{itemize}
+
+CPU-bound Python inside asyncio without yielding still blocks the loop---the cooperative discipline is explicit. For mixed workloads, run CPU work in \texttt{asyncio.to\_thread()}, multiprocessing, or native extensions.
+
+\paragraph{Mechanical picture at an await boundary.}
+\begin{verbatim}
+coroutine frame on heap -> await I/O future
+event loop registers fd with OS poller
+loop runs other coroutines
+I/O completes -> callback resumes waiting frame
+\end{verbatim}
+
+This is not parallelism of Python bytecode; it is \textbf{overlapped waiting} with cheap task switching. The OS still preempts the whole interpreter process, but thousands of logical tasks can share one thread because their dominant time is spent waiting, not executing opcodes.

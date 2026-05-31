@@ -1,0 +1,22 @@
+\subsection{The Base Object Framework}
+
+Before heaps, stacks, or garbage collection, clarify what CPython allocates: not bare ints or strings as the language presents them, but Python objects participating in one runtime graph. Functions, classes, modules, integers, and tracebacks all enter through the same object protocol---identity, type pointer, reference count, and type-specific tail storage.
+
+\subsubsection{The Realization of the ``Everything is an Object'' Paradigm: Unifying Functions, Types, and Primitives as First-Class Runtime Objects}
+
+In C, an \texttt{int} is not a function; a function is not normally stored in a variable as a first-class value with runtime type metadata. In Python, \texttt{10}, \texttt{len}, and \texttt{MyClass} are all heap objects referenced from namespaces. Containers store pointers to objects; assignment copies references, not bitwise payloads. Uniformity enables introspection, operator overloading, and dynamic dispatch at the cost of per-value overhead.
+
+\subsubsection{Underlying C Representation: Unpacking the \texttt{PyObject} Base Struct (Reference Count Tracker \texttt{ob\_refcnt} and Type Object Pointer \texttt{ob\_type})}
+
+Compare a raw C \texttt{int} on the stack---often four bytes with no type tag---with a Python \texttt{int} object. The Python value is a \texttt{PyLongObject} on the heap whose logical numeric bits sit \emph{after} \texttt{PyObject\_HEAD}. On typical 64-bit CPython builds that header is 16 bytes: \texttt{ob\_refcnt} (8 bytes) plus \texttt{ob\_type} (8 bytes) pointing at the \texttt{PyTypeObject} describing \texttt{int}. A ``small'' integer therefore costs header overhead plus variable digit storage---far heavier than a native \texttt{int}, but capable of arbitrary precision and uniform treatment.
+
+Every object answers two C-level questions immediately:
+
+\begin{itemize}
+    \item How many strong references keep me alive? (\texttt{ob\_refcnt})
+    \item Which behavior table governs me? (\texttt{ob\_type})
+\end{itemize}
+
+Variable-sized objects append \texttt{ob\_size} via \texttt{PyVarObject}. Extension and core code must use \texttt{Py\_INCREF}/\texttt{Py\_DECREF} and type slots rather than poke headers manually; the layout nonetheless explains dynamic typing, \texttt{type(obj)}, and why illegal operations fail with \texttt{TypeError} after inspecting \texttt{ob\_type}.
+
+The wrapped-cargo picture: the interpreter never sees a naked machine integer in the general case. It sees a pointer to a struct whose head identifies lifetime and behavior, whose tail holds payload.

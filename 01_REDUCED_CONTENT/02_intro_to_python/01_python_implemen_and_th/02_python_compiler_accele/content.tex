@@ -1,0 +1,35 @@
+\subsection{Python Compilers, Accelerators, and Translators: Cython, Nuitka, Numba, MyPyC, and Related Tools}
+
+Accelerators are not alternate Pythons in the same sense as PyPy. They are toolchain extensions that attack performance while leaving most source readable---by restricting dynamism, adding type information, or moving hot paths into native code.
+
+\subsubsection{Why Python Compilation Is Not C Compilation}
+
+Ordinary Python deliberately postpones decisions. Names rebind, operators dispatch through methods, imports execute code, and classes remain mutable at runtime. A general ahead-of-time compiler cannot treat \texttt{a + b} as one machine add because operand types are not fixed at compile time. Successful acceleration therefore adds facts: C types, type hints, numeric arrays, stable loops, or restricted subsets.
+
+\subsubsection{Cython: Python Near the C Boundary}
+
+Cython translates Python-like modules into C extensions. Annotated \texttt{cdef} types and direct C calls let inner loops approach C speed while outer orchestration stays Pythonic. The cultural role is explicit: admit where readability ends and native speed begins, then cross that boundary surgically.
+
+\subsubsection{Nuitka: Whole-Program Compilation with Runtime Preservation}
+
+Nuitka compiles Python programs to C/C++ executables but must still embed or link Python runtime semantics. It targets deployment and startup control as much as raw speed. It is not ``Python becomes C'' in the sense of erasing dynamism.
+
+\subsubsection{Numba: Runtime Compilation of Numerical Kernels}
+
+Numba JIT-compiles decorated functions when operations fit a numeric subset, lowering loops to LLVM without rewriting the whole program in C. It embodies the scientific-Python bargain: Python coordinates; native code calculates.
+
+\subsubsection{MyPyC: Type-Annotated Python Compiled to C Extensions}
+
+MyPyC uses static type information from gradual typing culture to emit CPython extension modules with less dynamic overhead. Disciplined typed codebases gain speed without leaving Python syntax entirely.
+
+\subsubsection{Packaging Tools Are Not Necessarily Compilers}
+
+Bundlers that produce \texttt{.exe} files often ship an embedded interpreter plus bytecode. The artifact looks native; the architecture may still be interpreter-hosted. Distribution convenience is not automatic performance transformation.
+
+\subsubsection{The Common Pattern: Move the Hot Path Downward}
+
+Most programs spend time in small regions: numeric kernels, parsers, serialization, geometry. Accelerators move those regions downward---from Python objects to typed native values, from interpreter loops to compiled loops, from dynamic lists to contiguous buffers---while Python remains the control layer.
+
+\subsubsection{The Conceptual Lesson}
+
+These tools prove the community's recurring engineering response: preserve Python's human-facing readability globally, then violate it locally where the machine demands it. They do not abolish CPython's model; they exploit seams inside it.

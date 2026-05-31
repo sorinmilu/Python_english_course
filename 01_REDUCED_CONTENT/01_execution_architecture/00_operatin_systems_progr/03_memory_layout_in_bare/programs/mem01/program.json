@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "The Data and BSS Segments: Initialized and Uninitialized Global/Static Variab...",
+  "label": "mem01",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

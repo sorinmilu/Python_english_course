@@ -1,0 +1,39 @@
+\subsection{CPython, PyPy, Jython, IronPython, and Alternative Runtime Strategies}
+
+Alternate runtimes are not curiosities. They show what Python is made of when the readable surface stays fixed but the execution engine changes.
+
+\subsubsection{CPython: The Dominant Reference Runtime}
+
+CPython compiles to bytecode and interprets it through a C loop while preserving a maximally dynamic object model. Its advantage is ecosystem compatibility: packages, wheels, debuggers, and extensions target this implementation first. Its cost is dispatch overhead: a visible addition may require object loads, type inspection, method lookup, reference updates, and exception checks.
+
+\subsubsection{PyPy: Python with a JIT-Oriented Runtime Strategy}
+
+PyPy trades some CPython-internal assumptions for a tracing JIT that observes hot loops and specializes them toward machine code. Pure Python workloads may accelerate dramatically; C-extension-heavy stacks may not, because compatibility layers reintroduce boundary cost. PyPy is a different answer to the same cultural question: keep Python syntax, attack performance at the runtime layer.
+
+\subsubsection{Jython: Python on the Java Virtual Machine}
+
+Jython hosts Python semantics on the JVM, making Java libraries the natural foreign boundary instead of the C ABI. Its architectural interest exceeds its modern deployment share: it proves Python can live inside another managed universe. Historical lag on Python~3 semantics also illustrates that ``Python'' in the ecosystem often silently means ``CPython~3.''
+
+\subsubsection{IronPython: Python on the .NET Runtime}
+
+IronPython plays the same integration role for .NET. Python becomes a flexible surface over CLR objects. Portability of the wider PyPI universe weakens when packages assume CPython C extensions.
+
+\subsubsection{Alternative Strategies and Specialized Pythons}
+
+MicroPython, GraalPy, and embedded subsets show the community building downward and outward: smaller runtimes for microcontrollers, JVM-hosted research platforms, restricted subsets for static compilation. The shared pattern is specialization without abandoning the readable core.
+
+\subsubsection{Compatibility Is Not Only Syntax}
+
+Real portability spans syntax, standard-library behavior, import semantics, object finalization timing, frame introspection, and binary extensions. Code that assumes immediate CPython destruction or address-like \texttt{id()} values is writing against an implementation, not the language.
+
+\subsubsection{Different Runtime Strategies, Different Tradeoffs}
+
+CPython optimizes compatibility and inspectability. PyPy optimizes sustained pure-Python throughput. Jython and IronPython optimize host-runtime integration. MicroPython optimizes constrained hardware. None is ``best''; each optimizes a different point on the readability--performance--integration triangle.
+
+\subsubsection{The Practical Consequence}
+
+\begin{quote}
+Python code describes language-level behavior; the implementation decides how that behavior is executed.
+\end{quote}
+
+Understanding alternate runtimes clarifies that Python is a language layer, a runtime layer, a host-platform layer, and an ecosystem layer---combined in CPython for most users, but logically separable.

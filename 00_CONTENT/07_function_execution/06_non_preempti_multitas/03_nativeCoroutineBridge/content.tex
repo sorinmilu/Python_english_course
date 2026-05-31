@@ -1,4 +1,827 @@
 \subsection{Native Coroutine Bridge}
-\subsubsection{`async def` Functions as Native Coroutine Object Factories}
-\subsubsection{`await` as Structured Suspension Over Awaitable Objects}
+
+Generator-based coroutines show the basic idea of cooperative suspension: execution runs until a suspension point, then control returns to an external caller. Native coroutines use a newer syntax and a more structured execution model, but the core idea remains related.
+
+The main syntax is:
+
+\begin{verbatim}
+async def func(...):
+    ...
+
+await something
+\end{verbatim}
+
+An \texttt{async def} function does not behave like a normal function. Calling it creates a coroutine object. The body does not run immediately. The coroutine must be driven by an event loop or by another coroutine that awaits it.
+
+\subsubsection{\texttt{async def} Functions as Native Coroutine Object Factories}
+
+A normal function executes when called.
+
+\begin{verbatim}
+def normal_quote():
+    print("normal body starts")
+    return "D'oh!"
+
+result = normal_quote()
+
+print(f"result:       {result!r}")
+print(f"type(result): {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal body starts
+result:       "D'oh!"
+type(result): <class 'str'>
+\end{verbatim}
+
+An \texttt{async def} function creates a coroutine object when called.
+
+\begin{verbatim}
+async def async_quote():
+    print("async body starts")
+    return "D'oh!"
+
+coro = async_quote()
+
+print(f"coro:       {coro}")
+print(f"type(coro): {type(coro)}")
+
+coro.close()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+coro:       <coroutine object async_quote at 0x...>
+type(coro): <class 'coroutine'>
+\end{verbatim}
+
+The line \texttt{"async body starts"} was not printed. Calling \texttt{async\_quote()} created the coroutine object, but did not start executing the coroutine body.
+
+The \texttt{close()} call is included here because the coroutine was created only for inspection. In real code, a coroutine should normally be awaited or scheduled.
+
+To actually run it in a simple script, use \texttt{asyncio.run()}.
+
+\begin{verbatim}
+import asyncio
+
+async def async_quote():
+    print("async body starts")
+    return "D'oh!"
+
+result = asyncio.run(async_quote())
+
+print(f"result:       {result!r}")
+print(f"type(result): {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+async body starts
+result:       "D'oh!"
+type(result): <class 'str'>
+\end{verbatim}
+
+The expression:
+
+\begin{verbatim}
+async_quote()
+\end{verbatim}
+
+creates a coroutine object.
+
+The expression:
+
+\begin{verbatim}
+asyncio.run(async_quote())
+\end{verbatim}
+
+creates a coroutine object, gives it to an event loop, runs it to completion, and returns the coroutine's final result.
+
+A coroutine object can be inspected.
+
+\begin{verbatim}
+async def async_quote():
+    return "No soup for you!"
+
+coro = async_quote()
+
+print(f"type(coro): {type(coro)}")
+print()
+
+selected_names = [
+    "__await__",
+    "send",
+    "throw",
+    "close",
+    "cr_frame",
+    "cr_code",
+    "cr_running",
+    "cr_await",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(coro)}")
+
+coro.close()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(coro): <class 'coroutine'>
+
+__await__      True
+send           True
+throw          True
+close          True
+cr_frame       True
+cr_code        True
+cr_running     True
+cr_await       True
+\end{verbatim}
+
+Some important attributes are:
+
+\begin{itemize}
+    \item \texttt{cr\_frame}: the coroutine's frame while it exists;
+    \item \texttt{cr\_code}: the coroutine's code object;
+    \item \texttt{cr\_running}: whether it is currently executing;
+    \item \texttt{cr\_await}: what the coroutine is currently awaiting, if anything;
+    \item \texttt{\_\_await\_\_}: the method that makes the object awaitable.
+\end{itemize}
+
+The coroutine's code object looks familiar.
+
+\begin{verbatim}
+async def async_quote():
+    text = "The answer is 42."
+    return text
+
+coro = async_quote()
+code_obj = coro.cr_code
+
+print(f"type(code_obj): {type(code_obj)}")
+print(f"co_name:        {code_obj.co_name}")
+print(f"co_varnames:    {code_obj.co_varnames}")
+print(f"co_consts:      {code_obj.co_consts}")
+
+coro.close()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(code_obj): <class 'code'>
+co_name:        async_quote
+co_varnames:    ('text',)
+co_consts:      (None, 'The answer is 42.')
+\end{verbatim}
+
+The coroutine object also has a frame before it completes.
+
+\begin{verbatim}
+async def async_quote():
+    text = "Ni!"
+    return text
+
+coro = async_quote()
+
+print(f"coro.cr_frame:       {coro.cr_frame}")
+print(f"type(coro.cr_frame): {type(coro.cr_frame)}")
+
+coro.close()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+coro.cr_frame:       <frame at 0x..., file "...", line 1, code async_quote>
+type(coro.cr_frame): <class 'frame'>
+\end{verbatim}
+
+After the coroutine completes, its frame is gone.
+
+\begin{verbatim}
+import asyncio
+
+saved_coro = None
+
+async def async_quote():
+    global saved_coro
+
+    saved_coro = asyncio.current_task().get_coro()
+    return "D'oh!"
+
+result = asyncio.run(async_quote())
+
+print(f"result: {result}")
+print(f"saved_coro.cr_frame: {saved_coro.cr_frame}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: D'oh!
+saved_coro.cr_frame: None
+\end{verbatim}
+
+The completed coroutine no longer has an active frame.
+
+The basic distinction is:
+
+\begin{verbatim}
+def function():
+    calling it runs the body immediately
+
+async def coroutine_function():
+    calling it creates a coroutine object
+    some scheduler must later drive that object
+\end{verbatim}
+
+\subsubsection{\texttt{await} as Structured Suspension Over Awaitable Objects}
+
+The \texttt{await} expression suspends the current coroutine until another awaitable object completes.
+
+It can appear only inside an \texttt{async def} function.
+
+\begin{verbatim}
+import asyncio
+
+async def wait_and_quote():
+    print("before await")
+
+    await asyncio.sleep(0)
+
+    print("after await")
+    return "Nobody expects the Spanish Inquisition!"
+
+result = asyncio.run(wait_and_quote())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before await
+after await
+result: Nobody expects the Spanish Inquisition!
+\end{verbatim}
+
+The line:
+
+\begin{verbatim}
+await asyncio.sleep(0)
+\end{verbatim}
+
+means:
+
+\begin{verbatim}
+create an awaitable sleep operation
+suspend this coroutine until that operation completes
+let the event loop run other ready work while this coroutine is suspended
+resume this coroutine after the awaited operation completes
+\end{verbatim}
+
+The object returned by \texttt{asyncio.sleep(0)} is a coroutine object.
+
+\begin{verbatim}
+import asyncio
+
+sleep_coro = asyncio.sleep(0)
+
+print(f"sleep_coro:       {sleep_coro}")
+print(f"type(sleep_coro): {type(sleep_coro)}")
+print(f"'__await__' in dir: {'__await__' in dir(sleep_coro)}")
+
+sleep_coro.close()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+sleep_coro:       <coroutine object sleep at 0x...>
+type(sleep_coro): <class 'coroutine'>
+'__await__' in dir: True
+\end{verbatim}
+
+An object can be awaited if it is awaitable. One practical test is whether it can provide an await iterator through \texttt{\_\_await\_\_}.
+
+A coroutine may await another coroutine.
+
+\begin{verbatim}
+import asyncio
+
+async def get_name():
+    print("get_name starts")
+    await asyncio.sleep(0)
+    print("get_name resumes")
+    return "Homer"
+
+async def build_line():
+    print("build_line starts")
+
+    name = await get_name()
+
+    print("build_line resumes")
+    return f"{name}: 42"
+
+result = asyncio.run(build_line())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+build_line starts
+get_name starts
+get_name resumes
+build_line resumes
+result: Homer: 42
+\end{verbatim}
+
+The outer coroutine \texttt{build\_line()} suspends while waiting for \texttt{get\_name()} to finish. When \texttt{get\_name()} returns, its return value becomes the value of the \texttt{await} expression.
+
+So this line:
+
+\begin{verbatim}
+name = await get_name()
+\end{verbatim}
+
+means:
+
+\begin{verbatim}
+run get_name() as an awaitable operation
+pause build_line() until get_name() completes
+bind get_name()'s returned object to local name name
+\end{verbatim}
+
+This resembles generator delegation, but it belongs to native coroutine scheduling rather than plain generator iteration.
+
+A coroutine can keep local state across \texttt{await} suspension points.
+
+\begin{verbatim}
+import asyncio
+
+async def counted_quote():
+    count = 40
+
+    print(f"before first await: count={count}")
+    await asyncio.sleep(0)
+
+    count = count + 1
+    print(f"before second await: count={count}")
+    await asyncio.sleep(0)
+
+    count = count + 1
+    print(f"before return: count={count}")
+    return count
+
+result = asyncio.run(counted_quote())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before first await: count=40
+before second await: count=41
+before return: count=42
+result: 42
+\end{verbatim}
+
+The local variable \texttt{count} survives across suspension points. The coroutine frame is paused, not restarted.
+
+The frame can be inspected while a coroutine is suspended by looking at task state from another coroutine.
+
+\begin{verbatim}
+import asyncio
+
+async def worker():
+    text = "D'oh!"
+
+    await asyncio.sleep(0.01)
+
+    return text
+
+async def main():
+    task = asyncio.create_task(worker())
+
+    await asyncio.sleep(0)
+
+    coro = task.get_coro()
+
+    print(f"coro:       {coro}")
+    print(f"type(coro): {type(coro)}")
+    print(f"cr_frame:   {coro.cr_frame}")
+    print(f"cr_await:   {coro.cr_await}")
+
+    result = await task
+
+    print(f"result:     {result}")
+    print(f"cr_frame after completion: {coro.cr_frame}")
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+coro:       <coroutine object worker at 0x...>
+type(coro): <class 'coroutine'>
+cr_frame:   <frame at 0x..., file "...", line 6, code worker>
+cr_await:   <coroutine object sleep at 0x...>
+result:     D'oh!
+cr_frame after completion: None
+\end{verbatim}
+
+The \texttt{cr\_await} attribute shows the awaitable object currently being awaited.
+
+A coroutine that awaits nothing will run straight through once the event loop starts it.
+
+\begin{verbatim}
+import asyncio
+
+async def immediate():
+    print("immediate starts")
+    return 42
+
+result = asyncio.run(immediate())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+immediate starts
+result: 42
+\end{verbatim}
+
+The function is still an \texttt{async def} function. Calling it still creates a coroutine object. It simply has no internal suspension point once scheduled.
+
+The compact rule is:
+
+\begin{quote}
+\texttt{await} is a structured suspension point. It pauses the current coroutine until the awaited object completes, then resumes the coroutine with the completed result.
+\end{quote}
+
 \subsubsection{Event Loops as External Schedulers for Coroutine Progress}
+
+A coroutine object does not advance itself. It needs a scheduler. In the standard library, the usual scheduler is an \texttt{asyncio} event loop.
+
+The simplest script-level entry point is \texttt{asyncio.run()}.
+
+\begin{verbatim}
+import asyncio
+
+async def main():
+    print("main starts")
+    await asyncio.sleep(0)
+    print("main resumes")
+    return "finished with 42"
+
+result = asyncio.run(main())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+main starts
+main resumes
+result: finished with 42
+\end{verbatim}
+
+The event loop drives the coroutine until completion. When the coroutine reaches \texttt{await}, the loop can run other ready work.
+
+Two tasks can interleave cooperatively.
+
+\begin{verbatim}
+import asyncio
+
+async def task(name, count):
+    for i in range(1, count + 1):
+        print(f"{name}: step {i}")
+        await asyncio.sleep(0)
+
+    return f"{name}: done"
+
+async def main():
+    task_a = asyncio.create_task(task("A", 3))
+    task_b = asyncio.create_task(task("B", 2))
+
+    result_a = await task_a
+    result_b = await task_b
+
+    print(result_a)
+    print(result_b)
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+A: step 1
+B: step 1
+A: step 2
+B: step 2
+A: step 3
+A: done
+B: done
+\end{verbatim}
+
+The exact interleaving can depend on scheduling details, but the important point is stable: each task gives control back to the event loop at \texttt{await asyncio.sleep(0)}.
+
+The \texttt{Task} object wraps a coroutine and lets the event loop manage its progress.
+
+\begin{verbatim}
+import asyncio
+
+async def worker():
+    await asyncio.sleep(0)
+    return "D'oh!"
+
+async def main():
+    task = asyncio.create_task(worker())
+
+    print(f"task:       {task}")
+    print(f"type(task): {type(task)}")
+    print()
+
+    selected_names = [
+        "done",
+        "result",
+        "cancel",
+        "get_coro",
+        "add_done_callback",
+        "__await__",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<20} {name in dir(task)}")
+
+    result = await task
+
+    print()
+    print(f"result: {result}")
+    print(f"task.done(): {task.done()}")
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+task:       <Task pending name='Task-2' coro=<worker() running at ...>>
+type(task): <class '_asyncio.Task'>
+
+done                 True
+result               True
+cancel               True
+get_coro             True
+add_done_callback    True
+__await__            True
+
+result: D'oh!
+task.done(): True
+\end{verbatim}
+
+A task is awaitable. Awaiting a task suspends the current coroutine until that task completes.
+
+The coroutine inside the task can be inspected.
+
+\begin{verbatim}
+import asyncio
+
+async def worker():
+    await asyncio.sleep(0)
+    return "No soup for you!"
+
+async def main():
+    task = asyncio.create_task(worker())
+    coro = task.get_coro()
+
+    print(f"coro:       {coro}")
+    print(f"type(coro): {type(coro)}")
+    print(f"cr_code:    {coro.cr_code}")
+    print(f"cr_frame:   {coro.cr_frame}")
+
+    result = await task
+
+    print(f"result: {result}")
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+coro:       <coroutine object worker at 0x...>
+type(coro): <class 'coroutine'>
+cr_code:    <code object worker at 0x..., file "...", line 3>
+cr_frame:   <frame at 0x..., file "...", line 3, code worker>
+result: No soup for you!
+\end{verbatim}
+
+The event loop does not make Python code run in parallel on multiple CPU cores. It coordinates progress between suspended coroutines.
+
+A coroutine that never awaits will block other coroutines until it finishes.
+
+\begin{verbatim}
+import asyncio
+
+async def greedy():
+    print("greedy starts")
+
+    for i in range(3):
+        print(f"greedy working {i}")
+
+    print("greedy ends")
+
+async def polite():
+    print("polite starts")
+    await asyncio.sleep(0)
+    print("polite resumes")
+
+async def main():
+    task_a = asyncio.create_task(greedy())
+    task_b = asyncio.create_task(polite())
+
+    await task_a
+    await task_b
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+greedy starts
+greedy working 0
+greedy working 1
+greedy working 2
+greedy ends
+polite starts
+polite resumes
+\end{verbatim}
+
+The \texttt{greedy()} coroutine does not suspend internally. Once it starts running, the event loop cannot move to another coroutine until \texttt{greedy()} returns.
+
+This coroutine cooperates.
+
+\begin{verbatim}
+import asyncio
+
+async def cooperative(name):
+    for i in range(3):
+        print(f"{name}: step {i}")
+        await asyncio.sleep(0)
+
+async def main():
+    task_a = asyncio.create_task(cooperative("A"))
+    task_b = asyncio.create_task(cooperative("B"))
+
+    await task_a
+    await task_b
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+A: step 0
+B: step 0
+A: step 1
+B: step 1
+A: step 2
+B: step 2
+\end{verbatim}
+
+Each \texttt{await asyncio.sleep(0)} gives control back to the event loop. The event loop can then resume another ready task.
+
+The scheduling model is therefore still cooperative:
+
+\begin{verbatim}
+coroutine runs
+    until it reaches await
+        event loop regains control
+        another ready coroutine may run
+    awaited operation completes
+        event loop resumes waiting coroutine
+coroutine returns
+    task becomes complete
+\end{verbatim}
+
+The event loop itself can be accessed from inside a running coroutine.
+
+\begin{verbatim}
+import asyncio
+
+async def main():
+    loop = asyncio.get_running_loop()
+
+    print(f"loop:       {loop}")
+    print(f"type(loop): {type(loop)}")
+
+asyncio.run(main())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+loop:       <_UnixSelectorEventLoop running=True closed=False debug=False>
+type(loop): <class 'asyncio.unix_events._UnixSelectorEventLoop'>
+\end{verbatim}
+
+The exact event loop class can differ by operating system and Python configuration. The conceptual role is the same: it is the external scheduler that drives coroutine progress.
+
+A simple final example shows the complete path.
+
+\begin{verbatim}
+import asyncio
+
+async def get_score(name):
+    print(f"start get_score({name})")
+
+    await asyncio.sleep(0)
+
+    print(f"resume get_score({name})")
+    return 42
+
+async def build_report():
+    print("build_report starts")
+
+    score = await get_score("Homer")
+
+    print("build_report resumes")
+    return f"Homer score={score}"
+
+result = asyncio.run(build_report())
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+build_report starts
+start get_score(Homer)
+resume get_score(Homer)
+build_report resumes
+result: Homer score=42
+\end{verbatim}
+
+The execution path is:
+
+\begin{verbatim}
+asyncio.run starts event loop
+    build_report coroutine starts
+        awaits get_score coroutine
+            get_score starts
+            awaits sleep
+                event loop regains control
+            sleep completes
+            get_score resumes
+            get_score returns 42
+        build_report receives 42
+        build_report returns report string
+asyncio.run returns final result to normal synchronous code
+\end{verbatim}
+
+The bridge from generator-based coroutines to native coroutines is:
+
+\begin{center}
+\begin{tabular}{|p{0.28\linewidth}|p{0.34\linewidth}|p{0.28\linewidth}|}
+\hline
+\textbf{Mechanism} & \textbf{Generator coroutine} & \textbf{Native coroutine} \\
+\hline
+Function marker & \texttt{def} with \texttt{yield} & \texttt{async def} \\
+\hline
+Created object & generator object & coroutine object \\
+\hline
+Suspension syntax & \texttt{yield} & \texttt{await} \\
+\hline
+Manual driving & \texttt{next()}, \texttt{send()} & event loop / task / await \\
+\hline
+External scheduler & custom caller loop & \texttt{asyncio} event loop \\
+\hline
+Completion signal & \texttt{StopIteration.value} & returned result through \texttt{await} or \texttt{asyncio.run()} \\
+\hline
+\end{tabular}
+\end{center}
+
+The final rule is:
+
+\begin{quote}
+An \texttt{async def} call creates a coroutine object. \texttt{await} is the structured suspension point inside native coroutine code. An event loop is the external scheduler that resumes coroutines when their awaited operations are ready.
+\end{quote}

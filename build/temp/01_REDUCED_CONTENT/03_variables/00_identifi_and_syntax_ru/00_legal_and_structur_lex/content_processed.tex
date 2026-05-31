@@ -1,0 +1,95 @@
+\subsection{Legal and Structural Lexer Constraints}
+
+Before a Python name can become a runtime binding, it must survive the source-code reading phase. Python divides program text into tokens---names, keywords, literals, operators, delimiters, indentation markers---and rejects any assignment target that cannot be tokenized as a valid identifier. If the text fails here, execution never begins: no object is created, no name is bound, and no runtime type question exists yet.
+
+This matters because Python names are flexible bindings, not C-style typed boxes. That flexibility starts only after the source code has been accepted. The syntax of the name is still fixed by the language at compile time.
+
+The central lexical rule is:
+
+\begin{quote}
+A Python identifier must look like a valid name before it can be used as a runtime name.
+\end{quote}
+
+A valid ordinary identifier may contain letters, digits, and underscores, but it cannot start with a digit. It also cannot be one of Python's \emph{hard} reserved keywords---tokens such as \texttt{def}, \texttt{class}, and \texttt{import} that the parser reserves for grammatical structure.
+
+However, hard keywords are not the only names Python treats specially. Built-in functions and types such as \texttt{print}, \texttt{id}, \texttt{type}, \texttt{len}, and \texttt{int} are \emph{not} protected compiler keywords. They are ordinary pre-populated entries in the \texttt{builtins} module dictionary. At runtime, a local or module-level assignment can mask them without triggering a syntax error:
+
+\begin{verbatim}
+print = 42          # legal source text; catastrophic runtime semantics
+print("hello")      # TypeError: 'int' object is not callable
+\end{verbatim}
+
+The LEGB rule resolves \texttt{print} in the innermost namespace that currently defines it. If the local frame's \texttt{f\_locals} dictionary or the module's \texttt{f\_globals} dictionary contains \texttt{print = 42}, that binding wins over the built-in entry. CPython performs no compile-time warning because, from the compiler's perspective, \texttt{print} is simply another identifier-shaped name.
+
+This is a deliberate design compromise. Python prioritizes namespace uniformity---every name is looked up through dictionary or fast-local machinery---over the C-like guarantee that certain identifiers are permanently reserved across all scopes. The execution risk is real: library code, interactive sessions, and hastily written modules can shadow built-ins and break downstream calls in ways that static analysis rarely catches.
+
+Hard keywords remain the only names the parser refuses outright:
+
+\begin{verbatim}
+def = 42            # SyntaxError: invalid syntax
+class = "Springfield"  # SyntaxError: invalid syntax
+\end{verbatim}
+
+The \texttt{keyword} module exposes the current interpreter's hard-keyword list (\texttt{keyword.kwlist}), which may grow between language versions. Soft keywords such as \texttt{match} and \texttt{case} occupy a middle tier: reserved only in specific grammatical positions. For identifier validation, the practical compile-time test remains: identifier-shaped \emph{and} not a hard keyword.
+
+\subsubsection{Digit Restrictions: Why Identifiers Cannot Start with a Numerical Character}
+
+A Python identifier cannot begin with a digit:
+
+\begin{verbatim}
+42answer = "value"   # SyntaxError: invalid decimal literal
+\end{verbatim}
+
+The rejection occurs at lex time, not at runtime. When Python reads source code, a leading digit begins a numeric literal. Allowing digit-leading identifiers would force the lexer to disambiguate forms such as \texttt{123abc}---integer literal followed by name, single identifier, or invalid number---on every token boundary. Python avoids this ambiguity with a clean rule: digits may appear after the first character, but not as the first character.
+
+Valid forms include \texttt{answer42}, \texttt{fact\_7}, and \texttt{room101}. Invalid forms include \texttt{42answer}, \texttt{7fact}, and \texttt{101room}. The string method \texttt{isidentifier()} checks structural shape only; it does not create a variable and does not consult the keyword table.
+
+Attempting to compile invalid source confirms the failure mode:
+
+\begin{verbatim}
+compile('42answer = 1', '<example>', 'exec')
+# SyntaxError: invalid decimal literal
+\end{verbatim}
+
+The exact error message may vary between Python versions, but the structural rule is stable.
+
+\subsubsection{Reserved Keywords: Why \texttt{def}, \texttt{class}, \texttt{import}, and Similar Tokens Cannot Be Used as Names}
+
+Some words are reserved because Python uses them to express program structure. Examples include \texttt{def}, \texttt{class}, \texttt{import}, \texttt{if}, \texttt{else}, \texttt{for}, \texttt{while}, \texttt{return}, \texttt{try}, and \texttt{with}.
+
+These tokens are forbidden not because they are poor English labels, but because they already have fixed grammatical jobs. If \texttt{def} were also an ordinary variable name, a line such as \texttt{def = 42} would make function-definition syntax structurally ambiguous. The parser must rely on \texttt{def} always introducing a function definition block.
+
+The \texttt{keyword.iskeyword()} function distinguishes hard keywords from identifier-shaped words that happen to collide with built-ins:
+
+\begin{verbatim}
+import keyword
+
+for name in ("def", "class", "print", "type", "answer_42"):
+    print(f"{name:<12} keyword={keyword.iskeyword(name)}")
+# def          keyword=True
+# class        keyword=True
+# print        keyword=False   <- maskable at runtime
+# type         keyword=False   <- maskable at runtime
+# answer_42    keyword=False
+\end{verbatim}
+
+Hard keywords are rejected by the parser. Built-ins are not. That asymmetry is the architectural fault line between compile-time grammar and runtime namespace masking.
+
+\subsubsection{Case Sensitivity: \texttt{name}, \texttt{Name}, and \texttt{NAME} as Distinct Bindings}
+
+Python identifiers are case-sensitive. \texttt{name}, \texttt{Name}, and \texttt{NAME} are three distinct identifiers and therefore three independent bindings in whatever namespace defines them:
+
+\begin{verbatim}
+name = "Jerry"
+Name = "George"
+NAME = "Elaine"
+# three separate dictionary entries; three separate objects
+\end{verbatim}
+
+Python matches spelling exactly, including letter case. The three names may even refer to objects of different types simultaneously. This is legal but architecturally hazardous: human readers scanning code often miss case-only distinctions, while the interpreter never does.
+
+The complete compile-time rule for ordinary variable names:
+
+\begin{quote}
+A Python variable name must be a valid identifier, must not be a hard reserved keyword, and is matched by exact spelling including letter case. Runtime masking of built-ins remains possible even when all lexical rules are satisfied.
+\end{quote}

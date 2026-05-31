@@ -1,0 +1,9 @@
+\subsection{The Concrete Internal C Structure of the CPython Runtime}
+
+CPython is a large C program whose high-level concepts are represented as C structures. The teaching goal is not source-file archaeology but the structural invariants that make Python behavior predictable.
+
+Every heap value begins with a common object header: reference count plus type pointer. Variable-sized objects extend the header with size metadata (\texttt{PyVarObject}). Type objects store behavior tables---numeric slots, sequence slots, mapping slots, attribute hooks, deallocation functions---so operators become runtime dispatch rather than fixed opcodes.
+
+Namespaces are mappings from identifier strings to \texttt{PyObject*} references. Module globals live in dictionary-like structures. Function objects wrap code objects with globals, defaults, and closure cells. Frame machinery records active execution. Thread and interpreter state coordinate which frame is running and how exceptions propagate.
+
+The ledger metaphor begins here: Python programs manipulate names, but CPython implements those names as entries in runtime tables connected to typed heap objects. Syntax speaks about \texttt{x}; the interpreter searches slots and dictionaries for the object bound to \texttt{x}.

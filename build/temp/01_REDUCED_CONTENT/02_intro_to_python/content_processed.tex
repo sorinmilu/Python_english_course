@@ -1,0 +1,15 @@
+\chapter{Introduction to the Python Language Architecture}
+
+This chapter moves from the native execution model of the previous chapter into Python itself. The goal is not a syntax tour. The goal is to explain why Python behaves the way it does: as a language whose readable surface is supported by a C-based runtime, an object graph, bytecode frames, managed memory, and a culture of explicit readability.
+
+The first section uses history as design explanation. Python did not appear because the world needed another syntax. It appeared because a systems programmer working on the Amoeba distributed operating system was trapped between C's compile-time cost and Bourne Shell's expressive weakness. The language that emerged fused ABC's teaching clarity with Unix systems utility and later endured a decade-long Python~2/Python~3 split to enforce a correct separation between text and bytes.
+
+The second section separates Python the language from CPython the reference implementation, and places alternate runtimes and accelerators as community-built answers to one recurring tension: keep the human-readable surface, satisfy the machine's demand for speed.
+
+The third section opens CPython's concrete runtime through \emph{The Ledger of Names}: code objects as static executable descriptions, frame objects as active heap records, namespace dictionaries for globals, and \emph{fast locals} as offset-indexed slots bypassing hash lookup inside functions.
+
+The fourth section treats memory as \emph{The Living Ecosystem}: every value is a wrapped heap object with \texttt{PyObject\_HEAD}, small-object allocation through PyMalloc arenas and pools, reference counting for immediate reclamation, and cyclic garbage collection for self-referential islands.
+
+The fifth and sixth sections compare Python's indentation-driven lexer with C's discarded braces, and classify Python as a dynamically bound, strongly verified runtime typing environment where \texttt{==} compares payloads through dunder methods and \texttt{is} compares raw heap addresses.
+
+Together, these sections replace the illusion that Python is ``just a script language'' with an architectural picture: a managed runtime hosted inside a native process, shaped by deliberate cultural choices about readability, correctness, and communal code review.

@@ -1,5 +1,354 @@
 \subsection{Filesystem Inspection and Manipulation}
+
+A path object does not only describe a possible location. It can also be used to ask the filesystem questions and perform filesystem operations. This moves the program beyond reading and writing file contents: the program can now inspect whether entries exist, create directories, list directory contents, rename entries, move entries, and delete entries.
+
+These operations still cross the operating-system boundary. Python does not own the filesystem. It asks the operating system to inspect or change filesystem state.
+
 \subsubsection{Checking Existence, File Type, and Directory Type}
+
+The methods \texttt{exists()}, \texttt{is\_file()}, and \texttt{is\_dir()} are basic filesystem inspection methods. They do not inspect a Python variable. They ask whether the external path currently refers to something in the filesystem, and what kind of thing it appears to be.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("fs_demo")
+demo_file = demo_dir / "quote.txt"
+
+demo_dir.mkdir(exist_ok=True)
+
+with open(demo_file, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Filesystem fact: D'oh is persistent if written to disk.\n")
+
+print("Path objects:")
+print(f"demo_dir  = {demo_dir}")
+print(f"demo_file = {demo_file}")
+
+print()
+print("Object types:")
+print(f"type(demo_dir)  = {type(demo_dir)}")
+print(f"type(demo_file) = {type(demo_file)}")
+
+print()
+print("Selected names from dir(demo_file):")
+for name in ["exists", "is_file", "is_dir", "name", "parent", "suffix"]:
+    print(f"{name:10} -> {name in dir(demo_file)}")
+
+print()
+print("Filesystem checks:")
+print(f"demo_dir.exists()   = {demo_dir.exists()}")
+print(f"demo_dir.is_dir()   = {demo_dir.is_dir()}")
+print(f"demo_dir.is_file()  = {demo_dir.is_file()}")
+
+print()
+print(f"demo_file.exists()  = {demo_file.exists()}")
+print(f"demo_file.is_dir()  = {demo_file.is_dir()}")
+print(f"demo_file.is_file() = {demo_file.is_file()}")
+
+missing_path = demo_dir / "missing.txt"
+
+print()
+print("Missing path checks:")
+print(f"missing_path.exists()  = {missing_path.exists()}")
+print(f"missing_path.is_file() = {missing_path.is_file()}")
+print(f"missing_path.is_dir()  = {missing_path.is_dir()}")
+
+exists_result = demo_file.exists()
+
+print()
+print("The result of exists() is a bool object:")
+print(f"exists_result       = {exists_result}")
+print(f"type(exists_result) = {type(exists_result)}")
+\end{verbatim}
+
+The result of these checks is a Boolean value. The path object remains only a reference. The real question is answered by the filesystem at the moment the method is called.
+
+This timing matters. A path may exist now and disappear later. Another process may create, delete, rename, or lock files between two operations. These checks are useful, but they are not permanent guarantees.
+
 \subsubsection{Creating Directories and Parent Directory Chains}
+
+The \texttt{mkdir()} method creates a directory. If the directory already exists, the default behavior is to raise an error. This is useful when accidental reuse of an existing directory would be suspicious.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_root = Path("mkdir_demo")
+simple_dir = demo_root / "simple"
+
+demo_root.mkdir(exist_ok=True)
+
+print("Before creating simple_dir:")
+print(f"simple_dir.exists() = {simple_dir.exists()}")
+
+simple_dir.mkdir()
+
+print()
+print("After creating simple_dir:")
+print(f"simple_dir.exists() = {simple_dir.exists()}")
+print(f"simple_dir.is_dir() = {simple_dir.is_dir()}")
+
+print()
+print("Trying to create the same directory again:")
+
+try:
+    simple_dir.mkdir()
+except FileExistsError as err:
+    print("Directory creation failed because it already exists.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+When a chain of parent directories may not already exist, \texttt{parents=True} tells Python to create the missing parent directories too. The option \texttt{exist\_ok=True} tells Python not to fail if the final directory already exists.
+
+\begin{verbatim}
+from pathlib import Path
+
+nested_dir = Path("mkdir_demo") / "level1" / "level2" / "level3"
+
+print("Nested directory path:")
+print(f"nested_dir       = {nested_dir}")
+print(f"type(nested_dir) = {type(nested_dir)}")
+print(f"nested_dir.parts = {nested_dir.parts}")
+
+print()
+print("Before mkdir():")
+print(f"nested_dir.exists() = {nested_dir.exists()}")
+
+nested_dir.mkdir(parents=True, exist_ok=True)
+
+print()
+print("After mkdir(parents=True, exist_ok=True):")
+print(f"nested_dir.exists() = {nested_dir.exists()}")
+print(f"nested_dir.is_dir() = {nested_dir.is_dir()}")
+
+print()
+print("Selected names from dir(nested_dir):")
+for name in ["mkdir", "exists", "is_dir", "parent", "parents", "parts"]:
+    print(f"{name:10} -> {name in dir(nested_dir)}")
+
+print()
+print("Parent chain:")
+for parent in nested_dir.parents:
+    print(parent)
+\end{verbatim}
+
+The method \texttt{mkdir()} changes filesystem state. It is not like creating a list or dictionary inside Python memory. The created directory remains after the Python process ends unless later removed.
+
+The practical rule is to use \texttt{parents=True} when the whole directory chain should be created, and \texttt{exist\_ok=True} when repeated execution of the same script should not fail merely because the directory is already present.
+
 \subsubsection{Listing Directory Contents and Iterating over Filesystem Entries}
+
+The method \texttt{iterdir()} returns an iterator over the entries directly inside a directory. Each yielded entry is a \texttt{Path} object.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("listing_demo")
+demo_dir.mkdir(exist_ok=True)
+
+file1 = demo_dir / "alpha.txt"
+file2 = demo_dir / "beta.txt"
+file3 = demo_dir / "answer_42.txt"
+subdir = demo_dir / "nested"
+
+with open(file1, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Alpha: Nobody expects the Spanish Inquisition.\n")
+
+with open(file2, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Beta: Serenity now.\n")
+
+with open(file3, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Answer: 42.\n")
+
+subdir.mkdir(exist_ok=True)
+
+entries = list(demo_dir.iterdir())
+
+print("Directory entries as a list:")
+print(f"entries       = {entries}")
+print(f"type(entries) = {type(entries)}")
+print(f"len(entries)  = {len(entries)}")
+
+print()
+print("Selected names from dir(entries):")
+for name in ["append", "extend", "insert", "pop", "sort", "reverse"]:
+    print(f"{name:10} -> {name in dir(entries)}")
+
+print()
+print("Inspecting entries:")
+for entry in entries:
+    print(f"entry = {entry}")
+    print(f"    type(entry) = {type(entry)}")
+    print(f"    name        = {entry.name}")
+    print(f"    is_file     = {entry.is_file()}")
+    print(f"    is_dir      = {entry.is_dir()}")
+\end{verbatim}
+
+The call \texttt{list(demo\_dir.iterdir())} materializes all immediate directory entries into a list. For a small directory this is convenient. For a very large directory, direct iteration may be preferable.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("listing_demo")
+
+print("Direct iteration over directory entries:")
+
+for entry in demo_dir.iterdir():
+    kind = "directory" if entry.is_dir() else "file"
+    print(f"{entry.name:15} -> {kind}")
+\end{verbatim}
+
+For filtered listing, \texttt{glob()} can match path patterns.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("listing_demo")
+
+txt_files = list(demo_dir.glob("*.txt"))
+
+print("Only .txt files:")
+for path in txt_files:
+    print(f"{path.name:15} size unknown here, type = {type(path)}")
+
+print()
+print("txt_files object:")
+print(f"type(txt_files) = {type(txt_files)}")
+print(f"len(txt_files)  = {len(txt_files)}")
+\end{verbatim}
+
+The pattern \texttt{"*.txt"} means entries whose names end with \texttt{.txt}. This is filesystem-oriented matching, not ordinary string splitting. The returned values are still \texttt{Path} objects.
+
 \subsubsection{Renaming, Moving, and Deleting Files Safely}
+
+Filesystem manipulation must be treated carefully because it changes external state. A rename, move, or delete operation affects files and directories outside Python memory. These changes are not undone automatically when the script ends.
+
+The method \texttt{rename()} changes the path of a filesystem entry. In the same directory, this is a rename. Across directories, it can act as a move when the operating system permits it.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("rename_demo")
+demo_dir.mkdir(exist_ok=True)
+
+old_path = demo_dir / "old_name.txt"
+new_path = demo_dir / "new_name.txt"
+
+with open(old_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Old name: These pretzels are making me thirsty.\n")
+
+print("Before rename:")
+print(f"old_path.exists() = {old_path.exists()}")
+print(f"new_path.exists() = {new_path.exists()}")
+
+old_path.rename(new_path)
+
+print()
+print("After rename:")
+print(f"old_path.exists() = {old_path.exists()}")
+print(f"new_path.exists() = {new_path.exists()}")
+
+with open(new_path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print()
+print("Content after rename:")
+print(content)
+\end{verbatim}
+
+A safer overwrite-aware pattern is to check whether the destination already exists before renaming. This does not remove all race conditions, but it prevents simple accidental replacement in ordinary scripts.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("safe_rename_demo")
+demo_dir.mkdir(exist_ok=True)
+
+src_path = demo_dir / "source.txt"
+dst_path = demo_dir / "destination.txt"
+
+with open(src_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Source: It's only a model.\n")
+
+with open(dst_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Destination already exists.\n")
+
+print("Before safe rename attempt:")
+print(f"src_path.exists() = {src_path.exists()}")
+print(f"dst_path.exists() = {dst_path.exists()}")
+
+if dst_path.exists():
+    print("Rename skipped: destination already exists.")
+else:
+    src_path.rename(dst_path)
+    print("Rename completed.")
+\end{verbatim}
+
+Deleting a file is done with \texttt{unlink()}. Deleting an empty directory is done with \texttt{rmdir()}. These are different operations because files and directories are different filesystem entry types.
+
+\begin{verbatim}
+from pathlib import Path
+
+demo_dir = Path("delete_demo")
+demo_dir.mkdir(exist_ok=True)
+
+file_path = demo_dir / "temporary.txt"
+
+with open(file_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Temporary file: No soup for you.\n")
+
+print("Before file deletion:")
+print(f"file_path.exists() = {file_path.exists()}")
+print(f"file_path.is_file() = {file_path.is_file()}")
+
+file_path.unlink()
+
+print()
+print("After file deletion:")
+print(f"file_path.exists() = {file_path.exists()}")
+
+print()
+print("Before directory deletion:")
+print(f"demo_dir.exists() = {demo_dir.exists()}")
+print(f"demo_dir.is_dir() = {demo_dir.is_dir()}")
+
+demo_dir.rmdir()
+
+print()
+print("After directory deletion:")
+print(f"demo_dir.exists() = {demo_dir.exists()}")
+\end{verbatim}
+
+The method \texttt{rmdir()} removes only an empty directory. This is a useful safety property. It prevents a directory tree from being erased accidentally by a simple empty-directory removal call.
+
+When deleting optional files, \texttt{missing\_ok=True} can make repeated script execution safer.
+
+\begin{verbatim}
+from pathlib import Path
+
+optional_path = Path("optional_delete_demo.txt")
+
+with open(optional_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("This file will be removed once.\n")
+
+print("First unlink:")
+optional_path.unlink(missing_ok=True)
+print(f"optional_path.exists() = {optional_path.exists()}")
+
+print()
+print("Second unlink with missing_ok=True:")
+optional_path.unlink(missing_ok=True)
+print("No exception was raised.")
+\end{verbatim}
+
+The practical rules are direct:
+
+\begin{itemize}
+    \item use \texttt{exists()}, \texttt{is\_file()}, and \texttt{is\_dir()} to inspect current filesystem state;
+    \item use \texttt{mkdir()} to create directories;
+    \item use \texttt{iterdir()} or \texttt{glob()} to list entries;
+    \item use \texttt{rename()} for renaming or moving;
+    \item use \texttt{unlink()} for files;
+    \item use \texttt{rmdir()} for empty directories.
+\end{itemize}
+
+All of these operations are external state operations. They should be written with more caution than ordinary in-memory object manipulation.

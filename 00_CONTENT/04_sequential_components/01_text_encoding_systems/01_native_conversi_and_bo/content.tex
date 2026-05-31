@@ -1,4 +1,539 @@
 \subsection{Native Conversion and Boundary Escape Sequences}
-\subsubsection{Octal Literal Parsing Boundaries (`\000` Values through Base-8 Conversions)}
-\subsubsection{Hexadecimal Literal Parsing Boundaries (`\xhh` Values through Base-16 Conversions)}
-\subsubsection{Raw String Literals: Suppressing Most Escape Processing with the `r"..."` Prefix}
+
+Python source code is text. When the interpreter reads a string literal, some character sequences beginning with a backslash are treated specially. These are called escape sequences.
+
+An escape sequence is not processed later by the string object. It is processed while the literal is being parsed.
+
+\begin{verbatim}
+text1 = "A"
+text2 = "\101"
+text3 = "\x41"
+
+print(f"text1: {text1!r}")
+print(f"text2: {text2!r}")
+print(f"text3: {text3!r}")
+
+print()
+print(f"text1 == text2: {text1 == text2}")
+print(f"text1 == text3: {text1 == text3}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text1: 'A'
+text2: 'A'
+text3: 'A'
+
+text1 == text2: True
+text1 == text3: True
+\end{verbatim}
+
+All three literals create the same final string object value: the character \texttt{"A"}. The source spelling differs, but the parsed text component is the same.
+
+The functions \texttt{ord()} and \texttt{chr()} make this boundary visible.
+
+\begin{verbatim}
+ch = "A"
+nr = ord(ch)
+back = chr(nr)
+
+print(f"ch:   {ch!r}")
+print(f"nr:   {nr}")
+print(f"back: {back!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ch:   'A'
+nr:   65
+back: 'A'
+\end{verbatim}
+
+\texttt{ord()} moves from a one-character string to its integer codepoint. \texttt{chr()} moves from an integer codepoint back to a one-character string.
+
+\subsubsection{Octal Literal Parsing Boundaries (\texttt{\textbackslash 000} Values through Base-8 Conversions)}
+
+An octal escape uses base 8 digits. The allowed digits are:
+
+\begin{verbatim}
+0 1 2 3 4 5 6 7
+\end{verbatim}
+
+In a Python string literal, an octal escape has this shape:
+
+\begin{verbatim}
+"\ooo"
+\end{verbatim}
+
+where \texttt{o} means an octal digit.
+
+For example, octal \texttt{101} is decimal \texttt{65}, and Unicode codepoint \texttt{65} is \texttt{"A"}.
+
+\begin{verbatim}
+octal_text = "101"
+
+nr = int(octal_text, 8)
+ch = chr(nr)
+
+print(f"octal_text: {octal_text!r}")
+print(f"decimal:    {nr}")
+print(f"character:  {ch!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+octal_text: '101'
+decimal:    65
+character:  'A'
+\end{verbatim}
+
+The literal escape \texttt{\textbackslash 101} performs this kind of conversion during literal parsing.
+
+\begin{verbatim}
+text = "\101"
+
+print(f"text:      {text!r}")
+print(f"ord(text): {ord(text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:      'A'
+ord(text): 65
+\end{verbatim}
+
+Several octal escapes can appear in the same string literal.
+
+\begin{verbatim}
+text = "\110\145\154\154\157"
+
+print(f"text: {text!r}")
+print(text)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'Hello'
+Hello
+\end{verbatim}
+
+The octal values are:
+
+\begin{verbatim}
+\110 -> H
+\145 -> e
+\154 -> l
+\154 -> l
+\157 -> o
+\end{verbatim}
+
+A null character can also be written with an octal escape.
+
+\begin{verbatim}
+text = "A\000B"
+
+print(f"text:      {text!r}")
+print(f"len(text): {len(text)}")
+
+print()
+for index, ch in enumerate(text):
+    print(f"index={index} ch={ch!r:<4} ord={ord(ch)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:      'A\x00B'
+len(text): 3
+
+index=0 ch='A'  ord=65
+index=1 ch='\x00' ord=0
+index=2 ch='B'  ord=66
+\end{verbatim}
+
+The null character is inside the Python string. It does not terminate the string. This is different from the way C programmers often think about null-terminated character arrays.
+
+Python consumes at most three octal digits for this escape form.
+
+\begin{verbatim}
+text1 = "\101"
+text2 = "\1012"
+
+print(f"text1: {text1!r}")
+print(f"text2: {text2!r}")
+
+print()
+for index, ch in enumerate(text2):
+    print(f"index={index} ch={ch!r} ord={ord(ch)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text1: 'A'
+text2: 'A2'
+
+index=0 ch='A' ord=65
+index=1 ch='2' ord=50
+\end{verbatim}
+
+The literal \texttt{"\textbackslash 1012"} is not read as one four-digit octal escape. Python reads \texttt{\textbackslash 101}, creates \texttt{"A"}, and then leaves \texttt{"2"} as an ordinary character.
+
+The practical rule is:
+
+\begin{quote}
+An octal escape is a source-code spelling that inserts a character by base-8 number. It is parsed before the final string object exists.
+\end{quote}
+
+\subsubsection{Hexadecimal Literal Parsing Boundaries (\texttt{\textbackslash xhh} Values through Base-16 Conversions)}
+
+A hexadecimal escape uses base 16 digits. The allowed digits are:
+
+\begin{verbatim}
+0 1 2 3 4 5 6 7 8 9 A B C D E F
+\end{verbatim}
+
+Lowercase letters are also accepted:
+
+\begin{verbatim}
+a b c d e f
+\end{verbatim}
+
+In a Python string literal, the short hexadecimal escape has this shape:
+
+\begin{verbatim}
+"\xhh"
+\end{verbatim}
+
+It requires exactly two hexadecimal digits after \texttt{\textbackslash x}.
+
+Hexadecimal \texttt{41} is decimal \texttt{65}, and decimal \texttt{65} is \texttt{"A"}.
+
+\begin{verbatim}
+hex_text = "41"
+
+nr = int(hex_text, 16)
+ch = chr(nr)
+
+print(f"hex_text: {hex_text!r}")
+print(f"decimal:  {nr}")
+print(f"char:     {ch!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+hex_text: '41'
+decimal:  65
+char:     'A'
+\end{verbatim}
+
+The escape \texttt{\textbackslash x41} performs this conversion during string literal parsing.
+
+\begin{verbatim}
+text = "\x41"
+
+print(f"text:      {text!r}")
+print(f"ord(text): {ord(text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:      'A'
+ord(text): 65
+\end{verbatim}
+
+Several hexadecimal escapes can be placed next to each other.
+
+\begin{verbatim}
+text = "\x4e\x69\x21"
+
+print(f"text: {text!r}")
+print(text)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'Ni!'
+Ni!
+\end{verbatim}
+
+The values are:
+
+\begin{verbatim}
+\x4e -> N
+\x69 -> i
+\x21 -> !
+\end{verbatim}
+
+The \texttt{\textbackslash xhh} form consumes exactly two hexadecimal digits.
+
+\begin{verbatim}
+text = "\x411"
+
+print(f"text: {text!r}")
+
+for index, ch in enumerate(text):
+    print(f"index={index} ch={ch!r} ord={ord(ch)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'A1'
+index=0 ch='A' ord=65
+index=1 ch='1' ord=49
+\end{verbatim}
+
+Python reads \texttt{\textbackslash x41} as \texttt{"A"}, then reads the remaining \texttt{"1"} as an ordinary character.
+
+A short hex escape is invalid if fewer than two hexadecimal digits follow \texttt{\textbackslash x}. Because this is a source-code parsing error, it cannot be caught by putting the bad literal directly in normal code. The program would fail before it starts running. To demonstrate it safely, we can compile source text from another string.
+
+\begin{verbatim}
+source = 'bad = "\\x4"'
+
+try:
+    compile(source, "<demo>", "exec")
+    print("compiled")
+except SyntaxError as err:
+    print("syntax error")
+    print(f"message: {err.msg}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+syntax error
+message: (unicode error) 'unicodeescape' codec can't decode bytes
+in position 0-2: truncated \xXX escape
+\end{verbatim}
+
+The exact wording may vary slightly between Python versions, but the cause is the same: \texttt{\textbackslash x} needs exactly two hexadecimal digits.
+
+A common confusion is to treat \texttt{\textbackslash xhh} as if it were the same thing as UTF-8 decoding. It is not.
+
+\begin{verbatim}
+wrong_text = "\xC4\x83"
+right_text = b"\xC4\x83".decode("utf-8")
+
+print(f"wrong_text: {wrong_text!r}")
+print(f"right_text: {right_text!r}")
+
+print()
+print(f"len(wrong_text): {len(wrong_text)}")
+print(f"len(right_text): {len(right_text)}")
+
+print()
+for ch in wrong_text:
+    print(f"wrong component: {ch!r:<4} U+{ord(ch):04X}")
+
+print()
+for ch in right_text:
+    print(f"right component: {ch!r:<4} U+{ord(ch):04X}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+wrong_text: 'Ä\x83'
+right_text: 'ă'
+
+len(wrong_text): 2
+len(right_text): 1
+
+wrong component: 'Ä'  U+00C4
+wrong component: '\x83' U+0083
+
+right component: 'ă'  U+0103
+\end{verbatim}
+
+The source literal \texttt{"\textbackslash xC4\textbackslash x83"} creates two text characters. The bytes literal \texttt{b"\textbackslash xC4\textbackslash x83"} creates two raw bytes, and UTF-8 decoding interprets those bytes as one text character.
+
+So the layer matters:
+
+\begin{itemize}
+    \item \texttt{"\textbackslash xC4\textbackslash x83"} is a \texttt{str} literal with two character escapes;
+    \item \texttt{b"\textbackslash xC4\textbackslash x83"} is a \texttt{bytes} literal with two byte escapes;
+    \item \texttt{decode("utf-8")} interprets the bytes according to UTF-8.
+\end{itemize}
+
+The practical rule is:
+
+\begin{quote}
+The escape \texttt{\textbackslash xhh} inserts a character with a two-digit hexadecimal value in a string literal. It does not automatically mean ``UTF-8 text''.
+\end{quote}
+
+\subsubsection{Raw String Literals: Suppressing Most Escape Processing with the \texttt{r"..."} Prefix}
+
+A raw string literal is written with an \texttt{r} or \texttt{R} prefix before the quote.
+
+\begin{verbatim}
+normal = "C:\new\test"
+raw = r"C:\new\test"
+
+print(f"normal: {normal!r}")
+print(f"raw:    {raw!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal: 'C:\new\test'
+raw:    'C:\\new\\test'
+\end{verbatim}
+
+The displayed \texttt{repr()} result shows what happened. In the normal string, \texttt{\textbackslash n} became a newline and \texttt{\textbackslash t} became a tab. In the raw string, the backslashes were kept as ordinary backslash characters.
+
+Printing the values makes the difference more visible.
+
+\begin{verbatim}
+normal = "C:\new\test"
+raw = r"C:\new\test"
+
+print("normal printed:")
+print(normal)
+
+print()
+print("raw printed:")
+print(raw)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal printed:
+C:
+ew	est
+
+raw printed:
+C:\new\test
+\end{verbatim}
+
+Raw string literals are useful when the text itself contains many backslashes, especially file paths and regular expression patterns.
+
+The raw prefix affects literal parsing. It does not create a special runtime string type.
+
+\begin{verbatim}
+normal = "abc"
+raw = r"abc"
+
+print(f"normal: {normal!r}")
+print(f"raw:    {raw!r}")
+
+print()
+print(f"type(normal): {type(normal)}")
+print(f"type(raw):    {type(raw)}")
+print(f"same value:   {normal == raw}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal: 'abc'
+raw:    'abc'
+
+type(normal): <class 'str'>
+type(raw):    <class 'str'>
+same value:   True
+\end{verbatim}
+
+There is no \texttt{raw string object} type. There is only a \texttt{str} object created from a raw string literal spelling.
+
+Raw strings suppress most escape processing, including octal, hex, and Unicode-looking escapes.
+
+\begin{verbatim}
+normal1 = "\101"
+raw1 = r"\101"
+
+normal2 = "\x41"
+raw2 = r"\x41"
+
+print(f"normal1: {normal1!r}")
+print(f"raw1:    {raw1!r}")
+
+print()
+print(f"normal2: {normal2!r}")
+print(f"raw2:    {raw2!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal1: 'A'
+raw1:    '\\101'
+
+normal2: 'A'
+raw2:    '\\x41'
+\end{verbatim}
+
+The raw literal keeps the backslash and the following characters as part of the resulting string.
+
+The length confirms the difference.
+
+\begin{verbatim}
+normal = "\x41"
+raw = r"\x41"
+
+print(f"normal:      {normal!r}")
+print(f"len(normal): {len(normal)}")
+
+print()
+print(f"raw:         {raw!r}")
+print(f"len(raw):    {len(raw)}")
+
+print()
+for index, ch in enumerate(raw):
+    print(f"index={index} ch={ch!r} ord={ord(ch)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal:      'A'
+len(normal): 1
+
+raw:         '\\x41'
+len(raw):    4
+
+index=0 ch='\\' ord=92
+index=1 ch='x' ord=120
+index=2 ch='4' ord=52
+index=3 ch='1' ord=49
+\end{verbatim}
+
+Raw strings have one important syntactic boundary: they cannot end with a single unpaired backslash, because that backslash would escape the closing quote in the source code.
+
+This is not valid Python source:
+
+\begin{verbatim}
+path = r"C:\temp\"
+\end{verbatim}
+
+A simple workaround is to concatenate a final backslash.
+
+\begin{verbatim}
+path = r"C:\temp" + "\\"
+
+print(f"path: {path!r}")
+print(path)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+path: 'C:\\temp\\'
+C:\temp\
+\end{verbatim}
+
+The practical rule is:
+
+\begin{quote}
+A raw string literal changes how Python reads backslashes in the source code. It does not change the runtime type. The result is still an ordinary \texttt{str}.
+\end{quote}

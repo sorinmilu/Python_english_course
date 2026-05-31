@@ -1,4 +1,410 @@
 \subsection{Stylistic Coding Conventions}
+
+The previous subsection described what Python accepts as a legal identifier. That is only the first boundary. A name can be legal and still be a bad programming name.
+
+Python will accept this:
+
+\begin{verbatim}
+xqz_42 = "Nobody expects the Spanish Inquisition!"
+\end{verbatim}
+
+The name is legal, but it does not explain the role of the value. The interpreter is satisfied. The reader is not.
+
+A programming language has two readers:
+
+\begin{itemize}
+    \item the interpreter, which needs syntactically valid source code;
+    \item the human programmer, who needs understandable source code.
+\end{itemize}
+
+The syntax rules protect the interpreter. Style rules protect the human reader. They do not usually change what the program does, but they strongly affect whether the program can be read, debugged, maintained, and taught.
+
+\begin{verbatim}
+line = "No soup for you."
+quote_from_seinfeld = "No soup for you."
+
+print(line)
+print(quote_from_seinfeld)
+\end{verbatim}
+
+Both names are legal. The second name carries more information. It tells the reader what kind of value the name is expected to reference.
+
+This is especially important in Python because names do not declare fixed types. In C, a declaration such as \texttt{int count} already gives the reader one piece of type information. In Python, the name itself often carries more of the explanatory burden.
+
 \subsubsection{Alignment with the PEP 8 Style Guide}
-\subsubsection{Readable Naming Conventions: Lowercase `snake_case` for Ordinary Variables}
+
+PEP 8 is Python's standard style guide. It is not the grammar of the language. Python does not reject a program merely because it violates PEP 8. Instead, PEP 8 describes common conventions that make Python code easier to read in a shared community.
+
+For ordinary variable names, the most important rule is simple:
+
+\begin{quote}
+Use lowercase words separated by underscores.
+\end{quote}
+
+This style is commonly called \texttt{snake\_case}.
+
+Poor style:
+
+\begin{verbatim}
+StudentFinalScore = 42
+studentFinalScore = 42
+sfs = 42
+\end{verbatim}
+
+Preferred ordinary-variable style:
+
+\begin{verbatim}
+student_final_score = 42
+\end{verbatim}
+
+A short comparison:
+
+\begin{verbatim}
+student_name = "Bart Simpson"
+quiz_score = 42
+final_score = 87.5
+passed_course = True
+
+print(f"{'student':<12} {student_name}")
+print(f"{'quiz':<12} {quiz_score}")
+print(f"{'final':<12} {final_score:.1f}")
+print(f"{'passed':<12} {passed_course}")
+
+print()
+print(f"type(student_name): {type(student_name)}")
+print(f"type(quiz_score):   {type(quiz_score)}")
+print(f"type(final_score):  {type(final_score)}")
+print(f"type(passed_course): {type(passed_course)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+student      Bart Simpson
+quiz         42
+final        87.5
+passed       True
+
+type(student_name): <class 'str'>
+type(quiz_score):   <class 'int'>
+type(final_score):  <class 'float'>
+type(passed_course): <class 'bool'>
+\end{verbatim}
+
+The names do not force the types. The object types still belong to the objects. However, readable names help the programmer understand the intended role of each binding.
+
+PEP 8 is not meant to replace judgment. A short name is acceptable when its meaning is obvious from a very small local context:
+
+\begin{verbatim}
+x = 42
+y = 7
+
+print(f"x + y = {x + y}")
+\end{verbatim}
+
+But in ordinary program text, names should usually say what they represent:
+
+\begin{verbatim}
+current_score = 42
+bonus_score = 7
+
+print(f"total score: {current_score + bonus_score}")
+\end{verbatim}
+
+The second version gives more information without requiring comments.
+
+\subsubsection{Readable Naming Conventions: Lowercase \texttt{snake\_case} for Ordinary Variables}
+
+The standard form for ordinary Python variables is lowercase \texttt{snake\_case}:
+
+\begin{verbatim}
+user_name = "Cosmo Kramer"
+episode_count = 180
+has_finished = False
+favorite_number = 42
+\end{verbatim}
+
+Each word is lowercase. Spaces are replaced with underscores. Digits may appear after the first character when they are part of the name.
+
+The goal is not decoration. The goal is fast reading.
+
+Compare:
+
+\begin{verbatim}
+n = "Homer"
+a = 39
+s = "Springfield"
+
+print(f"{n} is {a} and lives in {s}.")
+\end{verbatim}
+
+with:
+
+\begin{verbatim}
+person_name = "Homer"
+person_age = 39
+home_city = "Springfield"
+
+print(f"{person_name} is {person_age} and lives in {home_city}.")
+\end{verbatim}
+
+The second version is longer, but it is not harder. It removes guessing.
+
+A good variable name usually answers one of these questions:
+
+\begin{itemize}
+    \item What kind of thing is this?
+    \item What role does it play here?
+    \item What does this value mean in this calculation?
+\end{itemize}
+
+Example:
+
+\begin{verbatim}
+quote = "It is merely a flesh wound."
+quote_length = len(quote)
+quote_uppercase = quote.upper()
+
+print(f"quote:          {quote}")
+print(f"length:         {quote_length}")
+print(f"uppercase:      {quote_uppercase}")
+
+print()
+print(f"type(quote):          {type(quote)}")
+print(f"type(quote_length):   {type(quote_length)}")
+print(f"type(quote_uppercase): {type(quote_uppercase)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote:          It is merely a flesh wound.
+length:         29
+uppercase:      IT IS MERELY A FLESH WOUND.
+
+type(quote):          <class 'str'>
+type(quote_length):   <class 'int'>
+type(quote_uppercase): <class 'str'>
+\end{verbatim}
+
+The names help us see the flow:
+
+\begin{verbatim}
+quote           -> original string object
+quote_length    -> integer result returned by len()
+quote_uppercase -> new uppercase string object
+\end{verbatim}
+
+The name \texttt{quote\_uppercase} does not modify \texttt{quote}. It names the result of calling \texttt{upper()} on the string object.
+
+We can inspect a few relevant string capabilities:
+
+\begin{verbatim}
+quote = "No soup for you."
+
+print(f"type(quote): {type(quote)}")
+
+print("selected string methods:")
+print(f"{'upper':<15} {'upper' in dir(quote)}")
+print(f"{'lower':<15} {'lower' in dir(quote)}")
+print(f"{'replace':<15} {'replace' in dir(quote)}")
+print(f"{'split':<15} {'split' in dir(quote)}")
+
+print()
+print(quote.upper())
+print(quote.replace("soup", "debugger"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(quote): <class 'str'>
+selected string methods:
+upper           True
+lower           True
+replace         True
+split           True
+
+NO SOUP FOR YOU.
+No debugger for you.
+\end{verbatim}
+
+The naming convention does not belong to the string object. It belongs to the source-code name that refers to the object. The object has methods such as \texttt{upper()}, \texttt{lower()}, and \texttt{replace()}. The variable name is only the programmer's chosen binding label.
+
+Some names are too vague:
+
+\begin{verbatim}
+data = "Chuck Norris can hear sign language."
+thing = len(data)
+result = data.upper()
+\end{verbatim}
+
+Better:
+
+\begin{verbatim}
+fact_text = "Chuck Norris can hear sign language."
+fact_length = len(fact_text)
+fact_uppercase = fact_text.upper()
+\end{verbatim}
+
+The improved version does not change the runtime behavior. It changes the clarity of the program.
+
 \subsubsection{Underscore Conventions: Internal Names, Throwaway Names, and Special Method Boundaries}
+
+The underscore is legal inside Python identifiers, but it is also used by convention in several specific ways. These conventions are not all enforced by the interpreter. Some are agreements between Python programmers.
+
+The most common use has already appeared: separating words in ordinary names.
+
+\begin{verbatim}
+favorite_quote = "These pretzels are making me thirsty."
+current_value = 42
+final_answer = current_value + 1
+
+print(favorite_quote)
+print(final_answer)
+\end{verbatim}
+
+A single leading underscore usually means: this name is meant for internal use.
+
+\begin{verbatim}
+_public_title = "This name is legal, but the style says internal."
+
+print(_public_title)
+\end{verbatim}
+
+Python will still execute this. The leading underscore does not make the name truly private. It tells human readers: do not treat this as part of the normal public interface of a module, object, or component.
+
+For now, at the level of simple scripts, the practical advice is:
+
+\begin{quote}
+Do not start ordinary beginner variable names with an underscore unless you are intentionally marking them as internal or temporary.
+\end{quote}
+
+A single underscore by itself is often used as a throwaway name. It means that a value is required syntactically, but the program does not intend to use it.
+
+Example:
+
+\begin{verbatim}
+name, _, city = ("Jerry", "ignored middle field", "New York")
+
+print(f"name: {name}")
+print(f"city: {city}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name: Jerry
+city: New York
+\end{verbatim}
+
+The second value exists in the tuple, but the program deliberately ignores it. The underscore is still a real name, but by convention it says: this binding is not important.
+
+Another common use appears in loops:
+
+\begin{verbatim}
+for _ in range(3):
+    print("And now for something completely different.")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+And now for something completely different.
+And now for something completely different.
+And now for something completely different.
+\end{verbatim}
+
+The loop variable is not used. Only the repetition count matters.
+
+A trailing underscore is often used when a good name would otherwise collide with a Python keyword.
+
+The word \texttt{class} is a keyword, so this is invalid:
+
+\begin{verbatim}
+class = "Python 101"
+\end{verbatim}
+
+A common replacement is:
+
+\begin{verbatim}
+class_ = "Python 101"
+
+print(class_)
+\end{verbatim}
+
+The trailing underscore keeps the name readable while avoiding the reserved keyword.
+
+Double-leading and double-trailing underscores mark a different category. Names such as \texttt{\_\_init\_\_}, \texttt{\_\_str\_\_}, \texttt{\_\_repr\_\_}, and \texttt{\_\_add\_\_} are often called dunder names, meaning double-underscore names.
+
+These names are not ordinary decoration. They are used by Python's object model for special behavior.
+
+Even simple objects already have many of them:
+
+\begin{verbatim}
+number = 42
+
+print(f"type(number): {type(number)}")
+
+print("selected integer special methods:")
+print(f"{'__add__':<12} {'__add__' in dir(number)}")
+print(f"{'__str__':<12} {'__str__' in dir(number)}")
+print(f"{'__repr__':<12} {'__repr__' in dir(number)}")
+print(f"{'__eq__':<12} {'__eq__' in dir(number)}")
+
+print()
+print(number.__add__(8))
+print(number.__str__())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(number): <class 'int'>
+selected integer special methods:
+__add__      True
+__str__      True
+__repr__     True
+__eq__       True
+
+50
+42
+\end{verbatim}
+
+The expression:
+
+\begin{verbatim}
+number + 8
+\end{verbatim}
+
+is connected to integer addition behavior exposed through special methods such as \texttt{\_\_add\_\_}. This does not mean that beginners should call these methods directly in ordinary code. The point here is only to show that double-underscore names are part of Python's deeper object protocol.
+
+Therefore, do not invent ordinary variable names like this:
+
+\begin{verbatim}
+__score__ = 42
+__student_name__ = "Bart"
+\end{verbatim}
+
+Python may accept them as identifiers, but they visually imitate names reserved for special object behavior. For ordinary variables, use plain \texttt{snake\_case}:
+
+\begin{verbatim}
+score = 42
+student_name = "Bart"
+
+print(score)
+print(student_name)
+\end{verbatim}
+
+At this point, the practical naming rules are:
+
+\begin{itemize}
+    \item use lowercase \texttt{snake\_case} for ordinary variables;
+    \item use names that explain the value's role;
+    \item avoid case-only distinctions;
+    \item avoid leading underscores unless intentionally marking internal or throwaway names;
+    \item use a trailing underscore when avoiding a keyword collision;
+    \item do not invent double-underscore names for ordinary variables.
+\end{itemize}
+
+These rules do not make Python more powerful. They make Python programs easier to inspect. In a language where names are flexible bindings, readable naming is one of the main tools that keeps the source code understandable.

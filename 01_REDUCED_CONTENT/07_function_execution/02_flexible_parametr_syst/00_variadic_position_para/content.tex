@@ -1,0 +1,49 @@
+\subsection{Variadic Positional Parameters}
+
+A variadic positional parameter (\texttt{*args}) collects remaining positional arguments into a heap-allocated \texttt{tuple}. The star in the definition packs; the star at the call site unpacks an iterable into separate positional arguments.
+
+\subsubsection{Variable-Length Argument Packing: The Mechanics of \texttt{*args} and \texttt{**kwargs}}
+
+When a signature includes \texttt{*args}, CPython must allocate a fresh \texttt{tuple} at the call site to hold overflow positional references. When it includes \texttt{**kwargs}, it allocates a fresh \texttt{dict} for unbound keyword pairs. Both are ordinary heap objects with full allocation cost.
+
+Contrast this with the Vectorcall protocol (Python 3.8+): for many C-accelerated and simple Python calls, arguments pass through a contiguous C array of \texttt{PyObject*} pointers with a method flag (\texttt{METH\_VECTORCALL}). No intermediate tuple or dict is constructed. Signatures that force \texttt{*args}/\texttt{**kwargs}---or wrappers that use them---disable this fast path and pay explicit container allocation on every invocation.
+
+\begin{verbatim}
+def flexible(*args, **kwargs):
+    return len(args), len(kwargs)
+
+def fixed(a, b):
+    return a + b
+
+print(flexible(1, 2, 3, x=4))
+print(fixed(1, 2))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+(3, 1)
+3
+\end{verbatim}
+
+Decorators and forwarding wrappers commonly use \texttt{def wrapper(*args, **kwargs): return fn(*args, **kwargs)}. This preserves call shapes but forces tuple/dict packing at the wrapper boundary even when the underlying callable could have accepted a vectorcall layout.
+
+\subsubsection{Argument Unpacking Operations: Expanding Sequences Across Function Call Boundaries with \texttt{*}}
+
+Call-site \texttt{*iterable} expands an iterable into positional arguments before binding. The iterable must be iterable; element count must match the receiving signature unless a variadic parameter absorbs overflow. Unpacking passes object references, not copies.
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"{name}, {score}, {mood}")
+
+data = ["Homer", 42, "hungry"]
+show_line(*data)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer, 42, hungry
+\end{verbatim}
+
+Definition-side \texttt{*args} and call-side \texttt{*} are mirror operations: one packs many references into one tuple; the other expands one iterable into many arguments.

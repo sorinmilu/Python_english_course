@@ -1,4 +1,286 @@
 \subsection{Byte-Oriented Data Streams}
+
+Text files pass through an encoding and decoding boundary. Binary files do not. In binary mode, Python treats the file as a stream of bytes. The program does not ask Python to interpret those bytes as characters, lines, words, or encoded text.
+
+This is the correct model for images, compressed archives, executable files, audio data, network packets, and any format where each byte value matters directly. A binary file is not ``text with strange characters''. It is byte data.
+
 \subsubsection{Binary Mode as Raw Byte Transfer Without Text Decoding}
-\subsubsection{The `bytes` Object: Immutable Byte Sequences Distinct from `str`}
-\subsubsection{The `bytearray` Object: Mutable Byte Buffers for Incremental Modification}
+
+Binary mode is selected by adding \texttt{b} to the mode string. The most common binary modes are \texttt{"rb"} for reading bytes and \texttt{"wb"} for writing bytes.
+
+In binary mode, \texttt{write()} expects a bytes-like object, not a \texttt{str}. Likewise, \texttt{read()} returns \texttt{bytes}, not \texttt{str}.
+
+\begin{verbatim}
+path = "binary_mode_demo.bin"
+
+data = b"Binary mode does not decode text. 42.\n"
+
+print("Byte data before writing:")
+print(f"data       = {data}")
+print(f"type(data) = {type(data)}")
+print(f"len(data)  = {len(data)}")
+
+print()
+print("Selected names from dir(data):")
+for name in ["decode", "hex", "split", "replace", "startswith", "count"]:
+    print(f"{name:12} -> {name in dir(data)}")
+
+with open(path, "wb") as file_obj:
+    print()
+    print("Binary file object while writing:")
+    print(f"file_obj       = {file_obj}")
+    print(f"type(file_obj) = {type(file_obj)}")
+    print(f"file_obj.mode  = {file_obj.mode}")
+
+    print()
+    print("Selected names from dir(file_obj):")
+    for name in ["write", "read", "close", "flush", "seek", "tell", "mode"]:
+        print(f"{name:10} -> {name in dir(file_obj)}")
+
+    written_count = file_obj.write(data)
+
+print()
+print(f"write() returned: {written_count}")
+print("In binary mode, this is the number of bytes written.")
+
+with open(path, "rb") as file_obj:
+    restored_data = file_obj.read()
+
+print()
+print("Byte data read back:")
+print(f"restored_data       = {restored_data}")
+print(f"type(restored_data) = {type(restored_data)}")
+print(f"data == restored_data -> {data == restored_data}")
+\end{verbatim}
+
+The object written to the file is a \texttt{bytes} object. The object read back from the file is also a \texttt{bytes} object. Python does not decode the file content into text because the file was opened in binary mode.
+
+Passing a string directly to a binary file is an error.
+
+\begin{verbatim}
+path = "binary_type_error_demo.bin"
+
+text = "D'oh! This is a str, not bytes."
+
+with open(path, "wb") as file_obj:
+    try:
+        file_obj.write(text)
+    except TypeError as err:
+        print("Writing str to a binary file failed.")
+        print(f"type(err) = {type(err)}")
+        print(f"err       = {err}")
+
+    fixed_data = text.encode("utf-8")
+    file_obj.write(fixed_data)
+
+print()
+print("Corrected by explicit encoding:")
+print(f"fixed_data       = {fixed_data}")
+print(f"type(fixed_data) = {type(fixed_data)}")
+\end{verbatim}
+
+The failure is useful. It prevents the program from silently choosing an encoding. If the programmer wants text to become bytes, the conversion should be explicit.
+
+\subsubsection{The \texttt{bytes} Object: Immutable Byte Sequences Distinct from \texttt{str}}
+
+A \texttt{bytes} object is an immutable sequence of byte values. Each element is an integer from \texttt{0} to \texttt{255}. This is different from a \texttt{str}, whose elements are Unicode characters.
+
+\begin{verbatim}
+text = "Spam and eggs."
+data = b"Spam and eggs."
+
+print("Text object:")
+print(f"text       = {text}")
+print(f"type(text) = {type(text)}")
+print(f"len(text)  = {len(text)}")
+
+print()
+print("Bytes object:")
+print(f"data       = {data}")
+print(f"type(data) = {type(data)}")
+print(f"len(data)  = {len(data)}")
+
+print()
+print("Indexing:")
+first_char = text[0]
+first_byte = data[0]
+
+print(f"text[0]       = {first_char!r}")
+print(f"type(text[0]) = {type(first_char)}")
+
+print(f"data[0]       = {first_byte}")
+print(f"type(data[0]) = {type(first_byte)}")
+
+print()
+print("Slicing:")
+print(f"text[0:4]       = {text[0:4]!r}")
+print(f"type(text[0:4]) = {type(text[0:4])}")
+
+print(f"data[0:4]       = {data[0:4]}")
+print(f"type(data[0:4]) = {type(data[0:4])}")
+\end{verbatim}
+
+The difference is precise. Indexing a string returns a one-character \texttt{str}. Indexing a \texttt{bytes} object returns an \texttt{int}. Slicing a \texttt{bytes} object returns another \texttt{bytes} object.
+
+A \texttt{bytes} object can be inspected and transformed without becoming text.
+
+\begin{verbatim}
+data = b"Nobody expects the Spanish Inquisition!"
+
+print("Original bytes:")
+print(data)
+
+print()
+print("Selected bytes methods:")
+for name in ["hex", "decode", "replace", "split", "startswith", "endswith"]:
+    print(f"{name:12} -> {name in dir(data)}")
+
+print()
+print("Byte-level operations:")
+print(f"data.startswith(b'Nobody') -> {data.startswith(b'Nobody')}")
+print(f"data.endswith(b'!')        -> {data.endswith(b'!')}")
+print(f"data.count(b'e')           -> {data.count(b'e')}")
+print(f"data.replace(b'Nobody', b'Everybody') -> {data.replace(b'Nobody', b'Everybody')}")
+
+print()
+hex_text = data.hex()
+print("Hexadecimal view:")
+print(f"hex_text       = {hex_text}")
+print(f"type(hex_text) = {type(hex_text)}")
+\end{verbatim}
+
+The \texttt{hex()} method returns a textual hexadecimal representation of the byte sequence. This is useful for inspection because arbitrary bytes are not always printable as meaningful text.
+
+The \texttt{decode()} method crosses from bytes back to text, but only if the bytes represent valid text under the chosen encoding.
+
+\begin{verbatim}
+data = b"Serenity now!"
+
+text = data.decode("utf-8")
+
+print("Decoded bytes:")
+print(f"text       = {text}")
+print(f"type(text) = {type(text)}")
+\end{verbatim}
+
+The practical rule is: \texttt{bytes} is not a rough synonym for \texttt{str}. It is a separate object type for byte sequences. Convert explicitly when crossing between text and byte data.
+
+\subsubsection{The \texttt{bytearray} Object: Mutable Byte Buffers for Incremental Modification}
+
+A \texttt{bytes} object is immutable. Once created, its byte values cannot be changed in place. A \texttt{bytearray} is the mutable counterpart. It stores byte values like \texttt{bytes}, but allows modification.
+
+\begin{verbatim}
+data = b"Chuck Norris fact: 41."
+
+print("Immutable bytes object:")
+print(f"data       = {data}")
+print(f"type(data) = {type(data)}")
+
+print()
+try:
+    data[-2] = 50
+except TypeError as err:
+    print("Changing bytes in place failed.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+To modify byte data incrementally, create a \texttt{bytearray}.
+
+\begin{verbatim}
+buf = bytearray(b"Chuck Norris fact: 41.")
+
+print("Mutable bytearray object:")
+print(f"buf       = {buf}")
+print(f"type(buf) = {type(buf)}")
+print(f"len(buf)  = {len(buf)}")
+
+print()
+print("Selected names from dir(buf):")
+for name in ["append", "extend", "insert", "pop", "replace", "decode", "hex"]:
+    print(f"{name:10} -> {name in dir(buf)}")
+
+print()
+print("Before modification:")
+print(buf)
+
+buf[-2] = ord("2")
+
+print("After modification:")
+print(buf)
+
+text = buf.decode("utf-8")
+
+print()
+print("Decoded modified buffer:")
+print(f"text       = {text}")
+print(f"type(text) = {type(text)}")
+\end{verbatim}
+
+The expression \texttt{ord("2")} returns the integer code value for the character \texttt{"2"}. A \texttt{bytearray} position stores an integer byte value, not a one-character string.
+
+A \texttt{bytearray} can also grow.
+
+\begin{verbatim}
+buf = bytearray()
+
+print("Empty bytearray:")
+print(f"buf       = {buf}")
+print(f"type(buf) = {type(buf)}")
+
+buf.extend(b"D'oh")
+buf.append(33)
+buf.extend(b" 42")
+
+print()
+print("After incremental changes:")
+print(f"buf = {buf}")
+
+print()
+print("Element inspection:")
+for index, value in enumerate(buf):
+    print(f"index {index:02d} -> value {value:3d}")
+
+print()
+print("As decoded text:")
+print(buf.decode("utf-8"))
+\end{verbatim}
+
+The call \texttt{append(33)} adds one byte. The value \texttt{33} is the byte value for the exclamation mark in ASCII-compatible encodings. The call \texttt{extend(...)} adds several bytes.
+
+For file output, both \texttt{bytes} and \texttt{bytearray} can be written in binary mode.
+
+\begin{verbatim}
+path = "bytearray_write_demo.bin"
+
+buf = bytearray(b"The answer was ")
+buf.extend(b"41")
+buf[-1] = ord("2")
+buf.extend(b".\n")
+
+with open(path, "wb") as file_obj:
+    file_obj.write(buf)
+
+with open(path, "rb") as file_obj:
+    restored_data = file_obj.read()
+
+print("Restored binary data:")
+print(f"restored_data       = {restored_data}")
+print(f"type(restored_data) = {type(restored_data)}")
+
+print()
+print("Decoded for display:")
+print(restored_data.decode("utf-8"))
+\end{verbatim}
+
+The \texttt{bytearray} is useful when byte data must be built or modified step by step. The \texttt{bytes} object is useful when the byte sequence should be fixed and safe from in-place mutation.
+
+The practical distinction is direct:
+
+\begin{itemize}
+    \item \texttt{str}: immutable runtime text;
+    \item \texttt{bytes}: immutable byte sequence;
+    \item \texttt{bytearray}: mutable byte buffer.
+\end{itemize}
+
+Binary file mode works with byte-oriented objects. It does not perform text decoding or encoding unless the programmer explicitly asks for it.

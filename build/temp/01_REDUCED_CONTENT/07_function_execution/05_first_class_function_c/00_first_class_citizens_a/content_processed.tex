@@ -1,0 +1,76 @@
+\subsection{First-Class Citizens and Higher-Order Functions}
+
+A function object can travel through the program like any other object: assigned to variables, stored in collections, passed as arguments, and returned from calls. A higher-order function receives or returns another function.
+
+\subsubsection{Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine References inside Variables}
+
+\begin{verbatim}
+def say_doh():
+    return "D'oh!"
+
+fn = say_doh
+print(f"fn is say_doh: {fn is say_doh}, fn(): {fn()}")
+
+def apply_twice(fn, arg):
+    return fn(fn(arg))
+
+def add_one(x):
+    return x + 1
+
+print(apply_twice(add_one, 10))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn is say_doh: True, fn(): D'oh!
+12
+\end{verbatim}
+
+Writing \texttt{fn} passes the object; writing \texttt{fn()} invokes \texttt{\_\_call\_\_}.
+
+\subsubsection{Callbacks and Callback Chains: Decoupling Structural Execution Graphs}
+
+Dispatch tables map keys to function objects. Selection happens at runtime by indexing the table and calling the retrieved callable.
+
+\begin{verbatim}
+DISPATCH = {
+    "double": lambda x: x * 2,
+    "square": lambda x: x * x,
+}
+
+def run(op, value):
+    return DISPATCH[op](value)
+
+print(run("double", 21))
+print(run("square", 7))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+49
+\end{verbatim}
+
+Lambdas in dispatch tables compile to ordinary \texttt{PyCodeObject} instances with the same cost profile as \texttt{def}.
+
+\subsubsection{Higher-Order Functions: Functions That Receive or Return Other Functions}
+
+\begin{verbatim}
+def make_prefixer(prefix):
+    def add_prefix(text):
+        return f"{prefix}: {text}"
+    return add_prefix
+
+warn = make_prefixer("WARNING")
+print(warn("System alert"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+WARNING: System alert
+\end{verbatim}
+
+A higher-order function returns a configured callable whose closure cells hold state without globals or class instances.

@@ -1,0 +1,13 @@
+\section{Identifiers and Syntax Rules for Variables}
+
+Before a Python program can bind a name to an object, the name must first be accepted as valid source-code text. This section begins before runtime execution: it examines the lexical rules that decide whether a written token can become an identifier, and then contrasts those compile-time constraints with the far weaker protections Python offers against runtime name collisions in live namespaces.
+
+A variable name must be readable both by the lexer and by the engineer maintaining the code. The interpreter needs a form that can be separated cleanly from numeric literals, hard keywords, operators, and delimiters. But lexical validity is only the first gate. Once execution begins, Python's binding model treats most names as ordinary dictionary entries subject to the LEGB resolution order (Local, Enclosing, Global, Built-in). That architectural choice has consequences that no amount of identifier hygiene can fully eliminate.
+
+The central distinction for systems engineers is therefore twofold:
+
+\begin{quote}
+What names does the lexer legally accept, and what names can still be silently overwritten at runtime without any compile-time diagnostic?
+\end{quote}
+
+Only after these rules are clear does assignment make full architectural sense. A name must first survive tokenization; afterward it becomes a mutable binding in a namespace dictionary that higher scopes may or may not protect.

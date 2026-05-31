@@ -4,7 +4,7 @@
 
 \usepackage[fontsize=11pt]{scrextend}
 
-\usepackage[english,romanian]{babel}
+\usepackage[english]{babel}
 
 \usepackage[fixlanguage]{babelbib}
 
@@ -12,7 +12,8 @@
 \usepackage{makeidx} 
 \usepackage{csquotes}
 
-\usepackage[utf8]{inputenc} 
+\usepackage[utf8]{inputenc}
+\input{unicode_support.tex}
 \usepackage{pifont}
 \usepackage[T1]{fontenc}
 \usepackage{amssymb}
@@ -59,44 +60,9 @@
 \usetikzlibrary{shapes.geometric, fit,positioning,calc,arrows.meta,backgrounds}
 \usepackage{import}
 \subimport{layers/}{init.tex}
-\preto\section{\clearpage}
 
 \newcommand{\cmark}{\ding{51}} % ✓
 \newcommand{\xmark}{\ding{55}} % ✗ 
-
-% --- Auto-detect and fallback for missing PlotNeuralNet pics ---
-% \usepackage{xcolor}
-% colors if your code references them
-% \providecommand{\InputColor}{blue!20}
-% \providecommand{\ConvColor}{teal!30}
-% \providecommand{\PoolColor}{cyan!25}
-% \providecommand{\FcColor}{green!25}
-% \providecommand{\SoftMaxColor}{orange!35}
-% \providecommand{\SumColor}{violet!25}
-% \providecommand{\BlockColor}{black!15}
-
-% % default connection style if not defined
-% \tikzset{connection/.style={-Stealth, line width=0.6mm}}
-
-% \makeatletter
-% % if a pic key isn't defined, alias it to shapes that DO exist in the official repo
-% \pgfkeysifdefined{/tikz/pics/Conv/.@cmd}{}{%
-%   \tikzset{pics/Conv/.style    n args={1}{code={\pic {RightBandedBox={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Pool/.@cmd}{}{%
-%   \tikzset{pics/Pool/.style    n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Fc/.@cmd}{}{%
-%   \tikzset{pics/Fc/.style      n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/SoftMax/.@cmd}{}{%
-%   \tikzset{pics/SoftMax/.style n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Concat/.@cmd}{}{%
-%   \tikzset{pics/Concat/.style  n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \makeatother
-% --- end fallback ---
 
 \makeatletter
 \setlength{\@fptop}{0pt}
@@ -363,44 +329,60 @@
     bottom=2mm
 }
 
+\definecolor{slatenavy}{HTML}{1A2B3C}
+\definecolor{offwhite}{HTML}{FAFAFA}
+\definecolor{mutedgray}{HTML}{555555}
 
 % -----------------------------------------------------------------
 \begin{document}
 
+
+
 \begin{titlepage}
+    \clearpage
+    \thispagestyle{empty}
 
-\begin{center}
-    \LARGE{Academia Tehnică Militară "FERDINAND I"}
-    \vspace{5mm}
-    \\ \large{Scoala Doctorală}
-    \vspace{85mm}
+    % Establish the flat, cold, off-white background canvas
+    \begin{tikz}[remember picture, overlay]
+        \fill[offwhite] (current page.south west) rectangle (current page.north east);
+    \end{tikz}
 
-    \large{Referat 1}
-    \vspace{5mm}
-    \\ \LARGE{Analiza stadiului actual al metodelor de detecție a textului în imagini naturale prin utilizarea rețelelor neuronale}
-\end{center}
+    % Severe flush-left alignment for the primary typographic stack
+    \begin{flushleft}
+        \vspace*{1.5cm}
 
-\vspace{65mm}
+        % Sharp structural accent line
+        {\color{slatenavy}\hrule height 2.5pt}
+        \vspace*{0.8cm}
 
+        % Main Title: Massive, clean, aggressive sans-serif
+        {\fontsize{34}{40}\selectfont\sffamily\bfseries\color{black} PROGRAMMING IN PYTHON} \\[0.4cm]
+        
+        % Subtitle: Monospace font indicating the engineering focus
+        {\fontsize{13}{18}\selectfont\ttfamily\color{slatenavy} Sorin Milutinovici} \\[1.2cm]
+        
+    
+        \vspace*{5.5cm}
 
-\begin{minipage}[t]{0.49\textwidth}
-	{\large{Indrumător:}{\normalsize\vspace{3mm}
-	\bf\\ \large{Prof. Dr. Ing. Ciprian Răcuciu} \normalsize\vspace{3mm}\bf \\ }}
-\end{minipage}
-\hfill
-\begin{minipage}[t]{0.47\textwidth}\raggedleft
-	{\large{Student:}{\normalsize\vspace{3mm} \bf\\ \large{Milutinovici Sorin Petru}}}
-\end{minipage}
+        % Minimalist vertical geometric marker to balance the negative space
+        \begin{tikzpicture}
+            \fill[slatenavy!30] (0,0) rectangle (0.08cm, 2.5cm);
+        \end{tikzpicture}
 
-\vfill
+    \end{flushleft}
 
+    \vfill
 
-\begin{center}
-    \hrulefill\par
-    \vspace{3mm}
-    {\large 2026\par}
-\end{center}
+    % Severe flush-right alignment for institutional metadata
+    \begin{flushright}
+        \ttfamily\fontsize{9}{14}\selectfont\color{black}
+        \rule{6cm}{0.5pt} \\[0.3cm]
+        \textbf{TITU MAIORESCU UNIVERSITY} \\[0.1cm]
+        \textbf{DEPARTMENT OF COMPUTER SCIENCE} \\[0.1cm]
+        \color{mutedgray}RELEASE: MAY 2026
+    \end{flushright}
 
+    \vspace*{0.5cm}
 \end{titlepage}
 
 \tableofcontents

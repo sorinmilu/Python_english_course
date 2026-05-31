@@ -1,0 +1,19 @@
+\subsection{In-Place Memory Mutation}
+
+In-place set operators rewrite the left-hand \texttt{PySetObject}'s membership table while preserving object identity (\texttt{id} unchanged). All listed methods return \texttt{None}.
+
+\subsubsection{Destructive Union Updates via \texttt{.update()}}
+
+\texttt{update} performs multiset union into the target: hash each incoming element, insert if absent. Accepts arbitrary iterables; partial progress survives if a later element is unhashable.
+
+\subsubsection{Destructive Intersection Updates via \texttt{.intersection\_update()}}
+
+Retains only elements also present in the supplied iterable(s). Multiple arguments require membership in every argument.
+
+\subsubsection{Destructive Difference Updates via \texttt{.difference\_update()}}
+
+Removes from the target every element found in the removal iterables. Directional: only the left set is modified.
+
+\subsubsection{Destructive Symmetric Difference Updates via \texttt{.symmetric\_difference\_update()}}
+
+Replaces the target with elements exclusive to one side: shared members drop out; elements only in the argument are added.

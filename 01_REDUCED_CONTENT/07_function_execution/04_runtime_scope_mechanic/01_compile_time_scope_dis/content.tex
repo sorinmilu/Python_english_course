@@ -1,0 +1,35 @@
+\subsection{Compile-Time Scope Disambiguation}
+
+Python's compiler resolves names statically before bytecode emission. Symbol tables record whether each name is local, global, free (closure), or implicit (comprehension/generator). Runtime lookup follows these precomputed classifications.
+
+\subsubsection{How the Python Compiler Scans Syntax Trees for Assignment Targets}
+
+The compiler walks the AST and collects every assignment target (\texttt{=}, augmented assignment, \texttt{for} loop variables, \texttt{except} clauses). Any name assigned in a function scope becomes a local unless declared \texttt{global} or \texttt{nonlocal}.
+
+\subsubsection{Pre-Determining Local Scope Allocation Flags via Symbol Tables Prior to Execution}
+
+Symbol tables assign flags (\texttt{LOCAL}, \texttt{GLOBAL}, \texttt{FREE}, \texttt{CELL}) that determine \texttt{co\_varnames}, \texttt{co\_cellvars}, and \texttt{co\_freevars} on the resulting \texttt{PyCodeObject}. \texttt{co\_nlocals} fixes the fast-local array size allocated in each frame.
+
+\subsubsection{Static Name Binding Invariants vs. Dynamic Late-Binding Value Resolution}
+
+Classification is static; object values are dynamic. A name classified as \texttt{LOAD\_GLOBAL} always performs a dict lookup at runtime, but which object is found depends on current module state. Closures capture cells, not values: rebinding the outer name after creating the inner function updates the cell contents visible to the closure.
+
+\subsubsection{The Loop Variable Closure Trap: Why Nested Functions May See the Final Loop Value}
+
+Late-binding through cells means a closure created inside a loop shares one cell per captured name. All closures see the final value assigned after the loop completes unless a default argument captures the current value at definition time.
+
+\begin{verbatim}
+funcs = []
+for i in range(3):
+    funcs.append(lambda: i)
+
+print([f() for f in funcs])  # [2, 2, 2], not [0, 1, 2]
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+[2, 2, 2]
+\end{verbatim}
+
+Fix with a default argument: \texttt{lambda i=i: i} binds the current \texttt{i} at function creation time.

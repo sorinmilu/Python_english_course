@@ -1,0 +1,11 @@
+\subsection{Visual Comparison: Python Code Shape vs. C-Style Braced Code}
+
+At the surface, C marks blocks with \texttt{\{\}} and terminates statements with semicolons; Python introduces suites with colons and encodes nesting through leading whitespace. The deeper difference is front-end treatment.
+
+In C, curly braces are tokens the parser matches explicitly; whitespace is discarded before parsing. A misleading indent cannot change which statements belong to an \texttt{if}. The compiler's block tree follows brace pairs even when human readers are fooled.
+
+In Python, the tokenizer measures indentation columns at logical line starts. When indentation increases after a suite header, it emits \texttt{INDENT}; when it decreases to a previous level, it emits \texttt{DEDENT}. The parser consumes those tokens exactly as it would consume explicit block delimiters. Physical layout becomes a one-to-one blueprint of execution nesting---not a comment, not a convention, but grammar.
+
+That design enforces the cultural goal discussed earlier: communal readability with no separate ``pretty print'' lying about structure. The cost is whitespace sensitivity and fragility under careless editing. Function signatures without C-style type declarations likewise signal that parameter names will bind to arbitrary objects at call time, deferring type truth to runtime cargo headers (\texttt{ob\_type}), not to compile-time slot declarations.
+
+Python's lighter surface therefore trades punctuation for lexer rules and runtime dispatch. C's heavier surface buys early layout knowledge and direct machine mapping at compile time.

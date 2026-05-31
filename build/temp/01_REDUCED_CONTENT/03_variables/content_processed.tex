@@ -1,0 +1,11 @@
+\chapter{Variables and Singular Data Types}
+
+A Python program does not begin with objects floating in isolation. It begins with names---entries in namespace dictionaries---that allow the runtime to reach heap-allocated objects, inspect them, combine them, and replace them during execution. For a C programmer, this is one of the first places where Python must be read differently: a Python variable is not a declared memory box with a fixed storage type. It is a name in a namespace, and that name can be bound to an integer object, a floating-point object, a boolean object, \texttt{None}, or another runtime object. The object carries the type through its \texttt{ob\_type} pointer; the name provides access to it.
+
+This chapter studies how those bindings are established, how they interact with CPython's namespace architecture, and how the singular built-in value domains (\texttt{int}, \texttt{float}, \texttt{bool}, \texttt{None}) behave once bindings exist. The goal is not introductory syntax but runtime mechanics: keyword versus built-in masking, heap costs of reassignment on immutable types, arbitrary-precision integer representation, IEEE~754 floating-point boundaries, boolean inheritance from integer, and the algebraic precedence traps that arise when operators dispatch to object protocols rather than raw register arithmetic.
+
+The chapter ends by connecting dynamic assignment with strong runtime operation checking. Python allows a name to move freely from one object to another, but it does not allow arbitrary operations between incompatible objects:
+
+\begin{quote}
+Names are flexible bindings. Objects keep their runtime type. Operations are checked against the objects involved.
+\end{quote}

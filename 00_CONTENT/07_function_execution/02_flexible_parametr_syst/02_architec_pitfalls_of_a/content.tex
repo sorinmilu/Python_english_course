@@ -1,4 +1,845 @@
 \subsection{Architectural Pitfalls of Argument Evaluation}
-\subsubsection{The Mutable Default Arguments Trap: Why `def func(x=[])` Reuses One Persistent Mutable Object}
+
+Default arguments look like call-time conveniences, but they are not evaluated at call time. They are evaluated when the \texttt{def} statement executes and the function object is created.
+
+This matters because a default value is not a piece of source text kept for later. It is an object stored inside the function object. If that object is immutable, this usually causes no visible problem. If that object is mutable, repeated calls may accidentally share state through the same stored object.
+
+The danger is not caused by \texttt{list} specifically. The danger comes from storing one persistent mutable object as a default value.
+
+\subsubsection{The Mutable Default Arguments Trap: Why \texttt{def func(x=[])} Reuses One Persistent Mutable Object}
+
+Consider this function:
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+a = add_quote("D'oh!")
+b = add_quote("No soup for you!")
+c = add_quote("The answer is 42.")
+
+print(f"a: {a}")
+print(f"b: {b}")
+print(f"c: {c}")
+print()
+print(f"a is b: {a is b}")
+print(f"b is c: {b is c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ["D'oh!", 'No soup for you!', 'The answer is 42.']
+b: ["D'oh!", 'No soup for you!', 'The answer is 42.']
+c: ["D'oh!", 'No soup for you!', 'The answer is 42.']
+
+a is b: True
+b is c: True
+\end{verbatim}
+
+This is usually not what the programmer intended.
+
+The source line:
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+\end{verbatim}
+
+does not mean:
+
+\begin{verbatim}
+create a new empty list every time lines is omitted
+\end{verbatim}
+
+It means:
+
+\begin{verbatim}
+create one empty list now, while defining the function
+store that list inside the function object as the default for lines
+reuse that same list whenever the caller omits lines
+\end{verbatim}
+
+The stored default object can be inspected through \texttt{\_\_defaults\_\_}.
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+print(f"defaults:       {add_quote.__defaults__}")
+print(f"type(defaults): {type(add_quote.__defaults__)}")
+print()
+
+default_lines = add_quote.__defaults__[0]
+
+print(f"default_lines:       {default_lines}")
+print(f"type(default_lines): {type(default_lines)}")
+print(f"id(default_lines):   {id(default_lines)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+defaults:       ([],)
+type(defaults): <class 'tuple'>
+
+default_lines:       []
+type(default_lines): <class 'list'>
+id(default_lines):   2293103759744
+\end{verbatim}
+
+The function's \texttt{\_\_defaults\_\_} value is a tuple. Inside that tuple is the default list object.
+
+After calls, that same stored list has changed.
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+print("before calls")
+print(f"defaults: {add_quote.__defaults__}")
+print()
+
+add_quote("D'oh!")
+add_quote("No soup for you!")
+add_quote("Chuck Norris can divide by zero.")
+
+print("after calls")
+print(f"defaults: {add_quote.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before calls
+defaults: ([],)
+
+after calls
+defaults: (["D'oh!", 'No soup for you!', 'Chuck Norris can divide by zero.'],)
+\end{verbatim}
+
+The default list is not recreated. It is reused and mutated.
+
+The list object has mutating methods, which is why the problem appears.
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+default_lines = add_quote.__defaults__[0]
+
+print(f"type(default_lines): {type(default_lines)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "insert",
+    "pop",
+    "clear",
+    "__len__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(default_lines)}")
+
+print()
+default_lines.append("It is only a model.")
+print(f"default_lines: {default_lines}")
+print(f"defaults:      {add_quote.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(default_lines): <class 'list'>
+
+append         True
+extend         True
+insert         True
+pop            True
+clear          True
+__len__        True
+__getitem__    True
+__setitem__    True
+
+default_lines: ['It is only a model.']
+defaults:      (['It is only a model.'],)
+\end{verbatim}
+
+The function default and the external name \texttt{default\_lines} both refer to the same list object.
+
+The same trap appears with dictionaries.
+
+\begin{verbatim}
+def remember_score(name, score, table={}):
+    table[name] = score
+    return table
+
+first = remember_score("Homer", 42)
+second = remember_score("Lisa", 100)
+
+print(f"first:  {first}")
+print(f"second: {second}")
+print()
+print(f"first is second: {first is second}")
+print(f"defaults:        {remember_score.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first:  {'Homer': 42, 'Lisa': 100}
+second: {'Homer': 42, 'Lisa': 100}
+
+first is second: True
+defaults:        ({'Homer': 42, 'Lisa': 100},)
+\end{verbatim}
+
+Again, one dictionary was created when the function was defined. Repeated calls reuse it.
+
+The dictionary object has mutating methods and item assignment behavior.
+
+\begin{verbatim}
+def remember_score(name, score, table={}):
+    table[name] = score
+    return table
+
+default_table = remember_score.__defaults__[0]
+
+print(f"type(default_table): {type(default_table)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "update",
+    "clear",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(default_table)}")
+
+print()
+default_table["Bart"] = 7
+print(f"default_table: {default_table}")
+print(f"defaults:      {remember_score.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(default_table): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+update         True
+clear          True
+__getitem__    True
+__setitem__    True
+
+default_table: {'Bart': 7}
+defaults:      ({'Bart': 7},)
+\end{verbatim}
+
+The trap is not that lists and dictionaries are bad default values in every possible context. The trap is that their mutation persists across calls when the caller omits that argument.
+
+A caller can avoid the stored default by providing an explicit object.
+
+\begin{verbatim}
+def add_quote(text, lines=[]):
+    lines.append(text)
+    return lines
+
+own_lines = []
+
+a = add_quote("D'oh!", own_lines)
+b = add_quote("No soup for you!", own_lines)
+c = add_quote("The answer is 42.")
+
+print(f"own_lines: {own_lines}")
+print(f"a:         {a}")
+print(f"b:         {b}")
+print(f"c:         {c}")
+print()
+print(f"defaults:  {add_quote.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+own_lines: ["D'oh!", 'No soup for you!']
+a:         ["D'oh!", 'No soup for you!']
+b:         ["D'oh!", 'No soup for you!']
+c:         ['The answer is 42.']
+
+defaults:  (['The answer is 42.'],)
+\end{verbatim}
+
+The calls using \texttt{own\_lines} mutate the caller-provided list. The call that omits \texttt{lines} mutates the stored default list.
+
+So the real rule is:
+
+\begin{quote}
+A default argument is used only when the caller omits that argument. If the stored default is mutable and the function mutates it, the mutation persists.
+\end{quote}
+
 \subsubsection{Static Expression Evaluation: Why Default Values Are Created at Function Definition Time}
-\subsubsection{Defending Against State Contamination Using the Immutable `None` Idiom and Sentinel Guard Clauses}
+
+Default values are evaluated while Python is executing the \texttt{def} statement. This is true for immutable defaults, mutable defaults, function calls, arithmetic expressions, and object construction.
+
+A simple example uses a printed side effect.
+
+\begin{verbatim}
+def make_default():
+    print("make_default() is running")
+    return "D'oh!"
+
+def show_line(text=make_default()):
+    print(f"text={text!r}")
+
+print("after def")
+print()
+
+show_line()
+show_line()
+show_line("No soup for you!")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+make_default() is running
+after def
+
+text="D'oh!"
+text="D'oh!"
+text='No soup for you!'
+\end{verbatim}
+
+The function \texttt{make\_default()} ran once, while \texttt{show\_line} was being defined. It did not run again for each omitted argument.
+
+This means the function object stores the returned object.
+
+\begin{verbatim}
+def make_default():
+    print("make_default() is running")
+    return "D'oh!"
+
+def show_line(text=make_default()):
+    print(f"text={text!r}")
+
+print()
+print(f"show_line.__defaults__: {show_line.__defaults__}")
+print(f"type(__defaults__):     {type(show_line.__defaults__)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+make_default() is running
+
+show_line.__defaults__: ("D'oh!",)
+type(__defaults__):     <class 'tuple'>
+\end{verbatim}
+
+The tuple stores the default object.
+
+The tuple itself is an ordinary tuple.
+
+\begin{verbatim}
+def show_line(text="D'oh!"):
+    print(f"text={text!r}")
+
+defaults = show_line.__defaults__
+
+print(f"type(defaults): {type(defaults)}")
+print()
+
+selected_names = [
+    "count",
+    "index",
+    "__len__",
+    "__getitem__",
+    "__contains__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(defaults)}")
+
+print()
+print(f"len(defaults):    {len(defaults)}")
+print(f"defaults[0]:      {defaults[0]!r}")
+print(f"'D\\'oh!' in defaults: {'D\\'oh!' in defaults}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(defaults): <class 'tuple'>
+
+count          True
+index          True
+__len__        True
+__getitem__    True
+__contains__   True
+
+len(defaults):    1
+defaults[0]:      "D'oh!"
+'D\'oh!' in defaults: True
+\end{verbatim}
+
+Default expressions may refer to names that exist at definition time.
+
+\begin{verbatim}
+base_score = 42
+
+def show_score(name, score=base_score):
+    print(f"{name:<10} score={score:04d}")
+
+base_score = 999
+
+show_score("Homer")
+show_score("Lisa", 100)
+
+print()
+print(f"base_score now:       {base_score}")
+print(f"show_score defaults:  {show_score.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042
+Lisa       score=0100
+
+base_score now:       999
+show_score defaults:  (42,)
+\end{verbatim}
+
+The default object was selected while the function was being created. Later rebinding of \texttt{base\_score} does not rewrite the function object's stored default.
+
+This behavior is not limited to names. Any default expression is evaluated once.
+
+\begin{verbatim}
+def show_total(x=40 + 2):
+    print(f"x={x}")
+
+show_total()
+show_total()
+
+print(f"defaults: {show_total.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x=42
+x=42
+defaults: (42,)
+\end{verbatim}
+
+The expression \texttt{40 + 2} is not kept as a pending expression for every call. Its result is stored as the default.
+
+The same applies to object construction.
+
+\begin{verbatim}
+def make_list(items=list()):
+    print(f"items:     {items}")
+    print(f"id(items): {id(items)}")
+    items.append("Ni!")
+
+make_list()
+make_list()
+make_list()
+
+print()
+print(f"defaults: {make_list.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items:     []
+id(items): 2293103759744
+items:     ['Ni!']
+id(items): 2293103759744
+items:     ['Ni!', 'Ni!']
+id(items): 2293103759744
+
+defaults: (['Ni!', 'Ni!', 'Ni!'],)
+\end{verbatim}
+
+Using \texttt{list()} instead of \texttt{[]} does not fix the problem. The problem is not the spelling of the list. The problem is that the expression is evaluated once at function definition time.
+
+The same is true for a dictionary constructor.
+
+\begin{verbatim}
+def remember(name, data=dict()):
+    data[name] = len(data) + 1
+    return data
+
+print(remember("Arthur"))
+print(remember("Patsy"))
+print(remember("Galahad"))
+print()
+print(f"defaults: {remember.__defaults__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+{'Arthur': 1}
+{'Arthur': 1, 'Patsy': 2}
+{'Arthur': 1, 'Patsy': 2, 'Galahad': 3}
+
+defaults: ({'Arthur': 1, 'Patsy': 2, 'Galahad': 3},)
+\end{verbatim}
+
+The expression \texttt{dict()} created one dictionary while the function object was created. That same dictionary became the persistent default.
+
+The compact rule is:
+
+\begin{quote}
+Default argument expressions are definition-time expressions. They are not call-time expressions.
+\end{quote}
+
+\subsubsection{Defending Against State Contamination Using the Immutable \texttt{None} Idiom and Sentinel Guard Clauses}
+
+The usual defense is to use \texttt{None} as the default value and create a new mutable object inside the function body when needed.
+
+\begin{verbatim}
+def add_quote(text, lines=None):
+    if lines is None:
+        lines = []
+
+    lines.append(text)
+    return lines
+
+a = add_quote("D'oh!")
+b = add_quote("No soup for you!")
+c = add_quote("The answer is 42.")
+
+print(f"a: {a}")
+print(f"b: {b}")
+print(f"c: {c}")
+print()
+print(f"a is b: {a is b}")
+print(f"b is c: {b is c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ["D'oh!"]
+b: ['No soup for you!']
+c: ['The answer is 42.']
+
+a is b: False
+b is c: False
+\end{verbatim}
+
+Now each omitted argument creates a fresh list during the call.
+
+The function default is no longer a list. It is \texttt{None}.
+
+\begin{verbatim}
+def add_quote(text, lines=None):
+    if lines is None:
+        lines = []
+
+    lines.append(text)
+    return lines
+
+print(f"defaults:       {add_quote.__defaults__}")
+print(f"type(default):  {type(add_quote.__defaults__[0])}")
+print(f"default is None: {add_quote.__defaults__[0] is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+defaults:       (None,)
+type(default):  <class 'NoneType'>
+default is None: True
+\end{verbatim}
+
+The \texttt{None} object is immutable and is not a list. The function does not mutate \texttt{None}. It only uses \texttt{None} as a signal meaning ``the caller did not provide a list.''
+
+The \texttt{None} object can be inspected.
+
+\begin{verbatim}
+x = None
+
+print(f"x:       {x!r}")
+print(f"type(x): {type(x)}")
+print()
+
+selected_names = [
+    "__bool__",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(x)}")
+
+print()
+print(f"bool(None): {bool(None)}")
+print(f"repr(None): {repr(None)}")
+print(f"x is None:  {x is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x:       None
+type(x): <class 'NoneType'>
+
+__bool__    True
+__class__   True
+__eq__      True
+__repr__    True
+
+bool(None): False
+repr(None): None
+x is None:  True
+\end{verbatim}
+
+The check should normally use \texttt{is None}, not \texttt{== None}. This checks object identity, which is the correct test for this sentinel value.
+
+The same pattern works for dictionaries.
+
+\begin{verbatim}
+def remember_score(name, score, table=None):
+    if table is None:
+        table = {}
+
+    table[name] = score
+    return table
+
+first = remember_score("Homer", 42)
+second = remember_score("Lisa", 100)
+
+print(f"first:  {first}")
+print(f"second: {second}")
+print()
+print(f"first is second: {first is second}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first:  {'Homer': 42}
+second: {'Lisa': 100}
+
+first is second: False
+\end{verbatim}
+
+If the caller does provide a dictionary, the function still mutates that caller-provided dictionary.
+
+\begin{verbatim}
+def remember_score(name, score, table=None):
+    if table is None:
+        table = {}
+
+    table[name] = score
+    return table
+
+scores = {}
+
+remember_score("Homer", 42, scores)
+remember_score("Lisa", 100, scores)
+
+print(f"scores: {scores}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+scores: {'Homer': 42, 'Lisa': 100}
+\end{verbatim}
+
+This is correct if the function is supposed to update a provided dictionary. The \texttt{None} idiom only prevents accidental reuse of a hidden default dictionary.
+
+Sometimes \texttt{None} is a legitimate caller value. In that case, using \texttt{None} as the sentinel is ambiguous.
+
+For example:
+
+\begin{verbatim}
+def show_value(value=None):
+    if value is None:
+        print("no value supplied")
+    else:
+        print(f"value supplied: {value!r}")
+
+show_value()
+show_value(None)
+show_value(42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+no value supplied
+no value supplied
+value supplied: 42
+\end{verbatim}
+
+This function cannot distinguish between:
+
+\begin{verbatim}
+caller omitted value
+\end{verbatim}
+
+and:
+
+\begin{verbatim}
+caller explicitly passed None
+\end{verbatim}
+
+When that distinction matters, use a private sentinel object.
+
+\begin{verbatim}
+missing = object()
+
+def show_value(value=missing):
+    if value is missing:
+        print("no value supplied")
+    else:
+        print(f"value supplied: {value!r}")
+
+show_value()
+show_value(None)
+show_value(42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+no value supplied
+value supplied: None
+value supplied: 42
+\end{verbatim}
+
+The sentinel object is a unique object used only for identity comparison.
+
+It can be inspected like any other object.
+
+\begin{verbatim}
+missing = object()
+
+print(f"missing:       {missing}")
+print(f"type(missing): {type(missing)}")
+print(f"id(missing):   {id(missing)}")
+print()
+
+selected_names = [
+    "__class__",
+    "__eq__",
+    "__hash__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(missing)}")
+
+print()
+other = object()
+
+print(f"other:             {other}")
+print(f"missing is other:  {missing is other}")
+print(f"missing == other:  {missing == other}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+missing:       <object object at 0x...>
+type(missing): <class 'object'>
+id(missing):   2293100615536
+
+__class__   True
+__eq__      True
+__hash__    True
+__repr__    True
+
+other:             <object object at 0x...>
+missing is other:  False
+missing == other:  False
+\end{verbatim}
+
+Each call to \texttt{object()} creates a distinct object. That makes it useful as a sentinel.
+
+A sentinel guard clause can protect the function entrance.
+
+\begin{verbatim}
+missing = object()
+
+def build_lines(first=missing, lines=missing):
+    if first is missing:
+        first = "D'oh!"
+
+    if lines is missing:
+        lines = []
+
+    lines.append(first)
+    return lines
+
+a = build_lines()
+b = build_lines(None)
+c = build_lines("No soup for you!")
+
+print(f"a: {a}")
+print(f"b: {b}")
+print(f"c: {c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ["D'oh!"]
+b: [None]
+c: ['No soup for you!']
+\end{verbatim}
+
+Here, \texttt{None} is a valid explicit value. The private sentinel object means ``not supplied.''
+
+The important structure is:
+
+\begin{verbatim}
+missing = object()
+
+def func(x=missing):
+    if x is missing:
+        create or choose default now
+\end{verbatim}
+
+This creates the real default value during the call, not during function definition.
+
+The safe patterns are:
+
+\begin{itemize}
+    \item use immutable defaults such as numbers, strings, booleans, tuples of immutable values, or \texttt{None};
+    \item use \texttt{None} when \texttt{None} is not a meaningful caller value;
+    \item use a private sentinel object when \texttt{None} must remain a valid explicit value;
+    \item create new mutable objects inside the function body when they are needed per call.
+\end{itemize}
+
+The final rule is:
+
+\begin{quote}
+Never use a mutable object as a default value unless persistent shared state is deliberately intended and clearly documented.
+\end{quote}

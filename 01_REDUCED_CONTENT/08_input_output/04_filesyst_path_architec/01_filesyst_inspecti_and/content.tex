@@ -1,0 +1,27 @@
+\subsection{Filesystem Inspection and Manipulation}
+
+Beyond byte I/O, programs query and mutate directory structure through \texttt{Path} methods that invoke OS services.
+
+\subsubsection{Checking Existence, File Type, and Directory Type}
+
+\texttt{exists()}, \texttt{is\_file()}, and \texttt{is\_dir()} interrogate current filesystem state---results are momentary booleans, not permanent guarantees.
+
+\begin{verbatim}
+from pathlib import Path
+p = Path("fs_demo/quote.txt")
+p.parent.mkdir(exist_ok=True)
+p.write_text("D'oh is persistent.\n", encoding="utf-8")
+print(p.exists(), p.is_file(), p.is_dir())
+\end{verbatim}
+
+\subsubsection{Creating Directories and Parent Directory Chains}
+
+\texttt{mkdir()} creates one level; \texttt{mkdir(parents=True)} builds missing parents. \texttt{exist\_ok} controls collision behavior.
+
+\subsubsection{Listing Directory Contents and Iterating over Filesystem Entries}
+
+\texttt{iterdir()} yields child \texttt{Path} objects; \texttt{glob()} applies pattern matching.
+
+\subsubsection{Renaming, Moving, and Deleting Files Safely}
+
+\texttt{rename()}, \texttt{replace()}, and \texttt{unlink()} mutate namespace entries. TOCTOU races remain possible between check and operation---prefer EAFP for concurrent environments.

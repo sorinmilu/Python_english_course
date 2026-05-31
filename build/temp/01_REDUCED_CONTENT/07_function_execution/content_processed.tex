@@ -1,0 +1,5 @@
+\chapter{Function Execution Mechanics, Lexical Scopes, and Advanced Control Architecture}
+
+Functions are where Python programs become structured networks of calls, frames, bindings, returns, suspensions, and transformations. A \texttt{def} statement creates a runtime function object backed by a \texttt{PyCodeObject}. A call allocates an evaluation frame, binds parameters to local slots, executes bytecode, and terminates with a returned object reference.
+
+This chapter follows that machinery from call semantics through flexible signatures, namespace resolution, closures, decorators, generators, and coroutines. Each mechanism is a consequence of the same runtime model: names as bindings, frames as heap-allocated execution state, compiled code objects as instruction blueprints, and controlled transitions between active, suspended, and terminated computations.

@@ -1,0 +1,54 @@
+\subsection{Strong Typing in Operations}
+
+Python names are dynamically bound, but Python operations are strongly checked at runtime. Dynamic typing does not mean ``anything combines with anything.''
+
+\subsubsection{Why Heterogeneous Operations Such as \texttt{"3" + 4} Fail Instead of Silently Converting}
+
+The expression \texttt{"3" + 4} raises \texttt{TypeError}. For integers, \texttt{+} means numeric addition via \texttt{\_\_add\_\_}. For strings, \texttt{+} means concatenation. The mixed expression is ambiguous: should Python produce \texttt{7}, \texttt{"34"}, or convert one operand silently?
+
+Python refuses to guess. This is strong typing in practice:
+
+\begin{quote}
+Python does not silently convert unrelated object types to make an operation succeed.
+\end{quote}
+
+Both \texttt{str} and \texttt{int} implement \texttt{\_\_add\_\_}, but not for each other as partners. String repetition \texttt{"D" * 3} works because \texttt{str.\_\_mul\_\_} accepts \texttt{int}. String subtraction \texttt{"D" - 1} fails because no such protocol exists.
+
+Strong typing does not forbid all mixed-type operations. It requires that mixed-type operations be explicitly defined by the involved types---as in the numeric tower, not as arbitrary cross-domain coercion.
+
+\subsubsection{Explicit Conversion with \texttt{int()}, \texttt{float()}, \texttt{complex()}, \texttt{bool()}, and \texttt{str()}}
+
+Crossing type boundaries requires explicit conversion:
+
+\begin{verbatim}
+int("3") + 4          # 7
+"3" + str(4)          # "34"
+\end{verbatim}
+
+These produce different results because they express different intentions. Built-in converters obey target-type rules: \texttt{int("3.14")} raises \texttt{ValueError}; \texttt{int(float("3.14"))} truncates toward zero. \texttt{bool("False")} is \texttt{True} because non-empty strings are truthy---\texttt{bool()} tests truthiness, it does not parse English.
+
+\subsubsection{Numeric Promotion Boundaries: Integer, Float, Complex, and Boolean Interactions}
+
+Python defines mixed operations within its numeric tower:
+
+\begin{verbatim}
+int + int       -> int
+int + float     -> float
+bool + int      -> int      (True counts as 1)
+bool + float    -> float
+\end{verbatim}
+
+These are defined interactions, not silent conversion of unrelated domains. \texttt{42 + "1"} raises \texttt{TypeError}. \texttt{True + 41 == 42} succeeds because \texttt{bool} is an \texttt{int} subclass---a legacy design choice, not arbitrary coercion.
+
+Equality across numeric types is defined (\texttt{3.0 == 3}, \texttt{True == 1}); ordering of complex numbers against reals is not (\texttt{(3+4j) < 10} raises \texttt{TypeError}).
+
+The operational summary:
+
+\begin{verbatim}
+"3" + 4          -> TypeError
+int("3") + 4     -> 7
+42 + 0.5         -> 42.5
+True + 41        -> 42
+\end{verbatim}
+
+Names are flexible. Operations are checked. Objects keep their runtime type rules.

@@ -1,0 +1,11 @@
+\subsection{Native Conversion and Boundary Escape Sequences}
+
+Escape sequences in string literals are processed during lexical analysis, not by the runtime string object. The spelling \texttt{"\textbackslash x41"} and \texttt{"A"} yield the same parsed \texttt{str} because both insert codepoint \texttt{U+0041} before object construction.
+
+\subsubsection{Hexadecimal Literal Parsing Boundaries (\texttt{\textbackslash xhh} Values through Base-16 Conversions)}
+
+The form \texttt{"\textbackslash xhh"} requires exactly two hexadecimal digits after \texttt{\textbackslash x}. It inserts a single character whose codepoint equals that byte value interpreted as hex---not a UTF-8 byte sequence. The literal \texttt{"\textbackslash xC4\textbackslash x83"} creates two characters (\texttt{U+00C4}, \texttt{U+0083}); the bytes literal \texttt{b"\textbackslash xC4\textbackslash x83"} followed by \texttt{.decode('utf-8')} yields one character (\texttt{U+0103}, \texttt{ă}). Truncated \texttt{\textbackslash x} escapes are syntax errors caught at compile time.
+
+\subsubsection{Raw String Literals: Suppressing Most Escape Processing with the \texttt{r"..."} Prefix}
+
+The \texttt{r} prefix suppresses escape expansion during literal parsing: \texttt{r"\textbackslash x41"} stores four characters (backslash, \texttt{x}, \texttt{4}, \texttt{1}), not \texttt{'A'}. The result is still a normal \texttt{str}; there is no distinct raw-string runtime type. Raw literals cannot end with a lone backslash before the closing quote because that backslash would escape the delimiter---concatenate \texttt{r"C:\textbackslash temp" + "\textbackslash\textbackslash"} when a trailing separator is required.

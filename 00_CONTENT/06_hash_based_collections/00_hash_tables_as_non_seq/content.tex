@@ -1,1 +1,7 @@
 \section{Hash Tables as Non-Sequential Component Access Structures}
+
+Sequential containers teach one model of storage: components arranged in a visible order and accessed by integer position. A string, list, or tuple can answer questions such as ``what is at index \texttt{0}?'' or ``what slice lies between these two boundaries?'' That model is useful, but it is not the only way to organize components.
+
+Sets and dictionaries use a different strategy. They are not primarily built around position. They are built around hash-based access. A set asks whether a value is present. A dictionary asks which value is associated with a key. In both cases, Python uses a hash value to move quickly toward the internal table area where the element or key may be stored.
+
+This section introduces that change of perspective. The focus is not yet on all set and dictionary operations, but on the access architecture underneath them: how Python moves from sequential indexing to hash-derived placement, why equality is still needed after hashing, and why only hash-stable objects may safely participate as set elements or dictionary keys.

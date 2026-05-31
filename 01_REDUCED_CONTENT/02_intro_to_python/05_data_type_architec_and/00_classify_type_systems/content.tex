@@ -1,0 +1,23 @@
+\subsection{Classifying Type Systems: Static vs. Dynamic Variable Typing, Strong vs. Weak Enforcement Boundaries}
+
+Type vocabulary confuses because two independent axes are collapsed into one label.
+
+\textbf{Axis 1 --- When is type information enforced?}
+
+\begin{itemize}
+    \item \textbf{Static}: many constraints are checked before execution (C, Java, Rust at compile time).
+    \item \textbf{Dynamic}: constraints attach to runtime values; names rebind freely (Python, JavaScript, Ruby).
+\end{itemize}
+
+\textbf{Axis 2 --- How strictly are invalid combinations rejected?}
+
+\begin{itemize}
+    \item \textbf{Strong}: illegal operations fail rather than silently reinterpret bits (Python raises \texttt{TypeError} for \texttt{"3" + 4}).
+    \item \textbf{Weak}: implicit conversions coerce representations to make operations succeed (classic C arithmetic promotions across unlike types; JavaScript's permissive coercions).
+\end{itemize}
+
+Python is \emph{dynamically bound} and \emph{strongly verified}. The name \texttt{x} is not a typed slot; the object referenced by \texttt{x} carries a type pointer used at operation time. Flexibility lives at the binding boundary; strictness lives at the operation boundary.
+
+Static versus dynamic does not map to safe versus unsafe. C programs can crash after passing static checks; Python programs can fail late with \texttt{TypeError}. Gradual typing tools (mypy, pyright) add optional static sheets over the same runtime model but do not change CPython's dynamic enforcement during execution.
+
+Mislabeling Python as ``weakly typed'' because variables rebind misses the mechanism: rebinding is not silent coercion of storage; it is redirecting a name to different typed cargo.

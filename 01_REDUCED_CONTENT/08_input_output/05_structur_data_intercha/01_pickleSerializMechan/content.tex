@@ -1,0 +1,16 @@
+\subsection{Object Serialization Mechanics: The Internal Working of the \texttt{pickle} Protocol}
+
+\texttt{pickle} is not a passive byte dump of object memory. It defines a stack-based virtual machine that executes inside the interpreter: a pickle byte stream is a sequence of opcodes (\texttt{GLOBAL}, \texttt{REDUCE}, \texttt{BUILD}, \ldots) interpreted by \texttt{pickle.loads} / \texttt{pickle.load}.
+
+Deserializing executes those opcodes. A malicious stream can direct the unpickler to import modules, invoke callables, and reconstruct arbitrary objects---equivalent to arbitrary code execution under the importing user's privileges. Treat every pickle byte stream as untrusted code, not inert data.
+
+\begin{verbatim}
+import pickle
+
+state = {"score": 42, "name": "runtime"}
+blob = pickle.dumps(state)
+restored = pickle.loads(blob)
+print(restored == state)
+\end{verbatim}
+
+Use pickle only for trusted peer processes with matched Python versions. For interchange across trust boundaries, prefer JSON, explicit schemas, or format-specific parsers.

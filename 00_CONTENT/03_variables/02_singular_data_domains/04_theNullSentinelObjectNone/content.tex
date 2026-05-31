@@ -1,4 +1,434 @@
-\subsection{The Null-Sentinel Object (`None`)}
-\subsubsection{`None` as a Singleton Object, Not a Null Pointer}
+\subsection{The Null-Sentinel Object (\texttt{None})}
+
+Python uses \texttt{None} to represent absence, missing result, or ``no useful value here''. It is not the same thing as zero, an empty string, an empty list, or \texttt{False}.
+
+A first inspection:
+
+\begin{verbatim}
+value = None
+
+print(f"value: {value}")
+print(f"type:  {type(value)}")
+print(f"id:    {id(value)}")
+
+print()
+print("selected None methods:")
+print(f"{'__bool__':<15} {'__bool__' in dir(value)}")
+print(f"{'__repr__':<15} {'__repr__' in dir(value)}")
+print(f"{'__eq__':<15} {'__eq__' in dir(value)}")
+print(f"{'__class__':<15} {'__class__' in dir(value)}")
+
+print()
+print(f"bool(None): {bool(None)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: None
+type:  <class 'NoneType'>
+id:    140734431489696
+
+selected None methods:
+__bool__        True
+__repr__        True
+__eq__          True
+__class__       True
+
+bool(None): False
+\end{verbatim}
+
+The type of \texttt{None} is \texttt{NoneType}. The value \texttt{None} is falsy, but it is not the same object as \texttt{False}.
+
+\begin{verbatim}
+print(f"None == False: {None == False}")
+print(f"None is False: {None is False}")
+
+print()
+print(f"type(None):  {type(None)}")
+print(f"type(False): {type(False)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+None == False: False
+None is False: False
+
+type(None):  <class 'NoneType'>
+type(False): <class 'bool'>
+\end{verbatim}
+
+\subsubsection{\texttt{None} as a Singleton Object, Not a Null Pointer}
+
+In C, a null pointer is a pointer value that points to no valid object. Python's \texttt{None} should not be understood that way.
+
+\texttt{None} is a real Python object. Names can be bound to it, functions can return it, it has a type, and it has identity.
+
+\begin{verbatim}
+a = None
+b = None
+
+print(f"a: {a}")
+print(f"b: {b}")
+
+print()
+print(f"a == b: {a == b}")
+print(f"a is b: {a is b}")
+
+print()
+print(f"id(a): {id(a)}")
+print(f"id(b): {id(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: None
+b: None
+
+a == b: True
+a is b: True
+
+id(a): 140734431489696
+id(b): 140734431489696
+\end{verbatim}
+
+There is only one normal \texttt{None} object in a Python process. It is a singleton.
+
+Conceptually:
+
+\begin{verbatim}
+a ----\
+      ---> None singleton object
+b ----/
+\end{verbatim}
+
+This is different from an unbound name.
+
+\begin{verbatim}
+value = None
+
+print(value)
+print(type(value))
+\end{verbatim}
+
+This works because the name \texttt{value} exists and points to \texttt{None}.
+
+But this fails:
+
+\begin{verbatim}
+try:
+    print(missing_value)
+except NameError as err:
+    print("name lookup failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name lookup failed
+message: name 'missing_value' is not defined
+\end{verbatim}
+
+The difference is:
+
+\begin{verbatim}
+value = None       -> the name exists and refers to None
+missing_value      -> the name does not exist here
+\end{verbatim}
+
+So \texttt{None} is not ``no variable''. It is an object used to represent no useful value.
+
 \subsubsection{Absence, Default Return Values, and Missing-Value Signaling}
-\subsubsection{Identity Testing with `is None` and `is not None`}
+
+\texttt{None} is commonly used when a value is absent.
+
+\begin{verbatim}
+middle_name = None
+
+print(f"middle_name: {middle_name}")
+print(f"type:        {type(middle_name)}")
+
+if middle_name is None:
+    print("No middle name was provided.")
+else:
+    print(f"Middle name: {middle_name}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+middle_name: None
+type:        <class 'NoneType'>
+No middle name was provided.
+\end{verbatim}
+
+This is different from an empty string:
+
+\begin{verbatim}
+name1 = None
+name2 = ""
+
+print(f"name1: {name1!r}, type={type(name1)}")
+print(f"name2: {name2!r}, type={type(name2)}")
+
+print()
+print(f"name1 == name2: {name1 == name2}")
+print(f"bool(name1): {bool(name1)}")
+print(f"bool(name2): {bool(name2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name1: None, type=<class 'NoneType'>
+name2: '', type=<class 'str'>
+
+name1 == name2: False
+bool(name1): False
+bool(name2): False
+\end{verbatim}
+
+Both \texttt{None} and the empty string are falsy, but they do not mean the same thing.
+
+\begin{itemize}
+    \item \texttt{None} usually means: no value was supplied, found, or produced.
+    \item \texttt{""} means: a string exists, but it contains no characters.
+\end{itemize}
+
+A function that does not explicitly return a value returns \texttt{None} automatically.
+
+\begin{verbatim}
+def say_quote():
+    print("And now for something completely different.")
+
+result = say_quote()
+
+print()
+print(f"result: {result}")
+print(f"type(result): {type(result)}")
+print(f"result is None: {result is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+And now for something completely different.
+
+result: None
+type(result): <class 'NoneType'>
+result is None: True
+\end{verbatim}
+
+The function printed text, but it did not return a useful value. Therefore, Python returned \texttt{None}.
+
+Compare that with a function that returns a value:
+
+\begin{verbatim}
+def get_answer():
+    return 42
+
+result = get_answer()
+
+print(f"result: {result}")
+print(f"type(result): {type(result)}")
+print(f"result is None: {result is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 42
+type(result): <class 'int'>
+result is None: False
+\end{verbatim}
+
+\texttt{None} is also useful as a default marker:
+
+\begin{verbatim}
+user_name = None
+
+if user_name is None:
+    display_name = "Anonymous Pythonista"
+else:
+    display_name = user_name
+
+print(f"display_name: {display_name}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+display_name: Anonymous Pythonista
+\end{verbatim}
+
+This pattern is common because \texttt{None} clearly separates ``missing value'' from valid values that merely happen to be falsy.
+
+For example, zero may be a valid value:
+
+\begin{verbatim}
+score = 0
+
+if score is None:
+    print("No score was recorded.")
+else:
+    print(f"Recorded score: {score}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Recorded score: 0
+\end{verbatim}
+
+If the program used only a truth test, it would confuse \texttt{0} with absence:
+
+\begin{verbatim}
+score = 0
+
+if score:
+    print(f"Recorded score: {score}")
+else:
+    print("This branch also runs for zero.")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+This branch also runs for zero.
+\end{verbatim}
+
+So \texttt{None} is the better sentinel when absence must be distinguished from falsy but valid values.
+
+\subsubsection{Identity Testing with \texttt{is None} and \texttt{is not None}}
+
+The standard way to test for \texttt{None} is identity testing:
+
+\begin{verbatim}
+value is None
+value is not None
+\end{verbatim}
+
+Because \texttt{None} is a singleton, identity is the precise question. We are asking whether the name refers to the one \texttt{None} object.
+
+\begin{verbatim}
+values = [None, 0, "", False, 42, "D'oh!"]
+
+for value in values:
+    print(f"{repr(value):<8} "
+          f"is None: {value is None!s:<5} "
+          f"is not None: {value is not None!s:<5}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+None     is None: True  is not None: False
+0        is None: False is not None: True 
+''       is None: False is not None: True 
+False    is None: False is not None: True 
+42       is None: False is not None: True 
+"D'oh!"  is None: False is not None: True 
+\end{verbatim}
+
+This keeps the distinction clean:
+
+\begin{verbatim}
+if value is None:
+    print("missing")
+else:
+    print("present")
+\end{verbatim}
+
+Do not write this for ordinary \texttt{None} checks:
+
+\begin{verbatim}
+if value == None:
+    print("missing")
+\end{verbatim}
+
+It often works, but it asks the wrong question. The operator \texttt{==} asks whether two objects compare as equal. The operator \texttt{is} asks whether two names refer to the same object.
+
+For \texttt{None}, identity is the intended test.
+
+A compact comparison:
+
+\begin{verbatim}
+value = None
+
+print(f"value == None: {value == None}")
+print(f"value is None: {value is None}")
+
+value = 0
+
+print()
+print(f"value == None: {value == None}")
+print(f"value is None: {value is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value == None: True
+value is None: True
+
+value == None: False
+value is None: False
+\end{verbatim}
+
+The first case looks the same, but the meaning differs. \texttt{is None} is clearer and more exact.
+
+The opposite test is \texttt{is not None}:
+
+\begin{verbatim}
+quote = "No soup for you."
+
+if quote is not None:
+    print(f"quote exists: {quote}")
+else:
+    print("quote is missing")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote exists: No soup for you.
+\end{verbatim}
+
+This does not test whether the string is empty. It tests whether the value is missing.
+
+\begin{verbatim}
+quote = ""
+
+if quote is not None:
+    print("quote was supplied")
+else:
+    print("quote is missing")
+
+if quote:
+    print("quote has visible content")
+else:
+    print("quote is empty or otherwise falsy")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote was supplied
+quote is empty or otherwise falsy
+\end{verbatim}
+
+The two tests answer different questions:
+
+\begin{itemize}
+    \item \texttt{quote is not None}: was a value supplied?
+    \item \texttt{bool(quote)} or \texttt{if quote}: is the supplied value truthy?
+\end{itemize}
+
+The practical summary is:
+
+\begin{quote}
+\texttt{None} is Python's singleton object for absence or no useful result. It is not a null pointer and not the same thing as \texttt{False}, zero, or an empty string. Test it with \texttt{is None} and \texttt{is not None}.
+\end{quote}

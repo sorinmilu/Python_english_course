@@ -1,0 +1,13 @@
+\subsection{Immutable Sequence Invariants}
+
+Tuple immutability applies to the tuple object's own reference array: length fixed, slots read-only after construction. Referenced objects retain their own mutability rules.
+
+\subsubsection{Structural Definition: Fixed-Size, Read-Only Sequential Storage of \texttt{PyObject*} Addresses}
+
+At the C level, \texttt{PyTupleObject} stores \texttt{ob\_size} fixed \texttt{PyObject*} slots allocated with the header---no spare capacity field. Slot reassignment, \texttt{append}, and in-place \texttt{sort} are absent from the type. \texttt{+} and \texttt{*} build new tuples; the left operand's \texttt{id} is unchanged.
+
+\subsubsection{The Concept of Transitive Mutability: Why a Tuple Is Structurally Unalterable, Yet May Reference Internally Mutable Objects}
+
+Immutability constrains the tuple's immediate \texttt{PyObject*} array only: \texttt{t[i] = x} is forbidden. It grants zero authority over objects reachable through those pointers. If \texttt{t[i]} references a \texttt{list}, \texttt{t[i].append(...)} mutates the list in place while \texttt{id(t)} and \texttt{id(t[i])} stay constant---the slot still points at the same list object, now with different internal contents.
+
+Transitive mutability breaks hashability: a tuple is hashable only if every element is hashable. A \texttt{tuple} containing a \texttt{list} raises \texttt{TypeError} on \texttt{hash()} because the nested mutable violates the invariant required for dict keys.

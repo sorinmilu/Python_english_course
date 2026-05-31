@@ -1,0 +1,13 @@
+\subsection{The Memory Layout Paradigm Contrast}
+
+Positional indexing is the surface similarity between C arrays and Python lists. The storage model is not: C arrays embed homogeneous raw values contiguously; Python lists embed pointers to heterogeneous heap objects.
+
+\subsubsection{The C Array Blueprint: Fixed, Contiguous Structures Storing Homogeneous Raw Primitive Values Directly}
+
+A C \texttt{int nums[4]} lays four integer bit patterns in adjacent cells; address arithmetic \texttt{base + i * sizeof(int)} reaches slot \texttt{i}. Python's \texttt{array} module exposes a restricted homogeneous numeric buffer (\texttt{array('i', [...])}) with fixed \texttt{itemsize}---closer to C than \texttt{list}, but still a Python wrapper object, not a bare stack array.
+
+\subsubsection{The Python List Blueprint: A Contiguous Array Storing Heterogeneous \texttt{PyObject*} References on the Heap}
+
+CPython's \texttt{PyListObject} holds \texttt{ob\_item}, a contiguous \texttt{PyObject **} array: each slot is one pointer-width address referencing a \texttt{PyObject} header elsewhere. The pointer buffer enjoys cache locality; the payloads do not. Iterating a list forces the CPU to chase each \texttt{PyObject*} to unrelated heap addresses---systematic L1/L2 miss pressure compared to scanning a dense \texttt{int} array in C.
+
+Multiple slots may reference the same object (\texttt{[inner, inner, inner]}); mutating \texttt{inner} is visible through every slot sharing that address. Replacing \texttt{items[i] = other} rewires one pointer without copying the old or new object bodies. Distinction: slot reassignment vs.\ in-place mutation of the object currently referenced by a slot.

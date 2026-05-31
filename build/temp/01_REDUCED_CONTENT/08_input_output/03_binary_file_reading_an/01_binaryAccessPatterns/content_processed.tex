@@ -1,0 +1,34 @@
+\subsection{Binary Access Patterns}
+
+Binary workloads emphasize byte counts, fixed chunk sizes, and seek positions rather than lines.
+
+\subsubsection{Reading Fixed-Size Chunks for Large Files}
+
+\texttt{read(n)} in binary mode returns at most \texttt{n} bytes; empty \texttt{b""} signals EOF. Only one chunk resides in memory at a time.
+
+\begin{verbatim}
+path = "chunk_read_demo.bin"
+data = b"Chunk1\nChunk2\nChunk3\n"
+with open(path, "wb") as f:
+    f.write(data)
+with open(path, "rb") as f:
+    while chunk := f.read(8):
+        print(repr(chunk))
+\end{verbatim}
+
+\subsubsection{Writing Byte Buffers to External Storage}
+
+\texttt{write()} accepts \texttt{bytes} and \texttt{bytearray}; return value is bytes written.
+
+\subsubsection{Random Access with \texttt{.seek()} and \texttt{.tell()}}
+
+\texttt{tell()} reports the current byte offset; \texttt{seek()} repositions before read/write. Overwrites change bytes in place without list-like insertion semantics.
+
+\begin{verbatim}
+path = "seek_demo.bin"
+with open(path, "wb") as f:
+    f.write(b"0123456789")
+with open(path, "r+b") as f:
+    f.seek(5)
+    print(f.read(3))
+\end{verbatim}

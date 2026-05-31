@@ -1,0 +1,33 @@
+\subsection{CPython Memory Optimization Architecture (PEP 393)}
+
+CPython must store arbitrary Unicode in fixed heap objects while avoiding 4-byte-per-character waste on ASCII-heavy workloads. PEP 393 implements a \emph{flexible string representation}: the interpreter selects an internal character width from the maximum codepoint present in the string, not from the first or average character.
+
+\subsubsection{The Flexible String Representation Framework: Dynamic Character Data Width Selection Based on Maximum Codepoint Value}
+
+PEP 393 is a runtime chameleon layout. CPython tracks the highest codepoint in a \texttt{str} and chooses among:
+
+\begin{itemize}
+    \item 1 byte per codepoint (Latin-1 storage) when all codepoints $\leq$ \texttt{U+00FF};
+    \item 2 bytes per codepoint (UCS-2) when all codepoints $\leq$ \texttt{U+FFFF};
+    \item 4 bytes per codepoint (UCS-4) otherwise.
+\end{itemize}
+
+This is internal canonical storage, not UTF-8. \texttt{len()} still reports codepoint count regardless of width. \texttt{sys.getsizeof()} grows with width class---ASCII-heavy strings stay compact; a string whose max codepoint crosses a threshold pays wider per-slot storage for \emph{every} character, not only the outlier.
+
+The critical edge case: appending a single 4-byte emoji to a megabyte ASCII \texttt{str} forces a silent C-level reallocation that can quadruple the object's character buffer footprint, because the max-codepoint invariant now requires UCS-4 for the entire string body. Operations that look like small edits can trigger wholesale buffer migration.
+
+\subsubsection{Core Immutability: Fixed Heap Allocations and Read-Only Character Storage}
+
+Once allocated, a \texttt{PyUnicodeObject}'s character array is read-only from Python code. \texttt{text[0] = 'X'} fails; \texttt{text = text.upper()} or \texttt{text + suffix} binds the name to a new object (\texttt{id} changes). Immutability enables safe hashing, interning, and cross-thread sharing without copy-on-write on every read.
+
+\subsubsection{Computational and Allocation Overhead of Iterative String Concatenation}
+
+Because strings are immutable, \texttt{result = result + piece} inside a loop allocates a new buffer sized for the accumulated length, copies all prior content, appends the new piece, and discards the previous object---classic $O(n^2)$ heap churn for $n$ iterations. Each \texttt{+} is a full copy, not an in-place grow.
+
+\texttt{"".join(iterable)} amortizes this: one pass sums required total length (or uses known piece sizes), one allocation, one fill pass. The list holding pieces is mutable and cheap to extend; the final join performs a single string construction. For large accumulations, join is the architecturally correct pattern; repeated \texttt{+} is a performance trap disguised as readable syntax.
+
+\subsubsection{The Interning Subsystem: Immutable String Optimization and Singly Allocated Literals inside CPython}
+
+String interning (\texttt{sys.intern}) registers a \texttt{str} in a process-local table so future equal strings can share one \texttt{PyUnicodeObject}. Dictionary key lookup can then compare pointers after hash collision instead of scanning character data. Literal strings and compile-time constants are often interned automatically.
+
+This optimization is a leaky abstraction: \texttt{a == b} tests value equality; \texttt{a is b} tests object identity. Dynamically built strings---\texttt{"".join(...)}, stream reads, computed slices---typically produce equal (\texttt{==}) but distinct (\texttt{is}) objects even when the character sequences match byte-for-byte. Program logic must never rely on \texttt{is} for string content; identity reuse is a CPython performance artifact, not semantic specification.

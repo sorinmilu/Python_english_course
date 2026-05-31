@@ -1,0 +1,54 @@
+\subsection{The CPython Interpreter Loop as the Concrete Execution Site of Python Bytecode}
+
+Once a frame references a code object, execution happens in CPython's central \texttt{ceval} loop: a native \texttt{switch} (or threaded dispatch table) on opcode values that manipulates a stack of \texttt{PyObject*} pointers inside the frame.
+
+\subsubsection{The Interpreter Loop Is a Virtual Instruction Engine}
+
+The CPU executes CPython's C instructions; those instructions implement virtual opcodes. A source addition becomes loads of object pointers, a binary operation dispatching through type slots, reference count adjustments, possible exception setup, and a store into a fast local or namespace.
+
+\subsubsection{The Evaluation Stack: Temporary Objects During Expression Execution}
+
+Each frame owns an operand stack distinct from the native C stack. Opcodes push object pointers, pop operands for operations, and push results. For \texttt{a + b * c}, the stack holds intermediate products while the compiler's ordering is replayed. Everything on the stack is a reference to a heap object, never a raw unboxed value in the general case.
+
+\subsubsection{Name Lookup Is Runtime Work---Mostly Specialized}
+
+\texttt{LOAD\_FAST} indexes the local array. \texttt{LOAD\_GLOBAL} consults module dicts (with caching). Attributes and closures use their own opcode families. The ledger metaphor continues: each opcode is a mechanical read or write of a named slot or dict entry.
+
+\subsubsection{Operations Dispatch Through Object Types}
+
+Arithmetic opcodes call type-specific function pointers (\texttt{tp\_as\_number}, \texttt{nb\_add}, etc.). Failure raises \texttt{TypeError}. The interpreter loop therefore interleaves dispatch with exception edges on nearly every step.
+
+\subsubsection{Function Calls Create New Execution State}
+
+Call opcodes resolve the callable object, build an argument tuple or stack frame layout, allocate a new frame for the callee's code object, and transfer control. Returns pop callee frames, push result objects on the caller stack, and resume at the caller's next opcode.
+
+\subsubsection{Control Flow Is Bytecode Movement}
+
+Branches and loops are jumps in the instruction stream. Iteration opcodes implement the iterator protocol. \texttt{for} loops are not magic syntax; they are opcode sequences calling \texttt{\_\_iter\_\_} and \texttt{\_\_next\_\_}.
+
+\subsubsection{Exceptions Are Also Part of the Loop}
+
+When an opcode fails, the loop searches exception tables attached to the code object, unwinds stacks, or propagates to caller frames. Exception flow is structured non-local control implemented inside the same dispatch machinery.
+
+\subsubsection{Return Means Leaving the Current Frame}
+
+Returning pushes a value onto the caller's stack and destroys or recycles the callee frame, releasing local references. Objects survive if other references remain---including references held on caller stacks or in containers.
+
+\subsubsection{Why Python Has Runtime Overhead}
+
+Each opcode pays for dispatch, pointer traffic, type checks, and refcount bookkeeping. Flexibility is not free; the loop is the price of preserving Python semantics on every operation.
+
+\subsubsection{Modern CPython Optimizes, but the Model Remains}
+
+Specializing interpreters and inline cache opcodes reduce overhead, yet the teaching model persists: frames, object stacks, typed dispatch, ledger-backed name access.
+
+\subsubsection{The Final Mental Model}
+
+\begin{verbatim}
+frame.f_code        -> bytecode + metadata
+frame stack         -> PyObject* operand stack
+frame locals array  -> fast locals ledger
+ceval loop          -> fetch opcode, mutate stack, update refs
+\end{verbatim}
+
+The programmer writes \texttt{x = a + b}. CPython performs pointer loads, typed addition, and a fast store---all inside the interpreter loop that is the concrete execution site of Python programs.

@@ -1,0 +1,3 @@
+\section{Runtime Scope Mechanics and Variable Binding Analysis}
+
+Scope errors expose compile-time name classification. \texttt{UnboundLocalError}, conflicting local/global names, and \texttt{NameError} each map to a specific binding failure. Python scans assignment targets, builds symbol tables, selects \texttt{LOAD\_FAST} vs \texttt{LOAD\_GLOBAL}, and preserves closure variables in cells before execution begins.

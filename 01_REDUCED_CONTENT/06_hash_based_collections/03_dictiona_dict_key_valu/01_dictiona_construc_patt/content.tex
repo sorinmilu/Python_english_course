@@ -1,0 +1,15 @@
+\subsection{Dictionary Construction Patterns}
+
+All construction paths allocate a \texttt{PyDictObject} subject to the same hashable-key constraint and last-writer-wins rule for duplicate keys.
+
+\subsubsection{Literal Construction with \texttt{\{key: value\}} Pairs}
+
+Curly-brace literals embed \texttt{PyDictKeyEntry} records at compile time where possible; duplicate key tokens in one literal leave the final value for that key. Keys need not be strings---any hashable object is valid.
+
+\subsubsection{Constructor-Based Construction with \texttt{dict()}}
+
+\texttt{dict()} builds an empty mapping. \texttt{dict(**kwargs)} and \texttt{dict(name=value)} restrict keys to identifier spellings (always string keys). \texttt{dict(existing)} performs a shallow copy: new dict shell, shared value objects.
+
+\subsubsection{Dictionary Comprehensions as Key-Value Generation Pipelines}
+
+\texttt{\{k\_expr: v\_expr for ...\}} evaluates expressions per iteration; repeated generated keys overwrite earlier entries in the same comprehension. Generated keys must remain hashable.

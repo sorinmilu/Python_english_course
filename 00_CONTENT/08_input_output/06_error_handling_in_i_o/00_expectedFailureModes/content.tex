@@ -1,4 +1,229 @@
 \subsection{Expected Failure Modes}
-\subsubsection{Missing Files and `FileNotFoundError`}
-\subsubsection{Permission Failures and `PermissionError`}
+
+I/O code crosses from Python runtime objects into external operating-system state. That means failure is normal, not exceptional in the everyday sense. Files may be missing. Permissions may reject access. A path may refer to a directory instead of a file. A name may be invalid on the current platform. Another process may move, lock, or delete a file between two operations.
+
+Good I/O code must therefore treat failure modes as part of the interface. Opening a file is not only a Python operation. It is a request sent to the operating system, and that request can be refused.
+
+\subsubsection{Missing Files and \texttt{FileNotFoundError}}
+
+The most direct failure is trying to read a file that does not exist. In read mode, Python expects the external file to already exist. If the path cannot be resolved to an existing file, Python raises \texttt{FileNotFoundError}.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("missing_file_demo.txt")
+
+print("Path before opening:")
+print(f"path       = {path}")
+print(f"type(path) = {type(path)}")
+print(f"path.exists() = {path.exists()}")
+
+print()
+print("Selected names from dir(path):")
+for name in ["exists", "is_file", "is_dir", "name", "parent", "resolve"]:
+    print(f"{name:10} -> {name in dir(path)}")
+
+print()
+print("Trying to read a missing file:")
+
+try:
+    with open(path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+except FileNotFoundError as err:
+    print("The file could not be opened because it does not exist.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "filename", "errno", "strerror", "with_traceback"]:
+        print(f"{name:16} -> {name in dir(err)}")
+
+    print()
+    print(f"err.filename = {err.filename}")
+    print(f"err.errno    = {err.errno}")
+    print(f"err.strerror = {err.strerror}")
+\end{verbatim}
+
+The exception object contains information about the failed operation. The \texttt{filename} attribute can identify the path involved. The \texttt{errno} and \texttt{strerror} attributes expose lower-level operating-system error information when available.
+
+The important rule is that a missing file is not represented by \texttt{None}. Python does not return an empty string, an empty list, or a false value. It raises an exception because the requested file operation could not be performed.
+
+A successful read creates ordinary runtime text only after the file is actually opened and read.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("existing_file_demo.txt")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("D'oh! This file exists now.\n")
+    file_obj.write("The answer is 42.\n")
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print("Successful read:")
+print(content)
+
+print("Object inspection:")
+print(f"type(content) = {type(content)}")
+print(f"len(content)  = {len(content)}")
+\end{verbatim}
+
+The path alone does not provide the content. The content appears only after the I/O operation succeeds.
+
+\subsubsection{Permission Failures and \texttt{PermissionError}}
+
+A path may exist and still be inaccessible. The operating system may reject the operation because the current process does not have permission to read, write, create, or delete the target.
+
+When access is denied, Python commonly raises \texttt{PermissionError}. The exact situations depend on the operating system, filesystem, user account, and security settings.
+
+\begin{verbatim}
+from pathlib import Path
+
+path = Path("permission_pattern_demo.txt")
+
+print("Permission failures are operating-system decisions.")
+print("This example shows the normal handling pattern.")
+
+try:
+    with open(path, "w", encoding="utf-8") as file_obj:
+        file_obj.write("This write may succeed in a normal directory.\n")
+
+    print("The write succeeded here.")
+
+except PermissionError as err:
+    print("The operating system refused access.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "filename", "errno", "strerror"]:
+        print(f"{name:12} -> {name in dir(err)}")
+\end{verbatim}
+
+This code may succeed because the current directory is usually writable. That is normal. Permission errors are not produced by the syntax of \texttt{open()}; they are produced by the operating system when the requested access violates the current filesystem rules.
+
+A safer demonstration is to construct and inspect a \texttt{PermissionError} object directly. This does not pretend that the operating system denied the specific file operation. It only shows the exception type as a Python object.
+
+\begin{verbatim}
+err = PermissionError("Access denied by demonstration.")
+
+print("Constructed PermissionError object:")
+print(f"err       = {err}")
+print(f"type(err) = {type(err)}")
+
+print()
+print("Selected names from dir(err):")
+for name in ["args", "with_traceback", "add_note"]:
+    print(f"{name:16} -> {name in dir(err)}")
+
+print()
+print(f"err.args = {err.args}")
+\end{verbatim}
+
+In real file code, the exception is not usually constructed manually. It is raised by Python after the operating system refuses the operation.
+
+Some permission-like failures can also appear through related exception classes. For example, trying to open a directory as if it were a file may fail with \texttt{IsADirectoryError} on many systems.
+
+\begin{verbatim}
+from pathlib import Path
+
+dir_path = Path("directory_open_demo")
+dir_path.mkdir(exist_ok=True)
+
+print("Directory path:")
+print(f"dir_path       = {dir_path}")
+print(f"type(dir_path) = {type(dir_path)}")
+print(f"dir_path.is_dir() = {dir_path.is_dir()}")
+
+print()
+print("Trying to open a directory as a text file:")
+
+try:
+    with open(dir_path, "r", encoding="utf-8") as file_obj:
+        content = file_obj.read()
+except OSError as err:
+    print("The operating system rejected the operation.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+\end{verbatim}
+
+Catching \texttt{OSError} here is intentional. Filesystem failures are often subclasses of \texttt{OSError}, and the exact subclass can vary with platform and operation.
+
 \subsubsection{Invalid Paths, Locked Files, and Platform-Specific Filesystem Constraints}
+
+Not every string or \texttt{Path} object can become a valid filesystem location. Some path forms are invalid. Some names are forbidden on particular systems. Some paths are too long. Some files are locked by other processes. Some operations are legal on one operating system but fail on another.
+
+Python exposes many of these failures as \texttt{OSError} or one of its subclasses. Some invalid values can fail before the operating system operation is even attempted.
+
+A null byte inside a path is invalid.
+
+\begin{verbatim}
+bad_path = "bad\0name.txt"
+
+print("Bad path string:")
+print(f"bad_path       = {bad_path!r}")
+print(f"type(bad_path) = {type(bad_path)}")
+
+print()
+print("Trying to open a path containing a null byte:")
+
+try:
+    with open(bad_path, "w", encoding="utf-8") as file_obj:
+        file_obj.write("This will not be written.\n")
+except ValueError as err:
+    print("Python rejected the path value.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "with_traceback", "add_note"]:
+        print(f"{name:16} -> {name in dir(err)}")
+\end{verbatim}
+
+This is not a missing-file problem. The path value itself is invalid for a filesystem operation.
+
+Other failures come from the operating system. A very long file name, a reserved name, an invalid character, or a locked file may produce different errors depending on the platform.
+
+\begin{verbatim}
+from pathlib import Path
+
+base_dir = Path("path_error_demo")
+base_dir.mkdir(exist_ok=True)
+
+very_long_name = "x" * 300 + ".txt"
+long_path = base_dir / very_long_name
+
+print("Long path attempt:")
+print(f"type(long_path) = {type(long_path)}")
+print(f"name length     = {len(long_path.name)}")
+
+print()
+print("Trying to create a file with a very long name:")
+
+try:
+    with open(long_path, "w", encoding="utf-8") as file_obj:
+        file_obj.write("This may fail on many filesystems.\n")
+
+    print("The file was created on this filesystem.")
+
+except OSError as err:
+    print("The operating system rejected the path.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "filename", "errno", "strerror"]:
+        print(f"{name:12} -> {name in dir(err)}")
+\end{verbatim}
+
+The exact result is intentionally not promised. Filesystem limits are external rules. Python asks for the operation; the operating system and filesystem decide whether it is valid.
+
+Locked files are also platform-dependent. Some systems allow a file to be opened by several processes at the same time. Some operations may fail if another process holds an exclusive lock. Python code must be prepared for that failure even if the same code often works during testing.
+
+The practical rule is this: I/O failure is part of the contract. A file path can be syntactically valid as a Python object and still fail as an operating-system operation. Therefore, serious I/O code should expect exceptions such as \texttt{FileNotFoundError}, \texttt{PermissionError}, \texttt{IsADirectoryError}, \texttt{FileExistsError}, and broader \texttt{OSError} failures.

@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: no standard lambdas, but function pointers and nonstandard emulations.",
+  "label": "fun04",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

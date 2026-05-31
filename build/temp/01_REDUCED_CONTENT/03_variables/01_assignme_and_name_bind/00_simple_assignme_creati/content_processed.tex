@@ -1,0 +1,62 @@
+\subsection{Simple Assignment: Creating or Rebinding a Name}
+
+Assignment creates or changes a binding between a name and an object. The basic form is \texttt{name = object\_expression}. Python first evaluates the expression on the right side, producing or retrieving a heap object; then it stores a reference to that object under the name on the left side in the current namespace.
+
+In C, a statement such as \texttt{int x = 42;} reserves a fixed-width stack or data-segment cell and stores the bit pattern for 42 directly in that cell. In Python, \texttt{x = 42} binds the name \texttt{x} to an existing or newly allocated \texttt{PyLongObject} on the heap. The name is a label in a namespace; the integer is a separate object with \texttt{PyObject\_HEAD} overhead (reference count and type pointer) plus a variable-length digit array for the magnitude.
+
+\subsubsection{Assignment as Binding, Not Memory Copying}
+
+The assignment \texttt{answer = 42} does not copy raw binary value \texttt{42} into a named integer box. The conceptual picture is:
+
+\begin{verbatim}
+answer  --->  PyLongObject (value 42) on the heap
+\end{verbatim}
+
+The source name is a binding label. The object is the runtime value. The object carries its type through \texttt{ob\_type}; the name carries no declared type. Calling \texttt{id(answer)} returns the object's address during that run; calling \texttt{type(answer)} dispatches through the object's type pointer.
+
+This distinction is essential:
+
+\begin{itemize}
+    \item the name is not the object;
+    \item the name is not the type;
+    \item the name is a binding to an object;
+    \item the object carries its runtime type and behavior.
+\end{itemize}
+
+\subsubsection{Reassignment: Moving a Name from One Object to Another}
+
+A Python name can be rebound. Rebinding means the name stops referring to one object and starts referring to another. The name \texttt{item} does not transform from an integer box into a string box; the binding changes:
+
+\begin{verbatim}
+first:  item ---> int object 42
+second: item ---> str object "text"
+\end{verbatim}
+
+Only the final binding remains accessible through the name. Earlier objects may still exist because of other references, interned constants, or interpreter caches, but the name no longer points to them. This is dynamic binding at the assignment level: Python does not require a name to keep one declared type for the program's lifetime.
+
+\subsubsection{Object Sharing: Binding Multiple Names to the Same Runtime Object (\texttt{a = b})}
+
+The assignment \texttt{b = a} does not copy the integer object. It binds \texttt{b} to the same object that \texttt{a} already references:
+
+\begin{verbatim}
+a ----\
+       ---> int object 42
+b ----/
+\end{verbatim}
+
+Two names, one object. \texttt{a is b} returns \texttt{True} when both names resolve to identical heap addresses.
+
+If one name is later rebound, the other is not dragged along:
+
+\begin{verbatim}
+before:  a, b ---> int object 42
+a = 100
+after:   a ---> int object 100
+         b ---> int object 42    (unchanged)
+\end{verbatim}
+
+The line \texttt{a = 100} does not edit the old integer object \texttt{42}. Integers are immutable; it rebinds \texttt{a} to a different \texttt{PyLongObject}. For immutable singular values, the rule is:
+
+\begin{quote}
+Assignment binds a name to an object. Assignment from another name copies the reference, not the object. Reassignment moves one name to another object; it does not move all names that previously shared the old object.
+\end{quote}

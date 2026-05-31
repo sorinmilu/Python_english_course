@@ -1,1 +1,7 @@
 \section{Practical External Data Pipelines}
+
+Real programs often use files as part of a larger data movement pattern. They read external data, convert it into runtime objects, transform those objects, and write the result back to another external form. This is the practical shape of many scripts, import tools, converters, filters, and report generators.
+
+This section connects the earlier I/O mechanisms into complete pipelines. It explains why large inputs should be streamed instead of loaded all at once, how text and binary data can be processed incrementally, and how read-transform-write programs can be made safer with temporary files and clear separation between parsing, processing, and serialization.
+
+The central rule is simple: external data should cross the runtime boundary in controlled stages, so the program remains memory-aware, failure-aware, and structurally readable.

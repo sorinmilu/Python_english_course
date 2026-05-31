@@ -1,0 +1,9 @@
+\subsection{Names, Variables, and Object References: Why Python Variables Are Not C Boxes}
+
+A C variable declaration reserves storage with a compile-time type. A Python name is an entry in a namespace ledger or fast-local slot referencing heap cargo. Assignment writes pointer-sized bindings, not bitwise copies of structs (unless copy protocols run explicitly).
+
+Rebinding \texttt{x} from one object to another changes the arrow, not the old object's type tag inside a fictional unified box. Shared aliases (\texttt{b = a}) duplicate references; mutation through either name affects one mutable object.
+
+Function arguments initialize parameter slots with caller object references. Rebinding a parameter is local to the callee frame; mutating a shared mutable object is visible to the caller. There is one mechanism---reference assignment---not separate pass-by-value and pass-by-reference stories.
+
+Deleting a name removes one binding; objects live until the reference graph releases them.

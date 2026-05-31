@@ -1,4 +1,556 @@
 \subsection{CPython Architectural Evolution}
+
+Python dictionaries have kept the same visible programming role for a long time: they map keys to values. The internal storage strategy, however, has changed substantially. This matters because a dictionary is not only a convenient syntax form. It is also one of the most important runtime structures in CPython.
+
+Dictionaries are used directly by programmers, but they are also used internally for many name-to-object mappings. Module namespaces, object attribute storage, class bodies, keyword arguments, and many ordinary program structures depend on dictionary-like behavior.
+
+The programmer-facing rule is simple:
+
+\begin{quote}
+A dictionary retrieves a value by hashing a key, finding a candidate table location, and confirming the key with equality.
+\end{quote}
+
+The implementation question is more specific:
+
+\begin{quote}
+How are those keys, values, hashes, and table slots physically organized in memory?
+\end{quote}
+
+This subsection gives a simplified architectural view. It is not a replacement for reading CPython source code. It is the operational model needed to understand why dictionaries are fast, why their order behavior changed historically, and why insertion order is now preserved without turning dictionaries into lists.
+
 \subsubsection{The Classic Dictionary Model: Sparse Hash Table Storage and Historically Unspecified Iteration Order}
+
+The classic dictionary model can be imagined as one sparse hash table. The table had many slots, and each active slot stored the information needed for one dictionary entry.
+
+A simplified slot looked conceptually like this:
+
+\begin{verbatim}
+slot:
+    stored hash
+    key reference
+    value reference
+\end{verbatim}
+
+The table could not be completely full. Hash tables need empty slots so lookup can stop when a key is not present. Therefore, the table contained active entries and unused space.
+
+A simplified table might look like this:
+
+\begin{verbatim}
+slot 0: empty
+slot 1: hash/key/value
+slot 2: empty
+slot 3: hash/key/value
+slot 4: deleted marker
+slot 5: empty
+slot 6: hash/key/value
+slot 7: empty
+\end{verbatim}
+
+The entries are not stored because the programmer wrote them first, second, and third. They are stored where the hash-table placement machinery put them.
+
+Consider this ordinary dictionary:
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print(f"quotes: {quotes!r}")
+print(f"type(quotes): {type(quotes)}")
+print(f"len(quotes): {len(quotes)}")
+\end{verbatim}
+
+Possible output in modern Python:
+
+\begin{verbatim}
+quotes: {'Homer': "D'oh!", 'Jerry': 'No soup for you!', 'Arthur': 'It is only a model.'}
+type(quotes): <class 'dict'>
+len(quotes): 3
+\end{verbatim}
+
+The visible output in modern Python follows insertion order. Historically, that was not guaranteed for normal dictionaries. The table was a hash table first, and iteration order was not part of the language-level promise.
+
+The important distinction is:
+
+\begin{itemize}
+    \item lookup order is controlled by hash-table search;
+    \item historical iteration order was an implementation detail;
+    \item a dictionary was not meant to be read as a positional sequence.
+\end{itemize}
+
+The dictionary object still exposes mapping methods, not sequence-index methods.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print(f"type(quotes): {type(quotes)}")
+print(f"__getitem__ in dir: {'__getitem__' in dir(quotes)}")
+print(f"__setitem__ in dir: {'__setitem__' in dir(quotes)}")
+print(f"__contains__ in dir: {'__contains__' in dir(quotes)}")
+print(f"keys in dir:        {'keys' in dir(quotes)}")
+print(f"items in dir:       {'items' in dir(quotes)}")
+print(f"append in dir:      {'append' in dir(quotes)}")
+print(f"index in dir:       {'index' in dir(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(quotes): <class 'dict'>
+__getitem__ in dir: True
+__setitem__ in dir: True
+__contains__ in dir: True
+keys in dir:        True
+items in dir:       True
+append in dir:      False
+index in dir:       False
+\end{verbatim}
+
+The crucial methods here are:
+
+\begin{itemize}
+    \item \texttt{\_\_getitem\_\_}: retrieve a value by key;
+    \item \texttt{\_\_setitem\_\_}: insert or replace a key-value association;
+    \item \texttt{\_\_contains\_\_}: test key membership;
+    \item \texttt{keys}: expose the key domain;
+    \item \texttt{items}: expose key-value pair views.
+\end{itemize}
+
+There is no \texttt{append()} because a dictionary is not a growing positional row. There is no list-style \texttt{index()} because a dictionary does not locate entries by scanning for their numeric position.
+
+Historically, this meant programmers were not supposed to depend on ordinary dictionary iteration order.
+
+\begin{verbatim}
+data = {}
+
+data["first"] = "spam"
+data["second"] = "eggs"
+data["third"] = "larch"
+
+for key in data:
+    print(f"{key!r} -> {data[key]!r}")
+\end{verbatim}
+
+In modern Python, the output follows insertion order:
+
+\begin{verbatim}
+'first' -> 'spam'
+'second' -> 'eggs'
+'third' -> 'larch'
+\end{verbatim}
+
+In older Python versions, the language did not promise that behavior for normal dictionaries. The dictionary still worked correctly as a mapping, but the order of traversal was not a semantic feature of the object.
+
+The classic mental model is therefore:
+
+\begin{verbatim}
+dictionary = sparse hash table
+
+key -> hash(key)
+hash -> candidate slot
+slot/probe path -> equality check
+equality success -> return associated value
+\end{verbatim}
+
+That model explains fast key lookup. It does not explain insertion-order preservation, because insertion order was not a required property of the classic model.
+
 \subsubsection{The Modern Compact Dictionary: Dense Entry Storage, Sparse Indexing, Memory Reduction, and Insertion-Order Preservation}
-\subsubsection{Algorithmic Efficiency Matrix: Amortized O(1) Complexity for Key Insertion, Value Retrieval, and Structural Deletion}
+
+Modern CPython dictionaries use a more compact organization. A useful simplified model separates two ideas:
+
+\begin{itemize}
+    \item a sparse index table used for hash lookup;
+    \item a dense entry area that stores the actual entries in insertion order.
+\end{itemize}
+
+The sparse index table helps find the entry. The dense entry storage keeps the entries packed more tightly.
+
+A simplified picture looks like this:
+
+\begin{verbatim}
+sparse index table:
+    slot 0 -> empty
+    slot 1 -> entry index 2
+    slot 2 -> empty
+    slot 3 -> entry index 0
+    slot 4 -> entry index 1
+
+dense entries:
+    entry 0 -> hash, key="Homer",  value="D'oh!"
+    entry 1 -> hash, key="Jerry",  value="No soup for you!"
+    entry 2 -> hash, key="Arthur", value="It is only a model."
+\end{verbatim}
+
+The sparse table is still needed for hash-table lookup. The dense entries avoid storing full entry data in every sparse slot. This reduces wasted space and also makes insertion-order traversal natural: iterate the dense entries in the order in which they were inserted.
+
+The external behavior can be seen directly.
+
+\begin{verbatim}
+quotes = {}
+
+quotes["Homer"] = "D'oh!"
+quotes["Jerry"] = "No soup for you!"
+quotes["Arthur"] = "It is only a model."
+
+print(f"quotes: {quotes!r}")
+print()
+
+print("iteration:")
+for key in quotes:
+    print(f"{key!r} -> {quotes[key]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: {'Homer': "D'oh!", 'Jerry': 'No soup for you!', 'Arthur': 'It is only a model.'}
+
+iteration:
+'Homer' -> "D'oh!"
+'Jerry' -> 'No soup for you!'
+'Arthur' -> 'It is only a model.'
+\end{verbatim}
+
+The dictionary preserves insertion order. This does not mean that the dictionary is a list. It means that traversal follows the order in which keys were first inserted.
+
+Updating an existing key does not move that key to the end.
+
+\begin{verbatim}
+quotes = {}
+
+quotes["Homer"] = "D'oh!"
+quotes["Jerry"] = "No soup for you!"
+quotes["Arthur"] = "It is only a model."
+
+quotes["Jerry"] = "These pretzels are making me thirsty."
+
+print(f"quotes: {quotes!r}")
+print()
+
+for key, value in quotes.items():
+    print(f"{key!r:<8} -> {value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: {'Homer': "D'oh!", 'Jerry': 'These pretzels are making me thirsty.', 'Arthur': 'It is only a model.'}
+
+'Homer'  -> "D'oh!"
+'Jerry'  -> 'These pretzels are making me thirsty.'
+'Arthur' -> 'It is only a model.'
+\end{verbatim}
+
+The key \texttt{"Jerry"} stayed in its original insertion position. The value changed, but the key was not newly inserted.
+
+If a key is deleted and then inserted again, it appears at the end.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+del quotes["Jerry"]
+quotes["Jerry"] = "Serenity now!"
+
+print(f"quotes: {quotes!r}")
+print()
+
+for key, value in quotes.items():
+    print(f"{key!r:<8} -> {value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: {'Homer': "D'oh!", 'Arthur': 'It is only a model.', 'Jerry': 'Serenity now!'}
+
+'Homer'  -> "D'oh!"
+'Arthur' -> 'It is only a model.'
+'Jerry'  -> 'Serenity now!'
+\end{verbatim}
+
+The second insertion of \texttt{"Jerry"} is a new insertion event, so it appears after the keys that remained.
+
+This is not sorted order.
+
+\begin{verbatim}
+data = {}
+
+data["zebra"] = 1
+data["apple"] = 2
+data["mango"] = 3
+
+print(f"data: {data!r}")
+print(f"list(data): {list(data)}")
+print(f"sorted(data): {sorted(data)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: {'zebra': 1, 'apple': 2, 'mango': 3}
+list(data): ['zebra', 'apple', 'mango']
+sorted(data): ['apple', 'mango', 'zebra']
+\end{verbatim}
+
+The dictionary remembers insertion order. The function \texttt{sorted()} computes sorted order separately. These are different ideas.
+
+The compact dictionary also reduced memory usage compared with the older representation. The exact size of a dictionary depends on Python version, platform, number of entries, current table capacity, and implementation details. Still, \texttt{sys.getsizeof()} can show that a dictionary is a real heap object with storage overhead, not only the sum of its visible key and value objects.
+
+\begin{verbatim}
+import platform
+import sys
+
+empty = {}
+small = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print(f"implementation: {platform.python_implementation()}")
+print(f"python version: {platform.python_version()}")
+print()
+print(f"type(empty): {type(empty)}")
+print(f"sys.getsizeof(empty): {sys.getsizeof(empty)}")
+print()
+print(f"type(small): {type(small)}")
+print(f"sys.getsizeof(small): {sys.getsizeof(small)}")
+print(f"len(small): {len(small)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+implementation: CPython
+python version: 3.13.0
+
+type(empty): <class 'dict'>
+sys.getsizeof(empty): 64
+
+type(small): <class 'dict'>
+sys.getsizeof(small): 184
+len(small): 3
+\end{verbatim}
+
+The exact numbers may differ. The point is that a dictionary has internal table machinery. It is not only three visible pairs printed between braces.
+
+The architectural summary is:
+
+\begin{itemize}
+    \item classic dictionaries can be modeled as sparse hash tables containing entry data in table slots;
+    \item modern compact dictionaries separate sparse lookup indexes from dense entries;
+    \item dense entries make insertion-order traversal natural;
+    \item since Python 3.7, insertion-order preservation is a language guarantee for normal dictionaries;
+    \item this guarantee still does not make dictionaries positional sequences.
+\end{itemize}
+
+\subsubsection{Algorithmic Efficiency Matrix: Amortized \texttt{O(1)} Complexity for Key Insertion, Value Retrieval, and Structural Deletion}
+
+Dictionary performance comes from hash-table access. The usual operations are efficient on average because Python does not normally scan all keys from first to last.
+
+The three central operations are:
+
+\begin{itemize}
+    \item insert or replace a key-value pair;
+    \item retrieve a value by key;
+    \item delete a key-value pair.
+\end{itemize}
+
+All three are treated as amortized \texttt{O(1)} average-case operations under ordinary hash behavior.
+
+Retrieval by key is the most visible case.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+key = "Jerry"
+
+print(f"key: {key!r}")
+print(f"value: {quotes[key]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+key: 'Jerry'
+value: 'No soup for you!'
+\end{verbatim}
+
+Conceptually, the lookup is:
+
+\begin{verbatim}
+hash("Jerry")
+use the hash to search the sparse index table
+find a candidate entry
+confirm the stored key with equality
+return the associated value
+\end{verbatim}
+
+Insertion or replacement uses the same key-routing idea.
+
+\begin{verbatim}
+quotes = {}
+
+quotes["Homer"] = "D'oh!"
+quotes["Jerry"] = "No soup for you!"
+quotes["Homer"] = "Mmm... donuts"
+
+print(f"quotes: {quotes!r}")
+print(f"len(quotes): {len(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: {'Homer': 'Mmm... donuts', 'Jerry': 'No soup for you!'}
+len(quotes): 2
+\end{verbatim}
+
+The first assignment to \texttt{"Homer"} inserts a new key. The second assignment to \texttt{"Homer"} finds the existing equal key and replaces the value.
+
+Deletion removes a key-value association.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print(f"before: {quotes!r}")
+
+del quotes["Jerry"]
+
+print(f"after:  {quotes!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Homer': "D'oh!", 'Jerry': 'No soup for you!', 'Arthur': 'It is only a model.'}
+after:  {'Homer': "D'oh!", 'Arthur': 'It is only a model.'}
+\end{verbatim}
+
+The deletion removes the mapping for the key. Internally, hash tables must still preserve correct probe behavior after deletion, just as sets do.
+
+A dictionary should be compared with a list carefully. A list can store pairs too, but lookup by key would require sequential traversal unless the programmer builds another indexing structure.
+
+\begin{verbatim}
+pairs = [
+    ("Homer", "D'oh!"),
+    ("Jerry", "No soup for you!"),
+    ("Arthur", "It is only a model."),
+]
+
+target = "Arthur"
+
+for key, value in pairs:
+    print(f"checking {key!r}")
+    if key == target:
+        print(f"found value: {value!r}")
+        break
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking 'Homer'
+checking 'Jerry'
+checking 'Arthur'
+found value: 'It is only a model.'
+\end{verbatim}
+
+This list-based representation works, but lookup is positional traversal over pairs. If there are many pairs, the number of checks may grow with the number of entries.
+
+The dictionary representation asks the runtime hash table to do key lookup.
+
+\begin{verbatim}
+quote_by_name = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+target = "Arthur"
+
+print(f"found value: {quote_by_name[target]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+found value: 'It is only a model.'
+\end{verbatim}
+
+The source code is shorter, but the deeper point is the access architecture. The dictionary is built for key lookup.
+
+The complexity comparison can be summarized as follows:
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Operation} & \textbf{List of Pairs} & \textbf{Dictionary} \\
+\hline
+Find value by key & \texttt{O(N)} sequential scan & Amortized \texttt{O(1)} key lookup \\
+Insert new association & \texttt{O(1)} append, if duplicates ignored & Amortized \texttt{O(1)} key insertion \\
+Replace existing key & \texttt{O(N)} search, then replace & Amortized \texttt{O(1)} key update \\
+Delete by key & \texttt{O(N)} search, then delete & Amortized \texttt{O(1)} key deletion \\
+Preserve duplicate equal keys & Possible unless manually prevented & No; equal keys collapse \\
+Lookup requirement & Equality scan & Hashability and equality contract \\
+\end{tabular}
+\end{center}
+
+The phrase amortized \texttt{O(1)} should be read carefully. It does not mean that every operation takes exactly the same number of CPU instructions. It means that, under normal conditions, the expected cost does not grow linearly with the number of dictionary entries.
+
+Some events are more expensive. A dictionary may resize its internal table when it grows. That resizing operation costs more than a simple insertion, but it happens occasionally. Spread over many insertions, the average insertion cost remains constant-time in the usual analysis.
+
+A small script can show when the object size changes as entries are added.
+
+\begin{verbatim}
+import sys
+
+data = {}
+
+for num in range(12):
+    data[f"key_{num}"] = num
+    print(
+        f"len={len(data):>2} "
+        f"size={sys.getsizeof(data):>4} "
+        f"data={data!r}"
+    )
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+len= 1 size= 184 data={'key_0': 0}
+len= 2 size= 184 data={'key_0': 0, 'key_1': 1}
+len= 3 size= 184 data={'key_0': 0, 'key_1': 1, 'key_2': 2}
+len= 4 size= 184 data={'key_0': 0, 'key_1': 1, 'key_2': 2, 'key_3': 3}
+len= 5 size= 184 data={'key_0': 0, 'key_1': 1, 'key_2': 2, 'key_3': 3, 'key_4': 4}
+len= 6 size= 272 data={'key_0': 0, 'key_1': 1, 'key_2': 2, 'key_3': 3, 'key_4': 4, 'key_5': 5}
+...
+\end{verbatim}
+
+The exact thresholds and sizes vary by CPython version and platform. The important observation is that dictionary storage grows in table-sized steps, not one tiny independent memory block per visible pair.
+
+The practical rule is:
+
+\begin{quote}
+Use a dictionary when the program needs direct access from a stable key to an associated value.
+\end{quote}
+
+A dictionary is not just syntactic sugar for a list of pairs. It is a hash-based associative mapping with its own storage engine, ordering rules, and average-case performance profile.

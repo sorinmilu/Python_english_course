@@ -1,3 +1,430 @@
-\subsection{Loop-`else` Completion Semantics}
-\subsubsection{The Unique `else` Clause Semantics Applied to `while` and `for` Blocks}
+\subsection{Loop-\texttt{else} Completion Semantics}
+
+Python allows an \texttt{else} clause not only after \texttt{if}, but also after \texttt{for} and \texttt{while}. This surprises many programmers because the word \texttt{else} is usually associated with conditional branching. In loop syntax, however, \texttt{else} has a different meaning.
+
+A loop-\texttt{else} block does not mean ``if the loop condition was false at the beginning.'' It means: run this block only if the loop finished normally.
+
+For a \texttt{for} loop, normal completion means that the iterator was exhausted. For a \texttt{while} loop, normal completion means that the loop condition became false. If the loop is terminated by \texttt{break}, the \texttt{else} block is skipped.
+
+\begin{quote}
+A loop-\texttt{else} block runs after normal loop completion, not after early loop interruption.
+\end{quote}
+
+This makes loop-\texttt{else} useful for search patterns: if the loop finds the desired item, it uses \texttt{break}; if no item was found and the loop completed naturally, the \texttt{else} block reports the unsuccessful search.
+
+\subsubsection{The Unique \texttt{else} Clause Semantics Applied to \texttt{while} and \texttt{for} Blocks}
+
+The syntax is simple:
+
+\begin{verbatim}
+for item in items:
+    loop_body
+else:
+    completion_body
+\end{verbatim}
+
+or:
+
+\begin{verbatim}
+while condition:
+    loop_body
+else:
+    completion_body
+\end{verbatim}
+
+The \texttt{else} block is aligned with the loop header, not with an inner \texttt{if}. This indentation is essential. The \texttt{else} belongs to the loop.
+
+A \texttt{for} example without \texttt{break}:
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+
+for item in items:
+    print(f"checking: {item}")
+else:
+    print("loop completed normally")
+
+print("after loop")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: soup
+checking: pretzels
+checking: muffin
+loop completed normally
+after loop
+\end{verbatim}
+
+The iterator produced all values. No \texttt{break} interrupted the loop. Therefore the \texttt{else} block executed.
+
+Now add a \texttt{break}:
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+
+for item in items:
+    print(f"checking: {item}")
+
+    if item == "pretzels":
+        print("pretzels found, leaving loop")
+        break
+else:
+    print("loop completed normally")
+
+print("after loop")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: soup
+checking: pretzels
+pretzels found, leaving loop
+after loop
+\end{verbatim}
+
+The \texttt{else} block did not execute. The loop did not complete by exhausting the iterable. It was interrupted by \texttt{break}.
+
+The control-flow shape is:
+
+\begin{verbatim}
+for loop starts
+    -> get next item
+    -> execute body
+        if break occurs:
+            jump after loop and skip else
+    -> if iterator is exhausted:
+            execute else
+            continue after loop
+\end{verbatim}
+
+The same rule applies to \texttt{while}:
+
+\begin{verbatim}
+n = 1
+
+while n <= 3:
+    print(f"n: {n}")
+    n = n + 1
+else:
+    print("while condition became false")
+
+print("after loop")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+n: 1
+n: 2
+n: 3
+while condition became false
+after loop
+\end{verbatim}
+
+The loop stopped because \texttt{n <= 3} became false. This is normal completion, so the \texttt{else} block executed.
+
+With \texttt{break}:
+
+\begin{verbatim}
+n = 1
+
+while n <= 5:
+    print(f"n: {n}")
+
+    if n == 3:
+        print("breaking at three")
+        break
+
+    n = n + 1
+else:
+    print("while condition became false")
+
+print("after loop")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+n: 1
+n: 2
+n: 3
+breaking at three
+after loop
+\end{verbatim}
+
+The \texttt{else} block was skipped because the loop ended through \texttt{break}, not through the condition becoming false.
+
+The loop-\texttt{else} rule is therefore not symmetric with \texttt{if}-\texttt{else}. In an \texttt{if} statement, \texttt{else} means ``the condition was false.'' In a loop, \texttt{else} means ``the loop was not interrupted by \texttt{break}.''
+
+\begin{verbatim}
+if condition:
+    runs when condition is true
+else:
+    runs when condition is false
+
+for item in items:
+    runs for each produced item
+else:
+    runs when traversal finishes without break
+\end{verbatim}
+
+This is why the name \texttt{else} can feel misleading in loops. It is better to read it mentally as:
+
+\begin{quote}
+after normal loop completion
+\end{quote}
+
 \subsubsection{Conditional Execution: Triggering Logic Blocks Only After Non-Interrupted Loop Completion}
+
+The most useful application of loop-\texttt{else} is search logic.
+
+Without loop-\texttt{else}, programmers often use a flag:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+target = "Newman"
+found = False
+
+for name in names:
+    print(f"checking: {name}")
+
+    if name == target:
+        found = True
+        print(f"found: {name}")
+        break
+
+if not found:
+    print("target was not found")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: Jerry
+checking: Elaine
+checking: Kramer
+target was not found
+\end{verbatim}
+
+The flag \texttt{found} records whether the loop ended because the target was found.
+
+The loop-\texttt{else} version removes the flag:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+target = "Newman"
+
+for name in names:
+    print(f"checking: {name}")
+
+    if name == target:
+        print(f"found: {name}")
+        break
+else:
+    print("target was not found")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: Jerry
+checking: Elaine
+checking: Kramer
+target was not found
+\end{verbatim}
+
+The meaning is direct: if the loop reaches a match, it breaks; if it never reaches a match, it completes normally and the \texttt{else} block runs.
+
+When the target exists:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+target = "Elaine"
+
+for name in names:
+    print(f"checking: {name}")
+
+    if name == target:
+        print(f"found: {name}")
+        break
+else:
+    print("target was not found")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: Jerry
+checking: Elaine
+found: Elaine
+\end{verbatim}
+
+The \texttt{else} block is skipped because \texttt{break} interrupted the loop.
+
+The list being searched is still an ordinary list object:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+print(f"type(names): {type(names)}")
+print(f"dir(names) sample: {dir(names)[:10]}")
+print(f"len(names): {len(names)}")
+print(f"has __iter__: {'__iter__' in dir(names)}")
+print(f"has __contains__: {'__contains__' in dir(names)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(names): <class 'list'>
+dir(names) sample: ['__add__', '__class__', '__class_getitem__',
+'__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__',
+'__eq__', '__format__']
+len(names): 3
+has __iter__: True
+has __contains__: True
+\end{verbatim}
+
+The \texttt{\_\_iter\_\_()} method allows traversal. The \texttt{\_\_contains\_\_()} method supports membership testing with \texttt{in}. The loop-\texttt{else} structure does not change the list. It changes only how the program reacts to the traversal outcome.
+
+The same pattern works with numeric search over a \texttt{range}:
+
+\begin{verbatim}
+target = 42
+
+for n in range(1, 50):
+    if n == target:
+        print(f"found target: {n}")
+        break
+else:
+    print("target was not reached")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+found target: 42
+\end{verbatim}
+
+If the target is outside the described range:
+
+\begin{verbatim}
+target = 100
+
+for n in range(1, 50):
+    if n == target:
+        print(f"found target: {n}")
+        break
+else:
+    print("target was not reached")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+target was not reached
+\end{verbatim}
+
+The range object completed traversal normally. No \texttt{break} occurred. Therefore the \texttt{else} block ran.
+
+A \texttt{continue} statement does not suppress the loop-\texttt{else}. It interrupts only the current iteration, not the whole loop.
+
+\begin{verbatim}
+items = ["soup", "", "pretzels", ""]
+
+for item in items:
+    if item == "":
+        print("empty item skipped")
+        continue
+
+    print(f"processed: {item}")
+else:
+    print("loop completed without break")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+processed: soup
+empty item skipped
+processed: pretzels
+empty item skipped
+loop completed without break
+\end{verbatim}
+
+The loop used \texttt{continue}, but it did not use \texttt{break}. Therefore the \texttt{else} block executed.
+
+This gives an exact distinction:
+
+\begin{itemize}
+    \item \texttt{break} prevents loop-\texttt{else}.
+    \item \texttt{continue} does not prevent loop-\texttt{else}.
+    \item normal exhaustion of a \texttt{for} loop triggers loop-\texttt{else}.
+    \item normal falsification of a \texttt{while} condition triggers loop-\texttt{else}.
+\end{itemize}
+
+An exception that escapes the loop also prevents normal loop completion:
+
+\begin{verbatim}
+items = ["10", "20", "bad", "30"]
+
+try:
+    for item in items:
+        print(f"converting: {item}")
+        number = int(item)
+        print(f"number: {number}")
+    else:
+        print("all items converted")
+except ValueError as err:
+    print("conversion failed")
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+converting: 10
+number: 10
+converting: 20
+number: 20
+converting: bad
+conversion failed
+type(err): <class 'ValueError'>
+message: invalid literal for int() with base 10: 'bad'
+\end{verbatim}
+
+The loop-\texttt{else} block did not run because the loop did not complete normally. The exception transferred control to the \texttt{except} block.
+
+The practical reading is:
+
+\begin{quote}
+Use loop-\texttt{else} when the loop body contains a \texttt{break} that represents success, discovery, or early termination, and the \texttt{else} block represents the no-break case.
+\end{quote}
+
+A final compact pattern:
+
+\begin{verbatim}
+passwords = ["abc", "guest", "letmein"]
+wanted = "swordfish"
+
+for password in passwords:
+    if password == wanted:
+        print("access word found")
+        break
+else:
+    print("Nobody expects the missing password.")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Nobody expects the missing password.
+\end{verbatim}
+
+The loop inspected every candidate and never broke. The \texttt{else} block is therefore the completion route.
+
+For control-flow graph analysis, loop-\texttt{else} adds one more outgoing edge from the loop structure: the normal-completion edge. A \texttt{break} follows the interrupted-exit edge and skips that completion block. This is the entire rule.

@@ -1,0 +1,51 @@
+\subsection{Iterable vs. Iterator}
+
+In C, iterating an array is pointer arithmetic: \texttt{ptr++} advances a register through contiguous memory with no heap-allocated cursor object. Python's \texttt{for} loop compiles to explicit virtual-machine mechanics over protocol objects. The iterable is the traversal source; the iterator is a heap-allocated state machine that tracks progress.
+
+\subsubsection{The Iterator Protocol: Structural Traversal over Stateful Collections}
+
+A \texttt{for value in iterable:} block is not syntactic sugar for indexing. The compiler emits a fixed bytecode skeleton:
+
+\begin{verbatim}
+GET_ITER                 # stack: iterable -> iterator
+loop_head:
+FOR_ITER             exit # calls tp_iternext; on StopIteration, jump to exit
+    <loop body using TOS value>
+JUMP_BACKWARD      loop_head
+exit:
+\end{verbatim}
+
+\texttt{GET\_ITER} invokes \texttt{iter(iterable)}, which dispatches \texttt{tp\_iter} on the object's type. For a list this allocates a fresh \texttt{list\_iterator} object holding an index into the list's \texttt{ob\_item} pointer array. For a \texttt{range}, it allocates a \texttt{range\_iterator} storing start/stop/step counters entirely on the heap.
+
+Each \texttt{FOR\_ITER} probes the iterator's \texttt{tp\_iternext} slot---a C function pointer---which either pushes the next \texttt{PyObject*} or raises \texttt{StopIteration}. The interpreter converts that exception into a branch to the loop exit label. No length is required; exhaustion is signaled through the protocol, not a counter compare against \texttt{len()}.
+
+Contrast with bare metal:
+
+\begin{verbatim}
+C model:     base + i * sizeof(T)     # index in register, O(1) per step
+Python model: heap iterator + tp_iternext dispatch + refcount traffic
+\end{verbatim}
+
+Every loop iteration pays indirection through a type-specific C function, heap state for the cursor, and dynamic dispatch. Reusable iterables (\texttt{list}, \texttt{range}, \texttt{str}) can mint fresh iterators; a stored iterator object is a consumable cursor---once exhausted, \texttt{FOR\_ITER} exits immediately on the next \texttt{for} pass unless \texttt{GET\_ITER} is run again on the original iterable.
+
+An iterator's \texttt{\_\_iter\_\_()} returns \texttt{self}; calling \texttt{iter()} on a list creates a \emph{new} iterator each time. This asymmetry explains why \texttt{for x in it:} over a saved iterator yields nothing on the second pass while \texttt{for x in items:} works repeatedly.
+
+\subsubsection{Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-Preserving Suspended Subroutines}
+
+A function containing \texttt{yield} compiles to generator semantics: calling it executes \texttt{RETURN\_GENERATOR} and returns a generator object without running the body. Each \texttt{next()} resumes the suspended \texttt{PyFrameObject} stored in \texttt{gen.gi\_frame}.
+
+When execution reaches \texttt{YIELD\_VALUE}, the interpreter:
+
+\begin{enumerate}
+    \item leaves the yielded object on the stack as the return value to the caller;
+    \item preserves the frame's \texttt{f\_locals}, evaluation stack depth, and instruction pointer (\texttt{f\_lasti});
+    \item detaches that frame from the active C call chain without destroying it---the native C stack unwinds, but the Python frame is retained on the heap inside the generator object.
+\end{enumerate}
+
+Re-entry via \texttt{.\_\_next\_\_()} continues from the saved \texttt{f\_lasti}, not from a reconstructed native stack frame. This is cooperative suspension: the generator is not a background thread; it advances only when the driver loop issues \texttt{FOR\_ITER} or \texttt{next()}.
+
+After normal completion, \texttt{gi\_frame} becomes \texttt{None}; further \texttt{next()} calls raise \texttt{StopIteration}. The generator object may still exist, but no resumable execution state remains---analogous to an exhausted iterator with no reset primitive except calling the factory again.
+
+\begin{quote}
+Generators are heap-pinned \texttt{PyFrameObject} instances whose \texttt{YIELD\_VALUE} sites bypass standard frame destruction, enabling lazy streams at the cost of per-suspension allocation and interpreter re-entry overhead.
+\end{quote}

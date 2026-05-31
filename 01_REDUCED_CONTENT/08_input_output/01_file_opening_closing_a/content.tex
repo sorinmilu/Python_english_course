@@ -1,0 +1,3 @@
+\section{File Opening, Closing, and Resource Lifetime}
+
+Opening a file binds a Python stream object to an operating-system handle. That handle has a lifetime independent of ordinary garbage collection semantics: it must be released explicitly or through a context manager. This section covers resource invariants, the \texttt{with} protocol, and the distinction between user-space flushing and kernel-level durability.

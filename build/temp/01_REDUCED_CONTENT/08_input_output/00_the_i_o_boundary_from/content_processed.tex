@@ -1,0 +1,3 @@
+\section{The I/O Boundary: From Runtime Objects to External Systems}
+
+Python names and objects live inside the interpreter process; files, streams, and filesystem entries live outside it. CPython wraps POSIX descriptors and kernel services in managed runtime objects so I/O participates in the same object model as the rest of the language, without removing the underlying systems boundary.

@@ -1,0 +1,72 @@
+\subsection{Resource Management Invariants}
+
+Every successful \texttt{open()} acquires an external handle. Leaked handles exhaust process limits in long-running services. Closing (or leaving a \texttt{with} block) releases the descriptor and pushes pending buffered output toward the kernel.
+
+\subsubsection{Manual Closing with \texttt{.close()} and the Risk of Leaked File Handles}
+
+\texttt{close()} shuts down the OS connection; the Python wrapper may remain inspectable with \texttt{closed == True}. Writes after close raise \texttt{ValueError}. Manual close is fragile when exceptions skip the cleanup path.
+
+\begin{verbatim}
+path = "manual_close_demo.txt"
+file_obj = open(path, "w", encoding="utf-8")
+file_obj.write("No soup for you!\n")
+print(file_obj.closed)
+file_obj.close()
+print(file_obj.closed)
+\end{verbatim}
+
+\subsubsection{Context Managers: The \texttt{with} Statement as Structured Resource Lifetime Control}
+
+\texttt{with open(...) as f:} binds handle lifetime to a lexical block. Exit always runs cleanup, including on exceptions.
+
+\begin{verbatim}
+path = "with_demo.txt"
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Spam, spam, spam, eggs, and spam.\n")
+print(file_obj.closed)
+\end{verbatim}
+
+\subsubsection{The \texttt{\_\_enter\_\_()} / \texttt{\_\_exit\_\_()} Protocol Behind \texttt{with}}
+
+Context managers implement \texttt{\_\_enter\_\_()} (return bound object) and \texttt{\_\_exit\_\_()} (cleanup, including on exceptions). File objects close in \texttt{\_\_exit\_\_()}.
+
+\begin{verbatim}
+path = "protocol_demo.txt"
+file_obj = open(path, "w", encoding="utf-8")
+entered = file_obj.__enter__()
+entered.write("Protocol-driven write.\n")
+file_obj.__exit__(None, None, None)
+print(file_obj.closed)
+\end{verbatim}
+
+Normal code should use \texttt{with}, not manual protocol calls.
+
+\subsubsection{Exception-Safe Cleanup: Why File Handles Close Even When Errors Occur Inside the Block}
+
+If an exception interrupts a \texttt{with} block, \texttt{\_\_exit\_\_()} still runs and closes the file before the exception propagates---cleanup must not depend on the happy path.
+
+\subsubsection{Buffer Flushing Invariants: Distinguishing Application Caching from Kernel Synchronization}
+
+Three layers must not be conflated:
+
+\begin{itemize}
+    \item Python/user-space buffer --- \texttt{BufferedIOBase} block cache inside the interpreter process.
+    \item Kernel page cache --- data accepted by the OS but not necessarily on persistent media.
+    \item Physical storage --- blocks actually committed to the device.
+\end{itemize}
+
+\texttt{Stream.flush()} (and \texttt{close()}, which flushes first) empties the Python buffer and pushes bytes into the kernel page cache---analogous to C \texttt{fflush}. It does \emph{not} guarantee durability on disk or flash.
+
+To enforce a blocking storage barrier, call \texttt{os.fsync(fd)} on the underlying descriptor after flush:
+
+\begin{verbatim}
+import os
+
+path = "durability_demo.txt"
+with open(path, "w", encoding="utf-8") as f:
+    f.write("Critical record.\n")
+    f.flush()
+    os.fsync(f.fileno())
+\end{verbatim}
+
+Closing a file flushes user-space buffers but still does not replace \texttt{fsync} when crash-safe persistence is required.

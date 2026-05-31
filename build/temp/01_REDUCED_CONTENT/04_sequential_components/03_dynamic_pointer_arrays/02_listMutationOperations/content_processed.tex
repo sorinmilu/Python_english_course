@@ -1,0 +1,7 @@
+\subsection{List Mutation Operations}
+
+List mutation preserves \texttt{id(list)} while changing slot contents, length, or order. Methods such as \texttt{append}, \texttt{sort}, and \texttt{reverse} return \texttt{None}; rebinding to their return value destroys the list reference. Strings, by contrast, always allocate new objects on apparent modification.
+
+\subsubsection{Index Assignment and Slice Assignment}
+
+\texttt{items[i] = obj} replaces one \texttt{PyObject*} slot; the list shell is unchanged. Slice assignment \texttt{items[start:stop] = iterable} replaces a range of slots and may change \texttt{ob\_size} when the replacement iterable length differs---including zero-length slices as insertion points. The right-hand side must be iterable; assigning a bare integer to a slice is a \texttt{TypeError}.

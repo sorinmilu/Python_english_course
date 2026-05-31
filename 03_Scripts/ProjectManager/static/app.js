@@ -7,6 +7,7 @@ const state = {
   pollTimer: null,
   source: null,
   structure: null,
+  structureExportBusy: false,
   bibtexRefsReport: null,
   floatInventory: null,
   /** Persisted until page reload; only applied when viewing LaTeX source. */
@@ -87,6 +88,8 @@ const els = {
   structureCloseBtn: document.getElementById("structureCloseBtn"),
   structureSearch: document.getElementById("structureSearch"),
   structureSearchState: document.getElementById("structureSearchState"),
+  structureExportMdBtn: document.getElementById("structureExportMdBtn"),
+  structureExportState: document.getElementById("structureExportState"),
   structureViewer: document.getElementById("structureViewer"),
   floatInventoryModal: document.getElementById("floatInventoryModal"),
   floatInventoryTitle: document.getElementById("floatInventoryTitle"),
@@ -2084,6 +2087,147 @@ function renderStructure(query = "") {
     : "";
 }
 
+const STRUCTURE_HEADING_LEVELS = {
+  chapter: 1,
+  section: 2,
+  subsection: 3,
+  subsubsection: 4,
+};
+
+function structureHeadingMarkdown(node) {
+  const type = String(node.type || "").toLowerCase();
+  const title = String(node.title || "(untitled)").trim();
+  const level = Math.max(1, Math.min(STRUCTURE_HEADING_LEVELS[type] || 1, 6));
+  const hashes = "#".repeat(level);
+  if (type === "chapter") {
+    return `# CHAPTER: ${title}\n\n`;
+  }
+  return `${hashes} ${title}\n\n`;
+}
+
+function structureItemMarkdown(item) {
+  const kind = String(item.type || "item");
+  const label = String(item.label || "").trim();
+  const caption = String(item.caption || "(no caption)").trim();
+  const line = item.line ? ` (L${item.line})` : "";
+  const labelPart = label ? ` \`${label}\`` : "";
+  return `- **${kind}**${labelPart}: ${caption}${line}\n`;
+}
+
+function structureNodesToMarkdown(nodes) {
+  const chunks = [];
+  for (const node of nodes || []) {
+    chunks.push(structureHeadingMarkdown(node));
+    const label = String(node.label || "").trim();
+    const meta = [];
+    if (label) meta.push(`\`${label}\``);
+    if (node.line) meta.push(`L${node.line}`);
+    if (meta.length) {
+      chunks.push(`${meta.join(" · ")}\n\n`);
+    }
+    for (const item of node.items || []) {
+      chunks.push(structureItemMarkdown(item));
+    }
+    if (node.items?.length) {
+      chunks.push("\n");
+    }
+    chunks.push(structureNodesToMarkdown(node.children));
+  }
+  return chunks.join("");
+}
+
+function structureTreeToMarkdown(tree, meta = {}) {
+  const lines = ["# Document Structure\n\n"];
+  if (meta.sourcePath) {
+    lines.push(`Source: \`${meta.sourcePath}\`\n\n---\n\n`);
+  }
+  const body = structureNodesToMarkdown(tree).trim();
+  lines.push(body ? `${body}\n` : "\n");
+  return lines.join("");
+}
+
+function structureExportSuggestedName() {
+  const path = String(els.structurePath?.textContent || "").trim();
+  if (path) {
+    const base = path.split(/[/\\]/).pop()?.replace(/\.tex$/i, "") || "document";
+    return `${base}_structure.md`;
+  }
+  return "document_structure.md";
+}
+
+async function saveTextFileAs(text, suggestedName) {
+  const payload = text.endsWith("\n") ? text : `${text}\n`;
+  if (typeof window.showSaveFilePicker === "function") {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName,
+        types: [
+          {
+            description: "Markdown",
+            accept: { "text/markdown": [".md"] },
+          },
+        ],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(payload);
+      await writable.close();
+      return handle.name;
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  const blob = new Blob([payload], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = suggestedName;
+  anchor.click();
+  URL.revokeObjectURL(url);
+  return suggestedName;
+}
+
+function structureSetExportUi(message = "") {
+  if (els.structureExportState) {
+    els.structureExportState.textContent = message;
+  }
+}
+
+function syncStructureExportUi() {
+  const hasTree = Boolean(state.structure?.length);
+  if (els.structureExportMdBtn) {
+    els.structureExportMdBtn.disabled = !hasTree || state.structureExportBusy;
+  }
+}
+
+async function exportStructureMarkdown() {
+  if (!state.structure?.length || state.structureExportBusy) return;
+  state.structureExportBusy = true;
+  syncStructureExportUi();
+  structureSetExportUi("Saving…");
+  try {
+    const markdown = structureTreeToMarkdown(state.structure, {
+      sourcePath: els.structurePath?.textContent?.trim() || "",
+    });
+    const savedName = await saveTextFileAs(markdown, structureExportSuggestedName());
+    if (savedName) {
+      structureSetExportUi(`Saved ${savedName}`);
+      showError("");
+    } else {
+      structureSetExportUi("");
+    }
+  } catch (error) {
+    structureSetExportUi("");
+    showError(error.message);
+  } finally {
+    state.structureExportBusy = false;
+    syncStructureExportUi();
+  }
+}
+
 async function openStructure() {
   try {
     const data = await api(`/api/structure?t=${Date.now()}`);
@@ -2091,7 +2235,9 @@ async function openStructure() {
     els.structureTitle.textContent = data.label || "Document Structure";
     els.structurePath.textContent = data.path || "";
     els.structureSearch.value = "";
+    structureSetExportUi("");
     renderStructure("");
+    syncStructureExportUi();
     els.structureModal.classList.remove("hidden");
     els.structureModal.setAttribute("aria-hidden", "false");
     els.structureSearch.focus();
@@ -2726,6 +2872,7 @@ els.listTablesBtn.addEventListener("click", () => openFloatInventory("tables"));
 els.compressPdfBtn.addEventListener("click", compressPdf);
 els.sourceCloseBtn.addEventListener("click", closeSource);
 els.structureCloseBtn.addEventListener("click", closeStructure);
+els.structureExportMdBtn?.addEventListener("click", exportStructureMarkdown);
 els.floatInventoryCloseBtn.addEventListener("click", closeFloatInventory);
 els.sourceModal.addEventListener("click", (event) => {
   if (event.target === els.sourceModal) closeSource();

@@ -1,0 +1,28 @@
+\subsection{The Stack Subsystem and Reference Storage}
+
+
+\subsubsection{Native Stack vs. Python Frame Stack vs. Bytecode Evaluation Stack}
+
+Three stacks coexist and must not be conflated:
+
+\begin{itemize}
+    \item \textbf{Native C stack}: CPython's own function calls as a C program.
+    \item \textbf{Python frame chain}: linked execution records for Python calls, generators, and coroutines.
+    \item \textbf{Bytecode evaluation stack}: per-frame operand stack of \texttt{PyObject*} temporaries.
+\end{itemize}
+
+Tracebacks walk the Python frame chain, not a raw CPU backtrace. The evaluation stack holds wrapped cargo references while expressions unfold; it is neither the native stack nor the dict of globals.
+
+\subsubsection{Local Names as Reference Slots: Frame-Level Storage Pointing to Heap Objects}
+
+A Python local is a slot in the frame's fast-local array (or a closure cell) holding a pointer to heap cargo. \texttt{x = 10} stores a reference to an \texttt{int} object; \texttt{x = "hi"} replaces that pointer. Rebinding changes the slot; \texttt{list.append} mutates the object reached through shared slots.
+
+Function parameters initialize local slots from caller-supplied object references---Python passes references by assignment, not C-style value copies of structs.
+
+\subsubsection{Lifecycle Transitions: Frame Destruction, Stack Unwinding, and Reference Count Updates}
+
+When a frame ends---by return, exception propagation, or generator close---its local slots and stack are cleared, decrementing refcounts. Objects survive if other references remain (return values handed to callers, cells in closures, containers, or tracebacks temporarily retaining frames). Exception unwinding is therefore memory topology change: each exited frame removes outgoing references, possibly triggering immediate deallocation for acyclic objects.
+
+Suspended generator and coroutine frames delay this teardown, keeping local references alive until execution resumes or the generator object dies.
+
+The stack subsystem does not store object payloads inline. It stores arrows to wrapped cargo allocated by the real-estate developer on the heap.

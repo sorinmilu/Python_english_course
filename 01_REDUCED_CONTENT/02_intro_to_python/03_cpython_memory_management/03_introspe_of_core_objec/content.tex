@@ -1,0 +1,26 @@
+\subsection{Introspection of Core Object Properties}
+
+
+\subsubsection{Identity Verification: Object Identity Observation via the \texttt{id()} Function}
+
+From a C perspective, \texttt{is} is the fast path: it compares the pointer addresses of two \texttt{PyObject*} handles---do both names denote the same heap address? Value equality \texttt{==} is slower and indirect: it invokes rich comparison (\texttt{tp\_richcompare} / \texttt{\_\_eq\_\_}) that may traverse nested fields inside wrapped cargo.
+
+Two lists with identical elements compare equal but remain distinct allocations:
+
+\begin{quote}
+\texttt{==} asks whether payloads compare alike; \texttt{is} asks whether the handle addresses match.
+\end{quote}
+
+Use \texttt{is} for singletons such as \texttt{None}. Use \texttt{==} for numeric or structural equality. \texttt{id()} exposes the address-like identity CPython uses internally; it is for debugging and teaching, not portable object handles across lifetimes.
+
+\subsubsection{Dynamic Metadata Analysis: Runtime Type Descriptor Extraction via the \texttt{type()} Framework}
+
+\texttt{type(obj)} returns the type object pointed to by \texttt{ob\_type}. Types live on objects, not on names. Rebinding a name can change \texttt{type(x)} because the name now references different cargo.
+
+\texttt{isinstance} respects inheritance; \texttt{type(x) is T} tests exact descriptor identity. Operator dispatch reads the type's slot tables---another face of the wrapped-cargo model.
+
+\subsubsection{The Variable-as-Label Paradigm Shift: Binding Multiple Names to an Identical Runtime Object (\texttt{a = b})}
+
+\texttt{a = b} attaches another label to the same heap object; it does not copy cargo unless a copy protocol runs explicitly (\texttt{copy.copy}, \texttt{list.copy}, etc.). Mutation through shared labels is aliasing; rebinding one label leaves other labels pointing at the original object. Containers repeat the pattern at scale---shallow copies duplicate outer shells but may still share inner references.
+
+This paradigm completes the memory picture: names are labels, objects are wrapped heap entities, identity is pointer equality, and lifetimes follow reference graphs cleaned by refcnt plus cyclic GC.

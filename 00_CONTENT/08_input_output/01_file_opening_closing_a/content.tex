@@ -1,1 +1,5 @@
 \section{File Opening, Closing, and Resource Lifetime}
+
+Files are external resources, not ordinary in-memory values. Opening a file creates a Python object that gives the program temporary access to an operating-system-managed resource. That access has a lifetime: it begins when the file is opened and must end when the file is no longer needed.
+
+This section explains how \texttt{open()} constructs file objects, how modes control reading, writing, appending, creation, text access, and binary access, and why closing files is a required resource-management rule. It also introduces the \texttt{with} statement as Python's normal way to bind file usage to a safe, visible block of code.

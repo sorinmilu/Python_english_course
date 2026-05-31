@@ -1,4 +1,477 @@
-\subsection{The Complex Representation Architecture (`complex`)}
-\subsubsection{Language-Native Integration via the Mathematical Imaginary Component `j` Literal}
-\subsubsection{Component Access Mechanisms: Extracting `.real` and `.imag` Floating-Point Parts}
+\subsection{The Complex Representation Architecture (\texttt{complex})}
+
+Python has a built-in \texttt{complex} type. A complex number contains two floating-point parts:
+
+\begin{itemize}
+    \item a real part;
+    \item an imaginary part.
+\end{itemize}
+
+In Python source code, the imaginary component is written with \texttt{j}.
+
+\begin{verbatim}
+signal = 3 + 4j
+
+print(f"signal: {signal}")
+print(f"type:   {type(signal)}")
+
+print()
+print("selected complex methods/attributes:")
+print(f"{'real':<15} {'real' in dir(signal)}")
+print(f"{'imag':<15} {'imag' in dir(signal)}")
+print(f"{'conjugate':<15} {'conjugate' in dir(signal)}")
+print(f"{'__add__':<15} {'__add__' in dir(signal)}")
+print(f"{'__mul__':<15} {'__mul__' in dir(signal)}")
+
+print()
+print(f"real part:      {signal.real}")
+print(f"imaginary part: {signal.imag}")
+print(f"conjugate:      {signal.conjugate()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signal: (3+4j)
+type:   <class 'complex'>
+
+selected complex methods/attributes:
+real            True
+imag            True
+conjugate       True
+__add__         True
+__mul__         True
+
+real part:      3.0
+imaginary part: 4.0
+conjugate:      (3-4j)
+\end{verbatim}
+
+The value \texttt{3 + 4j} is one object of type \texttt{complex}. It is not a pair of separate Python variables. The real and imaginary components are accessible through attributes.
+
+\subsubsection{Language-Native Integration via the Mathematical Imaginary Component \texttt{j} Literal}
+
+Python uses \texttt{j} for the imaginary unit. This follows the convention used in engineering, where \texttt{i} is often already used for electric current.
+
+The imaginary literal must have a numeric coefficient:
+
+\begin{verbatim}
+z1 = 4j
+z2 = 3 + 4j
+z3 = -2j
+z4 = 0.5j
+
+print(f"z1: {z1}")
+print(f"z2: {z2}")
+print(f"z3: {z3}")
+print(f"z4: {z4}")
+
+print()
+print(f"type(z1): {type(z1)}")
+print(f"type(z2): {type(z2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z1: 4j
+z2: (3+4j)
+z3: (-0-2j)
+z4: 0.5j
+
+type(z1): <class 'complex'>
+type(z2): <class 'complex'>
+\end{verbatim}
+
+The text \texttt{4j} is a complex literal. The text \texttt{j} alone is not an imaginary literal. It is treated as an ordinary name.
+
+\begin{verbatim}
+try:
+    print(j)
+except NameError as err:
+    print("name lookup failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name lookup failed
+message: name 'j' is not defined
+\end{verbatim}
+
+This works only after binding \texttt{j} as a normal variable:
+
+\begin{verbatim}
+j = "Jerry"
+
+print(j)
+print(type(j))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Jerry
+<class 'str'>
+\end{verbatim}
+
+So the rule is:
+
+\begin{quote}
+\texttt{4j} is an imaginary numeric literal. Plain \texttt{j} is just a name.
+\end{quote}
+
+Uppercase \texttt{J} also works:
+
+\begin{verbatim}
+z1 = 4j
+z2 = 4J
+
+print(f"z1: {z1}")
+print(f"z2: {z2}")
+print(f"z1 == z2: {z1 == z2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z1: 4j
+z2: 4j
+z1 == z2: True
+\end{verbatim}
+
+Complex arithmetic is built into the language:
+
+\begin{verbatim}
+a = 3 + 4j
+b = 2 - 1j
+
+print(f"a: {a}")
+print(f"b: {b}")
+
+print()
+print(f"a + b: {a + b}")
+print(f"a - b: {a - b}")
+print(f"a * b: {a * b}")
+print(f"a / b: {a / b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: (3+4j)
+b: (2-1j)
+
+a + b: (5+3j)
+a - b: (1+5j)
+a * b: (10+5j)
+a / b: (0.4+2.2j)
+\end{verbatim}
+
+The operators are dispatched to complex-number behavior. The name \texttt{a} is still only a binding to a complex object.
+
+\subsubsection{Component Access Mechanisms: Extracting \texttt{.real} and \texttt{.imag} Floating-Point Parts}
+
+A complex object exposes its two components through \texttt{.real} and \texttt{.imag}.
+
+\begin{verbatim}
+position = 12.5 - 7.25j
+
+real_part = position.real
+imag_part = position.imag
+
+print(f"position:  {position}")
+print(f"real_part: {real_part}")
+print(f"imag_part: {imag_part}")
+
+print()
+print(f"type(position):  {type(position)}")
+print(f"type(real_part): {type(real_part)}")
+print(f"type(imag_part): {type(imag_part)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+position:  (12.5-7.25j)
+real_part: 12.5
+imag_part: -7.25
+
+type(position):  <class 'complex'>
+type(real_part): <class 'float'>
+type(imag_part): <class 'float'>
+\end{verbatim}
+
+The components are floating-point values. Even when the source text uses whole numbers, the extracted parts are floats:
+
+\begin{verbatim}
+z = 3 + 4j
+
+print(f"z.real: {z.real}")
+print(f"z.imag: {z.imag}")
+
+print()
+print(f"type(z.real): {type(z.real)}")
+print(f"type(z.imag): {type(z.imag)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z.real: 3.0
+z.imag: 4.0
+
+type(z.real): <class 'float'>
+type(z.imag): <class 'float'>
+\end{verbatim}
+
+A complex number with no explicit real part has real part \texttt{0.0}:
+
+\begin{verbatim}
+z = 42j
+
+print(f"z:      {z}")
+print(f"real:   {z.real}")
+print(f"imag:   {z.imag}")
+print(f"type:   {type(z)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z:      42j
+real:   0.0
+imag:   42.0
+type:   <class 'complex'>
+\end{verbatim}
+
+A complex number with no imaginary contribution can still be complex:
+
+\begin{verbatim}
+z = complex(42, 0)
+
+print(f"z:      {z}")
+print(f"real:   {z.real}")
+print(f"imag:   {z.imag}")
+print(f"type:   {type(z)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z:      (42+0j)
+real:   42.0
+imag:   0.0
+type:   <class 'complex'>
+\end{verbatim}
+
+The constructor \texttt{complex()} can build a complex object from two numeric parts:
+
+\begin{verbatim}
+real_part = 3
+imag_part = 4
+
+z = complex(real_part, imag_part)
+
+print(f"z: {z}")
+print(f"type(z): {type(z)}")
+print(f"z.real: {z.real}")
+print(f"z.imag: {z.imag}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z: (3+4j)
+type(z): <class 'complex'>
+z.real: 3.0
+z.imag: 4.0
+\end{verbatim}
+
+The method \texttt{conjugate()} returns a related complex number where the sign of the imaginary part is reversed:
+
+\begin{verbatim}
+z = 3 + 4j
+z_conj = z.conjugate()
+
+print(f"z:           {z}")
+print(f"conjugate:   {z_conj}")
+
+print()
+print(f"z real:      {z.real}")
+print(f"z imag:      {z.imag}")
+print(f"conj real:   {z_conj.real}")
+print(f"conj imag:   {z_conj.imag}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z:           (3+4j)
+conjugate:   (3-4j)
+
+z real:      3.0
+z imag:      4.0
+conj real:   3.0
+conj imag:   -4.0
+\end{verbatim}
+
+This method does not mutate the original complex object. Complex numbers are immutable. It returns a new complex object.
+
+\begin{verbatim}
+z = 3 + 4j
+
+old_id = id(z)
+z_conj = z.conjugate()
+
+print(f"z:       {z}")
+print(f"z_conj:  {z_conj}")
+
+print()
+print(f"id(z):      {id(z)}")
+print(f"id(z_conj): {id(z_conj)}")
+print(f"same object: {id(z) == id(z_conj)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+z:       (3+4j)
+z_conj:  (3-4j)
+
+id(z):      2214135700944
+id(z_conj): 2214135700976
+same object: False
+\end{verbatim}
+
 \subsubsection{Complex Arithmetic Boundaries: Why Ordering Comparisons Are Not Defined for Complex Numbers}
+
+Complex numbers support equality comparison:
+
+\begin{verbatim}
+a = 3 + 4j
+b = 3 + 4j
+c = 3 - 4j
+
+print(f"a == b: {a == b}")
+print(f"a == c: {a == c}")
+print(f"a != c: {a != c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a == b: True
+a == c: False
+a != c: True
+\end{verbatim}
+
+However, Python does not define ordinary ordering for complex numbers:
+
+\begin{verbatim}
+a = 3 + 4j
+b = 5 + 0j
+
+print(a < b)
+\end{verbatim}
+
+This raises a \texttt{TypeError}.
+
+Safe demonstration:
+
+\begin{verbatim}
+a = 3 + 4j
+b = 5 + 0j
+
+try:
+    print(a < b)
+except TypeError as err:
+    print("ordering failed")
+    print(f"message: {err}")
+    print(f"type(err): {type(err)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ordering failed
+message: '<' not supported between instances of 'complex' and 'complex'
+type(err): <class 'TypeError'>
+\end{verbatim}
+
+The reason is conceptual. Real numbers have a natural left-to-right order on a single number line. Complex numbers have two components. There is no single built-in rule that says whether \texttt{3 + 4j} should be less than \texttt{5 + 0j}.
+
+A programmer can choose a comparison rule for a specific problem, but Python does not pretend that one universal rule exists.
+
+For example, one possible rule is to compare by magnitude. Python's \texttt{abs()} returns the distance of the complex number from zero:
+
+\begin{verbatim}
+a = 3 + 4j
+b = 5 + 0j
+c = 1 + 1j
+
+print(f"abs(a): {abs(a)}")
+print(f"abs(b): {abs(b)}")
+print(f"abs(c): {abs(c)}")
+
+print()
+print(f"abs(a) == abs(b): {abs(a) == abs(b)}")
+print(f"abs(c) < abs(a):  {abs(c) < abs(a)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+abs(a): 5.0
+abs(b): 5.0
+abs(c): 1.4142135623730951
+
+abs(a) == abs(b): True
+abs(c) < abs(a):  True
+\end{verbatim}
+
+This comparison is not complex ordering. It is float ordering after reducing each complex number to a magnitude.
+
+A list of complex values cannot be sorted directly:
+
+\begin{verbatim}
+values = [3 + 4j, 1 + 1j, 5 + 0j]
+
+try:
+    print(sorted(values))
+except TypeError as err:
+    print("sorting failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+sorting failed
+message: '<' not supported between instances of 'complex' and 'complex'
+\end{verbatim}
+
+But it can be sorted by a chosen key, such as magnitude:
+
+\begin{verbatim}
+values = [3 + 4j, 1 + 1j, 5 + 0j]
+
+sorted_by_magnitude = sorted(values, key=abs)
+
+print(f"original:            {values}")
+print(f"sorted by magnitude: {sorted_by_magnitude}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+original:            [(3+4j), (1+1j), (5+0j)]
+sorted by magnitude: [(1+1j), (3+4j), (5+0j)]
+\end{verbatim}
+
+The practical summary is:
+
+\begin{quote}
+Python's \texttt{complex} type is a built-in numeric object with floating-point real and imaginary parts. It supports complex arithmetic and equality checks, but it does not support ordinary ordering comparisons such as \texttt{<} or \texttt{>}. If ordering is needed, the programmer must explicitly choose what property is being ordered.
+\end{quote}

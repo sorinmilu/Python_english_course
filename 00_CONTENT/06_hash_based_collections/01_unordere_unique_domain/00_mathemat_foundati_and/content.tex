@@ -1,4 +1,476 @@
 \subsection{Mathematical Foundations and Structural Syntax}
-\subsubsection{Defining Unique Unordered Domains Using the Curly-Brace `{}` Construct}
-\subsubsection{Instantiation Boundaries: Differentiating Empty Set Initialization `set()` from Empty Dictionary Literal Declaration `{}`}
+
+A \texttt{set} represents a domain of unique elements. The word ``domain'' is useful here because a set is not mainly about position, repetition, or sequence traversal. It is about whether a value belongs to a collection.
+
+A list may contain the same value many times. A set does not. If the same value is inserted repeatedly, the set keeps only one logical occurrence.
+
+\begin{quote}
+A list remembers positions and repetitions. A set remembers membership.
+\end{quote}
+
+This makes sets useful for questions such as:
+
+\begin{itemize}
+    \item has this value already appeared?
+    \item which unique values exist in this input?
+    \item which values belong to both groups?
+    \item which values belong to one group but not another?
+\end{itemize}
+
+The mathematical idea is old, but Python implements it with a runtime hash table. That means a \texttt{set} is not merely a mathematical notation. It is also a concrete memory structure with hash-based placement rules.
+
+\subsubsection{Defining Unique Unordered Domains Using the Curly-Brace \texttt{\{\}} Construct}
+
+A non-empty set can be written with curly braces. The elements are separated by commas.
+
+\begin{verbatim}
+facts = {"spam", "eggs", "spam", 42}
+
+print(f"facts: {facts!r}")
+print(f"type(facts): {type(facts)}")
+print(f"len(facts): {len(facts)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+facts: {'eggs', 42, 'spam'}
+type(facts): <class 'set'>
+len(facts): 3
+\end{verbatim}
+
+The input contained \texttt{"spam"} twice, but the resulting set contains it only once. The duplicate was not stored as a second independent component because sets enforce uniqueness.
+
+The printed order should not be interpreted as a stable structural order. A set is not a list with unusual brackets. It is not a tuple with mutable syntax. It is a hash-based uniqueness domain.
+
+We can inspect the object with \texttt{dir()}.
+
+\begin{verbatim}
+facts = {"spam", "eggs", 42}
+
+print(f"type(facts): {type(facts)}")
+print()
+
+print("__contains__" in dir(facts))
+print("__iter__" in dir(facts))
+print("__len__" in dir(facts))
+print("add" in dir(facts))
+print("remove" in dir(facts))
+print("union" in dir(facts))
+print("intersection" in dir(facts))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(facts): <class 'set'>
+
+True
+True
+True
+True
+True
+True
+True
+\end{verbatim}
+
+The most important names at this stage are:
+
+\begin{itemize}
+    \item \texttt{\_\_contains\_\_}: supports membership testing with \texttt{in};
+    \item \texttt{\_\_iter\_\_}: allows traversal over the current set elements;
+    \item \texttt{\_\_len\_\_}: supports \texttt{len()};
+    \item \texttt{add} and \texttt{remove}: later used for direct mutation;
+    \item \texttt{union} and \texttt{intersection}: later used for mathematical set calculations.
+\end{itemize}
+
+Membership is the natural first operation for a set.
+
+\begin{verbatim}
+facts = {"spam", "eggs", 42}
+
+print(f"{'spam' in facts = }")
+print(f"{'larch' in facts = }")
+print(f"{42 in facts = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'spam' in facts = True
+'larch' in facts = False
+42 in facts = True
+\end{verbatim}
+
+This code does not ask where \texttt{"spam"} is located. It asks whether \texttt{"spam"} belongs to the set. That is the correct mental model.
+
+A set may contain different hashable object types.
+
+\begin{verbatim}
+mixed = {"D'oh!", 42, ("Arthur", "Brian")}
+
+print(f"mixed: {mixed!r}")
+print(f"type(mixed): {type(mixed)}")
+
+for item in mixed:
+    print(f"item={item!r:<22} type={type(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+mixed: {42, "D'oh!", ('Arthur', 'Brian')}
+type(mixed): <class 'set'>
+item=42                     type=<class 'int'>
+item="D'oh!"                type=<class 'str'>
+item=('Arthur', 'Brian')    type=<class 'tuple'>
+\end{verbatim}
+
+The tuple is accepted because it is immutable and its contents are hashable. A list would not be accepted.
+
+\begin{verbatim}
+try:
+    bad_set = {"spam", ["eggs", 42]}
+except TypeError as err:
+    print(f"set construction failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+set construction failed: unhashable type: 'list'
+\end{verbatim}
+
+The list is rejected because a list can mutate. A mutable object cannot safely act as a hash-table element when its hash-relevant state may change after insertion.
+
+\subsubsection{Instantiation Boundaries: Differentiating Empty Set Initialization \texttt{set()} from Empty Dictionary Literal Declaration \texttt{\{\}}}
+
+The syntax for a non-empty set uses curly braces, but the syntax for an empty set does not.
+
+This is a deliberate boundary in Python syntax:
+
+\begin{itemize}
+    \item \texttt{\{\}} creates an empty dictionary;
+    \item \texttt{set()} creates an empty set.
+\end{itemize}
+
+The distinction exists because curly braces were already used for dictionaries before set literals were added to Python. Therefore, the empty curly-brace form kept its dictionary meaning.
+
+\begin{verbatim}
+empty_a = {}
+empty_b = set()
+
+print(f"empty_a: {empty_a!r}")
+print(f"type(empty_a): {type(empty_a)}")
+print()
+
+print(f"empty_b: {empty_b!r}")
+print(f"type(empty_b): {type(empty_b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+empty_a: {}
+type(empty_a): <class 'dict'>
+
+empty_b: set()
+type(empty_b): <class 'set'>
+\end{verbatim}
+
+This is one of the common beginner traps. The expression \texttt{\{\}} does not mean ``empty curly-brace collection in general.'' It specifically means empty dictionary.
+
+Because this subsection introduces both objects syntactically, we can inspect both types briefly.
+
+\begin{verbatim}
+empty_dict = {}
+empty_set = set()
+
+print("empty_dict")
+print(f"  type: {type(empty_dict)}")
+print(f"  keys in dir: {'keys' in dir(empty_dict)}")
+print(f"  items in dir: {'items' in dir(empty_dict)}")
+print(f"  add in dir: {'add' in dir(empty_dict)}")
+print()
+
+print("empty_set")
+print(f"  type: {type(empty_set)}")
+print(f"  keys in dir: {'keys' in dir(empty_set)}")
+print(f"  items in dir: {'items' in dir(empty_set)}")
+print(f"  add in dir: {'add' in dir(empty_set)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+empty_dict
+  type: <class 'dict'>
+  keys in dir: True
+  items in dir: True
+  add in dir: False
+
+empty_set
+  type: <class 'set'>
+  keys in dir: False
+  items in dir: False
+  add in dir: True
+\end{verbatim}
+
+The dictionary has \texttt{keys()} and \texttt{items()} because it stores key-value associations. The set has \texttt{add()} because it stores individual unique elements.
+
+A single value inside curly braces creates a set, not a dictionary.
+
+\begin{verbatim}
+one_item = {"Serenity now!"}
+
+print(f"one_item: {one_item!r}")
+print(f"type(one_item): {type(one_item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+one_item: {'Serenity now!'}
+type(one_item): <class 'set'>
+\end{verbatim}
+
+A colon creates dictionary syntax.
+
+\begin{verbatim}
+one_pair = {"Jerry": "Serenity now!"}
+
+print(f"one_pair: {one_pair!r}")
+print(f"type(one_pair): {type(one_pair)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+one_pair: {'Jerry': 'Serenity now!'}
+type(one_pair): <class 'dict'>
+\end{verbatim}
+
+The syntax boundary is therefore:
+
+\begin{verbatim}
+{"spam"}          -> set with one element
+{"spam", "eggs"}  -> set with two elements
+{}                -> empty dict
+set()             -> empty set
+{"name": "spam"}  -> dict with one key-value pair
+\end{verbatim}
+
+This boundary matters because set code and dictionary code support different operations. Confusing \texttt{\{\}} with an empty set often leads to errors later, when the program tries to call set-specific methods on a dictionary.
+
+\begin{verbatim}
+items = {}
+
+print(f"type(items): {type(items)}")
+
+try:
+    items.add("spam")
+except AttributeError as err:
+    print(f"method call failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(items): <class 'dict'>
+method call failed: 'dict' object has no attribute 'add'
+\end{verbatim}
+
+The fix is to use \texttt{set()} when the intended object is an empty set.
+
+\begin{verbatim}
+items = set()
+
+items.add("spam")
+
+print(f"items: {items!r}")
+print(f"type(items): {type(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: {'spam'}
+type(items): <class 'set'>
+\end{verbatim}
+
+The mutation operation \texttt{add()} will be studied later in more detail. Here it is used only to expose the syntactic difference between an empty dictionary and an empty set.
+
 \subsubsection{Set Comprehensions as Hash-Based Filtering Structures}
+
+A set comprehension builds a set by evaluating an expression across an iterable source. Its syntax resembles a list comprehension, but it uses curly braces and produces a set.
+
+\begin{verbatim}
+words = ["spam", "eggs", "spam", "larch", "eggs"]
+
+unique_words = {word for word in words}
+
+print(f"words: {words!r}")
+print(f"type(words): {type(words)}")
+print()
+
+print(f"unique_words: {unique_words!r}")
+print(f"type(unique_words): {type(unique_words)}")
+print(f"len(unique_words): {len(unique_words)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+words: ['spam', 'eggs', 'spam', 'larch', 'eggs']
+type(words): <class 'list'>
+
+unique_words: {'eggs', 'spam', 'larch'}
+type(unique_words): <class 'set'>
+len(unique_words): 3
+\end{verbatim}
+
+The source list has five components. The resulting set has three elements because repeated values collapse into one set member.
+
+A set comprehension can also include a filtering condition.
+
+\begin{verbatim}
+nums = [1, 2, 3, 4, 5, 42, 42]
+
+large_nums = {num for num in nums if num > 3}
+
+print(f"nums: {nums!r}")
+print(f"large_nums: {large_nums!r}")
+print(f"type(large_nums): {type(large_nums)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+nums: [1, 2, 3, 4, 5, 42, 42]
+large_nums: {42, 4, 5}
+type(large_nums): <class 'set'>
+\end{verbatim}
+
+This does two things at once:
+
+\begin{itemize}
+    \item it filters the input values with \texttt{if num > 3};
+    \item it removes duplicates because the result is a set.
+\end{itemize}
+
+The same idea works with transformed values.
+
+\begin{verbatim}
+quotes = [
+    "D'oh!",
+    "d'oh!",
+    "SPAM",
+    "spam",
+    "Nobody expects the Spanish Inquisition!",
+]
+
+normalized = {text.lower() for text in quotes}
+
+print("original values")
+for text in quotes:
+    print(f"  {text!r}")
+
+print()
+print(f"normalized: {normalized!r}")
+print(f"type(normalized): {type(normalized)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+original values
+  "D'oh!"
+  "d'oh!"
+  'SPAM'
+  'spam'
+  'Nobody expects the Spanish Inquisition!'
+
+normalized: {"d'oh!", 'spam', 'nobody expects the spanish inquisition!'}
+type(normalized): <class 'set'>
+\end{verbatim}
+
+The transformation \texttt{text.lower()} runs before set insertion. After that, the hash-based uniqueness rule applies. Therefore, \texttt{"SPAM"} and \texttt{"spam"} become the same resulting value.
+
+Set comprehensions are useful when the program needs a unique domain derived from another structure.
+
+\begin{verbatim}
+names = ["Homer", "Marge", "Lisa", "Homer", "Bart", "Lisa"]
+
+name_lengths = {len(name) for name in names}
+
+print(f"names: {names!r}")
+print(f"name_lengths: {name_lengths!r}")
+print(f"type(name_lengths): {type(name_lengths)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: ['Homer', 'Marge', 'Lisa', 'Homer', 'Bart', 'Lisa']
+name_lengths: {4, 5}
+type(name_lengths): <class 'set'>
+\end{verbatim}
+
+The result does not say which name had which length. It only says which distinct lengths occurred. That is the correct set-level meaning.
+
+A set comprehension should be read as:
+
+\begin{verbatim}
+build a set
+for each source element
+    compute the result expression
+    optionally reject it with an if condition
+    insert the result into the hash-based uniqueness domain
+\end{verbatim}
+
+So the comprehension:
+
+\begin{verbatim}
+{word.lower() for word in words if len(word) > 4}
+\end{verbatim}
+
+means:
+
+\begin{itemize}
+    \item traverse \texttt{words};
+    \item keep only words whose length is greater than \texttt{4};
+    \item convert each kept word to lowercase;
+    \item insert the lowercase result into a set;
+    \item collapse duplicates automatically.
+\end{itemize}
+
+A final example shows this complete path.
+
+\begin{verbatim}
+words = [
+    "Spam",
+    "eggs",
+    "SPAM",
+    "larch",
+    "LARCH",
+    "Ni!",
+]
+
+result = {word.lower() for word in words if len(word) > 3}
+
+print(f"words: {words!r}")
+print(f"result: {result!r}")
+print(f"type(result): {type(result)}")
+print(f"len(result): {len(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+words: ['Spam', 'eggs', 'SPAM', 'larch', 'LARCH', 'Ni!']
+result: {'eggs', 'spam', 'larch'}
+type(result): <class 'set'>
+len(result): 3
+\end{verbatim}
+
+The result is not a filtered list. It is a filtered, transformed, hash-based uniqueness domain.

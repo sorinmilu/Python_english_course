@@ -1,4 +1,640 @@
 \subsection{Exception Handling Infrastructure}
-\subsubsection{The `try` / `except` Trap: Intercepting and Deflecting Specific Exception Class Trees}
-\subsubsection{The Exception `else` Clause: Isolating Code Paths That Run Only When No Exceptions Occur}
-\subsubsection{Cleansing and Post-Processing: The Unconditional Execution Invariants of the `finally` Block}
+
+Python exception handling is built around a structured trap. The \texttt{try} block marks a region where exceptional control flow may begin. The \texttt{except} blocks describe which exception classes can be intercepted. The optional \texttt{else} block describes code that should run only when the protected region succeeds. The optional \texttt{finally} block describes code that must run whether the protected region succeeds, fails, or transfers control outward.
+
+The full structure is:
+
+\begin{verbatim}
+try:
+    protected_statements
+except SomeError:
+    recovery_statements
+else:
+    success_only_statements
+finally:
+    always_run_statements
+\end{verbatim}
+
+Not every part is required in every program. The most common form is \texttt{try}/\texttt{except}. The other clauses exist because exception handling is not only about catching failures. It is also about separating normal success logic from recovery logic and ensuring cleanup logic runs unconditionally.
+
+\begin{quote}
+\texttt{try} marks the danger region. \texttt{except} handles selected failures. \texttt{else} runs only after success. \texttt{finally} runs no matter how the region is left.
+\end{quote}
+
+\subsubsection{The \texttt{try} / \texttt{except} Trap: Intercepting and Deflecting Specific Exception Class Trees}
+
+A \texttt{try}/\texttt{except} statement creates a controlled region where specific exceptional routes can be intercepted. If an exception is raised inside the \texttt{try} block, Python stops the ordinary route through that block and searches the attached \texttt{except} clauses for a matching exception class.
+
+\begin{verbatim}
+text = "forty-two"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+except ValueError:
+    print("conversion failed")
+
+print("after try/except")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+conversion failed
+after try/except
+\end{verbatim}
+
+The line:
+
+\begin{verbatim}
+print(f"number: {number}")
+\end{verbatim}
+
+does not run, because \texttt{int(text)} raises \texttt{ValueError}. Execution is deflected into the matching \texttt{except ValueError:} block.
+
+The control route is:
+
+\begin{verbatim}
+enter try
+    -> attempt int(text)
+        success:
+            bind number
+            print number
+            continue after try/except
+        ValueError:
+            jump to except ValueError
+            print conversion failed
+            continue after try/except
+\end{verbatim}
+
+The \texttt{try} block should normally contain only the statements that belong to the risky operation and its immediate success-dependent continuation. If too much unrelated code is placed inside the same \texttt{try} block, the handler may catch exceptions from a larger region than intended.
+
+Too broad:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+    missing_name = unknown_variable
+except ValueError:
+    print("conversion failed")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+number: 42
+Traceback (most recent call last):
+  ...
+NameError: name 'unknown_variable' is not defined
+\end{verbatim}
+
+The \texttt{NameError} is not caught because the handler catches only \texttt{ValueError}. That is good: the handler should not pretend that a programmer mistake is an input conversion problem.
+
+If the handler were too broad, it could hide the real issue:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+    missing_name = unknown_variable
+except Exception as err:
+    print("some ordinary exception was caught")
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+number: 42
+some ordinary exception was caught
+type(err): <class 'NameError'>
+message: name 'unknown_variable' is not defined
+\end{verbatim}
+
+The program did not have a conversion problem. It had a name-resolution problem. Catching \texttt{Exception} trapped both possibilities.
+
+A better structure keeps the risky conversion narrow:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+except ValueError as err:
+    print("conversion failed")
+    print(f"message: {err}")
+else:
+    print(f"number: {number}")
+    print("conversion succeeded")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+number: 42
+conversion succeeded
+\end{verbatim}
+
+The handler now corresponds exactly to the operation that can raise the expected \texttt{ValueError}.
+
+Multiple handlers can be attached to one \texttt{try} block:
+
+\begin{verbatim}
+items = ["10", "20", "D'oh!"]
+index = 2
+
+try:
+    text = items[index]
+    number = int(text)
+    print(f"number: {number}")
+except IndexError as err:
+    print("bad index")
+    print(f"type(err): {type(err)}")
+except ValueError as err:
+    print("bad integer text")
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+bad integer text
+type(err): <class 'ValueError'>
+message: invalid literal for int() with base 10: "D'oh!"
+\end{verbatim}
+
+The first risky operation is indexing. It may raise \texttt{IndexError}. The second risky operation is conversion. It may raise \texttt{ValueError}. The handlers separate the two exceptional routes.
+
+The exception object is an ordinary runtime object:
+
+\begin{verbatim}
+try:
+    number = int("No soup for you!")
+except ValueError as err:
+    print(f"type(err): {type(err)}")
+    print(f"dir(err) sample: {dir(err)[:12]}")
+    print(f"err.args: {err.args}")
+    print(f"str(err): {str(err)}")
+    print(f"is Exception: {isinstance(err, Exception)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(err): <class 'ValueError'>
+dir(err) sample: ['__cause__', '__class__', '__context__', '__delattr__',
+'__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__',
+'__getattribute__', '__getstate__']
+err.args: ('invalid literal for int() with base 10: 'No soup for you!'',)
+str(err): invalid literal for int() with base 10: 'No soup for you!'
+is Exception: True
+\end{verbatim}
+
+The \texttt{args} attribute stores the arguments carried by the exception object. The \texttt{str()} conversion gives the message. The \texttt{isinstance()} test confirms that the object belongs to the exception class tree.
+
+The \texttt{try}/\texttt{except} structure is therefore a class-based routing trap:
+
+\begin{quote}
+If the protected route raises an exception whose class matches a handler, Python deflects execution into that handler instead of continuing through the ordinary route.
+\end{quote}
+
+\subsubsection{The Exception \texttt{else} Clause: Isolating Code Paths That Run Only When No Exceptions Occur}
+
+The \texttt{else} clause of a \texttt{try} statement runs only if the \texttt{try} block finishes without raising an exception. It is not the same as an \texttt{if}-\texttt{else} branch. It is a success-only continuation attached to exception handling.
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+except ValueError as err:
+    print("conversion failed")
+    print(f"message: {err}")
+else:
+    print("conversion succeeded")
+    print(f"number: {number}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+conversion succeeded
+number: 42
+\end{verbatim}
+
+If the conversion fails, the \texttt{else} block is skipped:
+
+\begin{verbatim}
+text = "forty-two"
+
+try:
+    number = int(text)
+except ValueError as err:
+    print("conversion failed")
+    print(f"message: {err}")
+else:
+    print("conversion succeeded")
+    print(f"number: {number}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+conversion failed
+message: invalid literal for int() with base 10: 'forty-two'
+\end{verbatim}
+
+The route is:
+
+\begin{verbatim}
+try block succeeds:
+    -> skip except
+    -> run else
+
+try block raises handled exception:
+    -> run matching except
+    -> skip else
+\end{verbatim}
+
+The main reason to use \texttt{else} is to keep the protected region narrow. Code in the \texttt{else} block depends on success, but it is not part of the risky operation being guarded.
+
+Less precise:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+    print("Nobody expects the Spanish Inquisition!")
+except ValueError:
+    print("conversion failed")
+\end{verbatim}
+
+More precise:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+except ValueError:
+    print("conversion failed")
+else:
+    print(f"number: {number}")
+    print("Nobody expects the Spanish Inquisition!")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+number: 42
+Nobody expects the Spanish Inquisition!
+\end{verbatim}
+
+The second version says exactly what is being protected: the conversion. The printing after successful conversion is success-path logic, not conversion-risk logic.
+
+The same pattern is useful with dictionary lookup:
+
+\begin{verbatim}
+scores = {
+    "Jerry": 72,
+    "Elaine": 91,
+    "Kramer": 42,
+}
+
+name = "Kramer"
+
+try:
+    score = scores[name]
+except KeyError as err:
+    print(f"missing score for: {err}")
+else:
+    print(f"{name:<8} | {score:>3}")
+    print("score lookup succeeded")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Kramer   |  42
+score lookup succeeded
+\end{verbatim}
+
+If the key is absent:
+
+\begin{verbatim}
+scores = {
+    "Jerry": 72,
+    "Elaine": 91,
+    "Kramer": 42,
+}
+
+name = "Newman"
+
+try:
+    score = scores[name]
+except KeyError as err:
+    print(f"missing score for: {err}")
+else:
+    print(f"{name:<8} | {score:>3}")
+    print("score lookup succeeded")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+missing score for: 'Newman'
+\end{verbatim}
+
+The dictionary object has its own lookup behavior:
+
+\begin{verbatim}
+scores = {
+    "Jerry": 72,
+    "Elaine": 91,
+    "Kramer": 42,
+}
+
+print(f"type(scores): {type(scores)}")
+print(f"dir(scores) sample: {dir(scores)[:12]}")
+print(f"has __getitem__: {'__getitem__' in dir(scores)}")
+print(f"has get: {'get' in dir(scores)}")
+print(f"has __contains__: {'__contains__' in dir(scores)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(scores): <class 'dict'>
+dir(scores) sample: ['__class__', '__class_getitem__', '__contains__',
+'__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__',
+'__format__', '__ge__', '__getattribute__', '__getitem__']
+has __getitem__: True
+has get: True
+has __contains__: True
+\end{verbatim}
+
+The bracket operation \texttt{scores[name]} uses lookup behavior associated with \texttt{\_\_getitem\_\_()}. A missing key raises \texttt{KeyError}. The \texttt{else} block runs only if that lookup succeeds.
+
+The practical rule is:
+
+\begin{quote}
+Put only the risky operation in \texttt{try}. Put the code that should run after successful completion in \texttt{else}.
+\end{quote}
+
+This keeps exception routes readable. The \texttt{except} block describes failure recovery. The \texttt{else} block describes the ordinary success continuation.
+
+\subsubsection{Cleansing and Post-Processing: The Unconditional Execution Invariants of the \texttt{finally} Block}
+
+The \texttt{finally} block runs after the \texttt{try} structure is left, regardless of whether the protected code succeeded, failed, or was interrupted by a control-flow transfer such as \texttt{break}, \texttt{return}, or an uncaught exception.
+
+At this stage of the chapter, the simplest rule is:
+
+\begin{quote}
+\texttt{finally} means: run this cleanup code no matter how the protected region was exited.
+\end{quote}
+
+Success case:
+
+\begin{verbatim}
+text = "42"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+except ValueError:
+    print("conversion failed")
+finally:
+    print("finally block ran")
+
+print("after try statement")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+number: 42
+finally block ran
+after try statement
+\end{verbatim}
+
+Handled failure case:
+
+\begin{verbatim}
+text = "forty-two"
+
+try:
+    number = int(text)
+    print(f"number: {number}")
+except ValueError:
+    print("conversion failed")
+finally:
+    print("finally block ran")
+
+print("after try statement")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+conversion failed
+finally block ran
+after try statement
+\end{verbatim}
+
+In both programs, the \texttt{finally} block runs.
+
+The \texttt{finally} block also runs when the exception is not handled locally. To demonstrate that without stopping the entire script, an outer \texttt{try} can catch the propagated exception:
+
+\begin{verbatim}
+try:
+    try:
+        print("inner try begins")
+        number = int("D'oh!")
+        print(f"number: {number}")
+    finally:
+        print("inner finally ran before propagation")
+except ValueError as err:
+    print("outer handler caught the propagated exception")
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inner try begins
+inner finally ran before propagation
+outer handler caught the propagated exception
+type(err): <class 'ValueError'>
+message: invalid literal for int() with base 10: "D'oh!"
+\end{verbatim}
+
+The inner \texttt{try} has no \texttt{except} handler. The \texttt{ValueError} must propagate outward. But before that propagation reaches the outer handler, the inner \texttt{finally} block runs.
+
+This means \texttt{finally} is not a success block and not a failure block. It is an exit block.
+
+A typical use is cleanup state:
+
+\begin{verbatim}
+resource_open = False
+
+try:
+    print("opening resource")
+    resource_open = True
+
+    print("using resource")
+    number = int("42")
+    print(f"number: {number}")
+finally:
+    print("cleanup section")
+    resource_open = False
+    print(f"resource_open: {resource_open}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+opening resource
+using resource
+number: 42
+cleanup section
+resource_open: False
+\end{verbatim}
+
+If an error happens, cleanup still runs:
+
+\begin{verbatim}
+resource_open = False
+
+try:
+    print("opening resource")
+    resource_open = True
+
+    print("using resource")
+    number = int("forty-two")
+    print(f"number: {number}")
+except ValueError as err:
+    print("conversion failed")
+    print(f"message: {err}")
+finally:
+    print("cleanup section")
+    resource_open = False
+    print(f"resource_open: {resource_open}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+opening resource
+using resource
+conversion failed
+message: invalid literal for int() with base 10: 'forty-two'
+cleanup section
+resource_open: False
+\end{verbatim}
+
+The variable \texttt{resource\_open} is only a simple teaching flag here. In real programs, the cleanup section commonly closes files, releases locks, closes network connections, ends temporary states, or restores invariants.
+
+A \texttt{finally} block can also run when a loop is interrupted with \texttt{break}:
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+
+for item in items:
+    try:
+        print(f"checking: {item}")
+
+        if item == "pretzels":
+            print("pretzels found")
+            break
+    finally:
+        print(f"finished attempt for: {item}")
+
+print("after loop")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking: soup
+finished attempt for: soup
+checking: pretzels
+pretzels found
+finished attempt for: pretzels
+after loop
+\end{verbatim}
+
+The \texttt{break} leaves the loop, but the \texttt{finally} block for the current iteration still runs before execution reaches the statement after the loop.
+
+The full clause order is fixed:
+
+\begin{verbatim}
+try:
+    ...
+except SomeError:
+    ...
+else:
+    ...
+finally:
+    ...
+\end{verbatim}
+
+The \texttt{else} clause, when present, comes after all \texttt{except} clauses and before \texttt{finally}. The \texttt{finally} block is last because it runs after the success or failure route has been determined.
+
+All three routes together:
+
+\begin{verbatim}
+texts = ["42", "forty-two"]
+
+for text in texts:
+    print(f"input: {text!r}")
+
+    try:
+        number = int(text)
+    except ValueError as err:
+        print("except route")
+        print(f"message: {err}")
+    else:
+        print("else route")
+        print(f"number: {number}")
+    finally:
+        print("finally route")
+        print("-" * 20)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+input: '42'
+else route
+number: 42
+finally route
+--------------------
+input: 'forty-two'
+except route
+message: invalid literal for int() with base 10: 'forty-two'
+finally route
+--------------------
+\end{verbatim}
+
+For the first input, the \texttt{try} block succeeds, so \texttt{else} runs, then \texttt{finally}. For the second input, the \texttt{try} block raises \texttt{ValueError}, so \texttt{except} runs, then \texttt{finally}.
+
+The practical reading is:
+
+\begin{itemize}
+    \item \texttt{try}: attempt the protected operation;
+    \item \texttt{except}: recover from selected exception classes;
+    \item \texttt{else}: run success-only code when no exception occurred;
+    \item \texttt{finally}: run cleanup code regardless of success or failure.
+\end{itemize}
+
+For control-flow graph analysis, \texttt{finally} adds a guaranteed exit checkpoint. Ordinary success routes, handled exception routes, unhandled propagation routes, and local loop-interruption routes must pass through it before continuing outward.

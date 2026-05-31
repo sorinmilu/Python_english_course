@@ -1,0 +1,11 @@
+\subsection{Architectural Case Study: High-Level Python Managed Code Realities vs. Bare-Metal Procedural C Coding}
+
+Consider moving a point in C versus Python. In C, a \texttt{struct Point} on the stack or heap has fixed field offsets known at compile time; \texttt{move(\&p, dx, dy)} passes an address and mutates integer bit patterns in place. The compiler emits loads and stores with constant offsets.
+
+In Python, \texttt{p = Point(2, 3)} allocates a heap instance whose attributes \texttt{x} and \texttt{y} are name bindings to integer objects. \texttt{move(p, dx, dy)} binds the parameter name to the same instance object; \texttt{p.x += dx} loads attributes, performs Python addition producing possibly new int objects, and rebinds attributes---immutable int cargo is not overwritten in place.
+
+Arrays illustrate the same split. A C array is contiguous untyped storage; a Python list is a heap object whose slots hold pointers to heterogeneous wrapped objects. Mixed-type lists are natural; indirection and header overhead are the price.
+
+Error timing follows architecture. C rejects incompatible storage assignments at compile time. Python permits rebinding names across types but rejects illegal operations at runtime when dispatch inspects \texttt{ob\_type} and finds no applicable slot---for example, attempting to add str and int cargo.
+
+Python is high-level because it relocates layout, lifetime, and dispatch into CPython. C remains bare-metal because those responsibilities stay visible in source. Neither is ``easier''; they expose different layers of the machine.

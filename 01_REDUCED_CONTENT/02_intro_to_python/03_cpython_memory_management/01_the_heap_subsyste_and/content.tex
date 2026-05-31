@@ -1,0 +1,35 @@
+\subsection{The Heap Subsystem and Object Allocation}
+
+\subsubsection{The Managed Runtime Allocation Arena: PyMalloc and Private Heap Segmentation Subsystems}
+
+Creating \texttt{x = [1, 2, 3]} triggers multiple allocations: list head, pointer array, references to existing or newly created int objects. Ordinary Python code never calls \texttt{malloc}; CPython's memory manager owns a private heap for objects and internal buffers.
+
+Calling the platform allocator per object would fragment address space and burn cycles in boundary checks. PyMalloc (the small-object allocator) therefore requests large \emph{arenas} from the OS---traditionally on the order of 256~KB each---and treats them as subdivided property.
+
+Structural hierarchy:
+
+\begin{verbatim}
+Arena   (~256 KB from OS via malloc/brk/mmap)
+  Pool  (4 KB slice inside arena, one size class)
+    Block  (fixed small unit handed to caller)
+\end{verbatim}
+
+Pools are dedicated to a single size class (8, 16, 24, \ldots{} bytes up to an implementation limit). A new 12-byte object draws from the 16-byte pool; freed blocks return to a freelist inside that pool, not immediately to the OS. The real-estate developer bought a warehouse; it hands out same-sized crates from pre-marked shelves.
+
+Large allocations bypass this pattern and go to the system allocator directly. Object-specific allocators (ints, dict tables, string payloads) add further specialization above the generic layer. Extension modules must allocate Python objects through Python APIs---mixing \texttt{free()} on PyMalloc memory corrupts the ledger of blocks.
+
+\subsubsection{Explicit Dynamic Instantiation: Analyzing Instance Generation on the Heap}
+
+\texttt{p = Point(2, 3)} resolves the class object, calls \texttt{\_\_new\_\_}/\texttt{\_\_init\_\_}, allocates an instance struct on the managed heap, binds attributes as references to other objects, then binds the name \texttt{p} to that instance. The name is not a struct slot; it is another ledger entry pointing at wrapped cargo.
+
+Shared aliases (\texttt{q = p}) duplicate references, not objects. Mutation through one name is visible through another when both reference the same heap identity.
+
+\subsubsection{Object Persistence Invariants: Reference Counting Foundations and Automated Slot Reclamation Realities}
+
+PyMalloc provides plots; reference counting decides when a building can be demolished. Each strong reference increment keeps the wrapped object alive; each decrement may trigger immediate deallocation when \texttt{ob\_refcnt} reaches zero---the type's \texttt{tp\_dealloc} returns the block to pools or the system.
+
+This strategy is deterministic and immediate for acyclic graphs: when the last name, container slot, frame local, or stack reference disappears, the object dies. Container slot overwrites and frame teardown release references just like \texttt{del}.
+
+Reference counting alone fails on cyclic graphs---two dicts referencing each other, mutually linked instances, or frames caught in reference cycles---because counts never reach zero even when the cluster is unreachable from the program. CPython therefore runs a generational cyclic garbage collector that periodically traces container objects, detects isolated cycles, and breaks them. Refcnt handles the open road; the cyclic GC clears closed loops---\emph{islands of isolation} invisible to refcount alone.
+
+Do not build application logic on exact counts or immediate finalization timing; build it on explicit resource protocols (\texttt{with} statements, weakrefs when needed). The architectural split---refcnt for eager reclamation, cyclic GC for graph surgery---is the dual-tier reclamation model every CPython programmer should know.

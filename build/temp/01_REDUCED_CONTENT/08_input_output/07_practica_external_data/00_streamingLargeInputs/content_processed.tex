@@ -1,0 +1,23 @@
+\subsection{Streaming Large Inputs}
+
+Materializing an entire file with \texttt{read()} or \texttt{readlines()} duplicates external bytes on the heap. Streaming processes bounded units sequentially.
+
+\subsubsection{Processing Files Line by Line Without Loading Entire Contents into Memory}
+
+Iterating a text file object yields one \texttt{str} line per step---constant memory regardless of file size (modulo line length).
+
+\begin{verbatim}
+from pathlib import Path
+path = Path("log.txt")
+path.write_text("INFO ok\nERROR fail\n", encoding="utf-8")
+errors = 0
+with open(path, encoding="utf-8") as f:
+    for line in f:
+        if line.startswith("ERROR"):
+            errors += 1
+print(errors)
+\end{verbatim}
+
+\subsubsection{Chunked Binary Processing for Large Media or Archive Files}
+
+Binary streaming uses \texttt{read(chunk\_size)} loops with fixed \texttt{n}, the same memory bound as line iteration but on raw bytes.

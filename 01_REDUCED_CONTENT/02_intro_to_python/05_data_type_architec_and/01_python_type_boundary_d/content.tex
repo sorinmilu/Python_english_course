@@ -1,0 +1,15 @@
+\subsection{Python's Type Boundary: Dynamic Names with Strong Runtime Type Constraint Verification}
+
+Python separates \emph{where names may point} from \emph{what operations may run}.
+
+Assignments such as rebinding a name from \texttt{int} cargo to \texttt{str} cargo are legal because names are not typed boxes. Operations are validated when executed: CPython follows \texttt{ob\_type} to locate slot functions; missing operations raise \texttt{TypeError} instead of reinterpret-casting payload bits.
+
+\begin{quote}
+The type boundary is at use, not at assignment.
+\end{quote}
+
+A function \texttt{def add\_one(x): return x + 1} compiles successfully; calls fail when \texttt{x} references cargo without a compatible \texttt{\_\_add\_\_} path. This is strong verification without static parameter declarations.
+
+Python also refuses most silent cross-type arithmetic that weakly typed languages allow through coercion rules. The interpreter does not ``helpfully'' treat a string as an integer; it stops. Optional type hints and static checkers document intent early, but the reference runtime still enforces object protocols dynamically.
+
+For C programmers: think of every operation as invoking typed methods on heap structs, not as machine instructions on declared stack slots.

@@ -1,7 +1,964 @@
 \subsection{Querying, Manipulating, and Mutating Dictionary States}
-\subsubsection{Explicit Lookups and the `KeyError` Boundary vs. Safe Access via `.get()`}
-\subsubsection{Default Insertion Patterns with `.setdefault()`}
-\subsubsection{View Object Subsystems: Interrogating `.keys()`, `.values()`, and `.items()` Dynamic Proxies}
+
+A dictionary is not only created and then read passively. Most real dictionary use involves querying, inserting, replacing, merging, removing, and inspecting changing state. These operations all revolve around the same central rule: the dictionary is organized by keys.
+
+Some operations only read dictionary state. Some operations mutate the existing dictionary object. Some operations create a new dictionary result. This subsection separates those cases carefully.
+
+\subsubsection{Explicit Lookups and the \texttt{KeyError} Boundary vs. Safe Access via \texttt{.get()}}
+
+The most direct dictionary lookup uses square brackets.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print(f"quotes['Homer']: {quotes['Homer']!r}")
+print(f"quotes['Jerry']: {quotes['Jerry']!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes['Homer']: "D'oh!"
+quotes['Jerry']: 'No soup for you!'
+\end{verbatim}
+
+This lookup is explicit and strict. If the key is absent, Python raises \texttt{KeyError}.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+try:
+    print(quotes["Elaine"])
+except KeyError as err:
+    print(f"lookup failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+lookup failed: 'Elaine'
+\end{verbatim}
+
+The exception is not accidental. Square-bracket lookup means: this key is expected to exist. If it does not exist, the program has crossed a boundary that Python reports immediately.
+
+The safer lookup method is \texttt{.get()}.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+print(f"quotes.get('Homer'):  {quotes.get('Homer')!r}")
+print(f"quotes.get('Elaine'): {quotes.get('Elaine')!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes.get('Homer'):  "D'oh!"
+quotes.get('Elaine'): None
+\end{verbatim}
+
+When the key is missing, \texttt{.get()} returns \texttt{None} by default instead of raising \texttt{KeyError}.
+
+A custom fallback value can be supplied.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+value1 = quotes.get("Homer", "unknown quote")
+value2 = quotes.get("Elaine", "unknown quote")
+
+print(f"value1: {value1!r}")
+print(f"value2: {value2!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value1: "D'oh!"
+value2: 'unknown quote'
+\end{verbatim}
+
+The method \texttt{.get()} does not insert the fallback value into the dictionary. It only returns it.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+}
+
+value = quotes.get("Bart", "Ay caramba!")
+
+print(f"value: {value!r}")
+print(f"quotes: {quotes!r}")
+print(f"'Bart' in quotes: {'Bart' in quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: 'Ay caramba!'
+quotes: {'Homer': "D'oh!"}
+'Bart' in quotes: False
+\end{verbatim}
+
+The fallback was returned, but the key \texttt{"Bart"} was not added.
+
+The relevant dictionary methods can be inspected directly.
+
+\begin{verbatim}
+quotes = {"Homer": "D'oh!"}
+
+print(f"type(quotes): {type(quotes)}")
+print(f"__getitem__ in dir: {'__getitem__' in dir(quotes)}")
+print(f"get in dir:         {'get' in dir(quotes)}")
+print(f"setdefault in dir:  {'setdefault' in dir(quotes)}")
+print(f"pop in dir:         {'pop' in dir(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(quotes): <class 'dict'>
+__getitem__ in dir: True
+get in dir:         True
+setdefault in dir:  True
+pop in dir:         True
+\end{verbatim}
+
+The practical distinction is:
+
+\begin{itemize}
+    \item use \texttt{d[key]} when absence is an error;
+    \item use \texttt{d.get(key)} when absence is an expected possibility;
+    \item use \texttt{d.get(key, fallback)} when a specific fallback value should be returned.
+\end{itemize}
+
+\subsubsection{Default Insertion Patterns with \texttt{.setdefault()}}
+
+The method \texttt{.setdefault()} is different from \texttt{.get()}. It does not merely return a fallback. If the key is missing, it inserts the key with the supplied default value and then returns that value.
+
+\begin{verbatim}
+scores = {
+    "Lisa": 10,
+    "Bart": 6,
+}
+
+value1 = scores.setdefault("Lisa", 0)
+value2 = scores.setdefault("Maggie", 0)
+
+print(f"value1: {value1}")
+print(f"value2: {value2}")
+print(f"scores: {scores!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value1: 10
+value2: 0
+scores: {'Lisa': 10, 'Bart': 6, 'Maggie': 0}
+\end{verbatim}
+
+The key \texttt{"Lisa"} already existed, so its existing value was returned. The key \texttt{"Maggie"} did not exist, so it was inserted with value \texttt{0}.
+
+This pattern is often used when building grouped data.
+
+\begin{verbatim}
+pairs = [
+    ("Homer", "D'oh!"),
+    ("Homer", "Mmm... donuts"),
+    ("Jerry", "No soup for you!"),
+    ("Jerry", "Serenity now!"),
+]
+
+quote_map = {}
+
+for name, quote in pairs:
+    quote_map.setdefault(name, []).append(quote)
+
+print(f"quote_map: {quote_map!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote_map: {'Homer': ["D'oh!", 'Mmm... donuts'], 'Jerry': ['No soup for you!', 'Serenity now!']}
+\end{verbatim}
+
+The expression:
+
+\begin{verbatim}
+quote_map.setdefault(name, [])
+\end{verbatim}
+
+means:
+
+\begin{itemize}
+    \item if \texttt{name} already exists, return its current value;
+    \item if \texttt{name} does not exist, insert \texttt{name} with a new empty list and return that list.
+\end{itemize}
+
+Then \texttt{.append(quote)} mutates the returned list.
+
+The value returned by \texttt{.setdefault()} is the actual object stored in the dictionary.
+
+\begin{verbatim}
+data = {}
+
+items = data.setdefault("numbers", [])
+
+print(f"before append: {data!r}")
+print(f"same object: {items is data['numbers']}")
+
+items.append(42)
+
+print(f"after append:  {data!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before append: {'numbers': []}
+same object: True
+after append:  {'numbers': [42]}
+\end{verbatim}
+
+This is useful, but it must be understood literally. The dictionary stores a reference to the list object. Mutating that list changes the value visible through the dictionary.
+
+A careful warning: do not reuse one external mutable default object for unrelated keys unless sharing is intended.
+
+\begin{verbatim}
+data = {}
+shared_list = []
+
+data.setdefault("a", shared_list)
+data.setdefault("b", shared_list)
+
+data["a"].append("spam")
+
+print(f"data: {data!r}")
+print(f"data['a'] is data['b']: {data['a'] is data['b']}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: {'a': ['spam'], 'b': ['spam']}
+data['a'] is data['b']: True
+\end{verbatim}
+
+Both keys refer to the same list. That is correct if sharing is intended, and wrong if each key should have an independent list.
+
+\subsubsection{View Object Subsystems: Interrogating \texttt{.keys()}, \texttt{.values()}, and \texttt{.items()} Dynamic Proxies}
+
+Dictionaries expose three main view objects:
+
+\begin{itemize}
+    \item \texttt{d.keys()}: a view of the key domain;
+    \item \texttt{d.values()}: a view of the value domain;
+    \item \texttt{d.items()}: a view of key-value pair tuples.
+\end{itemize}
+
+These are not lists. They are dynamic view objects connected to the dictionary.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+keys_view = quotes.keys()
+values_view = quotes.values()
+items_view = quotes.items()
+
+print(f"keys_view:   {keys_view}")
+print(f"values_view: {values_view}")
+print(f"items_view:  {items_view}")
+print()
+
+print(f"type(keys_view):   {type(keys_view)}")
+print(f"type(values_view): {type(values_view)}")
+print(f"type(items_view):  {type(items_view)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+keys_view:   dict_keys(['Homer', 'Jerry', 'Arthur'])
+values_view: dict_values(["D'oh!", 'No soup for you!', 'It is only a model.'])
+items_view:  dict_items([('Homer', "D'oh!"), ('Jerry', 'No soup for you!'), ('Arthur', 'It is only a model.')])
+
+type(keys_view):   <class 'dict_keys'>
+type(values_view): <class 'dict_values'>
+type(items_view):  <class 'dict_items'>
+\end{verbatim}
+
+The view objects can be iterated.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+
+print("keys")
+for key in quotes.keys():
+    print(f"  {key!r}")
+
+print()
+print("values")
+for value in quotes.values():
+    print(f"  {value!r}")
+
+print()
+print("items")
+for key, value in quotes.items():
+    print(f"  {key!r:<8} -> {value!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+keys
+  'Homer'
+  'Jerry'
+  'Arthur'
+
+values
+  "D'oh!"
+  'No soup for you!'
+  'It is only a model.'
+
+items
+  'Homer'  -> "D'oh!"
+  'Jerry'  -> 'No soup for you!'
+  'Arthur' -> 'It is only a model.'
+\end{verbatim}
+
+The \texttt{.items()} view is especially common because it gives both the key and the value in one traversal.
+
+The view objects have their own methods.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+keys_view = quotes.keys()
+values_view = quotes.values()
+items_view = quotes.items()
+
+print("dict_keys")
+print(f"  __iter__ in dir: {'__iter__' in dir(keys_view)}")
+print(f"  __contains__ in dir: {'__contains__' in dir(keys_view)}")
+print(f"  mapping in dir: {'mapping' in dir(keys_view)}")
+print()
+
+print("dict_values")
+print(f"  __iter__ in dir: {'__iter__' in dir(values_view)}")
+print(f"  __contains__ in dir: {'__contains__' in dir(values_view)}")
+print(f"  mapping in dir: {'mapping' in dir(values_view)}")
+print()
+
+print("dict_items")
+print(f"  __iter__ in dir: {'__iter__' in dir(items_view)}")
+print(f"  __contains__ in dir: {'__contains__' in dir(items_view)}")
+print(f"  mapping in dir: {'mapping' in dir(items_view)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+dict_keys
+  __iter__ in dir: True
+  __contains__ in dir: True
+  mapping in dir: True
+
+dict_values
+  __iter__ in dir: True
+  __contains__ in dir: True
+  mapping in dir: True
+
+dict_items
+  __iter__ in dir: True
+  __contains__ in dir: True
+  mapping in dir: True
+\end{verbatim}
+
+Membership testing on these views checks different logical domains.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+print(f"'Homer' in quotes.keys(): {'Homer' in quotes.keys()}")
+print(f"'D\\'oh!' in quotes.values(): {"D'oh!" in quotes.values()}")
+print(f"('Homer', \"D'oh!\") in quotes.items(): "
+      f"{('Homer', "D'oh!") in quotes.items()}")
+\end{verbatim}
+
+The previous example contains nested quoting that is visually noisy. A clearer version stores the tested values first.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+key = "Homer"
+value = "D'oh!"
+pair = ("Homer", "D'oh!")
+
+print(f"key in quotes.keys():     {key in quotes.keys()}")
+print(f"value in quotes.values(): {value in quotes.values()}")
+print(f"pair in quotes.items():   {pair in quotes.items()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+key in quotes.keys():     True
+value in quotes.values(): True
+pair in quotes.items():   True
+\end{verbatim}
+
+Usually, checking keys should be written directly as \texttt{key in d}, not \texttt{key in d.keys()}.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+}
+
+print(f"'Homer' in quotes:        {'Homer' in quotes}")
+print(f"'Homer' in quotes.keys(): {'Homer' in quotes.keys()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'Homer' in quotes:        True
+'Homer' in quotes.keys(): True
+\end{verbatim}
+
+The first form is shorter and directly expresses dictionary key membership.
+
 \subsubsection{Dynamic Views: Why Dictionary Views Reflect Later Dictionary Mutations}
+
+Dictionary views are dynamic. They do not freeze the dictionary state at the moment they are created. If the dictionary changes later, the views reflect the new state.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+keys_view = quotes.keys()
+values_view = quotes.values()
+items_view = quotes.items()
+
+print("before mutation")
+print(f"keys_view:   {keys_view}")
+print(f"values_view: {values_view}")
+print(f"items_view:  {items_view}")
+
+quotes["Arthur"] = "It is only a model."
+
+print()
+print("after mutation")
+print(f"keys_view:   {keys_view}")
+print(f"values_view: {values_view}")
+print(f"items_view:  {items_view}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before mutation
+keys_view:   dict_keys(['Homer', 'Jerry'])
+values_view: dict_values(["D'oh!", 'No soup for you!'])
+items_view:  dict_items([('Homer', "D'oh!"), ('Jerry', 'No soup for you!')])
+
+after mutation
+keys_view:   dict_keys(['Homer', 'Jerry', 'Arthur'])
+values_view: dict_values(["D'oh!", 'No soup for you!', 'It is only a model.'])
+items_view:  dict_items([('Homer', "D'oh!"), ('Jerry', 'No soup for you!'), ('Arthur', 'It is only a model.')])
+\end{verbatim}
+
+The view objects are not independent snapshots. They are live windows over the dictionary.
+
+If a snapshot is needed, explicitly build a list or tuple.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+keys_view = quotes.keys()
+keys_snapshot = list(quotes.keys())
+
+quotes["Arthur"] = "It is only a model."
+
+print(f"keys_view:     {keys_view}")
+print(f"keys_snapshot: {keys_snapshot}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+keys_view:     dict_keys(['Homer', 'Jerry', 'Arthur'])
+keys_snapshot: ['Homer', 'Jerry']
+\end{verbatim}
+
+The view changed because the dictionary changed. The list did not change because it is a separate object created from the old key sequence.
+
+The same distinction applies to items.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+items_view = quotes.items()
+items_snapshot = list(quotes.items())
+
+quotes["Jerry"] = "Serenity now!"
+
+print(f"items_view:     {items_view}")
+print(f"items_snapshot: {items_snapshot}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items_view:     dict_items([('Homer', "D'oh!"), ('Jerry', 'Serenity now!')])
+items_snapshot: [('Homer', "D'oh!"), ('Jerry', 'No soup for you!')]
+\end{verbatim}
+
+The view reflects the updated value. The list snapshot preserves the old key-value pairs.
+
+This dynamic behavior is useful because a view stays attached to the dictionary without copying all entries. It is dangerous only if the programmer assumes that the view is a frozen record.
+
 \subsubsection{The Mutation Trap: Why Mutating Dictionary Geometry During Iteration Triggers Runtime Exceptions}
-\subsubsection{Dynamic Modifications: In-Place Mutation, Dictionary Merging Operators (`|`, `|=`), and Key-Value Eviction (`.pop()`, `del`)}
+
+A dictionary may be mutated, but not every mutation is safe during active iteration. The main danger is changing the dictionary's geometry while Python is walking through it.
+
+Here, dictionary geometry means the set of keys: adding keys or deleting keys changes the shape of the mapping.
+
+\begin{verbatim}
+scores = {
+    "Lisa": 10,
+    "Bart": 6,
+    "Milhouse": 7,
+}
+
+try:
+    for name in scores:
+        print(f"checking {name!r}")
+        if scores[name] < 7:
+            del scores[name]
+except RuntimeError as err:
+    print(f"iteration failed: {err}")
+
+print(f"scores: {scores!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking 'Lisa'
+checking 'Bart'
+iteration failed: dictionary changed size during iteration
+scores: {'Lisa': 10, 'Milhouse': 7}
+\end{verbatim}
+
+The deletion changed the number of keys while the dictionary iterator was active. Python stops the operation because continuing would make traversal inconsistent.
+
+Adding a key during iteration has the same kind of problem.
+
+\begin{verbatim}
+data = {
+    "a": 1,
+    "b": 2,
+}
+
+try:
+    for key in data:
+        print(f"key: {key!r}")
+        data["c"] = 3
+except RuntimeError as err:
+    print(f"iteration failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+key: 'a'
+iteration failed: dictionary changed size during iteration
+\end{verbatim}
+
+The safe pattern is to iterate over a snapshot of the keys.
+
+\begin{verbatim}
+scores = {
+    "Lisa": 10,
+    "Bart": 6,
+    "Milhouse": 7,
+}
+
+for name in list(scores):
+    if scores[name] < 7:
+        del scores[name]
+
+print(f"scores: {scores!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+scores: {'Lisa': 10, 'Milhouse': 7}
+\end{verbatim}
+
+The expression \texttt{list(scores)} creates a separate list of keys before the loop begins. The loop walks over that list, not over the live dictionary geometry.
+
+Another safe pattern is to build a new dictionary.
+
+\begin{verbatim}
+scores = {
+    "Lisa": 10,
+    "Bart": 6,
+    "Milhouse": 7,
+}
+
+kept_scores = {
+    name: score
+    for name, score in scores.items()
+    if score >= 7
+}
+
+print(f"scores:      {scores!r}")
+print(f"kept_scores: {kept_scores!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+scores:      {'Lisa': 10, 'Bart': 6, 'Milhouse': 7}
+kept_scores: {'Lisa': 10, 'Milhouse': 7}
+\end{verbatim}
+
+The original dictionary is not mutated during the iteration. A new dictionary is constructed instead.
+
+Changing the value for an existing key is different from adding or deleting keys. It does not change the dictionary size.
+
+\begin{verbatim}
+scores = {
+    "Lisa": 10,
+    "Bart": 6,
+    "Milhouse": 7,
+}
+
+for name in scores:
+    scores[name] = scores[name] + 1
+
+print(f"scores: {scores!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+scores: {'Lisa': 11, 'Bart': 7, 'Milhouse': 8}
+\end{verbatim}
+
+This works because the key domain did not change. The values changed, but the dictionary geometry remained stable.
+
+The practical rule is:
+
+\begin{quote}
+Do not add or delete dictionary keys while iterating over the live dictionary. Iterate over a snapshot, or build a new dictionary.
+\end{quote}
+
+\subsubsection{Dynamic Modifications: In-Place Mutation, Dictionary Merging Operators \texttt{|}, \texttt{|=}, and Key-Value Eviction \texttt{.pop()}, \texttt{del}}
+
+A dictionary can be modified in place by assigning to keys.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+}
+
+print(f"before: {quotes!r}")
+print(f"id before: {id(quotes)}")
+
+quotes["Jerry"] = "No soup for you!"
+quotes["Homer"] = "Mmm... donuts"
+
+print()
+print(f"after:  {quotes!r}")
+print(f"id after:  {id(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Homer': "D'oh!"}
+id before: 2199812435584
+
+after:  {'Homer': 'Mmm... donuts', 'Jerry': 'No soup for you!'}
+id after:  2199812435584
+\end{verbatim}
+
+The dictionary object has the same identity. Its internal key-value state changed.
+
+Python also supports dictionary merging operators.
+
+The operator \texttt{|} creates a new dictionary.
+
+\begin{verbatim}
+base = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+extra = {
+    "Arthur": "It is only a model.",
+    "Jerry": "Serenity now!",
+}
+
+merged = base | extra
+
+print(f"base:   {base!r}")
+print(f"extra:  {extra!r}")
+print(f"merged: {merged!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base:   {'Homer': "D'oh!", 'Jerry': 'No soup for you!'}
+extra:  {'Arthur': 'It is only a model.', 'Jerry': 'Serenity now!'}
+merged: {'Homer': "D'oh!", 'Jerry': 'Serenity now!', 'Arthur': 'It is only a model.'}
+\end{verbatim}
+
+When both dictionaries contain the same key, the right-hand value wins. Here, \texttt{"Jerry"} receives the value from \texttt{extra}.
+
+The operator \texttt{|=} mutates the left dictionary in place.
+
+\begin{verbatim}
+base = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+extra = {
+    "Arthur": "It is only a model.",
+    "Jerry": "Serenity now!",
+}
+
+print(f"base before: {base!r}")
+print(f"id before: {id(base)}")
+
+base |= extra
+
+print()
+print(f"base after:  {base!r}")
+print(f"id after:  {id(base)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base before: {'Homer': "D'oh!", 'Jerry': 'No soup for you!'}
+id before: 2199812435584
+
+base after:  {'Homer': "D'oh!", 'Jerry': 'Serenity now!', 'Arthur': 'It is only a model.'}
+id after:  2199812435584
+\end{verbatim}
+
+The dictionary object remains the same object. The mapping state is changed.
+
+The method \texttt{.update()} is the older method form of in-place merging.
+
+\begin{verbatim}
+base = {
+    "Homer": "D'oh!",
+}
+
+result = base.update({
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+})
+
+print(f"base: {base!r}")
+print(f"result: {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base: {'Homer': "D'oh!", 'Jerry': 'No soup for you!', 'Arthur': 'It is only a model.'}
+result: None
+\end{verbatim}
+
+Like many in-place mutation methods, \texttt{.update()} returns \texttt{None}.
+
+Key-value eviction can be performed with \texttt{.pop()} or \texttt{del}.
+
+The method \texttt{.pop(key)} removes a key and returns its associated value.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+removed = quotes.pop("Jerry")
+
+print(f"removed: {removed!r}")
+print(f"quotes: {quotes!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+removed: 'No soup for you!'
+quotes: {'Homer': "D'oh!"}
+\end{verbatim}
+
+If the key is absent, \texttt{.pop()} raises \texttt{KeyError} unless a fallback is supplied.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+}
+
+try:
+    value = quotes.pop("Jerry")
+except KeyError as err:
+    print(f"pop failed: {err}")
+
+value = quotes.pop("Jerry", "missing quote")
+
+print(f"value with fallback: {value!r}")
+print(f"quotes: {quotes!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pop failed: 'Jerry'
+value with fallback: 'missing quote'
+quotes: {'Homer': "D'oh!"}
+\end{verbatim}
+
+The \texttt{del} statement removes a key-value pair but does not return the removed value.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+    "Jerry": "No soup for you!",
+}
+
+del quotes["Homer"]
+
+print(f"quotes: {quotes!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotes: {'Jerry': 'No soup for you!'}
+\end{verbatim}
+
+If the key is absent, \texttt{del} raises \texttt{KeyError}.
+
+\begin{verbatim}
+quotes = {
+    "Homer": "D'oh!",
+}
+
+try:
+    del quotes["Jerry"]
+except KeyError as err:
+    print(f"delete failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+delete failed: 'Jerry'
+\end{verbatim}
+
+The main dynamic modification operations can be summarized as follows:
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Operation} & \textbf{Effect} & \textbf{Mutates Existing Dict?} \\
+\hline
+\texttt{d[key] = value} & Insert or replace one key-value pair & Yes \\
+\texttt{d1 | d2} & Create merged dictionary & No \\
+\texttt{d1 |= d2} & Merge into \texttt{d1} & Yes \\
+\texttt{d.update(other)} & Merge into \texttt{d} & Yes \\
+\texttt{d.pop(key)} & Remove key and return value & Yes \\
+\texttt{del d[key]} & Remove key-value pair & Yes \\
+\end{tabular}
+\end{center}
+
+A final script shows insertion, replacement, merging, and deletion in one state trace.
+
+\begin{verbatim}
+data = {}
+
+print(f"start: {data!r}")
+
+data["Homer"] = "D'oh!"
+print(f"after insert Homer: {data!r}")
+
+data["Homer"] = "Mmm... donuts"
+print(f"after replace Homer: {data!r}")
+
+data |= {
+    "Jerry": "No soup for you!",
+    "Arthur": "It is only a model.",
+}
+print(f"after merge: {data!r}")
+
+removed = data.pop("Jerry")
+print(f"removed: {removed!r}")
+print(f"after pop: {data!r}")
+
+del data["Arthur"]
+print(f"after del: {data!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start: {}
+after insert Homer: {'Homer': "D'oh!"}
+after replace Homer: {'Homer': 'Mmm... donuts'}
+after merge: {'Homer': 'Mmm... donuts', 'Jerry': 'No soup for you!', 'Arthur': 'It is only a model.'}
+removed: 'No soup for you!'
+after pop: {'Homer': 'Mmm... donuts', 'Arthur': 'It is only a model.'}
+after del: {'Homer': 'Mmm... donuts'}
+\end{verbatim}
+
+The dictionary changes over time, but the access model remains constant: stable hashable keys control the mapping, and values are the associated payloads.

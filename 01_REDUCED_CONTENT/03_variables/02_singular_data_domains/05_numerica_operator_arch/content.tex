@@ -1,0 +1,83 @@
+\subsection{Numerical Operator Architecture and Precedence Graphs}
+
+Numerical operators are expression-level requests dispatched to runtime objects. The objects involved decide whether the operation is supported and what result object to allocate. \texttt{40 + 2} produces a new \texttt{PyLongObject}; the name is bound to that object afterward.
+
+\subsubsection{Standard Arithmetic: Operator Dispatch and Result Object Creation}
+
+The usual operators map to special methods:
+
+\begin{verbatim}
++   __add__        /   __truediv__
+-   __sub__        //  __floordiv__
+*   __mul__        %   __mod__
+                 **  __pow__
+\end{verbatim}
+
+\texttt{10 / 2} yields \texttt{5.0} (a \texttt{float}) because true division always produces floating-point results for integer operands. \texttt{10 // 2} yields \texttt{5} (floor division). Mixed \texttt{int} and \texttt{float} operands promote toward \texttt{float} through defined numeric coercion, not silent guessing across unrelated types.
+
+\subsubsection{Division Divergence: Floating-Point Division (\texttt{/}) vs. Floor Division (\texttt{//})}
+
+\texttt{/} performs true division. \texttt{//} performs floor division---rounding toward negative infinity, not toward zero as in C integer division:
+
+\begin{verbatim}
+11 // 2    # 5
+-11 // 2   # -6   (not -5)
+11 // -2   # -6
+\end{verbatim}
+
+With floating-point operands, \texttt{//} still floors but returns \texttt{float}. C programmers migrating to Python must not treat \texttt{//} as truncation toward zero.
+
+\subsubsection{Modular Math (\texttt{\%}) and Exponentiation (\texttt{**}) Mechanics}
+
+Modulo is tied to floor division: \texttt{a == (a // b) * b + (a \% b)} holds for all integer pairs, including negative operands (with remainder sign following divisor). \texttt{divmod(a, b)} returns \texttt{(a // b, a \% b)} atomically.
+
+Exponentiation \texttt{**} with integer operands can produce arbitrarily large exact integers. Negative exponents produce \texttt{float} results: \texttt{2 ** -2 == 0.25}.
+
+\subsubsection{Unary Operators and Precedence Traps: \texttt{-x}, \texttt{+x}, and \texttt{-2 ** 2}}
+
+Unary \texttt{+x} and \texttt{-x} dispatch \texttt{\_\_pos\_\_} and \texttt{\_\_neg\_\_}. The famous precedence trap:
+
+\begin{verbatim}
+-2 ** 2        # -4, not 4
+(-2) ** 2      # 4
+-(2 ** 2)      # -4
+\end{verbatim}
+
+Exponentiation (\texttt{**}) binds \emph{tighter} than unary minus on its left. Python parses \texttt{-2 ** 2} as \texttt{-(2 ** 2)}, not \texttt{(-2) ** 2}. This contradicts the visual grouping many engineers assume and differs from languages where unary operators bind more tightly than binary ones.
+
+On the right side of \texttt{**}, unary operators bind tighter: \texttt{2 ** -2} is \texttt{2 ** (-2) == 0.25}.
+
+\begin{quote}
+When exponentiation and unary signs appear together, use parentheses unless the intended grouping is unambiguous.
+\end{quote}
+
+\subsubsection{Parentheses as Explicit Precedence Control}
+
+Simplified arithmetic precedence (high to low):
+
+\begin{verbatim}
+**                 exponentiation
++x, -x             unary plus, minus
+*, /, //, %        multiplicative family
++, -               additive
+\end{verbatim}
+
+Without parentheses, \texttt{2 + 3 * 4} evaluates as \texttt{2 + (3 * 4) == 14}, not \texttt{20}. Parentheses override default grouping without creating new numeric types.
+
+Poor readability:
+
+\begin{verbatim}
+score = base + bonus * level - penalty // 2 ** round_count
+\end{verbatim}
+
+Architecturally explicit:
+
+\begin{verbatim}
+score = base + (bonus * level) - (penalty // (2 ** round_count))
+\end{verbatim}
+
+The practical summary:
+
+\begin{quote}
+Numerical operators allocate result objects through type-defined dispatch. Precedence controls grouping before dispatch executes. The \texttt{-2 ** 2} trap exemplifies why parentheses are architectural documentation, not optional decoration.
+\end{quote}

@@ -1,1 +1,7 @@
 \section{Text Encoding Systems, Lexical Escape Maps, and Character Representation}
+
+A Python string looks simple when it is printed on the screen, but text is one of the places where several representation layers meet. A visible character is not the same thing as a numeric codepoint, and a numeric codepoint is not the same thing as the bytes written to a file or sent through a network connection.
+
+This section separates those layers. We first look at ASCII, Unicode, and byte encodings such as UTF-8, UTF-16, and UTF-32. Then we examine Python's string-literal escape forms, where source-code spellings such as \texttt{\textbackslash x41}, \texttt{\textbackslash u03C0}, or \texttt{\textbackslash N\{...\}} are converted by the lexer into actual string characters.
+
+The practical goal is to prevent one common mistake: treating text, codepoints, escape sequences, and bytes as if they were the same object. They are related, but they live at different boundaries of the Python execution model.

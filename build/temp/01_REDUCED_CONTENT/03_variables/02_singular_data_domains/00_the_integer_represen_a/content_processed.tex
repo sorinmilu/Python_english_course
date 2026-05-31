@@ -1,0 +1,59 @@
+\subsection{The Integer Representation Architecture (\texttt{int})}
+
+Python's \texttt{int} type represents whole numbers. Unlike a C \texttt{int} occupying a fixed 32- or 64-bit register-width cell, Python's \texttt{int} is a heap-allocated \texttt{PyLongObject} that can grow without the overflow boundaries that constrain fixed-width native integers.
+
+\subsubsection{Arbitrary-Precision Math Engine: Eliminating Fixed-Width Integer Overflow Boundaries}
+
+In C, a signed 32-bit integer has maximum value \texttt{2147483647}. Adding past that boundary wraps or invokes undefined behavior depending on compilation flags. The storage width is fixed regardless of the value stored: a C \texttt{int} holding \texttt{42} still occupies the full register width.
+
+Python's \texttt{int} removes the ordinary overflow boundary entirely:
+
+\begin{verbatim}
+small_limit = 2_147_483_647
+bigger_value = small_limit + 1   # 2147483648; still type int; no wrap
+huge = 2 ** 200                  # exact; 201-bit magnitude
+\end{verbatim}
+
+Both small and enormous values have type \texttt{int} at the Python level. The practical boundaries become memory, allocation time, and interpreter limits---not a fixed bit width.
+
+This does not mean large integers are free. Each magnitude requires proportional storage and arithmetic cost. Python removes the C-style overflow cliff; it does not remove computational expense.
+
+\subsubsection{Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation for High-Magnitude Values}
+
+At the CPython implementation level, a Python integer is not one machine word. CPython stores the magnitude across a variable-length array of internal \emph{digits}---base-\(2^{30}\) chunks on typical 64-bit builds, not decimal digits. \texttt{sys.int\_info} exposes \texttt{bits\_per\_digit} and \texttt{sizeof\_digit} for the current build.
+
+The analogy for C programmers:
+
+\begin{verbatim}
+C fixed-width intuition:
+    int x;   // always same storage width
+
+Python int intuition:
+    x ---> PyLongObject on heap
+         ob_refcnt, ob_type, digit[0], digit[1], ...
+         digit array grows with bit_length()
+\end{verbatim}
+
+Observing growth indirectly:
+
+\begin{verbatim}
+import sys
+
+for n in [0, 42, 2**30, 2**60, 2**120]:
+    print(f"bits={n.bit_length():4d}  bytes={sys.getsizeof(n)}")
+# bytes increase as magnitude crosses digit boundaries
+\end{verbatim}
+
+When \texttt{value = value ** 20} replaces a small integer with a large one, CPython allocates a new \texttt{PyLongObject} and rebinds the name. The old object is not expanded in place. Integer arithmetic creates exact result objects; assignment binds names to those objects.
+
+\subsubsection{Integer Literals: Decimal, Binary, Octal, and Hexadecimal Notation}
+
+Integer literals are source-code notation for \texttt{int} objects. Decimal (\texttt{42}), binary (\texttt{0b101010}), octal (\texttt{0o52}), and hexadecimal (\texttt{0x2a}) all produce the same runtime type. The base changes how the value is written, not what type is allocated.
+
+Underscores improve readability: \texttt{1\_000\_000}, \texttt{0b1111\_0000}. The functions \texttt{bin()}, \texttt{oct()}, and \texttt{hex()} return \emph{string} representations, not integers. Parsing uses \texttt{int(text, base)}.
+
+The practical summary:
+
+\begin{quote}
+Python's \texttt{int} is an exact whole-number object backed by a variable-length digit array. Source code may write values in multiple bases, but the runtime object is always \texttt{int}, scaling its internal representation with magnitude rather than conforming to a fixed native register width.
+\end{quote}

@@ -1,0 +1,38 @@
+\subsection{Comparative Runtime Case Studies}
+
+\subsubsection{The Java Virtual Machine (JVM): Compiled Bytecode, Type Verification, Managed Memory, and the WORA Paradigm}
+
+Java separates \texttt{javac} (source $\rightarrow$ verified JVM bytecode) from the native JVM process. Bytecode is stack-oriented, strongly verified before execution, and backed by a generational garbage collector tuned for long-running services. JIT tiers (C1/C2, Graal) hot-compile methods into native code while preserving the bytecode ABI at boundaries. Design constraint: stable cross-platform bytecode; consequence: higher warmup memory and less predictable peak latency than a simple interpreter, but excellent sustained throughput.
+
+\subsubsection{CPython: Reference-Rich Stack Bytecode Inside a Stable C Extension Host}
+
+CPython compiles to stack bytecode at import/run time, then dispatches opcodes in a central loop. Objects are uniformly heap-allocated \texttt{PyObject} headers with reference counts plus a cyclic GC. The GIL prevents parallel bytecode execution in the standard build---a deliberate trade to keep C extension semantics simple. Consequence: predictable integration with C libraries; cost: CPU-bound Python threads do not scale across cores without multiprocessing or native extensions releasing the GIL.
+
+\subsubsection{V8 and JavaScript: Multi-Tiered Adaptive Compilation for Browser Latency}
+
+V8 ingests JavaScript, lowers it through Ignition bytecode, then promotes hot paths via optimizing compilers (TurboFan). The constraint is interactive web startup: compile quickly, optimize later. Consequence: excellent peak performance on hot loops, complex deoptimization when assumptions break, memory spent on multiple code versions simultaneously.
+
+\subsubsection{LuaJIT and Register VMs: Density and Dispatch Cost}
+
+LuaJIT uses a register-oriented bytecode and tracing JIT, reducing dispatch overhead relative to stack machines for tight numeric loops. Dalvik (historical Android) used register-style dex bytecode for compact mobile images. Contrast with CPython's stack opcodes: fewer instructions per semantic operation in registers, but more complex compilers.
+
+\subsubsection{Bash and Shell Dispatch: Process Spawning as the Real Instruction}
+
+Bash interprets command syntax but often implements ``instructions'' as \texttt{fork}/\texttt{exec} of external binaries. Concurrency is OS-process granularity, not in-process bytecode. Useful contrast: Python keeps computation inside one interpreter; shells orchestrate native utilities.
+
+\paragraph{Architectural summary for engineers from C.}
+\begin{center}
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Runtime} & \textbf{VM shape} & \textbf{Execution} & \textbf{Primary constraint} \\
+\hline
+CPython & Stack bytecode & Opcode loop + optional C ext & Stable C API / GIL \\
+JVM & Stack bytecode & Interpreter + multi-tier JIT & Portable verified bytecode \\
+V8 & Tiered JS IR & Ignition + optimizing JIT & Browser startup latency \\
+LuaJIT & Register + trace JIT & Hot trace compilation & Embedded speed \\
+Bash & Syntax tree & External process launch & POSIX tool composition \\
+\hline
+\end{tabular}
+\end{center}
+
+When choosing mental models for Python, treat CPython as a \textbf{conservative, object-heavy stack VM} optimized for integrator stability, not raw numeric throughput. Performance work therefore shifts to algorithm choice, data structure layout, vectorized libraries, or moving hot kernels to C---not expecting transparent JIT miracles on all code paths.
