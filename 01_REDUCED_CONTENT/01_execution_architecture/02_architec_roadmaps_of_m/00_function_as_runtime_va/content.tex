@@ -121,24 +121,7 @@ qsort
 
 A second useful C callback pattern appears in event libraries. A C API may let the user register a function and an opaque state pointer:
 
-\begin{verbatim}
-typedef void (*event_callback_t)(int event_code, void *user_data);
-
-void dispatch_event(event_callback_t callback, void *user_data) {
-    int event_code = 42;
-    callback(event_code, user_data);
-}
-
-void print_event(int event_code, void *user_data) {
-    const char *name = (const char *)user_data;
-    printf("%s received event %d\n", name, event_code);
-}
-
-int main(void) {
-    dispatch_event(print_event, "handler A");
-    return 0;
-}
-\end{verbatim}
+%<<<PROGRAM:programs/fun24>>>
 
 The useful application is GUI programming, network libraries, embedded systems, plugin hooks, and low-level event loops. The function pointer supplies the code. The \texttt{void *user\_data} pointer supplies state. This manually emulates what higher-level languages do automatically with closures.
 
@@ -276,29 +259,7 @@ The useful application is event-driven interface programming. The programmer reg
 
 A longer interface-based shape is:
 
-\begin{verbatim}
-interface Callback {
-    void call(String message);
-}
-
-class Printer implements Callback {
-    public void call(String message) {
-        System.out.println(message);
-    }
-}
-
-class Dispatcher {
-    static void run(Callback callback) {
-        callback.call("event happened");
-    }
-}
-
-public class Main {
-    public static void main(String[] args) {
-        Dispatcher.run(new Printer());
-    }
-}
-\end{verbatim}
+%<<<PROGRAM:programs/fun27>>>
 
 At source level, \texttt{callback.call(...)} looks like a method call. At JVM level, this creates ordinary method frames. During callback execution:
 
@@ -1472,32 +1433,13 @@ later call:
 
 The key rule is that the environment must outlive the callback. Therefore, allocating the environment on the stack would be wrong if the closure escapes:
 
-\begin{verbatim}
-struct closure bad_make_multiplier(int factor) {
-    struct multiplier_env env;
-    env.factor = factor;
-
-    struct closure c;
-    c.call = multiply_call;
-    c.env = &env;  /* invalid after return */
-
-    return c;
-}
-\end{verbatim}
+%<<<PROGRAM:programs/fun26>>>
 
 After \texttt{bad\_make\_multiplier} returns, \texttt{env} no longer exists. The closure contains a dangling pointer.
 
 Some C compilers provide nonstandard closure-like extensions. GCC nested functions can refer to enclosing variables in some modes, and Apple/Clang blocks provide a stronger closure-like extension:
 
-\begin{verbatim}
-int factor = 3;
-
-int (^multiply)(int) = ^int(int value) {
-    return value * factor;
-};
-
-printf("%d\n", multiply(10));
-\end{verbatim}
+%<<<PROGRAM:programs/fun28>>>
 
 Blocks can capture surrounding variables and may be copied to the heap when they must outlive their creation scope. This is not ISO C, but it shows what extra compiler/runtime machinery is needed to support closures safely.
 
@@ -1533,17 +1475,7 @@ This is not heap-preserved lexical state. It is lookup in the shell's current va
 
 A callback-like function generator can be approximated with \texttt{eval}, but this is fragile and often unsafe:
 
-\begin{verbatim}
-make_printer() {
-    local name="$1"
-    local prefix="$2"
-
-    eval "$name() { echo '$prefix' \"\$1\"; }"
-}
-
-make_printer print_error "ERROR:"
-print_error "file missing"
-\end{verbatim}
+%<<<PROGRAM:programs/fun25>>>
 
 This creates a named function whose body contains the chosen prefix text. The useful application is limited script metaprogramming, but it is not the same as a runtime closure object. It is command-text generation.
 

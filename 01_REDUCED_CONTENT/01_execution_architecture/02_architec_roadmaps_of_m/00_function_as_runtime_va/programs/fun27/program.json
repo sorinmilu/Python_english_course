@@ -1,0 +1,9 @@
+{
+  "language": "java",
+  "title": "Java: interface-based callbacks and Dispatcher.run invocation",
+  "label": "fun27",
+  "linenos": true,
+  "input": null,
+  "output": "event happened",
+  "file": "Main.java"
+}

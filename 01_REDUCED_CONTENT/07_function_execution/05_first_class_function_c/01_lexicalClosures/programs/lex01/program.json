@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Closures, Lexical Enclosures, and Free Variable Tracking Invariants",
+  "label": "lex01",
+  "linenos": true,
+  "input": null,
+  "output": "fn(): D'oh!\nco_cellvars: ('message',)\nco_freevars: ('message',)\nclosure: (<cell at 0x...: str object at 0x...>,)\ncell contents: \"D'oh!\"",
+  "file": "main.py"
+}

@@ -6,7 +6,7 @@ Scope failures reveal how the compiler classified names before runtime. Each err
 
 If a name is assigned anywhere in a function, the compiler marks it local for the entire function. A read before that assignment executes \texttt{LOAD\_FAST} on an uninitialized slot.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Runtime Execution Traces and Bytecode Analysis of UnboundLocalError}{ana01}
 value = 42
 
 def broken():
@@ -17,13 +17,15 @@ try:
     broken()
 except UnboundLocalError as err:
     print(err)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-local variable 'value' referenced before assignment
-\end{verbatim}
+\begin{iobox}{Expected Output}
+local variable 'value' referenced before assignment \\
+\end{iobox}
+
+
+
 
 Bytecode uses \texttt{LOAD\_FAST} for \texttt{value}, not \texttt{LOAD\_GLOBAL}, because the assignment later in the body forced local classification.
 

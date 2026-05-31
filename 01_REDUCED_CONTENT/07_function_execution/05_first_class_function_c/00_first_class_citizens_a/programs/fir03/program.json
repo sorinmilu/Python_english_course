@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine Re...",
+  "label": "fir03",
+  "linenos": true,
+  "input": null,
+  "output": "fn is say_doh: True, fn(): D'oh!\n12",
+  "file": "main.py"
+}

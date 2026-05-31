@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Defending Against State Contamination Using the Immutable None Idiom and Sent...",
+  "label": "arc01",
+  "linenos": true,
+  "input": null,
+  "output": "a=[\"D'oh!\"], b=['Ni!'], a is b: False",
+  "file": "main.py"
+}

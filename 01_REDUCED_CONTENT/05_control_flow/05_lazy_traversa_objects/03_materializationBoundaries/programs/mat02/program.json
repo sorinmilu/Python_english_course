@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat02",
+  "linenos": true,
+  "input": null,
+  "output": "pipeline is still lazy\nstored: [10, 20, 42]",
+  "file": "main.py"
+}

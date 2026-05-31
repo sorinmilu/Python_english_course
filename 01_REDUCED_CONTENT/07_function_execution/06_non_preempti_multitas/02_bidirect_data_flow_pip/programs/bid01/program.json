@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Consumers and Transformers: Feeding In-Flight Data via the .send() Interface",
+  "label": "bid01",
+  "linenos": true,
+  "input": null,
+  "output": "got: \"D'oh!\"\ngot: 'Ni!'",
+  "file": "main.py"
+}

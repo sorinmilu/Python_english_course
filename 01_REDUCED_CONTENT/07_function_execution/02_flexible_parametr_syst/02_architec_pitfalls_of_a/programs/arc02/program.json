@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Static Expression Evaluation: Why Default Values Are Created at Function Defi...",
+  "label": "arc02",
+  "linenos": true,
+  "input": null,
+  "output": "make_default_tag() running\nD'oh!\nother",
+  "file": "main.py"
+}

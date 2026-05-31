@@ -14,6 +14,8 @@ LANGUAGE_EXTENSIONS = {
     "java": ".java",
     "javascript": ".js",
     "python": ".py",
+    "bash": ".sh",
+    "shell": ".sh",
 }
 
 MIN_NONEMPTY_LINES = 6  # more than 5 non-empty lines
@@ -203,8 +205,8 @@ def infer_title(prose_before: str, body: str, lang: str) -> str:
     return f"{lang.upper()} program example"
 
 
-def escape_latex_title(text: str) -> str:
-    text = clean_latex_heading(text)
+def escape_latex_text(text: str) -> str:
+    """Escape characters that break LaTeX text mode (codebox titles, iobox lines, etc.)."""
     replacements = (
         ("&", r"\&"),
         ("%", r"\%"),
@@ -212,7 +214,13 @@ def escape_latex_title(text: str) -> str:
     )
     for old, new in replacements:
         text = text.replace(old, new)
+    text = re.sub(r"(?<!\\)_", r"\\_", text)
     return text
+
+
+def escape_latex_title(text: str) -> str:
+    text = clean_latex_heading(text)
+    return escape_latex_text(text)
 
 
 def format_iobox_body(text: str) -> str:
@@ -221,7 +229,7 @@ def format_iobox_body(text: str) -> str:
         lines.pop()
     if not lines:
         return ""
-    return "\n".join(line.rstrip() + " \\\\" for line in lines)
+    return "\n".join(escape_latex_text(line.rstrip()) + " \\\\" for line in lines)
 
 
 def parse_program_token(token: str) -> tuple[str, dict[str, Any]]:
@@ -299,7 +307,7 @@ def render_program(
     if input_text:
         parts.append(
             templates["program_inputbox_template"].substitute(
-                input_body=input_text.rstrip("\n"),
+                input_body=escape_latex_text(input_text.rstrip("\n")),
             )
         )
 
@@ -361,7 +369,7 @@ def detect_output_pair(content: str, block_end: int) -> tuple[str | None, int, i
     """If a following output verbatim exists, return (output_text, replace_start, replace_end)."""
     tail = content[block_end:]
     pattern = re.compile(
-        r"^\s*(?:Output:|The output is approximately:)\s*"
+        r"^\s*(?:Output:|The output is approximately:|Possible output(?:\s+excerpt|\s+on one CPython build)?\s*:)\s*"
         r"\\begin\{verbatim\}(.*?)\\end\{verbatim\}",
         re.DOTALL | re.IGNORECASE,
     )

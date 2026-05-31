@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat03",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'TypeError'>\nmessage: 'filter' object is not subscriptable",
+  "file": "main.py"
+}

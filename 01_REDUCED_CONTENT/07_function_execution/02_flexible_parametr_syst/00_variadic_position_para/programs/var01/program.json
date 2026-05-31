@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Variable-Length Argument Packing: The Mechanics of *args and **kwargs",
+  "label": "var01",
+  "linenos": true,
+  "input": null,
+  "output": "(3, 1)\n3",
+  "file": "main.py"
+}

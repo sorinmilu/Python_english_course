@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Multiple Return Values as Tuple Packing: The Real Structure Behind return a, b",
+  "label": "ret02",
+  "linenos": true,
+  "input": null,
+  "output": "result=('Homer', 42), type=<class 'tuple'>\nlabel='Homer', code=42",
+  "file": "main.py"
+}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.12.24)  31 MAY 2026 03:39
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.12.24)  31 MAY 2026 04:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -102,14 +102,7 @@ Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
 (babel)             (\language85). Reported on input line 105.
 Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
 (babel)             (\language85). Reported on input line 108.
-)
-(/usr/share/texlive/texmf-dist/tex/generic/babel-romanian/romanian.ldf
-Language: romanian 2021/04/04 v1.2m Romanian support from the babel system
 ))
-(/usr/share/texlive/texmf-dist/tex/generic/babel/locale/ro/babel-romanian.tex
-Package babel Info: Importing font and identification data for romanian
-(babel)             from babel-ro.ini. Reported on input line 11.
-)
 (/usr/share/texlive/texmf-dist/tex/generic/babel/locale/en/babel-english.tex
 Package babel Info: Importing font and identification data for english
 (babel)             from babel-en.ini. Reported on input line 11.
@@ -1540,103 +1533,116 @@ LaTeX Warning: You have requested package `layers/RightBandedBox',
 
 Package: RightBandedBox 
 ))
-Package hyperref Info: Option `colorlinks' set `true' on input line 268.
+Package hyperref Info: Option `colorlinks' set `true' on input line 233.
 \c@definition=\count479
 \c@theorem=\count480
 \c@tcb@cnt@codebox=\count481
 
 
-Package csquotes Warning: Load 'inputenc' before 'csquotes' on input line 372.
+Package csquotes Warning: Load 'inputenc' before 'csquotes' on input line 337.
 
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
-Package csquotes Info: Redefining alias 'default' -> 'romanian'.
-(./main_document_processed.aux)
+Package csquotes Info: Redefining alias 'default' -> 'english'.
+(./main_document_processed.aux
+
+LaTeX Warning: Label `lst:fun02' multiply defined.
+
+
+LaTeX Warning: Label `lst:fun02@cref' multiply defined.
+
+
+LaTeX Warning: Label `lst:fun01' multiply defined.
+
+
+LaTeX Warning: Label `lst:fun01@cref' multiply defined.
+
+)
 \openout1 = `main_document_processed.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C00/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C05/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C09/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C10/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C20/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C19/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C40/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C42/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C43/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C50/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C52/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C49/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C60/mj/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C61/mj/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C63/mj/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C64/mj/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C65/mj/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C70/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C31/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C32/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C33/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C34/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C35/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C36/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C37/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C80/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C81/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C01/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C11/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C21/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C41/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for C62/song/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 372.
-LaTeX Font Info:    ... okay on input line 372.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C00/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C05/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C09/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C10/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C20/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C19/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C40/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C42/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C43/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C50/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C52/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C49/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C60/mj/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C61/mj/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C63/mj/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C64/mj/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C65/mj/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C70/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C31/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C32/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C33/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C34/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C35/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C36/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C37/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C80/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C81/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C01/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C11/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C21/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C41/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for C62/song/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 337.
+LaTeX Font Info:    ... okay on input line 337.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1672,21 +1678,15 @@ LaTeX Font Info:    ... okay on input line 372.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-babelbib: Set bibliography fall-back language to romanian
+babelbib: Set bibliography fall-back language to english
 babelbib: english.bdf loaded because language english defined.
 (/usr/share/texlive/texmf-dist/tex/latex/babelbib/english.bdf
 File: english.bdf 2021/01/06 v1.34 babelbib: multilingual bibliographies
 
 babelbib extension \btxifchangecaseon added to \extrasenglish
 )
-babelbib: romanian.bdf loaded because language romanian defined.
-(/usr/share/texlive/texmf-dist/tex/latex/babelbib/romanian.bdf
-File: romanian.bdf 2021/01/06 v1.34 babelbib: multilingual bibliographies
-
-babelbib extension \btxifchangecaseoff added to \extrasromanian
-)
-babelbib: Load BibTeX extensions \bibsromanian for romanian
-babelbib: Set language for keywords in the bibliography fixed to romanian
+babelbib: Load BibTeX extensions \bibsenglish for english
+babelbib: Set language for keywords in the bibliography fixed to english
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count482
@@ -1716,7 +1716,7 @@ Package caption Info: rotating package is loaded.
 Package caption Info: wrapfig package is loaded.
 Package caption Info: End \AtBeginDocument code.
 \c@lstlisting=\count488
-Package hyperref Info: Link coloring ON on input line 372.
+Package hyperref Info: Link coloring ON on input line 337.
 
 (./main_document_processed.out) (./main_document_processed.out)
 \@outlinefile=\write5
@@ -1736,7 +1736,7 @@ File: UTF8.enc 2021/10/16 4.8.5
 File: UTF8.chr 2021/10/16 4.8.5
 )
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <9> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 415.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 380.
 
 
 [1
@@ -1754,6 +1754,12 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 4.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
+Overfull \hbox (14.61086pt too wide) in paragraph at lines 108--108
+ [][] [][][]\T1/cmr/m/n/10.95 Python Com-pil-ers, Ac-cel-er-a-tors, and Trans-l
+a-tors: Cython, Nu-itka, Numba, MyPyC, 
+ []
+
+
 
 [2
 
@@ -1768,14 +1774,14 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 
 [5]
-Capitolul 1.
+Chapter 1.
 
 
 [6
 
 
 ]
-Capitolul 2.
+Chapter 2.
 
 
 [7
@@ -1784,11 +1790,9 @@ Capitolul 2.
 
 [8]
 
-[9
+[9{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 
-]
-
-[10{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+[10]
 
 [11]
 
@@ -1800,7 +1804,7 @@ Capitolul 2.
 
 [15]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 688.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 653.
 
 
 [16]
@@ -1809,9 +1813,7 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
 
 [18]
 
-[19
-
-]
+[19]
 
 [20]
 
@@ -1838,10 +1840,10 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
 [31]
 
 [32]
-Overfull \hbox (4.46878pt too wide) in paragraph at lines 1472--1473
+Overfull \hbox (4.46878pt too wide) in paragraph at lines 1437--1438
 \T1/cmr/m/n/10.95 A \T1/cmr/bx/n/10.95 pro-cess vir-tual ma-chine \T1/cmr/m/n/1
-0.95 is a software exe-cu-tion en-vi-ron-ment that runs in-side an or-di-nary o
-perating-
+0.95 is a soft-ware ex-e-cu-tion en-vi-ron-ment that runs in-side an or-di-nary
+ operating-
  []
 
 
@@ -1849,8 +1851,8 @@ perating-
 [33]
 
 [34]
-Underfull \hbox (badness 1400) in paragraph at lines 1560--1561
-[]|\T1/cmr/m/n/10.95 Function or me-thod ca-lls may use runtime-
+Underfull \hbox (badness 1400) in paragraph at lines 1525--1526
+[]|\T1/cmr/m/n/10.95 Function or method calls may use runtime-
  []
 
 
@@ -1864,27 +1866,22 @@ Underfull \hbox (badness 1400) in paragraph at lines 1560--1561
 [38]
 
 [39]
-Underfull \hbox (badness 2213) in paragraph at lines 1778--1778
+Underfull \hbox (badness 2213) in paragraph at lines 1743--1743
 []|\T1/cmr/m/n/10.95 Source-derived syn-tax tree or
  []
 
 
-Underfull \hbox (badness 1675) in paragraph at lines 1780--1781
+Underfull \hbox (badness 1675) in paragraph at lines 1745--1746
 []|\T1/cmr/m/n/10.95 CPython, PHP Zend En-
  []
 
 
-Underfull \hbox (badness 1817) in paragraph at lines 1782--1782
-[]|\T1/cmr/m/n/10.95 Hybrid by-te-code and JIT
+Underfull \hbox (badness 1648) in paragraph at lines 1747--1747
+[]|\T1/cmr/m/n/10.95 Bytecode first, se-lected paths
  []
 
 
-Underfull \hbox (badness 1648) in paragraph at lines 1782--1782
-[]|\T1/cmr/m/n/10.95 Bytecode first, se-lec-ted pa-ths
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1784--1784
+Underfull \hbox (badness 10000) in paragraph at lines 1749--1749
 []|\T1/cmr/m/n/10.95 Command in-ter-pre-ta-tion
  []
 
@@ -1909,6 +1906,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 1784--1784
 [48]
 
 [49]
+Underfull \hbox (badness 1331) in paragraph at lines 2328--2329
+[]|\T1/cmr/m/n/10.95 Requires vir-tual reg-is-ter as-
+ []
+
+
 
 [50]
 
@@ -1920,28 +1922,20 @@ Underfull \hbox (badness 10000) in paragraph at lines 1784--1784
 
 [54]
 
-[55
-
-]
-
-[56
-
-]
-
-[57]
+[55]
 \g__tcobox_out_iow=\write7
 \openout7 = `main_document_processed.listing'.
 
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <6> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2601.
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2566.
 \pydata@fh@_50198C1AAAC27044BC498367ACCE2F74.data.minted=\write8
 \openout8 = `_50198C1AAAC27044BC498367ACCE2F74.data.minted'.
 
-runsystem(latexminted config  --timestamp 20260531033925 50198C1AAAC27044BC4983
+runsystem(latexminted config  --timestamp 20260531041240 50198C1AAAC27044BC4983
 67ACCE2F74)...executed safely (allowed).
 
  (./_50198C1AAAC27044BC498367ACCE2F74.config.minted)
-runsystem(latexminted cleanconfig  --timestamp 20260531033925 50198C1AAAC27044B
+runsystem(latexminted cleanconfig  --timestamp 20260531041240 50198C1AAAC27044B
 C498367ACCE2F74)...executed safely (allowed).
 
 
@@ -1951,28 +1945,55 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
 (Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5.
 )
 
+[56]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/30919C2850EA9EBEB6E777A8CB28C2E4.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 2637--2638
+
+ []
+
+
+
+[57]
+Overfull \hbox (0.40294pt too wide) in paragraph at lines 2662--2663
+ []\T1/cmr/bx/n/10.95 Python: sort-ing keys, GUI han-dlers, web call-backs, and
+ data-processing hooks.[] \T1/cmr/m/n/10.95 In Python,
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/186F2E37BD05F14F3CD541AF7A4D8CC6.highlight.minted)
+
 [58]
 
 [59]
 \openout7 = `main_document_processed.listing'.
 
- (./_minted/186F2E37BD05F14F3CD541AF7A4D8CC6.highlight.minted)
+ (./_minted/B772F63D8AD240346FED56E81661F245.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 2821--2822
+
+ []
+
+
 
 [60]
-
-[61]
-
-[62]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/0513803014FA51C171B0035015CE9E68.highlight.minted)
+Overfull \hbox (13.02127pt too wide) in paragraph at lines 2899--2900
+ []\T1/cmr/bx/n/10.95 JavaScript and V8: DOM events, AJAX, timers, promises, an
+d Node.js call-backs.[] \T1/cmr/m/n/10.95 JavaScript
+ []
 
-[63]
+
+
+[61]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/C16BA195A7AB880769A529884673A9D1.highlight.minted)
 
-[64]
+[62]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/B43A3A377C9E050DA3590A9D0668ABA8.highlight.minted)
@@ -1981,77 +2002,82 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
 
 (./_minted/92995561EDDBB0F4E9ED9BF6385C67CB.highlight.minted)
 
-[65]
+[63]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
 
-[66]
+[64]
 
-[67]
-Underfull \hbox (badness 5726) in paragraph at lines 3204--3204
-[]|\T1/cmr/bx/n/10.95 Useful ca-ll-back appli-ca-
+[65]
+Underfull \hbox (badness 5726) in paragraph at lines 3185--3185
+[]|\T1/cmr/bx/n/10.95 Useful call-back ap-pli-ca-
  []
 
 
-Underfull \hbox (badness 1253) in paragraph at lines 3206--3206
-\T1/cmr/m/n/10.95 bra-ries, em-be-d-ded ca-ll-ba-cks,
+Underfull \hbox (badness 1253) in paragraph at lines 3187--3187
+\T1/cmr/m/n/10.95 braries, em-bed-ded call-backs,
  []
 
 
-Underfull \hbox (badness 1009) in paragraph at lines 3208--3208
-[]|\T1/cmr/m/n/10.95 Sorting keys, GUI han-d-lers,
+Underfull \hbox (badness 1009) in paragraph at lines 3189--3189
+[]|\T1/cmr/m/n/10.95 Sorting keys, GUI han-dlers,
  []
 
 
-Underfull \hbox (badness 3525) in paragraph at lines 3210--3210
-[]|\T1/cmr/m/n/10.95 GUI lis-te-ners, stream ope-
+Underfull \hbox (badness 1681) in paragraph at lines 3191--3191
+[]|\T1/cmr/m/n/10.95 GUI lis-ten-ers, stream op-er-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3212--3212
+Underfull \hbox (badness 2119) in paragraph at lines 3191--3191
+\T1/cmr/m/n/10.95 a-tions, com-ple-tion han-dlers,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3193--3193
 []|\T1/cmr/m/n/10.95 JavaScript /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3212--3212
-[]|\T1/cmr/m/n/10.95 DOM events, AJA-X/-fetch
+Underfull \hbox (badness 10000) in paragraph at lines 3193--3193
+[]|\T1/cmr/m/n/10.95 DOM events, AJAX/fetch
  []
 
 
-Underfull \hbox (badness 3354) in paragraph at lines 3212--3212
-\T1/cmr/m/n/10.95 com-ple-tion, ti-mers, Node.js
+Underfull \hbox (badness 3354) in paragraph at lines 3193--3193
+\T1/cmr/m/n/10.95 com-ple-tion, timers, Node.js
  []
 
 
-Underfull \hbox (badness 1603) in paragraph at lines 3214--3215
-[]|\T1/cmr/m/n/10.95 Callable va-lue re-sol-ved by Zend
+Underfull \hbox (badness 1603) in paragraph at lines 3195--3196
+[]|\T1/cmr/m/n/10.95 Callable value re-solved by Zend
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3216--3216
-[]|\T1/cmtt/m/n/10.95 trap \T1/cmr/m/n/10.95 clea-nup han-d-lers,
+Underfull \hbox (badness 10000) in paragraph at lines 3197--3197
+[]|\T1/cmtt/m/n/10.95 trap \T1/cmr/m/n/10.95 cleanup han-dlers,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3216--3216
+Underfull \hbox (badness 10000) in paragraph at lines 3197--3197
 \T1/cmr/m/n/10.95 command-name dis-patch,
  []
 
 
 
-[68]
+[66]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/0D77413F963EE6275164A228373ED9D3.highlight.minted)
 
+[67]
+
+[68]
+
 [69]
 
 [70]
-
-[71]
-
-[72]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/DB23DDA04DCA669986325F3BDCD5CA40.highlight.minted)
@@ -2060,60 +2086,79 @@ Underfull \hbox (badness 10000) in paragraph at lines 3216--3216
 
 (./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
 
-[73]
+[71]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/6A242D0AB195637827065D6E1C41341A.highlight.minted)
 
-[74]
+[72]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/FB944D234CBAC74583986B2E6387C0E6.highlight.minted)
 
-[75]
+[73]
 
-[76]
-Underfull \hbox (badness 10000) in paragraph at lines 3742--3742
+[74]
+Underfull \hbox (badness 10000) in paragraph at lines 3723--3723
 []|\T1/cmr/m/n/10.95 JavaScript /
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3744--3745
+Underfull \hbox (badness 10000) in paragraph at lines 3725--3726
 []|\T1/cmr/m/n/10.95 Produces functional-interface-
  []
 
 
-Underfull \hbox (badness 4156) in paragraph at lines 3744--3745
-\T1/cmr/m/n/10.95 compatible ca-l-la-ble ob-ject; call
+Underfull \hbox (badness 4156) in paragraph at lines 3725--3726
+\T1/cmr/m/n/10.95 compatible callable ob-ject; call
+ []
+
+
+Underfull \hbox (badness 1215) in paragraph at lines 3727--3727
+[]|\T1/cmr/m/n/10.95 Anonymous func-tions / clo-
+ []
+
+
+Underfull \hbox (badness 2644) in paragraph at lines 3731--3731
+[]|\T1/cmr/m/n/10.95 No func-tion ob-jects; in-line
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 3731--3731
+\T1/cmr/m/n/10.95 com-mand text, com-mand
  []
 
 
 
-[77]
+[75]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/366FECB0D01409A2362933DEDB1669C1.highlight.minted)
 
-[78]
+[76]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/A82BEEBFFD99717D181FF771FB137CFF.highlight.minted)
 
-[79]
+[77]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/27D6594D0E4B108AC14A4A41398A3D2B.highlight.minted)
-\openout7 = `main_document_processed.listing'.
+Overfull \hbox (10.20992pt too wide) in paragraph at lines 3923--3924
+ []\T1/cmr/bx/n/10.95 JavaScript / V8: lex-i-cal en-vi-ron-ments for call-backs
+, AJAX, timers, and fac-to-ries.[] \T1/cmr/m/n/10.95 JavaScript
+ []
 
+\openout7 = `main_document_processed.listing'.
 
 (./_minted/ABCC1E2160DE4B0FC2A36EA643E03E8F.highlight.minted)
 
-[80]
+[78]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/7D12BFCFC8759BE108C77BD993F9A35E.highlight.minted)
 
-[81]
+[79]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/60F360AD3CBFEEAB746050BD0629C739.highlight.minted)
@@ -2122,17 +2167,17 @@ Underfull \hbox (badness 4156) in paragraph at lines 3744--3745
 
 (./_minted/38F5FE60AADFF60CF1563AE3387217F4.highlight.minted)
 
-[82]
+[80]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/889772B121A9EAC0EB6A2DA9B53D5D70.highlight.minted)
 
-[83]
+[81]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/9BB3F3D05A97BADD8DACE61ADD4B3E96.highlight.minted)
 
-[84]
+[82]
 \openout7 = `main_document_processed.listing'.
 
  (./_minted/DB7E2B23E4A0EB39849819047181555E.highlight.minted)
@@ -2141,94 +2186,120 @@ Underfull \hbox (badness 4156) in paragraph at lines 3744--3745
 
 (./_minted/26E4EB3D51885FD26E6A8D5EF5C449BD.highlight.minted)
 
-[85]
+[83]
 
-[86]
+[84]
+\openout7 = `main_document_processed.listing'.
 
-[87]
+ (./_minted/171ED1B16CF2B27C52E0B85CDD0F4455.highlight.minted)
+\openout7 = `main_document_processed.listing'.
 
-[88]
-Underfull \hbox (badness 2393) in paragraph at lines 4493--4494
-[]|\T1/cmr/m/n/10.95 Outer Py-thon frame di-sa-ppears;
+
+(./_minted/844588F583E7A9ACFC59D3E75E41FA45.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 4365--4366
+
  []
 
 
+
+[85]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0CE4B35A1DB0494B3D329DA39B4EBF80.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 4418--4419
+
+ []
+
+
+
+[86]
 Underfull \hbox (badness 10000) in paragraph at lines 4495--4495
+[]|\T1/cmr/m/n/10.95 Python /
+ []
+
+
+Underfull \hbox (badness 2393) in paragraph at lines 4495--4496
+[]|\T1/cmr/m/n/10.95 Outer Python frame dis-ap-pears;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4497--4497
 []|\T1/cmr/m/n/10.95 JavaScript /
  []
 
 
+Underfull \hbox (badness 1783) in paragraph at lines 4501--4502
+[]|\T1/cmr/m/n/10.95 Function frame dis-ap-pears; cap-
+ []
+
+
+Underfull \hbox (badness 1142) in paragraph at lines 4505--4506
+\T1/cmr/m/n/10.95 er-ated func-tions, sub-shell copies,
+ []
+
+
+
+[87]
+
+[88]
 
 [89]
+Chapter 3.
 
-[90]
-Capitolul 3.
+Overfull \hbox (3.08403pt too wide) in paragraph at lines 4572--4572
+[]\T1/cmr/bx/n/12 Chronological Time-line: The Gen-e-sis, Ori-gins, and For-mal
+ Re-lease of Python
+ []
 
 
-[91
+
+[90
 
 ]
 
-[92
+[91]
 
-]
+[92]
 
 [93]
 
-[94
-
-]
+[94]
 
 [95]
 
 [96]
+Chapter 4.
 
-[97]
+
+[97
+
+]
 
 [98]
-Capitolul 4.
 
+[99]
 
-[99
-
-]
-
-[100
-
-]
+[100]
 
 [101]
 
 [102]
 
-[103
+[103]
+Overfull \hbox (11.7164pt too wide) in paragraph at lines 5124--5125
+[]\T1/cmr/m/n/10.95 In CPython, ob-ject life-time is strongly con-nected to ref
+-er-ence count-ing (\T1/cmtt/m/n/10.95 ob_refcnt \T1/cmr/m/n/10.95 in \T1/cmtt/
+m/n/10.95 PyObject_HEAD\T1/cmr/m/n/10.95 ).
+ []
 
-]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5147.
+
 
 [104]
 
 [105]
-
-[106]
-Overfull \hbox (11.7164pt too wide) in paragraph at lines 5122--5123
-[]\T1/cmr/m/n/10.95 In CPy-thon, ob-ject li-fe-time is stron-gly con-nec-ted to
- re-fe-rence co-un-ting (\T1/cmtt/m/n/10.95 ob_refcnt \T1/cmr/m/n/10.95 in \T1/
-cmtt/m/n/10.95 PyObject_HEAD\T1/cmr/m/n/10.95 ).
- []
-
-
-
-[107]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5145.
-
-
-[108
-
-]
-
-[109]
-Overfull \hbox (28.54926pt too wide) in paragraph at lines 5251--5252
+Overfull \hbox (28.54926pt too wide) in paragraph at lines 5253--5254
 []\T1/cmr/m/n/10.95 NaN is not equal even to it-self. Test with \T1/cmtt/m/n/10
 .95 math.isnan()\T1/cmr/m/n/10.95 , not \T1/cmtt/m/n/10.95 ==\T1/cmr/m/n/10.95 
 . Use \T1/cmtt/m/n/10.95 math.isinf() \T1/cmr/m/n/10.95 and \T1/cmtt/m/n/10.95 
@@ -2237,10 +2308,33 @@ math.isfinite()
 
 
 
+[106]
+Overfull \hbox (6.47182pt too wide) in paragraph at lines 5309--5310
+[]\T1/cmr/m/n/10.95 Python booleans are sin-gle-ton truth-value ob-jects that i
+n-herit from \T1/cmtt/m/n/10.95 int \T1/cmr/m/n/10.95 due to early backward-
+ []
+
+
+
+[107]
+
+[108]
+
+[109]
+
 [110]
-Overfull \hbox (6.47182pt too wide) in paragraph at lines 5307--5308
-[]\T1/cmr/m/n/10.95 Python bo-o-leans are sin-gle-ton truth-value ob-jects that
- inhe-rit from \T1/cmtt/m/n/10.95 int \T1/cmr/m/n/10.95 due to early backward-
+Overfull \hbox (43.39604pt too wide) in paragraph at lines 5542--5543
+\T1/cmr/m/n/10.95 target-type rules: \T1/cmtt/m/n/10.95 int("3.14") \T1/cmr/m/n
+/10.95 raises \T1/cmtt/m/n/10.95 ValueError\T1/cmr/m/n/10.95 ; \T1/cmtt/m/n/10.
+95 int(float("3.14")) \T1/cmr/m/n/10.95 trun-cates to-ward zero. \T1/cmtt/m/n/1
+0.95 bool("False")
+ []
+
+
+Overfull \hbox (8.8895pt too wide) in paragraph at lines 5555--5556
+[]\T1/cmr/m/n/10.95 These are de-fined in-ter-ac-tions, not silent con-ver-sion
+ of un-re-lated do-mains. \T1/cmtt/m/n/10.95 42 + "1" \T1/cmr/m/n/10.95 raises 
+\T1/cmtt/m/n/10.95 TypeError\T1/cmr/m/n/10.95 .
  []
 
 
@@ -2250,66 +2344,61 @@ Overfull \hbox (6.47182pt too wide) in paragraph at lines 5307--5308
 [112]
 
 [113]
+Chapter 5.
+
+Overfull \hbox (9.73248pt too wide) in paragraph at lines 5650--5651
+[]\T1/cmr/m/n/10.95 Syntax such as \T1/cmtt/m/n/10.95 len(obj)\T1/cmr/m/n/10.95
+ , \T1/cmtt/m/n/10.95 obj[i]\T1/cmr/m/n/10.95 , and \T1/cmtt/m/n/10.95 x in obj
+ \T1/cmr/m/n/10.95 del-e-gates to spe-cial meth-ods (\T1/cmtt/m/n/10.95 __len__
+\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 __getitem__\T1/cmr/m/n/10.95 ,
+ []
+
+
 
 [114
 
 ]
-Overfull \hbox (43.39604pt too wide) in paragraph at lines 5540--5541
-\T1/cmr/m/n/10.95 target-type ru-les: \T1/cmtt/m/n/10.95 int("3.14") \T1/cmr/m/
-n/10.95 rai-ses \T1/cmtt/m/n/10.95 ValueError\T1/cmr/m/n/10.95 ; \T1/cmtt/m/n/1
-0.95 int(float("3.14")) \T1/cmr/m/n/10.95 trun-ca-tes toward zero. \T1/cmtt/m/n
-/10.95 bool("False")
- []
-
-
-Overfull \hbox (8.8895pt too wide) in paragraph at lines 5553--5554
-[]\T1/cmr/m/n/10.95 These are de-fined in-te-rac-tions, not si-lent con-ver-sio
-n of un-re-la-ted do-mains. \T1/cmtt/m/n/10.95 42 + "1" \T1/cmr/m/n/10.95 rai-s
-es \T1/cmtt/m/n/10.95 TypeError\T1/cmr/m/n/10.95 .
- []
-
-
 
 [115]
+Overfull \hbox (35.78638pt too wide) in paragraph at lines 5702--5703
+[]\T1/cmr/m/n/10.95 Decoding must match the en-cod-ing used at en-code time. Wr
+ong strict de-cod-ing raises \T1/cmtt/m/n/10.95 UnicodeDecodeError\T1/cmr/m/n/1
+0.95 ;
+ []
+
+
 
 [116]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5723.
+
 
 [117]
-Capitolul 5.
 
-
-[118
-
-]
-Overfull \hbox (9.73248pt too wide) in paragraph at lines 5648--5649
-[]\T1/cmr/m/n/10.95 Syntax such as \T1/cmtt/m/n/10.95 len(obj)\T1/cmr/m/n/10.95
- , \T1/cmtt/m/n/10.95 obj[i]\T1/cmr/m/n/10.95 , and \T1/cmtt/m/n/10.95 x in obj
- \T1/cmr/m/n/10.95 de-le-ga-tes to spe-cial me-thods (\T1/cmtt/m/n/10.95 __len_
-_\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 __getitem__\T1/cmr/m/n/10.95 ,
+[118]
+Overfull \hbox (14.82748pt too wide) in paragraph at lines 5803--5804
+[]\T1/cmr/m/n/10.95 Architecturally, \T1/cmtt/m/n/10.95 split\T1/cmr/m/n/10.95 
+/\T1/cmtt/m/n/10.95 join \T1/cmr/m/n/10.95 form the bound-ary be-tween flat tex
+t and pointer ar-rays of text fragments---
  []
 
 
 
-[119
+[119]
+Overfull \hbox (34.06035pt too wide) in paragraph at lines 5851--5852
+\T1/cmtt/m/n/10.95 items[i] = obj \T1/cmr/m/n/10.95 re-places one \T1/cmtt/m/n/
+10.95 PyObject* \T1/cmr/m/n/10.95 slot; the list shell is un-changed. Slice as-
+sign-ment \T1/cmtt/m/n/10.95 items[start:stop]
+ []
 
-]
+
 
 [120]
-Overfull \hbox (35.78638pt too wide) in paragraph at lines 5700--5701
-[]\T1/cmr/m/n/10.95 Decoding must match the en-co-ding used at en-code time. Wr
-ong strict de-co-ding rai-ses \T1/cmtt/m/n/10.95 UnicodeDecodeError\T1/cmr/m/n/
-10.95 ;
- []
 
-
-
-[121
-
-]
+[121]
 
 [122]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5721.
+Chapter 6.
 
 
 [123
@@ -2317,67 +2406,27 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
 ]
 
 [124]
-Overfull \hbox (14.82748pt too wide) in paragraph at lines 5801--5802
-[]\T1/cmr/m/n/10.95 Architecturally, \T1/cmtt/m/n/10.95 split\T1/cmr/m/n/10.95 
-/\T1/cmtt/m/n/10.95 join \T1/cmr/m/n/10.95 form the bo-un-dary be-tween flat te
-xt and po-in-ter ar-rays of text fragments---
- []
-
-
 
 [125]
 
-[126
-
-]
-Overfull \hbox (34.06035pt too wide) in paragraph at lines 5849--5850
-\T1/cmtt/m/n/10.95 items[i] = obj \T1/cmr/m/n/10.95 re-pla-ces one \T1/cmtt/m/n
-/10.95 PyObject* \T1/cmr/m/n/10.95 slot; the list shell is un-chan-ged. Slice a
-s-sig-n-ment \T1/cmtt/m/n/10.95 items[start:stop]
- []
-
-
+[126]
 
 [127]
 
-[128
-
-]
+[128]
 
 [129]
-Capitolul 6.
 
+[130]
 
-[130
-
-]
-
-[131
-
-]
+[131]
 
 [132]
 
 [133]
 
 [134]
-
-[135]
-
-[136]
-
-[137]
-
-[138
-
-]
-
-[139]
-
-[140]
-
-[141]
-Overfull \hbox (25.55652pt too wide) in paragraph at lines 6631--6631
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 6633--6633
 []\T1/cmtt/m/n/10.95 first_tok: TokenInfo(type=1 (NAME), string=\TS1/cmtt/m/n/1
 0.95 '\T1/cmtt/m/n/10.95 x\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , start=(1, 0
 ), end=(1, 1), line=\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 x = 42\n\TS1/cmtt/m
@@ -2385,23 +2434,21 @@ Overfull \hbox (25.55652pt too wide) in paragraph at lines 6631--6631
  []
 
 
-Overfull \hbox (28.09885pt too wide) in paragraph at lines 6641--6642
-[]\T1/cmr/m/n/10.95 If Py-thon ex-pects in-den-ta-tion and the in-den-ta-tion d
-oes not form a va-lid block, it rai-ses \T1/cmtt/m/n/10.95 IndentationError\T1/
-cmr/m/n/10.95 . 
+Overfull \hbox (28.09885pt too wide) in paragraph at lines 6643--6644
+[]\T1/cmr/m/n/10.95 If Python ex-pects in-den-ta-tion and the in-den-ta-tion do
+es not form a valid block, it raises \T1/cmtt/m/n/10.95 IndentationError\T1/cmr
+/m/n/10.95 . 
  []
 
 
-
-[142]
-Overfull \hbox (19.89815pt too wide) in paragraph at lines 6663--6663
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 6665--6665
 []\T1/cmtt/m/n/10.95 message: expected an indented block after \TS1/cmtt/m/n/10
 .95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on
  line 1 (<bad_indent>, line 2)[] 
  []
 
 
-Overfull \hbox (172.67416pt too wide) in paragraph at lines 6664--6664
+Overfull \hbox (172.67416pt too wide) in paragraph at lines 6666--6666
 []\T1/cmtt/m/n/10.95 args: ("expected an indented block after \TS1/cmtt/m/n/10.
 95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on 
 line 1", (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <bad_indent>\TS1/cmtt/m/n/10.
@@ -2410,13 +2457,15 @@ i!")\n\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , 2, -1))[]
  []
 
 
-Overfull \hbox (19.89815pt too wide) in paragraph at lines 6696--6696
+
+[135]
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 6698--6698
 []\T1/cmtt/m/n/10.95 message: inconsistent use of tabs and spaces in indentatio
 n (<mixed_tabs_spaces>, line 3)[] 
  []
 
 
-Overfull \hbox (178.33253pt too wide) in paragraph at lines 6697--6697
+Overfull \hbox (178.33253pt too wide) in paragraph at lines 6699--6699
 []\T1/cmtt/m/n/10.95 args: (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 inconsisten
 t use of tabs and spaces in indentation\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
 , (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <mixed_tabs_spaces>\TS1/cmtt/m/n/10.
@@ -2425,9 +2474,7 @@ t use of tabs and spaces in indentation\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
  []
 
 
-
-[143]
-Overfull \hbox (280.18321pt too wide) in paragraph at lines 6713--6713
+Overfull \hbox (280.18321pt too wide) in paragraph at lines 6715--6715
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 TabError\T
 S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
 /n/10.95 IndentationError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1
@@ -2436,6 +2483,37 @@ n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Exception\TS1/cmtt/m/
 n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 B
 aseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.
 95 '\T1/cmtt/m/n/10.95 object\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[] 
+ []
+
+
+
+[136]
+
+[137]
+
+[138]
+
+[139]
+
+[140]
+
+[141]
+
+[142]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/8D477E0FEEEFCE048316B489DA1368FD.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 7177--7180
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/DA58FADD0FF724641BB1C7AA96F69F81.highlight.minted)
+
+[143]
+Underfull \hbox (badness 10000) in paragraph at lines 7200--7203
+
  []
 
 
@@ -2449,25 +2527,7 @@ aseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.
 [147]
 
 [148]
-
-[149]
-
-[150]
-
-[151]
-
-[152]
-
-[153
-
-]
-
-[154]
-
-[155]
-
-[156]
-Overfull \hbox (200.96602pt too wide) in paragraph at lines 7513--7513
+Overfull \hbox (200.96602pt too wide) in paragraph at lines 7519--7519
 []\T1/cmtt/m/n/10.95 dir(status) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
 95 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cm
 tt/m/n/10.95 __class__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/1
@@ -2481,23 +2541,23 @@ _\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
  []
 
 
-Overfull \hbox (121.74883pt too wide) in paragraph at lines 7561--7561
+Overfull \hbox (121.74883pt too wide) in paragraph at lines 7567--7567
 []\T1/cmtt/m/n/10.95 message = "Chuck Norris counted to infinity twice." if nam
 e == "Chuck" and power >= 40 else "ordinary case"[] 
  []
 
 
 
-[157]
+[149]
 
-[158]
+[150]
 
-[159]
+[151]
 
-[160]
+[152]
 
-[161]
-Overfull \hbox (172.67416pt too wide) in paragraph at lines 7874--7874
+[153]
+Overfull \hbox (172.67416pt too wide) in paragraph at lines 7880--7880
 []\T1/cmtt/m/n/10.95 dir(result) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
 95 __bool__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/c
 mtt/m/n/10.95 __class__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/
@@ -2512,6 +2572,22 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 
 
 
+[154]
+
+[155]
+
+[156]
+
+[157]
+
+[158]
+
+[159]
+
+[160]
+
+[161]
+
 [162]
 
 [163]
@@ -2522,9 +2598,7 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 
 [166]
 
-[167
-
-]
+[167]
 
 [168]
 
@@ -2550,27 +2624,68 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 
 [179]
 
-[180
-
-]
+[180]
 
 [181]
 
-[182
-
-]
+[182]
 
 [183]
 
 [184]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/074FF1E33EC74754E41B24F065BDBF5F.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 9895--9903
+
+ []
+
+
 
 [185]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/3C2FF66F2924FF3C5D66CE54D71818D3.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 9961--9968
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/032D9B7DA90A8D6BA895DD1616C2820D.highlight.minted)
 
 [186]
+Underfull \hbox (badness 10000) in paragraph at lines 10012--10015
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/C5D181038451FB6C55A460C887B17CC3.highlight.minted)
 
 [187]
+Underfull \hbox (badness 10000) in paragraph at lines 10082--10084
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/04FC4E830132BF309B9FFFB3431277C2.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 10124--10125
+
+ []
+
+
 
 [188]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/E1D8E9E69B5BCA013F630EB5FB473943.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 10164--10173
+
+ []
+
+
 
 [189]
 
@@ -2579,12 +2694,49 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 [191]
 
 [192]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/3226498E2DF7AA85CA09D15F9B45B535.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 10463--10465
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/538DCF0E3DAB08631A4E93870335863B.highlight.minted)
 
 [193]
+Underfull \hbox (badness 10000) in paragraph at lines 10489--10492
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/C76DBC13F8BBB6B986AE2036A6FD722A.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 10516--10518
+
+ []
+
+
 
 [194]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0345CBAD9A3F8C74AB955E1FE53C53D0.highlight.minted)
 
 [195]
+Underfull \hbox (badness 10000) in paragraph at lines 10617--10619
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/B2CCE7763E4514DE9AF41AAA0F0B86AB.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 10665--10669
+
+ []
+
+
 
 [196]
 
@@ -2601,29 +2753,7 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 [202]
 
 [203]
-
-[204]
-
-[205]
-
-[206]
-
-[207
-
-]
-
-[208]
-
-[209]
-
-[210]
-
-[211]
-
-[212]
-
-[213]
-Overfull \hbox (2.92303pt too wide) in paragraph at lines 11123--11123
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 11151--11151
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ValueError
 \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt
 /m/n/10.95 Exception\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt
@@ -2633,7 +2763,7 @@ Overfull \hbox (2.92303pt too wide) in paragraph at lines 11123--11123
  []
 
 
-Overfull \hbox (121.74883pt too wide) in paragraph at lines 11124--11124
+Overfull \hbox (121.74883pt too wide) in paragraph at lines 11152--11152
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 KeyError\T
 S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
 /n/10.95 LookupError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt
@@ -2644,7 +2774,7 @@ ct\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[]
  []
 
 
-Overfull \hbox (133.06557pt too wide) in paragraph at lines 11125--11125
+Overfull \hbox (133.06557pt too wide) in paragraph at lines 11153--11153
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 IndexError
 \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt
 /m/n/10.95 LookupError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cm
@@ -2656,156 +2786,386 @@ ject\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[]
 
 
 
-[214]
+[204]
 
-[215]
+[205]
+
+[206]
+
+[207]
+
+[208]
+
+[209]
+
+[210]
+
+[211]
+Overfull \hbox (2.50345pt too wide) in paragraph at lines 11651--11652
+[]\T1/cmr/m/n/10.95 on \T1/cmr/m/it/10.95 any \T1/cmr/m/n/10.95 exit path---nor
+mal, \T1/cmtt/m/n/10.95 return\T1/cmr/m/n/10.95 , han-dled ex-cep-tion, or prop
+agation---calls \T1/cmtt/m/n/10.95 __exit__(exc_type,
+ []
+
+
+
+[212]
+Overfull \hbox (28.31369pt too wide) in paragraph at lines 11675--11676
+\T1/cmr/m/n/10.95 When Python code raises an ex-cep-tion, CPython does not rely
+ on hard-ware traps or portable \T1/cmtt/m/n/10.95 setjmp\T1/cmr/m/n/10.95 /\T1
+/cmtt/m/n/10.95 longjmp
+ []
+
+
+
+[213]
+
+[214]
+Chapter 7.
+
+
+[215
+
+]
 
 [216]
 
 [217]
 
 [218]
+Overfull \hbox (18.34691pt too wide) in paragraph at lines 11912--11912
+[][]\T1/cmr/bx/n/10.95 Containment and Scope Test-ing: Iden-ti-fy-ing Sub-sets 
+\T1/cmtt/m/n/10.95 .issubset() \T1/cmr/bx/n/10.95 and Su-per-sets \T1/cmtt/m/n/
+10.95 .issuperset() 
+ []
+
+
 
 [219]
 
 [220]
+Overfull \hbox (4.9531pt too wide) in paragraph at lines 12017--12018
+\T1/cmtt/m/n/10.95 keys()\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 values()\T1/cmr
+/m/n/10.95 , and \T1/cmtt/m/n/10.95 items() \T1/cmr/m/n/10.95 re-turn lightweig
+ht view ob-jects (\T1/cmtt/m/n/10.95 dict_keys\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/
+10.95 dict_values\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 dict_items\T1/cmr/m/n/1
+0.95 )
+ []
+
+
 
 [221]
-Overfull \hbox (2.50345pt too wide) in paragraph at lines 11623--11624
-[]\T1/cmr/m/n/10.95 on \T1/cmr/m/it/10.95 any \T1/cmr/m/n/10.95 exit path---nor
-mal, \T1/cmtt/m/n/10.95 return\T1/cmr/m/n/10.95 , han-d-led ex-cep-tion, or pro
-pagation---calls \T1/cmtt/m/n/10.95 __exit__(exc_type,
- []
-
-
-Overfull \hbox (28.31369pt too wide) in paragraph at lines 11647--11648
-\T1/cmr/m/n/10.95 When Py-thon code rai-ses an ex-cep-tion, CPy-thon does not r
-ely on har-dware traps or por-ta-ble \T1/cmtt/m/n/10.95 setjmp\T1/cmr/m/n/10.95
- /\T1/cmtt/m/n/10.95 longjmp
- []
-
-
 
 [222]
+Chapter 8.
+\openout7 = `main_document_processed.listing'.
 
-[223]
-Capitolul 7.
+(./_minted/560989A442D6F1AA4E0AC0D9765BA00F.highlight.minted)
 
-
-[224
-
-]
-
-[225
+[223
 
 ]
+Underfull \hbox (badness 10000) in paragraph at lines 12060--12065
+
+ []
+
+
+Overfull \hbox (5.3211pt too wide) in paragraph at lines 12098--12099
+\T1/cmr/m/n/10.95 A \T1/cmtt/m/n/10.95 lambda \T1/cmr/m/n/10.95 ex-pres-sion cr
+e-ates the same kind of func-tion ob-ject as \T1/cmtt/m/n/10.95 def\T1/cmr/m/n/
+10.95 . The com-piler emits a \T1/cmtt/m/n/10.95 PyCodeObject
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/CC256329AE39EE19F3D3DD8ECE86A971.highlight.minted)
+
+[224]
+Underfull \hbox (badness 10000) in paragraph at lines 12113--12115
+
+ []
+
+
+Overfull \hbox (68.44202pt too wide) in paragraph at lines 12131--12132
+[]\T1/cmr/m/n/10.95 This de-sign trades stack ef-fi-ciency for run-time flex-i-
+bil-ity: frames can be in-tro-spected via \T1/cmtt/m/n/10.95 inspect.currentfra
+me()\T1/cmr/m/n/10.95 ,
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/CEE0B42C3EC76A2D09AB0EE492F80643.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12146--12147
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/18DD0161F076CC02D256E69D5B3D86B8.highlight.minted)
+
+[225]
+Underfull \hbox (badness 10000) in paragraph at lines 12173--12175
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/9C1A44EB9A7F27D7BD4567FB6F2C616A.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12199--12201
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/05F61859D58EAE7AA554AD16BD077257.highlight.minted)
 
 [226]
+Underfull \hbox (badness 10000) in paragraph at lines 12226--12228
 
-[227
+ []
 
-]
+\openout7 = `main_document_processed.listing'.
 
-[228]
-Overfull \hbox (18.34691pt too wide) in paragraph at lines 11884--11884
-[][]\T1/cmr/bx/n/10.95 Containment and Scope Tes-ting: Iden-ti-fying Sub-sets \
-T1/cmtt/m/n/10.95 .issubset() \T1/cmr/bx/n/10.95 and Su-per-sets \T1/cmtt/m/n/1
-0.95 .issuperset() 
+(./_minted/46DED444F9346923AD635309E84C597A.highlight.minted)
+
+[227]
+Underfull \hbox (badness 10000) in paragraph at lines 12274--12275
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/1A14EAD891464FBC1C3E66018BC9D1B2.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12300--12302
+
  []
 
 
-
-[229
-
-]
-
-[230
-
-]
-
-[231]
-Overfull \hbox (4.9531pt too wide) in paragraph at lines 11989--11990
-\T1/cmtt/m/n/10.95 keys()\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 values()\T1/cmr
-/m/n/10.95 , and \T1/cmtt/m/n/10.95 items() \T1/cmr/m/n/10.95 re-turn li-gh-twe
-i-ght view ob-jects (\T1/cmtt/m/n/10.95 dict_keys\T1/cmr/m/n/10.95 , \T1/cmtt/m
-/n/10.95 dict_values\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 dict_items\T1/cmr/m/
-n/10.95 )
- []
-
-
-
-[232]
-Capitolul 8.
-
-
-[233
-
-]
-
-[234
-
-]
-Overfull \hbox (5.3211pt too wide) in paragraph at lines 12068--12069
-\T1/cmr/m/n/10.95 A \T1/cmtt/m/n/10.95 lambda \T1/cmr/m/n/10.95 ex-pres-sion cr
-e-a-tes the same kind of func-tion ob-ject as \T1/cmtt/m/n/10.95 def\T1/cmr/m/n
-/10.95 . The com-pi-ler emits a \T1/cmtt/m/n/10.95 PyCodeObject
- []
-
-
-Overfull \hbox (68.44202pt too wide) in paragraph at lines 12099--12100
-[]\T1/cmr/m/n/10.95 This de-sign tra-des stack effi-ciency for run-time fle-xi-
-bi-lity: fra-mes can be in-tros-pec-ted via \T1/cmtt/m/n/10.95 inspect.currentf
-rame()\T1/cmr/m/n/10.95 ,
- []
-
-
-
-[235]
-
-[236]
-
-[237]
-
-[238
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 12268--12268
+Underfull \hbox (badness 10000) in paragraph at lines 12312--12312
 []|\T1/cmr/bx/n/10.95 Operation in-side
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 12272--12272
+Underfull \hbox (badness 10000) in paragraph at lines 12316--12316
 []|\T1/cmtt/m/n/10.95 text =
  []
 
 
-Overfull \hbox (1.63469pt too wide) in paragraph at lines 12266--12279
+Overfull \hbox (1.63469pt too wide) in paragraph at lines 12310--12323
  [] 
  []
 
 
 
-[239]
+[228]
+\openout7 = `main_document_processed.listing'.
 
-[240]
-Overfull \hbox (14.20161pt too wide) in paragraph at lines 12390--12391
-\T1/cmr/m/n/10.95 (\T1/cmtt/m/n/10.95 METH_VECTORCALL\T1/cmr/m/n/10.95 ). No in
--ter-me-di-ate tu-ple or dict is con-struc-ted. Sig-na-tu-res that force \T1/cm
-tt/m/n/10.95 *args\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 **kwargs\T1/cmr/m/n/10.
-95 ---
+ (./_minted/40F287898FAB21D6CEB313A7E6940E4D.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12349--12351
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/AF523B846496B5E483C8B6DBD6AE0061.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12376--12379
+
  []
 
 
 
-[241
+[229]
+Overfull \hbox (14.20161pt too wide) in paragraph at lines 12438--12439
+\T1/cmr/m/n/10.95 (\T1/cmtt/m/n/10.95 METH_VECTORCALL\T1/cmr/m/n/10.95 ). No in
+-ter-me-di-ate tu-ple or dict is con-structed. Sig-na-tures that force \T1/cmtt
+/m/n/10.95 *args\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 **kwargs\T1/cmr/m/n/10.95
+ ---
+ []
 
-]
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/CFDA1621505AFA26066E477CD616D925.highlight.minted)
+
+[230]
+Underfull \hbox (badness 10000) in paragraph at lines 12453--12455
+
+ []
+
+
+
+[231]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/E4CE37E09EAD7510D7270A04F61FC430.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12550--12553
+
+ []
+
+
+
+[232]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/F842CFE01D5BB61032A0D960FBA93E19.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12576--12579
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/D3724A39BC26E0C59E9CD3CF72210B23.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12603--12604
+
+ []
+
+
+
+[233]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/CB96A6335FF54EAB6C42F0C902EFE290.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12646--12655
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/7366158F19F438DB23F7B2834275F5ED.highlight.minted)
+
+[234]
+Underfull \hbox (badness 10000) in paragraph at lines 12688--12690
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/79327DC623798CFC0CAA218F2873AD53.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12713--12714
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/24BE525A927962E64C03B8D47E6DCE4B.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12740--12741
+
+ []
+
+
+
+[235]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/DCF2B9E4F71C5B811AB83DDC19CE2F90.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12781--12782
+
+ []
+
+
+
+[236]
+
+[237]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/7F3381AE0B28C48EA5868CB1E7D267D6.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12864--12866
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/7823524CF1311CCF81088603DB7200D2.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12892--12894
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/4FC7083F1FC229CECDD1353F765EF898.highlight.minted)
+
+[238]
+Underfull \hbox (badness 10000) in paragraph at lines 12915--12916
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/71BF7BFE8E6DE3A3A33D2FFDFD320DDB.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12951--12956
+
+ []
+
+
+Overfull \hbox (16.39143pt too wide) in paragraph at lines 12961--12962
+\T1/cmr/m/n/10.95 ject ref-er-ences. Mu-ta-ble cells share one ob-ject across i
+n-vo-ca-tions of the same clo-sure (\T1/cmtt/m/n/10.95 items.append(...)\T1/cmr
+/m/n/10.95 );
+ []
+
+
+
+[239]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/D8294D51886D4A918C420FFB68AD6262.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 12992--12994
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/6804B3EE7B8FBD669ADAB986BA2D504C.highlight.minted)
+Overfull \hbox (10.22443pt too wide) in paragraph at lines 13015--13016
+[]\T1/cmr/m/n/10.95 Stacked dec-o-ra-tors ap-ply bottom-up: \T1/cmtt/m/n/10.95 
+@a @b def f $\OMS/cmsy/m/n/10.95 ^^Q$ \T1/cmtt/m/n/10.95 f = a(b(f))\T1/cmr/m/n
+/10.95 . Dec-o-ra-tor fac-to-ries (\T1/cmtt/m/n/10.95 @deco(arg)\T1/cmr/m/n/10.
+95 )
+ []
+
+
+
+[240]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/7D6A2D8C8BCB2C9346BF094DAD5B9B84.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 13046--13049
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/516FAAC77E752050E36F8D8BB3C6581D.highlight.minted)
+
+[241]
+Underfull \hbox (badness 10000) in paragraph at lines 13074--13077
+
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/0019BE5DABE8AE3DDE8150D8CC2010FE.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 13113--13114
+
+ []
+
+
 
 [242]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/B73AB674E6147DCB60D5E9A5E19AC456.highlight.minted)
+Underfull \hbox (badness 10000) in paragraph at lines 13148--13150
+
+ []
+
+
 
 [243]
 
 [244]
+Chapter 9.
+
 
 [245
 
@@ -2815,133 +3175,50 @@ tt/m/n/10.95 *args\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 **kwargs\T1/cmr/m/n/10.
 
 [247]
 
-[248
-
-]
+[248]
 
 [249]
+Overfull \hbox (20.83215pt too wide) in paragraph at lines 13444--13445
+\T1/cmr/m/n/10.95 Mismatched en-cod-ings sur-face as \T1/cmtt/m/n/10.95 Unicode
+DecodeError \T1/cmr/m/n/10.95 or \T1/cmtt/m/n/10.95 UnicodeEncodeError\T1/cmr/m
+/n/10.95 . De-fault \T1/cmtt/m/n/10.95 errors="strict"
+ []
 
-[250
 
-]
-Overfull \hbox (16.39143pt too wide) in paragraph at lines 12887--12888
-\T1/cmr/m/n/10.95 ject re-fe-ren-ces. Mu-ta-ble ce-lls share one ob-ject across
- in-vo-ca-tions of the same clo-sure (\T1/cmtt/m/n/10.95 items.append(...)\T1/c
-mr/m/n/10.95 );
+
+[250]
+Overfull \hbox (48.23837pt too wide) in paragraph at lines 13541--13542
+\T1/cmtt/m/n/10.95 pathlib.Path \T1/cmr/m/n/10.95 is an er-gonomic struc-tural 
+ab-strac-tion: \T1/cmtt/m/n/10.95 / \T1/cmr/m/n/10.95 over-load com-poses com-p
+o-nents, \T1/cmtt/m/n/10.95 .name\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .parent\
+T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .suffix
  []
 
 
 
 [251]
-Overfull \hbox (10.22443pt too wide) in paragraph at lines 12938--12939
-[]\T1/cmr/m/n/10.95 Stacked de-co-ra-tors apply bottom-up: \T1/cmtt/m/n/10.95 @
-a @b def f $\OMS/cmsy/m/n/10.95 ^^Q$ \T1/cmtt/m/n/10.95 f = a(b(f))\T1/cmr/m/n/
-10.95 . De-co-ra-tor fac-to-ries (\T1/cmtt/m/n/10.95 @deco(arg)\T1/cmr/m/n/10.9
-5 )
- []
-
-
 
 [252]
 
-[253
+[253]
+Overfull \hbox (49.8578pt too wide) in paragraph at lines 13698--13699
+\T1/cmr/m/n/10.95 ``Easier to ask for-give-ness than per-mis-sion'': at-tempt \
+T1/cmtt/m/n/10.95 open\T1/cmr/m/n/10.95 /read and catch \T1/cmtt/m/n/10.95 File
+NotFoundError\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 PermissionError\T1/cmr/m/n/
+10.95 ,
+ []
 
-]
+
 
 [254]
 
-[255]
-Capitolul 9.
-
-
-[256
-
-]
-
-[257
-
-]
-
-[258
-
-]
-Overfull \hbox (2.73625pt too wide) in paragraph at lines 13217--13218
-[]\T1/cmtt/m/n/10.95 TextIOWrapper \T1/cmr/m/n/10.95 --- top la-yer; runs en-co
--din-g/-de-co-ding state ma-chi-nes and uni-ver-sal new-line transla-
- []
-
-
-
-[259]
-
-[260]
-
-[261
-
-]
-
-[262]
-Overfull \hbox (20.83215pt too wide) in paragraph at lines 13359--13360
-\T1/cmr/m/n/10.95 Mismatched en-co-dings sur-face as \T1/cmtt/m/n/10.95 Unicode
-DecodeError \T1/cmr/m/n/10.95 or \T1/cmtt/m/n/10.95 UnicodeEncodeError\T1/cmr/m
-/n/10.95 . De-fa-ult \T1/cmtt/m/n/10.95 errors="strict"
- []
-
-
-
-[263
-
-]
-
-[264]
-
-[265
-
-]
-
-[266]
-Overfull \hbox (48.23837pt too wide) in paragraph at lines 13456--13457
-\T1/cmtt/m/n/10.95 pathlib.Path \T1/cmr/m/n/10.95 is an er-go-no-mic struc-tu-r
-al abs-trac-tion: \T1/cmtt/m/n/10.95 / \T1/cmr/m/n/10.95 over-load com-po-ses c
-om-po-nents, \T1/cmtt/m/n/10.95 .name\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .par
-ent\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .suffix
- []
-
-
-
-[267
-
-]
-
-[268]
-
-[269
-
-]
-
-[270]
-Overfull \hbox (49.8578pt too wide) in paragraph at lines 13613--13614
-\T1/cmr/m/n/10.95 ``Easier to ask for-gi-ve-ness than per-mis-sion'': at-tempt 
-\T1/cmtt/m/n/10.95 open\T1/cmr/m/n/10.95 /read and catch \T1/cmtt/m/n/10.95 Fil
-eNotFoundError\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 PermissionError\T1/cmr/m/n
-/10.95 ,
- []
-
-
-
-[271
-
-]
-
-[272
-
-] (./main_document_processed.lof)
+[255] (./main_document_processed.lof)
 \tf@lof=\write9
 \openout9 = `main_document_processed.lof'.
 
  (./main_document_processed.bbl
 
-[273
+[256
 
 ]
 
@@ -2949,47 +3226,53 @@ LaTeX Warning: Empty `thebibliography' environment on input line 3.
 
 )
 
-[274
+[257
 
 ] (./main_document_processed.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
+
+
+LaTeX Warning: There were multiply-defined labels.
+
 Package rerunfilecheck Info: File `main_document_processed.out' has not changed
 .
-(rerunfilecheck)             Checksum: C06EF8D64B4ED18C5B5FC13D76838DE0;43846.
+(rerunfilecheck)             Checksum: CFFB77E92B11C8D08009ED313E09999A;43843.
  ) 
 Here is how much of TeX's memory you used:
- 54183 strings out of 473197
- 1252725 string characters out of 5718604
- 1969699 words of memory out of 5000000
- 75631 multiletter control sequences out of 15000+600000
- 583079 words of font info for 88 fonts, out of 8000000 for 9000
+ 54776 strings out of 473197
+ 1274261 string characters out of 5718604
+ 1971271 words of memory out of 5000000
+ 76061 multiletter control sequences out of 15000+600000
+ 584796 words of font info for 93 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  130i,13n,124p,875b,1510s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive
-/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf/fonts/t
-ype1/public/cm-super/sfbx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super
-/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/
-share/texmf/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf/fonts/ty
-pe1/public/cm-super/sfbx2488.pfb></usr/share/texmf/fonts/type1/public/cm-super/
-sfit1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm0600.pfb></usr/s
-hare/texmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/typ
-e1/public/cm-super/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/s
-fsx0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx0900.pfb></usr/sh
-are/texmf/fonts/type1/public/cm-super/sfsx3583.pfb></usr/share/texmf/fonts/type
-1/public/cm-super/sfti1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sf
-tt0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb></usr/sha
-re/texmf/fonts/type1/public/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1
-/public/cm-super/sftt1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sft
-t1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1440.pfb>
-Output written on main_document_processed.pdf (274 pages, 1176575 bytes).
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/f
+onts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texmf/fonts/type1/public/cm
+-super/sfbx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb>
+</usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/fo
+nts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf/fonts/type1/public/cm-
+super/sfbx2488.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfit1000.pfb><
+/usr/share/texmf/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texmf/fon
+ts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/type1/public/cm-s
+uper/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx0800.pfb></
+usr/share/texmf/fonts/type1/public/cm-super/sfsx0900.pfb></usr/share/texmf/font
+s/type1/public/cm-super/sfsx3583.pfb></usr/share/texmf/fonts/type1/public/cm-su
+per/sfti1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0800.pfb></u
+sr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb></usr/share/texmf/fonts
+/type1/public/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1/public/cm-sup
+er/sftt1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1200.pfb></us
+r/share/texmf/fonts/type1/public/cm-super/sftt1440.pfb>
+Output written on main_document_processed.pdf (257 pages, 1252089 bytes).
 PDF statistics:
- 2700 PDF objects out of 2984 (max. 8388607)
- 2328 compressed objects within 24 object streams
- 817 named destinations out of 1000 (max. 500000)
+ 2695 PDF objects out of 2984 (max. 8388607)
+ 2335 compressed objects within 24 object streams
+ 847 named destinations out of 1000 (max. 500000)
  1445 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Positional-Only Parameters Using /",
+  "label": "fun01",
+  "linenos": true,
+  "input": null,
+  "output": "(a, b, /)\na: POSITIONAL_ONLY\nb: POSITIONAL_ONLY",
+  "file": "main.py"
+}

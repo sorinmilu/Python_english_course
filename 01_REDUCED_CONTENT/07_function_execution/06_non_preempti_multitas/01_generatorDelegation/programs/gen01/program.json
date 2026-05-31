@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "yield from as Delegated Iteration over Subgenerators and Iterables",
+  "label": "gen01",
+  "linenos": true,
+  "input": null,
+  "output": "[1, 2, 3]",
+  "file": "main.py"
+}

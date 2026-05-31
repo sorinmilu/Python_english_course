@@ -145,46 +145,13 @@ The final value remains bound after the loop because the \texttt{for} statement 
 
 The \texttt{pass} statement is also useful when defining a function or class before implementing it:
 
-\begin{verbatim}
-def convert_score(score):
-    pass
+%<<<PROGRAM:programs/emp02>>>
 
-class EmptyBox:
-    pass
-
-print(f"type(convert_score): {type(convert_score)}")
-print(f"type(EmptyBox): {type(EmptyBox)}")
-print(f"type(EmptyBox()): {type(EmptyBox())}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(convert_score): <class 'function'>
-type(EmptyBox): <class 'type'>
-type(EmptyBox()): <class '__main__.EmptyBox'>
-\end{verbatim}
 
 The function exists even though its body does no useful work. If it is called, it returns \texttt{None}, because a Python function without an explicit \texttt{return} statement returns \texttt{None} automatically.
 
-\begin{verbatim}
-def convert_score(score):
-    pass
+%<<<PROGRAM:programs/emp01>>>
 
-result = convert_score(42)
-
-print(f"result: {result}")
-print(f"type(result): {type(result)}")
-print(f"dir(result) sample: {dir(result)[:5]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-result: None
-type(result): <class 'NoneType'>
-dir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__']
-\end{verbatim}
 
 The object \texttt{None} is Python's single built-in object for representing absence of a returned value. Its type is \texttt{NoneType}. The method \texttt{\_\_bool\_\_} is important because \texttt{None} is false in truth-value testing:
 

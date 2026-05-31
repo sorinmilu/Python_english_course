@@ -6,23 +6,8 @@ A function signature is the call contract: how argument objects bind to local pa
 
 Default values are evaluated when the \texttt{def} statement executes and stored on the function object (\texttt{\_\_defaults\_\_} as a tuple, \texttt{\_\_kwdefaults\_\_} as a dict for keyword-only defaults). Rebinding a name used in a default expression does not alter stored defaults.
 
-\begin{verbatim}
-default_score = 42
+%<<<PROGRAM:programs/fun02>>>
 
-def show_line(name, score=default_score):
-    return f"{name}: {score}"
-
-default_score = 999
-print(show_line("Homer"))
-print(f"stored default: {show_line.__defaults__}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-Homer: 42
-stored default: (42,)
-\end{verbatim}
 
 A function call in a default (\texttt{def f(x=make\_obj())}) runs once at definition time. Mutable defaults persist across calls---studied in the architectural pitfalls section.
 
@@ -30,25 +15,8 @@ A function call in a default (\texttt{def f(x=make\_obj())}) runs once at defini
 
 Parameters before \texttt{/} accept positional arguments only. The marker is a binding-rule separator, not a parameter.
 
-\begin{verbatim}
-import inspect
+%<<<PROGRAM:programs/fun01>>>
 
-def divide(a, b, /):
-    return a / b
-
-sig = inspect.signature(divide)
-print(f"{sig}")
-for name, param in sig.parameters.items():
-    print(f"{name}: {param.kind}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-(a, b, /)
-a: POSITIONAL_ONLY
-b: POSITIONAL_ONLY
-\end{verbatim}
 
 \subsubsection{Keyword-Only Parameters Using \texttt{*}}
 

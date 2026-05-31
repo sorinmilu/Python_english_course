@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Nam...",
+  "label": "mem01",
+  "linenos": true,
+  "input": null,
+  "output": "x='Arthur', y='Patsy'\nafter caller rebind: x='Patsy', y='Arthur'",
+  "file": "main.py"
+}

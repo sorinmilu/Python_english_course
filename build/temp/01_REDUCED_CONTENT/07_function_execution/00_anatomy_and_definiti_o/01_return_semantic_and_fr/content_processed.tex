@@ -8,7 +8,7 @@ Unlike C, where activation records typically live on the hardware stack, CPython
 
 This design trades stack efficiency for runtime flexibility: frames can be introspected via \texttt{inspect.currentframe()}, preserved across \texttt{yield} suspensions (\texttt{gi\_frame}), and chained during recursion. The cost is heap allocation and reference management on every call---significant compared to bare-metal stack frames, but necessary for Python's object model and generator/coroutine semantics.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Execution Frames: Inside the CPython Call Stack and PyFrameObject Allocation}{ret04}
 import inspect
 
 def show_frame(n):
@@ -17,13 +17,15 @@ def show_frame(n):
           f"locals={list(frame.f_locals.keys())}, f_back={frame.f_back is not None}")
 
 show_frame(42)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-n=42, co_name=show_frame, locals=['n', 'frame'], f_back=True
-\end{verbatim}
+\begin{iobox}{Expected Output}
+n=42, co\_name=show\_frame, locals=['n', 'frame'], f\_back=True \\
+\end{iobox}
+
+
+
 
 Recursive calls create a chain of simultaneous heap frames, each running the same \texttt{co\_code} with different local state, until \texttt{sys.getrecursionlimit()} is exceeded.
 
@@ -31,7 +33,7 @@ Recursive calls create a chain of simultaneous heap frames, each running the sam
 
 A function that reaches the end of its body without \texttt{return} yields \texttt{None}. \texttt{print()} sends text to stdout; \texttt{return} sends an object to the caller. These are separate operations.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Implicit Return Defaults: Why Functions Without return Produce None}{ret03}
 def noisy_add(a, b):
     print(a + b)
 
@@ -42,14 +44,16 @@ x = noisy_add(20, 22)
 y = real_add(20, 22)
 
 print(f"x={x!r}, y={y!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-42
-x=None, y=42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+42 \\
+x=None, y=42 \\
+\end{iobox}
+
+
+
 
 An explicit bare \texttt{return} also returns \texttt{None}. There is normally one \texttt{None} object per process; check with \texttt{is None}.
 
@@ -57,7 +61,7 @@ An explicit bare \texttt{return} also returns \texttt{None}. There is normally o
 
 Python functions always return one object reference. \texttt{return a, b} constructs a tuple and returns it; the caller may unpack with \texttt{x, y = func()}.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Multiple Return Values as Tuple Packing: The Real Structure Behind return a, b}{ret02}
 def get_pair():
     return "Homer", 42
 
@@ -66,14 +70,16 @@ label, code = get_pair()
 
 print(f"result={result}, type={type(result)}")
 print(f"label={label!r}, code={code!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-result=('Homer', 42), type=<class 'tuple'>
-label='Homer', code=42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+result=('Homer', 42), type=<class 'tuple'> \\
+label='Homer', code=42 \\
+\end{iobox}
+
+
+
 
 Starred unpacking (\texttt{first, *rest = func()}) collects overflow into a new \texttt{list}. Mismatch between target count and tuple length raises \texttt{ValueError} in the caller, not in the callee.
 
@@ -81,7 +87,7 @@ Starred unpacking (\texttt{first, *rest = func()}) collects overflow into a new 
 
 Each recursive call allocates a new heap frame with its own locals. The base case stops frame creation; returns unwind one object at a time.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth B...}{ret01}
 import sys
 
 def sum_down(n):
@@ -91,13 +97,15 @@ def sum_down(n):
 
 print(f"sum_down(4)={sum_down(4)}")
 print(f"recursion limit={sys.getrecursionlimit()}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-sum_down(4)=10
-recursion limit=1000
-\end{verbatim}
+\begin{iobox}{Expected Output}
+sum\_down(4)=10 \\
+recursion limit=1000 \\
+\end{iobox}
+
+
+
 
 Without a base case or progress toward it, Python raises \texttt{RecursionError: maximum recursion depth exceeded}. Each active call consumes stack depth because every frame must remain allocated until its callee returns.

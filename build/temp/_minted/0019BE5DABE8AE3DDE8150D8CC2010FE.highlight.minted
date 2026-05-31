@@ -1,0 +1,11 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{inner}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{yield} \PYG{l+m+mi}{1}
+    \PYG{k}{yield} \PYG{l+m+mi}{2}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{outer}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{yield from} \PYG{n}{inner}\PYG{p}{(}\PYG{p}{)}
+    \PYG{k}{yield} \PYG{l+m+mi}{3}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{list}\PYG{p}{(}\PYG{n}{outer}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}\PYG{p}{)}
+\end{MintedVerbatim}

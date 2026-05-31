@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Execution Frames: Inside the CPython Call Stack and PyFrameObject Allocation",
+  "label": "ret04",
+  "linenos": true,
+  "input": null,
+  "output": "n=42, co_name=show_frame, locals=['n', 'frame'], f_back=True",
+  "file": "main.py"
+}

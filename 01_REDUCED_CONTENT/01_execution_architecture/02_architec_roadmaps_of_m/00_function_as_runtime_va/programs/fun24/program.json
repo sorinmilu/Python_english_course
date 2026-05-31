@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C event libraries: registering callbacks with an opaque user_data pointer",
+  "label": "fun24",
+  "linenos": true,
+  "input": null,
+  "output": "handler A received event 42",
+  "file": "main.c"
+}

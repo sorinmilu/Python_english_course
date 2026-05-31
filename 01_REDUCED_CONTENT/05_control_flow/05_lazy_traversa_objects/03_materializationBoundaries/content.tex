@@ -260,74 +260,20 @@ The list is reusable because the integer objects are now stored in the list.
 
 The same applies to \texttt{filter()}:
 
-\begin{verbatim}
-def is_even(num):
-    return num % 2 == 0
+%<<<PROGRAM:programs/mat05>>>
 
-nums = [10, 15, 20, 42, 99]
-
-even_iter = filter(is_even, nums)
-even_nums = list(even_iter)
-
-print(f"even_nums: {even_nums}")
-print(f"type(even_nums): {type(even_nums)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-even_nums: [10, 20, 42]
-type(even_nums): <class 'list'>
-\end{verbatim}
 
 The filtered values are now stored.
 
 Materialization also makes length and indexing available when the target container supports them:
 
-\begin{verbatim}
-def is_even(num):
-    return num % 2 == 0
+%<<<PROGRAM:programs/mat04>>>
 
-nums = [10, 15, 20, 42, 99]
-
-even_nums = list(filter(is_even, nums))
-
-print(f"len(even_nums): {len(even_nums)}")
-print(f"even_nums[0]: {even_nums[0]}")
-print(f"even_nums[-1]: {even_nums[-1]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-len(even_nums): 3
-even_nums[0]: 10
-even_nums[-1]: 42
-\end{verbatim}
 
 A lazy \texttt{filter} object does not support indexing:
 
-\begin{verbatim}
-def is_even(num):
-    return num % 2 == 0
+%<<<PROGRAM:programs/mat03>>>
 
-nums = [10, 15, 20, 42, 99]
-
-even_iter = filter(is_even, nums)
-
-try:
-    print(even_iter[0])
-except TypeError as err:
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'TypeError'>
-message: 'filter' object is not subscriptable
-\end{verbatim}
 
 The iterator can produce values, but it is not an indexable sequence. If indexed access is needed, materialization is the correct boundary.
 
@@ -405,28 +351,8 @@ The reported list size is only the list container's storage for references. It d
 
 A useful practical pattern is to leave the pipeline lazy until the point where storage is actually needed:
 
-\begin{verbatim}
-def is_even(num):
-    return num % 2 == 0
+%<<<PROGRAM:programs/mat02>>>
 
-texts = ["10", "15", "20", "42", "99"]
-
-nums = map(int, texts)
-even_nums = filter(is_even, nums)
-
-print("pipeline is still lazy")
-
-stored = list(even_nums)
-
-print(f"stored: {stored}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-pipeline is still lazy
-stored: [10, 20, 42]
-\end{verbatim}
 
 The transformation and filtering occur when \texttt{list(even\_nums)} consumes the pipeline.
 
@@ -453,28 +379,8 @@ Here \texttt{sum()} consumes the lazy pipeline. No list is created. This is usef
 
 But if the intermediate values must be printed, inspected, reused, or indexed, materialize them:
 
-\begin{verbatim}
-def is_even(num):
-    return num % 2 == 0
+%<<<PROGRAM:programs/mat01>>>
 
-texts = ["10", "15", "20", "42", "99"]
-
-even_nums = list(filter(is_even, map(int, texts)))
-
-print(f"even_nums: {even_nums}")
-print(f"first even number: {even_nums[0]}")
-print(f"total: {sum(even_nums)}")
-print(f"again total: {sum(even_nums)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-even_nums: [10, 20, 42]
-first even number: 10
-total: 72
-again total: 72
-\end{verbatim}
 
 The practical rule is:
 

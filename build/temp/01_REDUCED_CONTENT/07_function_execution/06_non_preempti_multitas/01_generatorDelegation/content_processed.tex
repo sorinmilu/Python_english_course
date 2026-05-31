@@ -4,7 +4,7 @@
 
 \subsubsection{\texttt{yield from} as Delegated Iteration over Subgenerators and Iterables}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{yield from as Delegated Iteration over Subgenerators and Iterables}{gen01}
 def inner():
     yield 1
     yield 2
@@ -14,13 +14,15 @@ def outer():
     yield 3
 
 print(list(outer()))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-[1, 2, 3]
-\end{verbatim}
+\begin{iobox}{Expected Output}
+[1, 2, 3] \\
+\end{iobox}
+
+
+
 
 The outer generator suspends while the inner generator runs, sharing the delegation protocol without manually iterating.
 

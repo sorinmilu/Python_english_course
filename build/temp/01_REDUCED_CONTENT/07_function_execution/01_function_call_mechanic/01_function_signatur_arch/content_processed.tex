@@ -6,7 +6,7 @@ A function signature is the call contract: how argument objects bind to local pa
 
 Default values are evaluated when the \texttt{def} statement executes and stored on the function object (\texttt{\_\_defaults\_\_} as a tuple, \texttt{\_\_kwdefaults\_\_} as a dict for keyword-only defaults). Rebinding a name used in a default expression does not alter stored defaults.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Default Parameter Values and Definition-Time Evaluation}{fun02}
 default_score = 42
 
 def show_line(name, score=default_score):
@@ -15,14 +15,16 @@ def show_line(name, score=default_score):
 default_score = 999
 print(show_line("Homer"))
 print(f"stored default: {show_line.__defaults__}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-Homer: 42
-stored default: (42,)
-\end{verbatim}
+\begin{iobox}{Expected Output}
+Homer: 42 \\
+stored default: (42,) \\
+\end{iobox}
+
+
+
 
 A function call in a default (\texttt{def f(x=make\_obj())}) runs once at definition time. Mutable defaults persist across calls---studied in the architectural pitfalls section.
 
@@ -30,7 +32,7 @@ A function call in a default (\texttt{def f(x=make\_obj())}) runs once at defini
 
 Parameters before \texttt{/} accept positional arguments only. The marker is a binding-rule separator, not a parameter.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Positional-Only Parameters Using /}{fun01}
 import inspect
 
 def divide(a, b, /):
@@ -40,15 +42,17 @@ sig = inspect.signature(divide)
 print(f"{sig}")
 for name, param in sig.parameters.items():
     print(f"{name}: {param.kind}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-(a, b, /)
-a: POSITIONAL_ONLY
-b: POSITIONAL_ONLY
-\end{verbatim}
+\begin{iobox}{Expected Output}
+(a, b, /) \\
+a: POSITIONAL\_ONLY \\
+b: POSITIONAL\_ONLY \\
+\end{iobox}
+
+
+
 
 \subsubsection{Keyword-Only Parameters Using \texttt{*}}
 

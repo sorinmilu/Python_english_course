@@ -1,0 +1,14 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{is\PYGZus{}even}\PYG{p}{(}\PYG{n}{num}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{return} \PYG{n}{num} \PYG{o}{\PYGZpc{}} \PYG{l+m+mi}{2} \PYG{o}{==} \PYG{l+m+mi}{0}
+
+\PYG{n}{nums} \PYG{o}{=} \PYG{p}{[}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{15}\PYG{p}{,} \PYG{l+m+mi}{20}\PYG{p}{,} \PYG{l+m+mi}{42}\PYG{p}{,} \PYG{l+m+mi}{99}\PYG{p}{]}
+
+\PYG{n}{even\PYGZus{}iter} \PYG{o}{=} \PYG{n+nb}{filter}\PYG{p}{(}\PYG{n}{is\PYGZus{}even}\PYG{p}{,} \PYG{n}{nums}\PYG{p}{)}
+
+\PYG{k}{try}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{even\PYGZus{}iter}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{TypeError} \PYG{k}{as} \PYG{n}{err}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{type(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{message: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

@@ -4,7 +4,7 @@
 
 \usepackage[fontsize=11pt]{scrextend}
 
-\usepackage[english,romanian]{babel}
+\usepackage[english]{babel}
 
 \usepackage[fixlanguage]{babelbib}
 
@@ -60,44 +60,9 @@
 \usetikzlibrary{shapes.geometric, fit,positioning,calc,arrows.meta,backgrounds}
 \usepackage{import}
 \subimport{layers/}{init.tex}
-\preto\section{\clearpage}
 
 \newcommand{\cmark}{\ding{51}} % ✓
 \newcommand{\xmark}{\ding{55}} % ✗ 
-
-% --- Auto-detect and fallback for missing PlotNeuralNet pics ---
-% \usepackage{xcolor}
-% colors if your code references them
-% \providecommand{\InputColor}{blue!20}
-% \providecommand{\ConvColor}{teal!30}
-% \providecommand{\PoolColor}{cyan!25}
-% \providecommand{\FcColor}{green!25}
-% \providecommand{\SoftMaxColor}{orange!35}
-% \providecommand{\SumColor}{violet!25}
-% \providecommand{\BlockColor}{black!15}
-
-% % default connection style if not defined
-% \tikzset{connection/.style={-Stealth, line width=0.6mm}}
-
-% \makeatletter
-% % if a pic key isn't defined, alias it to shapes that DO exist in the official repo
-% \pgfkeysifdefined{/tikz/pics/Conv/.@cmd}{}{%
-%   \tikzset{pics/Conv/.style    n args={1}{code={\pic {RightBandedBox={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Pool/.@cmd}{}{%
-%   \tikzset{pics/Pool/.style    n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Fc/.@cmd}{}{%
-%   \tikzset{pics/Fc/.style      n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/SoftMax/.@cmd}{}{%
-%   \tikzset{pics/SoftMax/.style n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \pgfkeysifdefined{/tikz/pics/Concat/.@cmd}{}{%
-%   \tikzset{pics/Concat/.style  n args={1}{code={\pic {Box={#1}};}}}
-% }
-% \makeatother
-% --- end fallback ---
 
 \makeatletter
 \setlength{\@fptop}{0pt}
@@ -2646,7 +2611,9 @@ qsort
 
 A second useful C callback pattern appears in event libraries. A C API may let the user register a function and an opaque state pointer:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{C event libraries: registering callbacks with an opaque user\_data pointer}{fun24}
+#include <stdio.h>
+
 typedef void (*event_callback_t)(int event_code, void *user_data);
 
 void dispatch_event(event_callback_t callback, void *user_data) {
@@ -2663,7 +2630,14 @@ int main(void) {
     dispatch_event(print_event, "handler A");
     return 0;
 }
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+handler A received event 42 \\
+\end{iobox}
+
+
 
 The useful application is GUI programming, network libraries, embedded systems, plugin hooks, and low-level event loops. The function pointer supplies the code. The \texttt{void *user\_data} pointer supplies state. This manually emulates what higher-level languages do automatically with closures.
 
@@ -2818,7 +2792,7 @@ The useful application is event-driven interface programming. The programmer reg
 
 A longer interface-based shape is:
 
-\begin{verbatim}
+\begin{codebox}[]{java}{Java: interface-based callbacks and Dispatcher.run invocation}{fun27}
 interface Callback {
     void call(String message);
 }
@@ -2840,7 +2814,14 @@ public class Main {
         Dispatcher.run(new Printer());
     }
 }
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+event happened \\
+\end{iobox}
+
+
 
 At source level, \texttt{callback.call(...)} looks like a method call. At JVM level, this creates ordinary method frames. During callback execution:
 
@@ -4345,7 +4326,7 @@ later call:
 
 The key rule is that the environment must outlive the callback. Therefore, allocating the environment on the stack would be wrong if the closure escapes:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{C: returning a closure that points at a stack-allocated environment (dangling pointer)}{fun26}
 struct closure bad_make_multiplier(int factor) {
     struct multiplier_env env;
     env.factor = factor;
@@ -4356,21 +4337,35 @@ struct closure bad_make_multiplier(int factor) {
 
     return c;
 }
-\end{verbatim}
+\end{codebox}
+
+
 
 After \texttt{bad\_make\_multiplier} returns, \texttt{env} no longer exists. The closure contains a dangling pointer.
 
 Some C compilers provide nonstandard closure-like extensions. GCC nested functions can refer to enclosing variables in some modes, and Apple/Clang blocks provide a stronger closure-like extension:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{Clang blocks: capturing lexical state with a non-ISO C closure extension}{fun28}
+#include <stdio.h>
+
 int factor = 3;
 
 int (^multiply)(int) = ^int(int value) {
     return value * factor;
 };
 
-printf("%d\n", multiply(10));
-\end{verbatim}
+int main(void) {
+    printf("%d\n", multiply(10));
+    return 0;
+}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+30 \\
+\end{iobox}
+
+
 
 Blocks can capture surrounding variables and may be copied to the heap when they must outlive their creation scope. This is not ISO C, but it shows what extra compiler/runtime machinery is needed to support closures safely.
 
@@ -4406,7 +4401,7 @@ This is not heap-preserved lexical state. It is lookup in the shell's current va
 
 A callback-like function generator can be approximated with \texttt{eval}, but this is fragile and often unsafe:
 
-\begin{verbatim}
+\begin{codebox}[]{bash}{Bash: approximating callback factories with eval and dynamically defined functions}{fun25}
 make_printer() {
     local name="$1"
     local prefix="$2"
@@ -4416,7 +4411,14 @@ make_printer() {
 
 make_printer print_error "ERROR:"
 print_error "file missing"
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+ERROR: file missing \\
+\end{iobox}
+
+
 
 This creates a named function whose body contains the chosen prefix text. The useful application is limited script metaprogramming, but it is not the same as a runtime closure object. It is command-text generation.
 
@@ -7158,7 +7160,7 @@ The final value remains bound after the loop because the \texttt{for} statement 
 
 The \texttt{pass} statement is also useful when defining a function or class before implementing it:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The pass Statement: Syntactically Valid Empty Control-Flow Bodies}{emp02}
 def convert_score(score):
     pass
 
@@ -7168,19 +7170,21 @@ class EmptyBox:
 print(f"type(convert_score): {type(convert_score)}")
 print(f"type(EmptyBox): {type(EmptyBox)}")
 print(f"type(EmptyBox()): {type(EmptyBox())}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type(convert_score): <class 'function'>
-type(EmptyBox): <class 'type'>
-type(EmptyBox()): <class '__main__.EmptyBox'>
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type(convert\_score): <class 'function'> \\
+type(EmptyBox): <class 'type'> \\
+type(EmptyBox()): <class '\_\_main\_\_.EmptyBox'> \\
+\end{iobox}
+
+
+
 
 The function exists even though its body does no useful work. If it is called, it returns \texttt{None}, because a Python function without an explicit \texttt{return} statement returns \texttt{None} automatically.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The pass Statement: Syntactically Valid Empty Control-Flow Bodies}{emp01}
 def convert_score(score):
     pass
 
@@ -7189,15 +7193,17 @@ result = convert_score(42)
 print(f"result: {result}")
 print(f"type(result): {type(result)}")
 print(f"dir(result) sample: {dir(result)[:5]}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-result: None
-type(result): <class 'NoneType'>
-dir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__']
-\end{verbatim}
+\begin{iobox}{Expected Output}
+result: None \\
+type(result): <class 'NoneType'> \\
+dir(result) sample: ['\_\_bool\_\_', '\_\_class\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_'] \\
+\end{iobox}
+
+
+
 
 The object \texttt{None} is Python's single built-in object for representing absence of a returned value. Its type is \texttt{NoneType}. The method \texttt{\_\_bool\_\_} is important because \texttt{None} is false in truth-value testing:
 
@@ -9865,7 +9871,7 @@ The source list is reusable. The \texttt{map} iterator is not reusable after exh
 
 The transformation callable does not have to be \texttt{int}. It can be another callable object. A simple named function makes the lazy behavior visible:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra06}
 def loud_text(text):
     print(f"transforming: {text}")
     return text.upper()
@@ -9882,20 +9888,22 @@ print(next(loud_quotes))
 
 print("asking for second value")
 print(next(loud_quotes))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-map object created
-type(loud_quotes): <class 'map'>
-asking for first value
-transforming: ni
-NI
-asking for second value
-transforming: spam
-SPAM
-\end{verbatim}
+\begin{iobox}{Expected Output}
+map object created \\
+type(loud\_quotes): <class 'map'> \\
+asking for first value \\
+transforming: ni \\
+NI \\
+asking for second value \\
+transforming: spam \\
+SPAM \\
+\end{iobox}
+
+
+
 
 The function is not called when the \texttt{map} object is created. It is called when the iterator is advanced.
 
@@ -9932,7 +9940,7 @@ filter(predicate, iterable)
 
 The predicate is called for each value. If the predicate result is true, the original value is yielded. If the predicate result is false, the value is skipped.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra05}
 def is_even(num):
     return num % 2 == 0
 
@@ -9946,19 +9954,21 @@ print(f"dir(even_nums) sample: {dir(even_nums)[:12]}")
 
 print(f"has __iter__: {'__iter__' in dir(even_nums)}")
 print(f"has __next__: {'__next__' in dir(even_nums)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type(nums): <class 'list'>
-type(even_nums): <class 'filter'>
-dir(even_nums) sample: ['__class__', '__delattr__', '__dir__', '__doc__',
-'__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
-'__gt__', '__hash__', '__init__']
-has __iter__: True
-has __next__: True
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type(nums): <class 'list'> \\
+type(even\_nums): <class 'filter'> \\
+dir(even\_nums) sample: ['\_\_class\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', \\
+'\_\_eq\_\_', '\_\_format\_\_', '\_\_ge\_\_', '\_\_getattribute\_\_', '\_\_getstate\_\_', \\
+'\_\_gt\_\_', '\_\_hash\_\_', '\_\_init\_\_'] \\
+has \_\_iter\_\_: True \\
+has \_\_next\_\_: True \\
+\end{iobox}
+
+
+
 
 The \texttt{filter} object is also an iterator. It is lazy and consumable.
 
@@ -9986,7 +9996,7 @@ The values \texttt{15} and \texttt{99} were tested but not yielded, because the 
 
 A manual version makes the logic explicit:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra04}
 def is_even(num):
     return num % 2 == 0
 
@@ -9995,15 +10005,17 @@ nums = [10, 15, 20, 42, 99]
 for num in nums:
     if is_even(num):
         print(f"accepted: {num}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-accepted: 10
-accepted: 20
-accepted: 42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+accepted: 10 \\
+accepted: 20 \\
+accepted: 42 \\
+\end{iobox}
+
+
+
 
 The \texttt{filter()} version packages this pattern into a lazy iterator.
 
@@ -10050,7 +10062,7 @@ The \texttt{filter(None, values)} form keeps only those values whose \texttt{boo
 
 Like \texttt{map}, a \texttt{filter} object is consumed after traversal:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra03}
 def is_even(num):
     return num % 2 == 0
 
@@ -10063,14 +10075,16 @@ second = list(even_nums)
 
 print(f"first: {first}")
 print(f"second: {second}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-first: [10, 20, 42]
-second: []
-\end{verbatim}
+\begin{iobox}{Expected Output}
+first: [10, 20, 42] \\
+second: [] \\
+\end{iobox}
+
+
+
 
 The first materialization consumes the iterator.
 
@@ -10093,7 +10107,7 @@ Possible output:
 
 This works, but the \texttt{lambda} expression introduces another compact function syntax. For early teaching code, a named function is often clearer:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra02}
 def is_even(num):
     return num % 2 == 0
 
@@ -10103,13 +10117,15 @@ nums = map(int, texts)
 even_nums = filter(is_even, nums)
 
 print(list(even_nums))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-[10, 20, 42]
-\end{verbatim}
+\begin{iobox}{Expected Output}
+[10, 20, 42] \\
+\end{iobox}
+
+
+
 
 The pipeline is:
 
@@ -10124,7 +10140,7 @@ The important detail is that \texttt{nums} is itself a \texttt{map} iterator. Th
 
 A final example makes the stream-like behavior visible:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra01}
 def show_int(text):
     print(f"mapping: {text}")
     return int(text)
@@ -10141,21 +10157,23 @@ large_nums = filter(is_large, nums)
 print("pipeline created")
 print("asking for first accepted value")
 print(next(large_nums))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-pipeline created
-asking for first accepted value
-mapping: 10
-filtering: 10
-mapping: 20
-filtering: 20
-mapping: 42
-filtering: 42
-42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+pipeline created \\
+asking for first accepted value \\
+mapping: 10 \\
+filtering: 10 \\
+mapping: 20 \\
+filtering: 20 \\
+mapping: 42 \\
+filtering: 42 \\
+42 \\
+\end{iobox}
+
+
+
 
 The pipeline stops as soon as \texttt{next(large\_nums)} receives one accepted value. The value \texttt{"100"} has not yet been mapped or filtered, because no one has asked for another accepted value.
 
@@ -10427,7 +10445,7 @@ The list is reusable because the integer objects are now stored in the list.
 
 The same applies to \texttt{filter()}:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat05}
 def is_even(num):
     return num % 2 == 0
 
@@ -10438,20 +10456,22 @@ even_nums = list(even_iter)
 
 print(f"even_nums: {even_nums}")
 print(f"type(even_nums): {type(even_nums)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-even_nums: [10, 20, 42]
-type(even_nums): <class 'list'>
-\end{verbatim}
+\begin{iobox}{Expected Output}
+even\_nums: [10, 20, 42] \\
+type(even\_nums): <class 'list'> \\
+\end{iobox}
+
+
+
 
 The filtered values are now stored.
 
 Materialization also makes length and indexing available when the target container supports them:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat04}
 def is_even(num):
     return num % 2 == 0
 
@@ -10462,19 +10482,21 @@ even_nums = list(filter(is_even, nums))
 print(f"len(even_nums): {len(even_nums)}")
 print(f"even_nums[0]: {even_nums[0]}")
 print(f"even_nums[-1]: {even_nums[-1]}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-len(even_nums): 3
-even_nums[0]: 10
-even_nums[-1]: 42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+len(even\_nums): 3 \\
+even\_nums[0]: 10 \\
+even\_nums[-1]: 42 \\
+\end{iobox}
+
+
+
 
 A lazy \texttt{filter} object does not support indexing:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat03}
 def is_even(num):
     return num % 2 == 0
 
@@ -10487,14 +10509,16 @@ try:
 except TypeError as err:
     print(f"type(err): {type(err)}")
     print(f"message: {err}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type(err): <class 'TypeError'>
-message: 'filter' object is not subscriptable
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type(err): <class 'TypeError'> \\
+message: 'filter' object is not subscriptable \\
+\end{iobox}
+
+
+
 
 The iterator can produce values, but it is not an indexable sequence. If indexed access is needed, materialization is the correct boundary.
 
@@ -10572,7 +10596,7 @@ The reported list size is only the list container's storage for references. It d
 
 A useful practical pattern is to leave the pipeline lazy until the point where storage is actually needed:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat02}
 def is_even(num):
     return num % 2 == 0
 
@@ -10586,14 +10610,16 @@ print("pipeline is still lazy")
 stored = list(even_nums)
 
 print(f"stored: {stored}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-pipeline is still lazy
-stored: [10, 20, 42]
-\end{verbatim}
+\begin{iobox}{Expected Output}
+pipeline is still lazy \\
+stored: [10, 20, 42] \\
+\end{iobox}
+
+
+
 
 The transformation and filtering occur when \texttt{list(even\_nums)} consumes the pipeline.
 
@@ -10620,7 +10646,7 @@ Here \texttt{sum()} consumes the lazy pipeline. No list is created. This is usef
 
 But if the intermediate values must be printed, inspected, reused, or indexed, materialize them:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat01}
 def is_even(num):
     return num % 2 == 0
 
@@ -10632,16 +10658,18 @@ print(f"even_nums: {even_nums}")
 print(f"first even number: {even_nums[0]}")
 print(f"total: {sum(even_nums)}")
 print(f"again total: {sum(even_nums)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-even_nums: [10, 20, 42]
-first even number: 10
-total: 72
-again total: 72
-\end{verbatim}
+\begin{iobox}{Expected Output}
+even\_nums: [10, 20, 42] \\
+first even number: 10 \\
+total: 72 \\
+again total: 72 \\
+\end{iobox}
+
+
+
 
 The practical rule is:
 
@@ -12013,7 +12041,7 @@ A Python function is a runtime object. The \texttt{def} statement creates it, at
 
 A function object references a code object. The function is the callable wrapper; the code object holds compiled execution data: local names, constants, external names, and raw bytecode.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\_\_cod...}{str02}
 def make_message(name, number=42):
     text = f"{name} says {number}"
     return text.upper()
@@ -12025,17 +12053,19 @@ print(f"co_varnames:    {code_obj.co_varnames}")
 print(f"co_consts:      {code_obj.co_consts}")
 print(f"co_names:       {code_obj.co_names}")
 print(f"co_code length: {len(code_obj.co_code)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-co_argcount:    2
-co_varnames:    ('name', 'number', 'text')
-co_consts:      (None, ' says ')
-co_names:       ('upper',)
-co_code length: 58
-\end{verbatim}
+\begin{iobox}{Expected Output}
+co\_argcount:    2 \\
+co\_varnames:    ('name', 'number', 'text') \\
+co\_consts:      (None, ' says ') \\
+co\_names:       ('upper',) \\
+co\_code length: 58 \\
+\end{iobox}
+
+
+
 
 The stable separation is: function object (callable metadata) $\rightarrow$ code object (compiled description) $\rightarrow$ \texttt{co\_code} bytes (VM instruction stream). Exact byte sequences vary by CPython version; the object chain does not.
 
@@ -12067,7 +12097,7 @@ When the function is called, a frame executes these instructions. A function is 
 
 A \texttt{lambda} expression creates the same kind of function object as \texttt{def}. The compiler emits a \texttt{PyCodeObject} with identical structural fields: \texttt{co\_varnames}, \texttt{co\_consts}, \texttt{co\_code}, and call behavior via \texttt{\_\_call\_\_}. Lambdas are syntactic sugar restricted to a single expression; they carry the same allocation and execution profile as named functions.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Anonymous Expressions: The Structural Equivalence of lambda Functions}{str01}
 def add_def(x):
     return x + 42
 
@@ -12076,14 +12106,16 @@ add_lambda = lambda x: x + 42
 for label, fn in [("add_def", add_def), ("add_lambda", add_lambda)]:
     print(f"{label}: type={type(fn)}, vars={fn.__code__.co_varnames}, "
           f"consts={fn.__code__.co_consts}, result={fn(8)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-add_def: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50
-add_lambda: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50
-\end{verbatim}
+\begin{iobox}{Expected Output}
+add\_def: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50 \\
+add\_lambda: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50 \\
+\end{iobox}
+
+
+
 
 The only runtime differences are cosmetic: \texttt{\_\_name\_\_} is \texttt{'<lambda>'} and there is no docstring slot. Performance, frame allocation, and bytecode structure are equivalent. Use \texttt{lambda} only when an expression-level function is clearer; use \texttt{def} for multi-statement bodies.
 
@@ -12098,7 +12130,7 @@ Unlike C, where activation records typically live on the hardware stack, CPython
 
 This design trades stack efficiency for runtime flexibility: frames can be introspected via \texttt{inspect.currentframe()}, preserved across \texttt{yield} suspensions (\texttt{gi\_frame}), and chained during recursion. The cost is heap allocation and reference management on every call---significant compared to bare-metal stack frames, but necessary for Python's object model and generator/coroutine semantics.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Execution Frames: Inside the CPython Call Stack and PyFrameObject Allocation}{ret04}
 import inspect
 
 def show_frame(n):
@@ -12107,13 +12139,15 @@ def show_frame(n):
           f"locals={list(frame.f_locals.keys())}, f_back={frame.f_back is not None}")
 
 show_frame(42)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-n=42, co_name=show_frame, locals=['n', 'frame'], f_back=True
-\end{verbatim}
+\begin{iobox}{Expected Output}
+n=42, co\_name=show\_frame, locals=['n', 'frame'], f\_back=True \\
+\end{iobox}
+
+
+
 
 Recursive calls create a chain of simultaneous heap frames, each running the same \texttt{co\_code} with different local state, until \texttt{sys.getrecursionlimit()} is exceeded.
 
@@ -12121,7 +12155,7 @@ Recursive calls create a chain of simultaneous heap frames, each running the sam
 
 A function that reaches the end of its body without \texttt{return} yields \texttt{None}. \texttt{print()} sends text to stdout; \texttt{return} sends an object to the caller. These are separate operations.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Implicit Return Defaults: Why Functions Without return Produce None}{ret03}
 def noisy_add(a, b):
     print(a + b)
 
@@ -12132,14 +12166,16 @@ x = noisy_add(20, 22)
 y = real_add(20, 22)
 
 print(f"x={x!r}, y={y!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-42
-x=None, y=42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+42 \\
+x=None, y=42 \\
+\end{iobox}
+
+
+
 
 An explicit bare \texttt{return} also returns \texttt{None}. There is normally one \texttt{None} object per process; check with \texttt{is None}.
 
@@ -12147,7 +12183,7 @@ An explicit bare \texttt{return} also returns \texttt{None}. There is normally o
 
 Python functions always return one object reference. \texttt{return a, b} constructs a tuple and returns it; the caller may unpack with \texttt{x, y = func()}.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Multiple Return Values as Tuple Packing: The Real Structure Behind return a, b}{ret02}
 def get_pair():
     return "Homer", 42
 
@@ -12156,14 +12192,16 @@ label, code = get_pair()
 
 print(f"result={result}, type={type(result)}")
 print(f"label={label!r}, code={code!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-result=('Homer', 42), type=<class 'tuple'>
-label='Homer', code=42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+result=('Homer', 42), type=<class 'tuple'> \\
+label='Homer', code=42 \\
+\end{iobox}
+
+
+
 
 Starred unpacking (\texttt{first, *rest = func()}) collects overflow into a new \texttt{list}. Mismatch between target count and tuple length raises \texttt{ValueError} in the caller, not in the callee.
 
@@ -12171,7 +12209,7 @@ Starred unpacking (\texttt{first, *rest = func()}) collects overflow into a new 
 
 Each recursive call allocates a new heap frame with its own locals. The base case stops frame creation; returns unwind one object at a time.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth B...}{ret01}
 import sys
 
 def sum_down(n):
@@ -12181,14 +12219,16 @@ def sum_down(n):
 
 print(f"sum_down(4)={sum_down(4)}")
 print(f"recursion limit={sys.getrecursionlimit()}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-sum_down(4)=10
-recursion limit=1000
-\end{verbatim}
+\begin{iobox}{Expected Output}
+sum\_down(4)=10 \\
+recursion limit=1000 \\
+\end{iobox}
+
+
+
 
 Without a base case or progress toward it, Python raises \texttt{RecursionError: maximum recursion depth exceeded}. Each active call consumes stack depth because every frame must remain allocated until its callee returns.
 
@@ -12213,7 +12253,7 @@ Python parameter passing is call-by-object-reference (call-by-sharing): the call
     \item in-place mutation of a shared mutable object is visible through all names referencing it.
 \end{enumerate}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object Referen...}{mem02}
 def change_number(n):
     n = n + 1
 
@@ -12227,13 +12267,15 @@ change_number(x)
 add_line(quotes)
 
 print(f"x={x}, quotes={quotes}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-x=42, quotes=["D'oh!", 'extra']
-\end{verbatim}
+\begin{iobox}{Expected Output}
+x=42, quotes=["D'oh!", 'extra'] \\
+\end{iobox}
+
+
+
 
 Immutable objects cannot change in place; \texttt{n = n + 1} creates a new integer and rebinds \texttt{n}. Mutable objects can be mutated through shared references.
 
@@ -12241,7 +12283,7 @@ Immutable objects cannot change in place; \texttt{n = n + 1} creates a new integ
 
 C passes values or pointer copies into callee storage. Python creates a new local binding to the same heap object. The callee cannot rebind the caller's name slot; it can only mutate a shared object or rebind its own local name.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Nam...}{mem01}
 def bad_swap(a, b):
     a, b = b, a
 
@@ -12251,14 +12293,16 @@ print(f"after bad_swap: x={x!r}, y={y!r}")
 
 x, y = y, x  # caller must rebind explicitly
 print(f"after caller rebind: x={x!r}, y={y!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-x='Arthur', y='Patsy'
-after caller rebind: x='Patsy', y='Arthur'
-\end{verbatim}
+\begin{iobox}{Expected Output}
+x='Arthur', y='Patsy' \\
+after caller rebind: x='Patsy', y='Arthur' \\
+\end{iobox}
+
+
+
 
 \subsubsection{Side Effects Matrix: Mutating Mutable Objects In Place vs. Reassigning Local Names}
 
@@ -12289,7 +12333,7 @@ A function signature is the call contract: how argument objects bind to local pa
 
 Default values are evaluated when the \texttt{def} statement executes and stored on the function object (\texttt{\_\_defaults\_\_} as a tuple, \texttt{\_\_kwdefaults\_\_} as a dict for keyword-only defaults). Rebinding a name used in a default expression does not alter stored defaults.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Default Parameter Values and Definition-Time Evaluation}{fun02}
 default_score = 42
 
 def show_line(name, score=default_score):
@@ -12298,14 +12342,16 @@ def show_line(name, score=default_score):
 default_score = 999
 print(show_line("Homer"))
 print(f"stored default: {show_line.__defaults__}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-Homer: 42
-stored default: (42,)
-\end{verbatim}
+\begin{iobox}{Expected Output}
+Homer: 42 \\
+stored default: (42,) \\
+\end{iobox}
+
+
+
 
 A function call in a default (\texttt{def f(x=make\_obj())}) runs once at definition time. Mutable defaults persist across calls---studied in the architectural pitfalls section.
 
@@ -12313,7 +12359,7 @@ A function call in a default (\texttt{def f(x=make\_obj())}) runs once at defini
 
 Parameters before \texttt{/} accept positional arguments only. The marker is a binding-rule separator, not a parameter.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Positional-Only Parameters Using /}{fun01}
 import inspect
 
 def divide(a, b, /):
@@ -12323,15 +12369,17 @@ sig = inspect.signature(divide)
 print(f"{sig}")
 for name, param in sig.parameters.items():
     print(f"{name}: {param.kind}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-(a, b, /)
-a: POSITIONAL_ONLY
-b: POSITIONAL_ONLY
-\end{verbatim}
+\begin{iobox}{Expected Output}
+(a, b, /) \\
+a: POSITIONAL\_ONLY \\
+b: POSITIONAL\_ONLY \\
+\end{iobox}
+
+
+
 
 \subsubsection{Keyword-Only Parameters Using \texttt{*}}
 
@@ -12389,7 +12437,7 @@ When a signature includes \texttt{*args}, CPython must allocate a fresh \texttt{
 
 Contrast this with the Vectorcall protocol (Python 3.8+): for many C-accelerated and simple Python calls, arguments pass through a contiguous C array of \texttt{PyObject*} pointers with a method flag (\texttt{METH\_VECTORCALL}). No intermediate tuple or dict is constructed. Signatures that force \texttt{*args}/\texttt{**kwargs}---or wrappers that use them---disable this fast path and pay explicit container allocation on every invocation.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Variable-Length Argument Packing: The Mechanics of *args and **kwargs}{var01}
 def flexible(*args, **kwargs):
     return len(args), len(kwargs)
 
@@ -12398,14 +12446,16 @@ def fixed(a, b):
 
 print(flexible(1, 2, 3, x=4))
 print(fixed(1, 2))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-(3, 1)
-3
-\end{verbatim}
+\begin{iobox}{Expected Output}
+(3, 1) \\
+3 \\
+\end{iobox}
+
+
+
 
 Decorators and forwarding wrappers commonly use \texttt{def wrapper(*args, **kwargs): return fn(*args, **kwargs)}. This preserves call shapes but forces tuple/dict packing at the wrapper boundary even when the underlying callable could have accepted a vectorcall layout.
 
@@ -12482,7 +12532,7 @@ Default arguments are evaluated when the \texttt{def} statement executes, not on
 
 \subsubsection{The Mutable Default Arguments Trap: Why \texttt{def func(x=[])} Reuses One Persistent Mutable Object}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Mutable Default Arguments Trap: Why def func(x=[]) Reuses One Persistent...}{arc03}
 def add_quote(text, lines=[]):
     lines.append(text)
     return lines
@@ -12493,21 +12543,23 @@ b = add_quote("No soup for you!")
 print(f"a={a}")
 print(f"b={b}, a is b: {a is b}")
 print(f"stored default: {add_quote.__defaults__}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-a=["D'oh!", 'No soup for you!']
-b=["D'oh!", 'No soup for you!'], a is b: True
-stored default: (["D'oh!", 'No soup for you!'],)
-\end{verbatim}
+\begin{iobox}{Expected Output}
+a=["D'oh!", 'No soup for you!'] \\
+b=["D'oh!", 'No soup for you!'], a is b: True \\
+stored default: (["D'oh!", 'No soup for you!'],) \\
+\end{iobox}
+
+
+
 
 One list object is created at definition time and reused whenever \texttt{lines} is omitted.
 
 \subsubsection{Static Expression Evaluation: Why Default Values Are Created at Function Definition Time}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Static Expression Evaluation: Why Default Values Are Created at Function Defi...}{arc02}
 def make_default_tag():
     print("make_default_tag() running")
     return "D'oh!"
@@ -12517,21 +12569,23 @@ def show_tag(text=make_default_tag()):
 
 show_tag()
 show_tag("other")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-make_default_tag() running
-D'oh!
-other
-\end{verbatim}
+\begin{iobox}{Expected Output}
+make\_default\_tag() running \\
+D'oh! \\
+other \\
+\end{iobox}
+
+
+
 
 \texttt{make\_default\_tag()} runs once during \texttt{def}, not on every call.
 
 \subsubsection{Defending Against State Contamination Using the Immutable \texttt{None} Idiom and Sentinel Guard Clauses}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Defending Against State Contamination Using the Immutable None Idiom and Sent...}{arc01}
 def add_quote(text, lines=None):
     if lines is None:
         lines = []
@@ -12542,13 +12596,15 @@ a = add_quote("D'oh!")
 b = add_quote("Ni!")
 
 print(f"a={a}, b={b}, a is b: {a is b}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-a=["D'oh!"], b=['Ni!'], a is b: False
-\end{verbatim}
+\begin{iobox}{Expected Output}
+a=["D'oh!"], b=['Ni!'], a is b: False \\
+\end{iobox}
+
+
+
 
 Use \texttt{None} as the default sentinel; allocate mutable state inside the function body on each call.
 
@@ -12568,7 +12624,7 @@ For names bound in the current function scope, CPython emits \texttt{LOAD\_FAST}
 
 For globals and builtins, the compiler emits \texttt{LOAD\_GLOBAL} / \texttt{STORE\_GLOBAL} (or \texttt{LOAD\_NAME} at module level), which perform dictionary lookups in \texttt{f\_globals} and the builtins namespace. These paths carry hash-table overhead on every access.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Variable Scope and Lexical Boundaries: The LEGB Resolution Rules}{the01}
 import dis
 
 def local_access(name, score):
@@ -12583,21 +12639,23 @@ answer = 42
 dis.dis(local_access)
 print("---")
 dis.dis(global_access)
-\end{verbatim}
+\end{codebox}
 
-Possible output excerpt:
 
-\begin{verbatim}
-  2           2 LOAD_FAST                0 (name)
-              4 LOAD_FAST                1 (score)
-             ...
-             14 STORE_FAST               2 (message)
-  3          16 LOAD_FAST                2 (message)
-             18 RETURN_VALUE
----
-  2           0 LOAD_GLOBAL              0 (answer)
-             12 RETURN_VALUE
-\end{verbatim}
+\begin{iobox}{Expected Output}
+  2           2 LOAD\_FAST                0 (name) \\
+              4 LOAD\_FAST                1 (score) \\
+             ... \\
+             14 STORE\_FAST               2 (message) \\
+  3          16 LOAD\_FAST                2 (message) \\
+             18 RETURN\_VALUE \\
+--- \\
+  2           0 LOAD\_GLOBAL              0 (answer) \\
+             12 RETURN\_VALUE \\
+\end{iobox}
+
+
+
 
 Enclosing-scope reads from nested functions use \texttt{LOAD\_DEREF} / \texttt{STORE\_DEREF} on cell objects---heap-allocated indirection slots shared between outer and inner code objects.
 
@@ -12614,7 +12672,7 @@ Reading an outer name follows LEGB automatically. Assigning to an outer name req
 
 \subsubsection{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}{mut03}
 answer = 42
 
 def set_answer():
@@ -12623,20 +12681,22 @@ def set_answer():
 
 set_answer()
 print(f"outside: {answer}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-inside: 100
-outside: 42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+inside: 100 \\
+outside: 42 \\
+\end{iobox}
+
+
+
 
 Assignment inside the function creates a local \texttt{answer}; it does not mutate the module binding.
 
 \subsubsection{Overriding Module Scope: The \texttt{global} Declaration Syntax and Module Namespace Mutation}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Overriding Module Scope: The global Declaration Syntax and Module Namespace M...}{mut02}
 counter = 0
 
 def increment():
@@ -12646,19 +12706,21 @@ def increment():
 increment()
 increment()
 print(counter)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-2
-\end{verbatim}
+\begin{iobox}{Expected Output}
+2 \\
+\end{iobox}
+
+
+
 
 \texttt{global} redirects \texttt{STORE\_GLOBAL} to the module namespace dictionary.
 
 \subsubsection{Overriding Nested Intermediary Scopes: The \texttt{nonlocal} Declaration Syntax and Cell Reference Mutation}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Overriding Nested Intermediary Scopes: The nonlocal Declaration Syntax and Ce...}{mut01}
 def make_counter():
     count = 0
 
@@ -12671,13 +12733,15 @@ def make_counter():
 
 counter = make_counter()
 print(counter(), counter(), counter())
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-1 2 3
-\end{verbatim}
+\begin{iobox}{Expected Output}
+1 2 3 \\
+\end{iobox}
+
+
+
 
 \texttt{nonlocal} writes through the closure cell, not a new local slot. Integer rebinding creates a new \texttt{int} object and updates the cell reference.
 
@@ -12699,7 +12763,7 @@ Scope failures reveal how the compiler classified names before runtime. Each err
 
 If a name is assigned anywhere in a function, the compiler marks it local for the entire function. A read before that assignment executes \texttt{LOAD\_FAST} on an uninitialized slot.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Runtime Execution Traces and Bytecode Analysis of UnboundLocalError}{ana01}
 value = 42
 
 def broken():
@@ -12710,13 +12774,15 @@ try:
     broken()
 except UnboundLocalError as err:
     print(err)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-local variable 'value' referenced before assignment
-\end{verbatim}
+\begin{iobox}{Expected Output}
+local variable 'value' referenced before assignment \\
+\end{iobox}
+
+
+
 
 Bytecode uses \texttt{LOAD\_FAST} for \texttt{value}, not \texttt{LOAD\_GLOBAL}, because the assignment later in the body forced local classification.
 
@@ -12777,7 +12843,7 @@ A function object can travel through the program like any other object: assigned
 
 \subsubsection{Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine References inside Variables}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine Re...}{fir03}
 def say_doh():
     return "D'oh!"
 
@@ -12791,14 +12857,16 @@ def add_one(x):
     return x + 1
 
 print(apply_twice(add_one, 10))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-fn is say_doh: True, fn(): D'oh!
-12
-\end{verbatim}
+\begin{iobox}{Expected Output}
+fn is say\_doh: True, fn(): D'oh! \\
+12 \\
+\end{iobox}
+
+
+
 
 Writing \texttt{fn} passes the object; writing \texttt{fn()} invokes \texttt{\_\_call\_\_}.
 
@@ -12806,7 +12874,7 @@ Writing \texttt{fn} passes the object; writing \texttt{fn()} invokes \texttt{\_\
 
 Dispatch tables map keys to function objects. Selection happens at runtime by indexing the table and calling the retrieved callable.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Callbacks and Callback Chains: Decoupling Structural Execution Graphs}{fir02}
 DISPATCH = {
     "double": lambda x: x * 2,
     "square": lambda x: x * x,
@@ -12817,20 +12885,22 @@ def run(op, value):
 
 print(run("double", 21))
 print(run("square", 7))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-42
-49
-\end{verbatim}
+\begin{iobox}{Expected Output}
+42 \\
+49 \\
+\end{iobox}
+
+
+
 
 Lambdas in dispatch tables compile to ordinary \texttt{PyCodeObject} instances with the same cost profile as \texttt{def}.
 
 \subsubsection{Higher-Order Functions: Functions That Receive or Return Other Functions}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Higher-Order Functions: Functions That Receive or Return Other Functions}{fir01}
 def make_prefixer(prefix):
     def add_prefix(text):
         return f"{prefix}: {text}"
@@ -12838,13 +12908,15 @@ def make_prefixer(prefix):
 
 warn = make_prefixer("WARNING")
 print(warn("System alert"))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-WARNING: System alert
-\end{verbatim}
+\begin{iobox}{Expected Output}
+WARNING: System alert \\
+\end{iobox}
+
+
+
 
 A higher-order function returns a configured callable whose closure cells hold state without globals or class instances.
 
@@ -12857,7 +12929,7 @@ A closure is an inner function whose code references free variables from an encl
 
 When the compiler detects that an inner function reads an outer local, it promotes that name to a \texttt{cell}: a \texttt{PyCellObject} holding a \texttt{PyObject*} pointer. The outer code object's \texttt{co\_cellvars} lists names stored in cells; the inner code object's \texttt{co\_freevars} lists names loaded through cells. At runtime, \texttt{LOAD\_DEREF} reads \texttt{cell\_contents}; \texttt{STORE\_DEREF} writes it.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Closures, Lexical Enclosures, and Free Variable Tracking Invariants}{lex01}
 def outer():
     message = "D'oh!"
 
@@ -12872,17 +12944,19 @@ print(f"co_cellvars: {outer.__code__.co_cellvars}")
 print(f"co_freevars: {fn.__code__.co_freevars}")
 print(f"closure: {fn.__closure__}")
 print(f"cell contents: {fn.__closure__[0].cell_contents!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-fn(): D'oh!
-co_cellvars: ('message',)
-co_freevars: ('message',)
-closure: (<cell at 0x...: str object at 0x...>,)
-cell contents: "D'oh!"
-\end{verbatim}
+\begin{iobox}{Expected Output}
+fn(): D'oh! \\
+co\_cellvars: ('message',) \\
+co\_freevars: ('message',) \\
+closure: (<cell at 0x...: str object at 0x...>,) \\
+cell contents: "D'oh!" \\
+\end{iobox}
+
+
+
 
 Each call to a factory creates separate function objects with separate cell tuples holding distinct object references. Mutable cells share one object across invocations of the same closure (\texttt{items.append(...)}); immutable rebinding requires \texttt{nonlocal} to update the cell pointer.
 
@@ -12899,7 +12973,7 @@ A decorator is a compile-time meta-programming hook that intercepts function ini
 
 \subsubsection{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec02}
 def make_logged(fn):
     def wrapper(*args, **kwargs):
         print(f"calling {fn.__name__}")
@@ -12911,18 +12985,20 @@ def shout(text):
     return text.upper()
 
 print(shout("ni!"))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-calling shout
-NI!
-\end{verbatim}
+\begin{iobox}{Expected Output}
+calling shout \\
+NI! \\
+\end{iobox}
+
+
+
 
 The AST transformation is exact:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec01}
 @make_logged
 def shout(text):
     return text.upper()
@@ -12931,7 +13007,8 @@ def shout(text):
 def shout(text):
     return text.upper()
 shout = make_logged(shout)
-\end{verbatim}
+\end{codebox}
+
 
 Execution order at \texttt{def} time: (1) compile and instantiate the original function object with its \texttt{PyCodeObject}; (2) invoke the decorator, passing that callable reference; (3) receive the wrapper (or replacement) object; (4) rebind the public name to the returned object. The wrapper typically closes over the original via a cell in \texttt{\_\_closure\_\_}.
 
@@ -12953,7 +13030,7 @@ A generator function contains \texttt{yield}. Calling it returns a generator obj
 
 \subsubsection{The \texttt{yield} Keyword Architecture: Pausing Function Execution Without Destroying Local State}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The yield Keyword Architecture: Pausing Function Execution Without Destroying...}{laz02}
 def count_quotes():
     yield "D'oh!"
     yield "No soup for you!"
@@ -12962,15 +13039,17 @@ gen = count_quotes()
 print(f"type: {type(gen)}")
 print(next(gen))
 print(next(gen))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type: <class 'generator'>
-D'oh!
-No soup for you!
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type: <class 'generator'> \\
+D'oh! \\
+No soup for you! \\
+\end{iobox}
+
+
+
 
 \texttt{yield} sends a value outward and suspends. Local variables (\texttt{x}, \texttt{y}, loop counters) remain in the generator frame.
 
@@ -12978,7 +13057,7 @@ No soup for you!
 
 A generator holds \texttt{gi\_code} (the \texttt{PyCodeObject}) and \texttt{gi\_frame} (the heap-allocated \texttt{PyFrameObject} while suspended). \texttt{f\_lasti} records the bytecode offset for resumption. When the generator completes, \texttt{gi\_frame} becomes \texttt{None} and the frame is deallocated.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Exec...}{laz01}
 def small_gen():
     x = "D'oh!"
     yield x
@@ -12988,15 +13067,17 @@ print(f"gi_frame before next: {gen.gi_frame}")
 print(f"f_locals: {gen.gi_frame.f_locals}")
 value = next(gen)
 print(f"yielded: {value!r}, gi_frame after: {gen.gi_frame}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-gi_frame before next: <frame at 0x..., file "...", line 1, code small_gen>
-f_locals: {}
-yielded: "D'oh!", gi_frame after: None
-\end{verbatim}
+\begin{iobox}{Expected Output}
+gi\_frame before next: <frame at 0x..., file "...", line 1, code small\_gen> \\
+f\_locals: {} \\
+yielded: "D'oh!", gi\_frame after: None \\
+\end{iobox}
+
+
+
 
 This confirms the general frame model: CPython keeps evaluation state on the heap so generators can pause without copying locals to a separate structure.
 
@@ -13015,7 +13096,7 @@ Each \texttt{next(gen)} re-enters the same frame at \texttt{f\_lasti}. The for-l
 
 \subsubsection{\texttt{yield from} as Delegated Iteration over Subgenerators and Iterables}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{yield from as Delegated Iteration over Subgenerators and Iterables}{gen01}
 def inner():
     yield 1
     yield 2
@@ -13025,13 +13106,15 @@ def outer():
     yield 3
 
 print(list(outer()))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-[1, 2, 3]
-\end{verbatim}
+\begin{iobox}{Expected Output}
+[1, 2, 3] \\
+\end{iobox}
+
+
+
 
 The outer generator suspends while the inner generator runs, sharing the delegation protocol without manually iterating.
 
@@ -13048,7 +13131,7 @@ Generator-based coroutines extend \texttt{yield} into a bidirectional channel: t
 
 \texttt{gen.send(value)} resumes the generator and sets \texttt{yield} to receive \texttt{value}. The first \texttt{send} must use \texttt{None} (or precede any non-\texttt{None} send with \texttt{next()}), because execution must reach the first \texttt{yield} before a value can be injected.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Consumers and Transformers: Feeding In-Flight Data via the .send() Interface}{bid01}
 def echo():
     while True:
         received = yield
@@ -13058,14 +13141,16 @@ gen = echo()
 next(gen)
 gen.send("D'oh!")
 gen.send("Ni!")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-got: "D'oh!"
-got: 'Ni!'
-\end{verbatim}
+\begin{iobox}{Expected Output}
+got: "D'oh!" \\
+got: 'Ni!' \\
+\end{iobox}
+
+
+
 
 \subsubsection{Exception Injection with \texttt{.throw()} and Controlled Shutdown with \texttt{.close()}}
 

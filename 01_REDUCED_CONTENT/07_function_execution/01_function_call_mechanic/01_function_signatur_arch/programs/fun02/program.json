@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Default Parameter Values and Definition-Time Evaluation",
+  "label": "fun02",
+  "linenos": true,
+  "input": null,
+  "output": "Homer: 42\nstored default: (42,)",
+  "file": "main.py"
+}

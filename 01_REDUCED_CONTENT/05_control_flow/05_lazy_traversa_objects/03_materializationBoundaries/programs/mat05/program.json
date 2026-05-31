@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat05",
+  "linenos": true,
+  "input": null,
+  "output": "even_nums: [10, 20, 42]\ntype(even_nums): <class 'list'>",
+  "file": "main.py"
+}

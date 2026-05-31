@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Anonymous Expressions: The Structural Equivalence of lambda Functions",
+  "label": "str01",
+  "linenos": true,
+  "input": null,
+  "output": "add_def: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50\nadd_lambda: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50",
+  "file": "main.py"
+}

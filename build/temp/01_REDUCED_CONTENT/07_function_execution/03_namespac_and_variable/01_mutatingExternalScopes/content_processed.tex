@@ -4,7 +4,7 @@ Reading an outer name follows LEGB automatically. Assigning to an outer name req
 
 \subsubsection{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}{mut03}
 answer = 42
 
 def set_answer():
@@ -13,20 +13,22 @@ def set_answer():
 
 set_answer()
 print(f"outside: {answer}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-inside: 100
-outside: 42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+inside: 100 \\
+outside: 42 \\
+\end{iobox}
+
+
+
 
 Assignment inside the function creates a local \texttt{answer}; it does not mutate the module binding.
 
 \subsubsection{Overriding Module Scope: The \texttt{global} Declaration Syntax and Module Namespace Mutation}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Overriding Module Scope: The global Declaration Syntax and Module Namespace M...}{mut02}
 counter = 0
 
 def increment():
@@ -36,19 +38,21 @@ def increment():
 increment()
 increment()
 print(counter)
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-2
-\end{verbatim}
+\begin{iobox}{Expected Output}
+2 \\
+\end{iobox}
+
+
+
 
 \texttt{global} redirects \texttt{STORE\_GLOBAL} to the module namespace dictionary.
 
 \subsubsection{Overriding Nested Intermediary Scopes: The \texttt{nonlocal} Declaration Syntax and Cell Reference Mutation}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Overriding Nested Intermediary Scopes: The nonlocal Declaration Syntax and Ce...}{mut01}
 def make_counter():
     count = 0
 
@@ -61,13 +65,15 @@ def make_counter():
 
 counter = make_counter()
 print(counter(), counter(), counter())
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-1 2 3
-\end{verbatim}
+\begin{iobox}{Expected Output}
+1 2 3 \\
+\end{iobox}
+
+
+
 
 \texttt{nonlocal} writes through the closure cell, not a new local slot. Integer rebinding creates a new \texttt{int} object and updates the cell reference.
 

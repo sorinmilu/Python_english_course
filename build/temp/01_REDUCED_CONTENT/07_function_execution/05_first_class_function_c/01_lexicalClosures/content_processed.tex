@@ -6,7 +6,7 @@ A closure is an inner function whose code references free variables from an encl
 
 When the compiler detects that an inner function reads an outer local, it promotes that name to a \texttt{cell}: a \texttt{PyCellObject} holding a \texttt{PyObject*} pointer. The outer code object's \texttt{co\_cellvars} lists names stored in cells; the inner code object's \texttt{co\_freevars} lists names loaded through cells. At runtime, \texttt{LOAD\_DEREF} reads \texttt{cell\_contents}; \texttt{STORE\_DEREF} writes it.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{Closures, Lexical Enclosures, and Free Variable Tracking Invariants}{lex01}
 def outer():
     message = "D'oh!"
 
@@ -21,17 +21,19 @@ print(f"co_cellvars: {outer.__code__.co_cellvars}")
 print(f"co_freevars: {fn.__code__.co_freevars}")
 print(f"closure: {fn.__closure__}")
 print(f"cell contents: {fn.__closure__[0].cell_contents!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-fn(): D'oh!
-co_cellvars: ('message',)
-co_freevars: ('message',)
-closure: (<cell at 0x...: str object at 0x...>,)
-cell contents: "D'oh!"
-\end{verbatim}
+\begin{iobox}{Expected Output}
+fn(): D'oh! \\
+co\_cellvars: ('message',) \\
+co\_freevars: ('message',) \\
+closure: (<cell at 0x...: str object at 0x...>,) \\
+cell contents: "D'oh!" \\
+\end{iobox}
+
+
+
 
 Each call to a factory creates separate function objects with separate cell tuples holding distinct object references. Mutable cells share one object across invocations of the same closure (\texttt{items.append(...)}); immutable rebinding requires \texttt{nonlocal} to update the cell pointer.
 

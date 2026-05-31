@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Runtime Execution Traces and Bytecode Analysis of UnboundLocalError",
+  "label": "ana01",
+  "linenos": true,
+  "input": null,
+  "output": "local variable 'value' referenced before assignment",
+  "file": "main.py"
+}

@@ -1,1822 +1,2621 @@
 {
   "mode": "apply",
-  "total_files": 189,
-  "total_accepted": 55,
-  "total_rejected": 551,
+  "content_dir": "01_REDUCED_CONTENT",
+  "total_files": 185,
+  "total_accepted": 42,
+  "total_rejected": 756,
   "results": [
     {
-      "file": "00_CONTENT/00_Introduction/content.tex",
+      "file": "01_REDUCED_CONTENT/00_Introduction/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/00_foundationsOfExecutionArchitecture/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/00_foundati_of_executio_a/content.tex",
       "accepted": [],
       "rejected_count": 1,
       "rejected_sample": [
         {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/00_foundationsOfExecutionArchitecture/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/00_foundati_of_executio_a/content.tex",
           "reason": "too_few_lines",
           "preview": "python script.py"
         }
       ]
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-      "accepted": [],
-      "rejected_count": 117,
-      "rejected_sample": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-          "reason": "too_few_lines",
-          "preview": "import numpy"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-          "reason": "too_few_lines",
-          "preview": "error while loading shared libraries: libexample.so:"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-          "reason": "unknown_language",
-          "preview": "program executable"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-          "reason": "too_few_lines",
-          "preview": "int missing_function(void);"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/01_theTraditionalCompilationPipelineTheCBlueprint/content.tex",
-          "reason": "too_few_lines",
-          "preview": "/* math_utils.c */"
-        }
-      ]
-    },
-    {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-      "accepted": [],
-      "rejected_count": 14,
-      "rejected_sample": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-          "reason": "too_few_lines",
-          "preview": "python script.py"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-          "reason": "too_few_lines",
-          "preview": "return 0;"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-          "reason": "too_few_lines",
-          "preview": "int main(int argc, char *argv[]) {"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-          "reason": "too_few_lines",
-          "preview": "int main(int argc, char *argv[])"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/02_programLoadingAndExecutionMechanics/content.tex",
-          "reason": "too_few_lines",
-          "preview": "int main(void)"
-        }
-      ]
-    },
-    {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-      "accepted": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "slug": "c-the-process-stack-automatic-variable-lifetime-tracking-cal",
-          "language": "c",
-          "title": "The Process Stack: Automatic Variable Lifetime Tracking, Call Chains, and Pus...",
-          "program_dir": "programs/c-the-process-stack-automatic-variable-lifetime-tracking-cal",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "slug": "c-the-data-and-bss-segments-initialized-and-uninitialized-gl",
-          "language": "c",
-          "title": "The Data and BSS Segments: Initialized and Uninitialized Global/Static Variab...",
-          "program_dir": "programs/c-the-data-and-bss-segments-initialized-and-uninitialized-gl",
-          "has_output": false
-        }
-      ],
-      "rejected_count": 49,
-      "rejected_sample": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "reason": "too_few_lines",
-          "preview": "parse_line()"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "reason": "too_few_lines",
-          "preview": "int *huge_array = malloc(100000000 * sizeof(int));"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "reason": "too_few_lines",
-          "preview": "void dangerous(void) {"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "reason": "too_few_lines",
-          "preview": "factorial(3)"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/03_memoryLayoutInBareMetalCompiledProcesses/content.tex",
-          "reason": "unknown_language",
-          "preview": "int factorial(int n) {"
-        }
-      ]
-    },
-    {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-      "accepted": [],
-      "rejected_count": 30,
-      "rejected_sample": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-          "reason": "too_few_lines",
-          "preview": "async def bad_task():"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-          "reason": "too_few_lines",
-          "preview": "g = numbers()"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-          "reason": "too_few_lines",
-          "preview": "def numbers():"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-          "reason": "too_few_lines",
-          "preview": "async def fetch_data():"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/04_operatingSystemResourceManagement/content.tex",
-          "reason": "unknown_language",
-          "preview": "Coroutine A starts async read"
-        }
-      ]
-    },
-    {
-      "file": "00_CONTENT/01_execution_architecture/00_operating_systems_programs_and_process_mechanics/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/01_the_traditio_compilat/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/02_program_loading_and_ex/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/03_memory_layout_in_bare/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/04_operatin_system_resour/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/00_operatin_systems_progr/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
       "accepted": [],
       "rejected_count": 47,
       "rejected_sample": [
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
           "reason": "too_few_lines",
           "preview": "ls"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
           "reason": "too_few_lines",
           "preview": "cd /tmp"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
           "reason": "diagram_or_trace",
           "preview": "Bash script text"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
           "reason": "diagram_or_trace",
           "preview": "JavaScript source"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/00_fromNativeExecutablesToRuntimeHostedPrograms/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/00_from_native_executab_t/content.tex",
           "reason": "diagram_or_trace",
           "preview": ".class bytecode"
         }
       ]
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
       "accepted": [],
       "rejected_count": 54,
       "rejected_sample": [
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
           "reason": "diagram_or_trace",
           "preview": "source code"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
           "reason": "too_few_lines",
           "preview": "T1 = ADD CV(a), CV(b)"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
           "reason": "too_few_lines",
           "preview": "LOAD a        -> accumulator"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
           "reason": "too_few_lines",
           "preview": "ADD r3, r1, r2"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/01_abstractingTheHardwareLayerTheProcessVmBlueprint/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/01_abstract_the_hardware/content.tex",
           "reason": "too_few_lines",
           "preview": "ADD RAX, RBX"
         }
       ]
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-      "accepted": [],
-      "rejected_count": 60,
-      "rejected_sample": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "Python code"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-          "reason": "too_few_lines",
-          "preview": "total = 0"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "JVM bytecode"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "JavaScript source"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/02_comparativeRuntimeCaseStudies/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "generic bytecode operation"
-        }
-      ]
-    },
-    {
-      "file": "00_CONTENT/01_execution_architecture/01_process_virtual_machines_and_interpreted_runtimes/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/02_comparat_runtime_case/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-      "accepted": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "c-c-no-standard-closures-explicit-environment-structs-and-li",
-          "language": "c",
-          "title": "C: no standard closures, explicit environment structs, and lifetime hazards.",
-          "program_dir": "programs/c-c-no-standard-closures-explicit-environment-structs-and-li",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-closures-with-textttuse",
-          "language": "php",
-          "title": "PHP: closures with \\texttt{use",
-          "program_dir": "programs/php-php-closures-with-textttuse",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-closures-with-textttuse-02",
-          "language": "php",
-          "title": "PHP: closures with \\texttt{use",
-          "program_dir": "programs/php-php-closures-with-textttuse-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "java-java-captured-variables-in-lambdas-and-generated-callab",
-          "language": "java",
-          "title": "Java: captured variables in lambdas and generated callable objects.",
-          "program_dir": "programs/java-java-captured-variables-in-lambdas-and-generated-callab",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "java-java-captured-variables-in-lambdas-and-generated-callab-02",
-          "language": "java",
-          "title": "Java: captured variables in lambdas and generated callable objects.",
-          "program_dir": "programs/java-java-captured-variables-in-lambdas-and-generated-callab-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks",
-          "language": "javascript",
-          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
-          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks-02",
-          "language": "javascript",
-          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
-          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "javascript-javascript-v8-lexical-environments-for-callbacks-03",
-          "language": "javascript",
-          "title": "JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factor...",
-          "program_dir": "programs/javascript-javascript-v8-lexical-environments-for-callbacks-03",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi",
-          "language": "python",
-          "title": "Python / CPython: closure cells and non-local lexical bindings.",
-          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi-02",
-          "language": "python",
-          "title": "Python / CPython: closure cells and non-local lexical bindings.",
-          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "python-python-cpython-closure-cells-and-non-local-lexical-bi-03",
-          "language": "python",
-          "title": "Python / CPython: closure cells and non-local lexical bindings.",
-          "program_dir": "programs/python-python-cpython-closure-cells-and-non-local-lexical-bi-03",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "c-c-no-standard-lambdas-but-function-pointers-and-nonstandar",
-          "language": "c",
-          "title": "C: no standard lambdas, but function pointers and nonstandard emulations.",
-          "program_dir": "programs/c-c-no-standard-lambdas-but-function-pointers-and-nonstandar",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "c-c-no-standard-lambdas-but-function-pointers-and-nonstandar-02",
-          "language": "c",
-          "title": "C: no standard lambdas, but function pointers and nonstandard emulations.",
-          "program_dir": "programs/c-c-no-standard-lambdas-but-function-pointers-and-nonstandar-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-anonymous-functions-closures-array-processing-and-ro",
-          "language": "php",
-          "title": "PHP: anonymous functions, closures, array processing, and route handlers.",
-          "program_dir": "programs/php-php-anonymous-functions-closures-array-processing-and-ro",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-anonymous-functions-closures-array-processing-and-ro-02",
-          "language": "php",
-          "title": "PHP: anonymous functions, closures, array processing, and route handlers.",
-          "program_dir": "programs/php-php-anonymous-functions-closures-array-processing-and-ro-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "python-anonymous-subroutines-inline-block-definitions-lambda",
-          "language": "python",
-          "title": "Anonymous Subroutines: Inline Block Definitions, Lambda Expressions, and Func...",
-          "program_dir": "programs/python-anonymous-subroutines-inline-block-definitions-lambda",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-array-callbacks-sorting-callbacks-request-hooks-and",
-          "language": "php",
-          "title": "PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.",
-          "program_dir": "programs/php-php-array-callbacks-sorting-callbacks-request-hooks-and",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "php-php-array-callbacks-sorting-callbacks-request-hooks-and-02",
-          "language": "php",
-          "title": "PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.",
-          "program_dir": "programs/php-php-array-callbacks-sorting-callbacks-request-hooks-and-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "javascript-javascript-and-v8-dom-events-ajax-timers-promises",
-          "language": "javascript",
-          "title": "JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.",
-          "program_dir": "programs/javascript-javascript-and-v8-dom-events-ajax-timers-promises",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "javascript-javascript-and-v8-dom-events-ajax-timers-promises-02",
-          "language": "javascript",
-          "title": "JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.",
-          "program_dir": "programs/javascript-javascript-and-v8-dom-events-ajax-timers-promises-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "java-java-listeners-gui-events-stream-operations-and-functio",
-          "language": "java",
-          "title": "Java: listeners, GUI events, stream operations, and functional interfaces.",
-          "program_dir": "programs/java-java-listeners-gui-events-stream-operations-and-functio",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "python-python-sorting-keys-gui-handlers-web-callbacks-and-da",
-          "language": "python",
-          "title": "Python: sorting keys, GUI handlers, web callbacks, and data-processing hooks.",
-          "program_dir": "programs/python-python-sorting-keys-gui-handlers-web-callbacks-and-da",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
-          "slug": "c-c-function-pointers-comparators-signal-handlers-and-c-styl",
-          "language": "c",
-          "title": "C: function pointers, comparators, signal handlers, and C-style event hooks.",
-          "program_dir": "programs/c-c-function-pointers-comparators-signal-handlers-and-c-styl",
-          "has_output": false
-        }
-      ],
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/01_process_virtual_machin/content.tex",
+      "accepted": [],
+      "rejected_count": 0,
+      "rejected_sample": []
+    },
+    {
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
+      "accepted": [],
       "rejected_count": 100,
       "rejected_sample": [
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
           "reason": "diagram_or_trace",
           "preview": "callable object"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
           "reason": "too_few_lines",
           "preview": "outer function returns"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
           "reason": "too_few_lines",
           "preview": "outer function returns"
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
           "reason": "too_few_lines",
           "preview": "prefix=\"inside\""
         },
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/00_functionsAsRuntimeValuesAndSavedExecutionContext/content.tex",
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/00_function_as_runtime_va/content.tex",
           "reason": "diagram_or_trace",
           "preview": "top shell frame"
         }
       ]
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-      "accepted": [
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "c-c-non-blocking-file-descriptors-and-explicit-event-loops",
-          "language": "c",
-          "title": "C: non-blocking file descriptors and explicit event loops.",
-          "program_dir": "programs/c-c-non-blocking-file-descriptors-and-explicit-event-loops",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "php-php-request-oriented-execution-fibers-and-async-framewor",
-          "language": "php",
-          "title": "PHP: request-oriented execution, Fibers, and async frameworks.",
-          "program_dir": "programs/php-php-request-oriented-execution-fibers-and-async-framewor",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and",
-          "language": "javascript",
-          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
-          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and-02",
-          "language": "javascript",
-          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
-          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-host-event-loops-ajax-promises-and-03",
-          "language": "javascript",
-          "title": "JavaScript / V8: host event loops, AJAX, promises, and \\texttt{async",
-          "program_dir": "programs/javascript-javascript-v8-host-event-loops-ajax-promises-and-03",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-cpython-textttasyncio",
-          "language": "python",
-          "title": "Python / CPython: \\texttt{asyncio",
-          "program_dir": "programs/python-python-cpython-textttasyncio",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "c-c-textttselect",
-          "language": "c",
-          "title": "C: \\texttt{select",
-          "program_dir": "programs/c-c-textttselect",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "java-java-single-thread-event-loops-and-callback-dispatch",
-          "language": "java",
-          "title": "Java: single-thread event loops and callback dispatch.",
-          "program_dir": "programs/java-java-single-thread-event-loops-and-callback-dispatch",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "php-php-zend-engine-fibers-and-user-space-async-frameworks",
-          "language": "php",
-          "title": "PHP / Zend Engine: Fibers and user-space async frameworks.",
-          "program_dir": "programs/php-php-zend-engine-fibers-and-user-space-async-frameworks",
-          "has_output": true
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-browser-and-nodejs-event-loops",
-          "language": "javascript",
-          "title": "JavaScript / V8: browser and Node.js event loops.",
-          "program_dir": "programs/javascript-javascript-v8-browser-and-nodejs-event-loops",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-cpython-textttasyncio-02",
-          "language": "python",
-          "title": "Python / CPython: \\texttt{asyncio",
-          "program_dir": "programs/python-python-cpython-textttasyncio-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "c-c-coroutine-emulation-with-explicit-state-machines-or-sepa",
-          "language": "c",
-          "title": "C: coroutine emulation with explicit state machines or separate stacks.",
-          "program_dir": "programs/c-c-coroutine-emulation-with-explicit-state-machines-or-sepa",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "java-java-no-direct-language-coroutine-but-runtime-managed-a",
-          "language": "java",
-          "title": "Java: no direct language coroutine, but runtime-managed alternatives.",
-          "program_dir": "programs/java-java-no-direct-language-coroutine-but-runtime-managed-a",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-lua-classic-coroutine-style-cooperative-transfer",
-          "language": "python",
-          "title": "Lua: classic coroutine-style cooperative transfer.",
-          "program_dir": "programs/python-lua-classic-coroutine-style-cooperative-transfer",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "php-php-generator-coroutines-with-textttsend",
-          "language": "php",
-          "title": "PHP: generator coroutines with \\texttt{send",
-          "program_dir": "programs/php-php-generator-coroutines-with-textttsend",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-generator-coroutines-and-explicit-resu",
-          "language": "javascript",
-          "title": "JavaScript: generator coroutines and explicit resumption.",
-          "program_dir": "programs/javascript-javascript-generator-coroutines-and-explicit-resu",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-generator-based-coroutines-with-textttsend",
-          "language": "python",
-          "title": "Python: generator-based coroutines with \\texttt{send",
-          "program_dir": "programs/python-python-generator-based-coroutines-with-textttsend",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-generator-based-coroutines-with-textttsend-02",
-          "language": "python",
-          "title": "Python: generator-based coroutines with \\texttt{send",
-          "program_dir": "programs/python-python-generator-based-coroutines-with-textttsend-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "c-c-emulating-generators-with-explicit-state-machines",
-          "language": "c",
-          "title": "C: emulating generators with explicit state machines.",
-          "program_dir": "programs/c-c-emulating-generators-with-explicit-state-machines",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "c-c-emulating-generators-with-explicit-state-machines-02",
-          "language": "c",
-          "title": "C: emulating generators with explicit state machines.",
-          "program_dir": "programs/c-c-emulating-generators-with-explicit-state-machines-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "java-java-no-native-generator-syntax-but-iterator-objects-em",
-          "language": "java",
-          "title": "Java: no native generator syntax, but iterator objects emulate lazy production.",
-          "program_dir": "programs/java-java-no-native-generator-syntax-but-iterator-objects-em",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "java-java-no-native-generator-syntax-but-iterator-objects-em-02",
-          "language": "java",
-          "title": "Java: no native generator syntax, but iterator objects emulate lazy production.",
-          "program_dir": "programs/java-java-no-native-generator-syntax-but-iterator-objects-em-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "php-php-zend-engine-generators-with-textttyield",
-          "language": "php",
-          "title": "PHP / Zend Engine: generators with \\texttt{yield",
-          "program_dir": "programs/php-php-zend-engine-generators-with-textttyield",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "php-php-zend-engine-generators-with-textttyield-02",
-          "language": "php",
-          "title": "PHP / Zend Engine: generators with \\texttt{yield",
-          "program_dir": "programs/php-php-zend-engine-generators-with-textttyield-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-generator-functions-and-resumable-f",
-          "language": "javascript",
-          "title": "JavaScript / V8: generator functions and resumable function state.",
-          "program_dir": "programs/javascript-javascript-v8-generator-functions-and-resumable-f",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "javascript-javascript-v8-generator-functions-and-resumable-f-02",
-          "language": "javascript",
-          "title": "JavaScript / V8: generator functions and resumable function state.",
-          "program_dir": "programs/javascript-javascript-v8-generator-functions-and-resumable-f-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-cpython-generator-functions-and-suspended-pyth",
-          "language": "python",
-          "title": "Python / CPython: generator functions and suspended Python frames.",
-          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-cpython-generator-functions-and-suspended-pyth-02",
-          "language": "python",
-          "title": "Python / CPython: generator functions and suspended Python frames.",
-          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth-02",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-python-cpython-generator-functions-and-suspended-pyth-03",
-          "language": "python",
-          "title": "Python / CPython: generator functions and suspended Python frames.",
-          "program_dir": "programs/python-python-cpython-generator-functions-and-suspended-pyth-03",
-          "has_output": false
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "slug": "python-generators-lazy-sequence-evaluation-in-flight-stream",
-          "language": "python",
-          "title": "Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-...",
-          "program_dir": "programs/python-generators-lazy-sequence-evaluation-in-flight-stream",
-          "has_output": false
-        }
-      ],
-      "rejected_count": 79,
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/01_suspende_executio_and/content.tex",
+      "accepted": [],
+      "rejected_count": 1,
       "rejected_sample": [
         {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "event loop"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "reason": "unknown_language",
-          "preview": "while true; do"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "reason": "unknown_language",
-          "preview": "long_task_one &"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "reason": "diagram_or_trace",
-          "preview": "connection struct"
-        },
-        {
-          "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/01_suspendedExecutionAndRuntimeManagedControlFlow/content.tex",
-          "reason": "unknown_language",
-          "preview": "main event loop"
+          "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/01_suspende_executio_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "coroutine frame on heap -> await I/O future"
         }
       ]
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/02_architectural_roadmaps_of_modern_procedural_extensions/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/02_architec_roadmaps_of_m/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/01_execution_architecture/content.tex",
+      "file": "01_REDUCED_CONTENT/01_execution_architecture/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/00_chronologicalTimelineTheGenesisOriginsAndFormalReleaseOfPythonGuidoVanR_2eb93cae/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/00_historic_context_and_d/00_chronolo_timeline_the/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/01_designPhilosophyAndTensionsReadingTheZenOfPythonCritically/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/00_historic_context_and_d/01_design_philosop_and_te/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/02_whyPythonSpreadScriptingWebFrameworksScientificComputingResearchWorkflo_11d135dd/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/00_historic_context_and_d/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/00_historical_context_and_design_evolution/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/01_python_implemen_and_th/00_python_as_language_vs/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/00_pythonAsALanguageVsCpythonAsTheReferenceImplementation/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/01_python_implemen_and_th/01_cpython_pypy_jython_ir/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/01_cpythonPypyJythonIronpythonAndAlternativeRuntimeStrategies/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/01_python_implemen_and_th/02_python_compiler_accele/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/02_pythonCompilersAcceleratorsAndTranslatorsCythonNuitkaNumbaMypycAndRelatedTools/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/01_python_implemen_and_th/03_the_practica_conseque/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/03_thePracticalConsequencePythonCodeCanHaveDifferentExecutionBackendsButOn_299af52d/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/01_python_implemen_and_th/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/01_python_implementations_and_the_role_of_cpython/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_python_success/01_the_computing_world/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/00_fromChapter1SRuntimeModelToCpythonSConcreteImplementation/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_python_success/02_design_choices/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/01_theConcreteInternalCStructureOfTheCpythonRuntime/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_python_success/03_python_for_serious/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/02_parsingAndCompilingPythonSourceFromPyFilesToAstCodeObjectsBytecodeAndPy_8ea77755/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_python_success/04_python_popular/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/03_codeObjectsFrameObjectsAndNamespaceDictionaries/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_python_success/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/04_theCpythonInterpreterLoopAsTheConcreteExecutionSiteOfPythonBytecode/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/00_from_chapter1_runtime/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
-    },
-    {
-      "file": "00_CONTENT/02_intro_to_python/02_the_cpython_reference/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
-    },
-    {
-      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/00_theBaseObjectFramework/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
-    },
-    {
-      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/01_theHeapSubsystemAndObjectAllocation/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
-    },
-    {
-      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/02_theStackSubsystemAndReferenceStorage/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/00_from_chapter1_runtime/content.tex",
+          "reason": "too_few_lines",
+          "preview": "Operating system runs CPython (native C program)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/03_introspectionOfCoreObjectProperties/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/01_the_concrete_internal/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/03_cpython_memory_management/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/02_parsing_and_compilin_p/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/02_parsing_and_compilin_p/content.tex",
+          "reason": "too_few_lines",
+          "preview": ".py source -> tokens -> AST -> code object -> bytecode -> frame execution"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/00_visualComparisonPythonCodeShapeVsCStyleBracedCode/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/03_code_objects_frame_obj/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/03_code_objects_frame_obj/content.tex",
+          "reason": "too_few_lines",
+          "preview": "compile -> code object (static ledger schema)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/03_code_objects_frame_obj/content.tex",
+          "reason": "too_few_lines",
+          "preview": "module global x   -> dict hash lookup in namespace"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/03_code_objects_frame_obj/content.tex",
+          "reason": "too_few_lines",
+          "preview": "code object     -> static ledger template (bytecode + name tables)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/01_architecturalCaseStudy/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/04_the_cpython_interpre_l/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/04_the_cpython_interpre_l/content.tex",
+          "reason": "too_few_lines",
+          "preview": "frame.f_code        -> bytecode + metadata"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/02_codeBlocksFromExplicitBraces/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/02_the_cpython_reference/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/04_comparative_syntax_and_language_paradigm_divergence/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/00_theBaseObjectFramework/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/00_classifyingTypeSystemsStaticVsDynamicVariableTypingStrongVsWeakEnforcem_7259aa1b/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/01_the_heap_subsyste_and/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/01_the_heap_subsyste_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "Arena   (~256 KB from OS via malloc/brk/mmap)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/01_pythonSTypeBoundaryDynamicNamesWithStrongRuntimeTypeConstraintVerification/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/02_the_stack_subsyste_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/02_namesVariablesAndObjectReferencesWhyPythonVariablesAreNotCBoxes/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/03_introspe_of_core_objec/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/03_memoryStorageClassificationsBuiltInSingleValueObjectsVsCompositeReferen_71caef4e/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/03_cpython_memory_management/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/04_mutabilityAndIdentityImmutableObjectsMutableObjectsSharedReferencesAndIsVs/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/04_comparat_syntax_and_la/00_visual_comparis_python/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/05_objectInterfacesDunderMethodsInternalSlotsOperatorsConstructionAndRepresentation/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/04_comparat_syntax_and_la/01_architecturalCaseStudy/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/05_data_type_architecture_and_runtime_type_systems/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/04_comparat_syntax_and_la/02_code_blocks_from_expli/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/02_intro_to_python/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/04_comparat_syntax_and_la/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/00_legalAndStructuralLexerConstraints/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/00_classify_type_systems/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/01_stylisticCodingConventions/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/01_python_type_boundary_d/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/00_identifiers_and_syntax_rules_for_variables/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/02_names_variable_and_obj/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/00_simpleAssignmentCreatingOrRebindingAName/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/03_memory_storage_classif/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/01_multipleAssignmentAndUnpacking/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/04_mutabili_and_identity/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/02_augmentedAssignment/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/05_object_interfac_dunder/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/03_deletingNames/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/05_data_type_architec_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/01_assignment_and_name_binding/content.tex",
+      "file": "01_REDUCED_CONTENT/02_intro_to_python/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/00_theIntegerRepresentationArchitectureInt/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 6,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
+          "reason": "too_few_lines",
+          "preview": "name = \"Jerry\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
+          "reason": "unknown_language",
+          "preview": "import keyword"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
+          "reason": "too_few_lines",
+          "preview": "compile('42answer = 1', '<example>', 'exec')"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
+          "reason": "too_few_lines",
+          "preview": "42answer = \"value\"   # SyntaxError: invalid decimal literal"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/00_legal_and_structur_lex/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def = 42            # SyntaxError: invalid syntax"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/01_theFloatingPointRepresentationArchitectureFloat/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/00_identifi_and_syntax_ru/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/02_theComplexRepresentationArchitectureComplex/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/00_simple_assignme_creati/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/00_simple_assignme_creati/content.tex",
+          "reason": "too_few_lines",
+          "preview": "before:  a, b ---> int object 42"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/00_simple_assignme_creati/content.tex",
+          "reason": "too_few_lines",
+          "preview": "a ----\\"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/00_simple_assignme_creati/content.tex",
+          "reason": "too_few_lines",
+          "preview": "first:  item ---> int object 42"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/00_simple_assignme_creati/content.tex",
+          "reason": "too_few_lines",
+          "preview": "answer  --->  PyLongObject (value 42) on the heap"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/03_theBooleanRepresentationArchitectureBool/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/01_multiple_assignme_and/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/01_multiple_assignme_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "first, *middle, last = [10, 20, 30, 40]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/01_multiple_assignme_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "name, age, city = (\"Bart\", 10, \"Springfield\")"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/01_multiple_assignme_and/content.tex",
+          "reason": "unknown_language",
+          "preview": "before:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/01_multiple_assignme_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "temp = a;  a = b;  b = temp;"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/04_theNullSentinelObjectNone/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/02_augmentedAssignment/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/02_augmentedAssignment/content.tex",
+          "reason": "unknown_language",
+          "preview": "numbers = [10, 20]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/02_augmentedAssignment/content.tex",
+          "reason": "unknown_language",
+          "preview": "import sys"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/05_numericalOperatorArchitectureAndPrecedenceGraphs/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/03_deletingNames/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/03_deletingNames/content.tex",
+          "reason": "too_few_lines",
+          "preview": "assignment   -> create or change a name-to-object binding"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/03_deletingNames/content.tex",
+          "reason": "too_few_lines",
+          "preview": "a = \"text\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/03_deletingNames/content.tex",
+          "reason": "too_few_lines",
+          "preview": "value = None   # name exists; bound to None singleton"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/02_singular_data_domains_and_operator_precedence/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/01_assignme_and_name_bind/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/00_dynamicTypingInAssignment/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/00_the_integer_represen_a/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/00_the_integer_represen_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import sys"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/00_the_integer_represen_a/content.tex",
+          "reason": "unknown_language",
+          "preview": "C fixed-width intuition:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/00_the_integer_represen_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "small_limit = 2_147_483_647"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/01_strongTypingInOperations/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/01_the_floating_point_rep/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/01_the_floating_point_rep/content.tex",
+          "reason": "too_few_lines",
+          "preview": "float(\"nan\") == float(\"nan\")   # False"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/01_the_floating_point_rep/content.tex",
+          "reason": "too_few_lines",
+          "preview": "0.1 + 0.2 == 0.3        # False"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/02_structuralSummary/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/03_the_boolean_represen_a/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/03_the_boolean_represen_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "isinstance(True, int)    # True"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/03_the_boolean_represen_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "bool <: int <: object"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/03_runtime_typing_consequences_in_singular_operations/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/04_theNullSentinelObjectNone/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/04_theNullSentinelObjectNone/content.tex",
+          "reason": "too_few_lines",
+          "preview": "if value is None:       # correct: tests singleton identity"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/04_theNullSentinelObjectNone/content.tex",
+          "reason": "too_few_lines",
+          "preview": "middle_name = None    # absence of value"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/03_variables/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 6,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "score = base + (bonus * level) - (penalty // (2 ** round_count))"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "score = base + bonus * level - penalty // 2 ** round_count"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "**                 exponentiation"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "-2 ** 2        # -4, not 4"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/05_numerica_operator_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "11 // 2    # 5"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/00_orderedComponentStorageAndPositionalAccess/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/02_singular_data_domains/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/01_sequenceOperatorsAndSharedBehaviors/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/00_dynamicTypingInAssignment/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/00_dynamicTypingInAssignment/content.tex",
+          "reason": "too_few_lines",
+          "preview": "name = 42       -> references int object"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/00_dynamicTypingInAssignment/content.tex",
+          "reason": "too_few_lines",
+          "preview": "isinstance(x, (int, float)) and not isinstance(x, bool)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/00_dynamicTypingInAssignment/content.tex",
+          "reason": "too_few_lines",
+          "preview": "flag = True"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/00_dynamicTypingInAssignment/content.tex",
+          "reason": "too_few_lines",
+          "preview": "value = 42        # int"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/04_sequential_components/00_the_general_sequence_model_in_python/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/01_strongTypingInOperations/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/01_strongTypingInOperations/content.tex",
+          "reason": "too_few_lines",
+          "preview": "\"3\" + 4          -> TypeError"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/01_strongTypingInOperations/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int + int       -> int"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/01_strongTypingInOperations/content.tex",
+          "reason": "too_few_lines",
+          "preview": "int(\"3\") + 4          # 7"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/00_characterInteroperabilityStandards/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/02_structuralSummary/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/02_structuralSummary/content.tex",
+          "reason": "unknown_language",
+          "preview": "assignment:    flexible name-to-object binding"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/01_nativeConversionAndBoundaryEscapeSequences/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/03_runtime_typing_consequ/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/02_extendedUniversalCodepointEscapeAccess/content.tex",
+      "file": "01_REDUCED_CONTENT/03_variables/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/01_text_encoding_systems_lexical_escape_maps_and_character_representation/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/00_the_general_sequence_m/00_ordered_componen_stora/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/00_structuralAbstractionOfTheUnicodeStandard/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/00_the_general_sequence_m/01_sequence_operator_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/01_cpythonMemoryOptimizationArchitecturePep393/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/00_the_general_sequence_m/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/02_structuralExtractionAndEvaluation/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/01_text_encoding_systems/00_characte_interope_stan/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/03_stringSequenceOperations/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/01_text_encoding_systems/01_native_conversi_and_bo/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/02_cpython_string_memory_realities_str/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/01_text_encoding_systems/02_extended_universa_code/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/00_theMemoryLayoutParadigmContrast/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/01_text_encoding_systems/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/01_cpythonDynamicScalingMechanics/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/02_cpython_string_memory/00_structur_abstract_of_t/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/02_listMutationOperations/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/02_cpython_string_memory/01_cpython_memory_optimiz/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/03_deepVsShallowStructuralCloning/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/02_cpython_string_memory/02_structur_extracti_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/03_dynamic_pointer_arrays_the_python_list_architecture_list/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/02_cpython_string_memory/03_stringSequenceOperations/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/00_tupleSyntaxAndStructuralRole/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/02_cpython_string_memory/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/01_immutableSequenceInvariants/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/00_the_memory_layout_para/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/02_cpythonAllocationOptimizations/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/01_cpython_dynamic_scalin/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/01_cpython_dynamic_scalin/content.tex",
+          "reason": "too_few_lines",
+          "preview": "new_allocated = newsize + (newsize >> 3) + (newsize < 9 ? 3 : 6)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/04_sequential_components/04_fixed_structural_contiguity_the_tuple_architecture_tuple/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/02_listMutationOperations/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/04_sequential_components/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/03_deep_vs_shallow_struct/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/00_from_linear_source_text_to_control_flow_graphs/00_statementsBasicBlocksAndExecutionEdges/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/03_dynamic_pointer_arrays/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/00_from_linear_source_text_to_control_flow_graphs/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/04_fixed_structur_contigu/00_tuple_syntax_and_struc/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/00_thePhilosophyOfSyntacticWhitespace/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/04_fixed_structur_contigu/01_immutabl_sequence_inva/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/01_comparativeParadigmAnalysis/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/04_fixed_structur_contigu/02_cpython_allocati_optim/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/02_emptyBlocksAndStructuralPlaceholders/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/04_fixed_structur_contigu/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/01_code_block_syntax_and_indentation_semantics/content.tex",
+      "file": "01_REDUCED_CONTENT/04_sequential_components/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/00_syntaxOfBranchingControlGraphs/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 28,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
+          "reason": "too_few_lines",
+          "preview": "type(err): <class 'ValueError'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
+          "reason": "unknown_language",
+          "preview": "text = \"forty-two\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
+          "reason": "too_few_lines",
+          "preview": "/* C-style idea, not Python code */"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "start"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/00_statemen_basic_blocks/content.tex",
+          "reason": "too_few_lines",
+          "preview": "before conversion"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/01_logicEvaluationArchitecture/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/00_from_linear_source_tex/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/02_conditional_statements_and_decision_trees/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 29,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
+          "reason": "too_few_lines",
+          "preview": "caught as indentation problem: <class 'TabError'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
+          "reason": "too_few_lines",
+          "preview": "bad_src = \"if True:\\n        print('spaces')\\n\\tprint('tab')\\n\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
+          "reason": "too_few_lines",
+          "preview": "<class 'TabError'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
+          "reason": "too_few_lines",
+          "preview": "print(TabError)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/00_the_philosop_of_syntac/content.tex",
+          "reason": "too_few_lines",
+          "preview": "type(err): <class 'TabError'>"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/00_theLazyEvaluationInvariant/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 21,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "print(\"finished all items\")"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "print(\"finished one item\")"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
+          "reason": "unknown_language",
+          "preview": "checking item: soup"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
+          "reason": "unknown_language",
+          "preview": "items = [\"soup\", \"pretzels\", \"muffin\"]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/01_comparat_paradigm_anal/content.tex",
+          "reason": "unknown_language",
+          "preview": "name = \"Bart\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/01_sequenceBehaviorMetrics/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "slug": "emp01",
+          "language": "python",
+          "title": "The pass Statement: Syntactically Valid Empty Control-Flow Bodies",
+          "program_dir": "programs/emp01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "slug": "emp02",
+          "language": "python",
+          "title": "The pass Statement: Syntactically Valid Empty Control-Flow Bodies",
+          "program_dir": "programs/emp02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 20,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "No soup for you!"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "ready = True"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "x = pass"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "bool(result): False"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/02_empty_blocks_and_struc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "result = None"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/03_arithmetic_sequence_descriptors_the_range_object/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/01_code_block_syntax_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/00_indefiniteIterationTheWhileLoop/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 33,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
+          "reason": "too_few_lines",
+          "preview": "status = \"passing\" if score >= 50"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
+          "reason": "too_few_lines",
+          "preview": "scores: [42, 88, 15]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
+          "reason": "unknown_language",
+          "preview": "scores = [42, 88, 15]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
+          "reason": "too_few_lines",
+          "preview": "weather: cold"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/00_syntax_of_branchin_con/content.tex",
+          "reason": "too_few_lines",
+          "preview": "temperature = 18"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/01_definiteIterationTheForLoop/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 40,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
+          "reason": "too_few_lines",
+          "preview": "check: True"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
+          "reason": "too_few_lines",
+          "preview": "x = 42"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
+          "reason": "too_few_lines",
+          "preview": "10 < x and x in items"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
+          "reason": "too_few_lines",
+          "preview": "check: True"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/01_logic_evaluati_archite/content.tex",
+          "reason": "too_few_lines",
+          "preview": "x = 42"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/02_iterableVsIterator/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/02_conditio_statemen_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/03_interruptingExecutionFlowSubsystems/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 24,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
+          "reason": "too_few_lines",
+          "preview": "step 0: And now for something completely different."
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
+          "reason": "too_few_lines",
+          "preview": "for i in range(3):"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
+          "reason": "too_few_lines",
+          "preview": "nums: range(0, 1000000)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
+          "reason": "too_few_lines",
+          "preview": "nums = range(0, 1_000_000)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/00_the_lazy_evaluati_inva/content.tex",
+          "reason": "unknown_language",
+          "preview": "range object created"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/04_loopElseCompletionSemantics/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 40,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
+          "reason": "unknown_language",
+          "preview": "plain traversal"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
+          "reason": "unknown_language",
+          "preview": "steps = range(1, 6)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
+          "reason": "unknown_language",
+          "preview": "type(it1): <class 'range_iterator'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
+          "reason": "unknown_language",
+          "preview": "nums = range(1, 4)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/01_sequenceBehaviorMetrics/content.tex",
+          "reason": "unknown_language",
+          "preview": "first traversal"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/04_iterative_loops_and_the_iterator_protocol/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/03_arithmet_sequence_desc/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/00_enumeratedTraversal/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/02_iterableVsIterator/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/02_iterableVsIterator/content.tex",
+          "reason": "too_few_lines",
+          "preview": "C model:     base + i * sizeof(T)     # index in register, O(1) per step"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/02_iterableVsIterator/content.tex",
+          "reason": "unknown_language",
+          "preview": "GET_ITER                 # stack: iterable -> iterator"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/01_parallelTraversal/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/04_loop_else_completi_sem/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/04_loop_else_completi_sem/content.tex",
+          "reason": "diagram_or_trace",
+          "preview": "FOR_ITER --StopIteration--> else_block --> merge_point"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/04_loop_else_completi_sem/content.tex",
+          "reason": "too_few_lines",
+          "preview": "for item in items:"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/02_transformingAndFilteringIterationStreams/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/04_iterativ_loops_and_the/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/03_materializationBoundaries/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 25,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": " 1 | No soup for you!"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
+          "reason": "unknown_language",
+          "preview": "quotes = ["
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "names = [\"Jerry\", \"Elaine\", \"Kramer\"]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "names = [\"Jerry\", \"Elaine\", \"Kramer\"]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/00_enumeratedTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "first: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/05_lazy_traversal_objects_and_iteration_helpers/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 28,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "a |  1 | soup"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "letters = \"abc\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "first: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
+          "reason": "unknown_language",
+          "preview": "names = [\"Jerry\", \"Elaine\", \"Kramer\"]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/01_parallelTraversal/content.tex",
+          "reason": "too_few_lines",
+          "preview": "first: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/00_theArchitectureOfNonLocalJumps/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra01",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra02",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra03",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra03",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra04",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra04",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra05",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra05",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "slug": "tra06",
+          "language": "python",
+          "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+          "program_dir": "programs/tra06",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 33,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "reason": "unknown_language",
+          "preview": "pipeline created"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "reason": "too_few_lines",
+          "preview": "texts"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "reason": "too_few_lines",
+          "preview": "[10, 20, 42]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "reason": "too_few_lines",
+          "preview": "[10, 20, 42]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/02_transfor_and_filterin/content.tex",
+          "reason": "too_few_lines",
+          "preview": "texts = [\"10\", \"15\", \"20\", \"42\"]"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/01_exceptionClassHierarchiesAndHandlerSelection/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "slug": "mat01",
+          "language": "python",
+          "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+          "program_dir": "programs/mat01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "slug": "mat02",
+          "language": "python",
+          "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+          "program_dir": "programs/mat02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "slug": "mat03",
+          "language": "python",
+          "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+          "program_dir": "programs/mat03",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "slug": "mat04",
+          "language": "python",
+          "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+          "program_dir": "programs/mat04",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "slug": "mat05",
+          "language": "python",
+          "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+          "program_dir": "programs/mat05",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 33,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "even_nums: [10, 20, 42]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "total: 72"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def is_even(num):"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "pipeline is still lazy"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/03_materializationBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "type(nums): <class 'list'>"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/02_exceptionHandlingInfrastructure/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/05_lazy_traversa_objects/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/03_propagationMechanics/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 31,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
+          "reason": "too_few_lines",
+          "preview": "age text was not a valid integer"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
+          "reason": "unknown_language",
+          "preview": "age_text = \"forty-two\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
+          "reason": "too_few_lines",
+          "preview": "age text was not a valid integer"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
+          "reason": "unknown_language",
+          "preview": "age_text = \"forty-two\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/00_the_architec_of_non_lo/content.tex",
+          "reason": "too_few_lines",
+          "preview": "no age was entered"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/06_exceptional_control_flow_and_error_routing/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 37,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
+          "reason": "unknown_language",
+          "preview": "unexpected failure during conversion block"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
+          "reason": "unknown_language",
+          "preview": "try:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "total: 72"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
+          "reason": "unknown_language",
+          "preview": "items = [\"10\", \"20\", \"42\"]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/01_exceptio_class_hierarc/content.tex",
+          "reason": "too_few_lines",
+          "preview": "some error happened"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/05_control_flow/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/02_exceptio_handling_infr/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/02_exceptio_handling_infr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import dis"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/02_exceptio_handling_infr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "with EXPR as VAR:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/02_exceptio_handling_infr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "try:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/02_exceptio_handling_infr/content.tex",
+          "reason": "unknown_language",
+          "preview": "try:"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/00_fromPositionalAccessToHashBasedAccess/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/03_propagationMechanics/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/03_propagationMechanics/content.tex",
+          "reason": "too_few_lines",
+          "preview": "C error-code model:  return -1; caller must poll every boundary"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/01_theHashAndEqualityContract/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/06_exceptio_control_flow/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/00_hash_tables_as_non_sequential_component_access_structures/content.tex",
+      "file": "01_REDUCED_CONTENT/05_control_flow/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/00_mathematicalFoundationsAndStructuralSyntax/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/00_hash_tables_as_non_seq/00_from_position_access_t/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/06_hash_based_collections/00_hash_tables_as_non_seq/00_from_position_access_t/content.tex",
+          "reason": "too_few_lines",
+          "preview": "set:  element -> hash(element) -> probe table -> __eq__ confirmation"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/01_constraintsOfElementIngestionAndRuntimeEngines/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/00_hash_tables_as_non_seq/01_the_hash_and_equality/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/02_coreSetMutationOperations/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/00_hash_tables_as_non_seq/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/03_immutableSetVariants/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/00_mathemat_foundati_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/01_unordered_unique_domains_the_set_architecture_set/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/01_constrai_of_element_in/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/01_constrai_of_element_in/content.tex",
+          "reason": "too_few_lines",
+          "preview": "perturb = hash"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/00_fundamentalSetCalculations/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/02_coreSetMutationOperations/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/01_inPlaceMemoryMutation/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/03_immutableSetVariants/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/02_structuralRelationshipEvaluation/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/01_unordere_unique_domain/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/02_set_mathematical_operators_and_mutator_methods/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/02_set_mathemat_operator/00_fundamen_set_calculat/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/00_foundationsOfAssociativeMapping/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/02_set_mathemat_operator/01_inPlaceMemoryMutation/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/01_dictionaryConstructionPatterns/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/02_set_mathemat_operator/02_structur_relation_eval/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/02_cpythonArchitecturalEvolution/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/02_set_mathemat_operator/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/03_orderingGuaranteesAndMisconceptions/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/00_foundati_of_associat_m/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/04_queryingManipulatingAndMutatingDictionaryStates/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/01_dictiona_construc_patt/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/03_dictionaries_dict_key_value_associative_mappings/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/02_cpython_architec_evolu/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/06_hash_based_collections/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/03_ordering_guarante_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/00_structuralSyntaxAndFunctionObjectCreation/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/04_querying_manipula_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/01_returnSemanticsAndFrameTermination/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/03_dictiona_dict_key_valu/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/00_anatomy_and_definition_of_functions/content.tex",
+      "file": "01_REDUCED_CONTENT/06_hash_based_collections/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/00_memorySemanticsOfParameterPassing/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "slug": "str01",
+          "language": "python",
+          "title": "Anonymous Expressions: The Structural Equivalence of lambda Functions",
+          "program_dir": "programs/str01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "slug": "str02",
+          "language": "python",
+          "title": "The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\\_\\_cod...",
+          "program_dir": "programs/str02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "reason": "too_few_lines",
+          "preview": "add_def: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "reason": "unknown_language",
+          "preview": "  4           2 LOAD_FAST                0 (name)"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import dis"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/00_structur_syntax_and_fu/content.tex",
+          "reason": "too_few_lines",
+          "preview": "co_argcount:    2"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/01_functionSignatureArchitecture/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "slug": "ret01",
+          "language": "python",
+          "title": "Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth B...",
+          "program_dir": "programs/ret01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "slug": "ret02",
+          "language": "python",
+          "title": "Multiple Return Values as Tuple Packing: The Real Structure Behind return a, b",
+          "program_dir": "programs/ret02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "slug": "ret03",
+          "language": "python",
+          "title": "Implicit Return Defaults: Why Functions Without return Produce None",
+          "program_dir": "programs/ret03",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "slug": "ret04",
+          "language": "python",
+          "title": "Execution Frames: Inside the CPython Call Stack and PyFrameObject Allocation",
+          "program_dir": "programs/ret04",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "sum_down(4)=10"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "result=('Homer', 42), type=<class 'tuple'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "42"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/01_return_semantic_and_fr/content.tex",
+          "reason": "too_few_lines",
+          "preview": "n=42, co_name=show_frame, locals=['n', 'frame'], f_back=True"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/01_function_call_mechanics_and_parameter_binding/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/00_anatomy_and_definiti_o/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/00_variadicPositionalParameters/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/00_memory_semantic_of_par/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/00_memory_semantic_of_par/content.tex",
+          "slug": "mem01",
+          "language": "python",
+          "title": "C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Nam...",
+          "program_dir": "programs/mem01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/00_memory_semantic_of_par/content.tex",
+          "slug": "mem02",
+          "language": "python",
+          "title": "The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object Referen...",
+          "program_dir": "programs/mem02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/00_memory_semantic_of_par/content.tex",
+          "reason": "too_few_lines",
+          "preview": "x='Arthur', y='Patsy'"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/00_memory_semantic_of_par/content.tex",
+          "reason": "too_few_lines",
+          "preview": "x=42, quotes=[\"D'oh!\", 'extra']"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/01_variadicKeywordParameters/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "slug": "fun01",
+          "language": "python",
+          "title": "Positional-Only Parameters Using /",
+          "program_dir": "programs/fun01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "slug": "fun02",
+          "language": "python",
+          "title": "Default Parameter Values and Definition-Time Evaluation",
+          "program_dir": "programs/fun02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 6,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "Homer: Homer"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def build_line(name: str, score: int = 42) -> str:"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "localhost:8080"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def connect(host, *, port):"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/01_function_signatur_arch/content.tex",
+          "reason": "too_few_lines",
+          "preview": "(a, b, /)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/02_architecturalPitfallsOfArgumentEvaluation/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/01_function_call_mechanic/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/02_flexible_parametrization_systems/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/00_variadic_position_para/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/00_variadic_position_para/content.tex",
+          "slug": "var01",
+          "language": "python",
+          "title": "Variable-Length Argument Packing: The Mechanics of *args and **kwargs",
+          "program_dir": "programs/var01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/00_variadic_position_para/content.tex",
+          "reason": "too_few_lines",
+          "preview": "Homer, 42, hungry"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/00_variadic_position_para/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def show_line(name, score, mood):"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/00_variadic_position_para/content.tex",
+          "reason": "too_few_lines",
+          "preview": "(3, 1)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/00_theLegbRuleInvariant/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/01_variadicKeywordParameters/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/01_variadicKeywordParameters/content.tex",
+          "reason": "too_few_lines",
+          "preview": "localhost:8080 timeout=30"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/01_variadicKeywordParameters/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def connect(host, port, timeout=30):"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/01_variadicKeywordParameters/content.tex",
+          "reason": "too_few_lines",
+          "preview": "title='Annual', options={'year': 2026, 'draft': True}"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/01_variadicKeywordParameters/content.tex",
+          "reason": "too_few_lines",
+          "preview": "def show_report(title, **options):"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/01_mutatingExternalScopes/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "slug": "arc01",
+          "language": "python",
+          "title": "Defending Against State Contamination Using the Immutable None Idiom and Sent...",
+          "program_dir": "programs/arc01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "slug": "arc02",
+          "language": "python",
+          "title": "Static Expression Evaluation: Why Default Values Are Created at Function Defi...",
+          "program_dir": "programs/arc02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "slug": "arc03",
+          "language": "python",
+          "title": "The Mutable Default Arguments Trap: Why def func(x=[]) Reuses One Persistent...",
+          "program_dir": "programs/arc03",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "a=[\"D'oh!\"], b=['Ni!'], a is b: False"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "make_default_tag() running"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/02_architec_pitfalls_of_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "a=[\"D'oh!\", 'No soup for you!']"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/03_namespaces_and_variable_scope_resolution/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/02_flexible_parametr_syst/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/00_anatomyOfScopeFailures/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/00_theLegbRuleInvariant/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/00_theLegbRuleInvariant/content.tex",
+          "slug": "the01",
+          "language": "python",
+          "title": "Variable Scope and Lexical Boundaries: The LEGB Resolution Rules",
+          "program_dir": "programs/the01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/00_theLegbRuleInvariant/content.tex",
+          "reason": "unknown_language",
+          "preview": "  2           2 LOAD_FAST                0 (name)"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/01_compileTimeScopeDisambiguation/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "slug": "mut01",
+          "language": "python",
+          "title": "Overriding Nested Intermediary Scopes: The nonlocal Declaration Syntax and Ce...",
+          "program_dir": "programs/mut01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "slug": "mut02",
+          "language": "python",
+          "title": "Overriding Module Scope: The global Declaration Syntax and Module Namespace M...",
+          "program_dir": "programs/mut02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "slug": "mut03",
+          "language": "python",
+          "title": "Local Read Access Boundaries vs. the Shadowing Consequence of Assignment",
+          "program_dir": "programs/mut03",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "reason": "too_few_lines",
+          "preview": "1 2 3"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "reason": "too_few_lines",
+          "preview": "2"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/01_mutatingExternalScopes/content.tex",
+          "reason": "too_few_lines",
+          "preview": "inside: 100"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/04_runtime_scope_mechanics_and_variable_binding_analysis/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/03_namespac_and_variable/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/00_firstClassCitizensAndHigherOrderFunctions/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/00_anatomyOfScopeFailures/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/00_anatomyOfScopeFailures/content.tex",
+          "slug": "ana01",
+          "language": "python",
+          "title": "Runtime Execution Traces and Bytecode Analysis of UnboundLocalError",
+          "program_dir": "programs/ana01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/00_anatomyOfScopeFailures/content.tex",
+          "reason": "too_few_lines",
+          "preview": "local variable 'value' referenced before assignment"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/01_lexicalClosures/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/01_compile_time_scope_dis/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/01_compile_time_scope_dis/content.tex",
+          "reason": "too_few_lines",
+          "preview": "[2, 2, 2]"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/01_compile_time_scope_dis/content.tex",
+          "reason": "too_few_lines",
+          "preview": "funcs = []"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/02_decorators/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/04_runtime_scope_mechanic/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/05_first_class_functions_closures_and_function_transformation/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "slug": "fir01",
+          "language": "python",
+          "title": "Higher-Order Functions: Functions That Receive or Return Other Functions",
+          "program_dir": "programs/fir01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "slug": "fir02",
+          "language": "python",
+          "title": "Callbacks and Callback Chains: Decoupling Structural Execution Graphs",
+          "program_dir": "programs/fir02",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "slug": "fir03",
+          "language": "python",
+          "title": "Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine Re...",
+          "program_dir": "programs/fir03",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "WARNING: System alert"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "42"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/00_first_class_citizens_a/content.tex",
+          "reason": "too_few_lines",
+          "preview": "fn is say_doh: True, fn(): D'oh!"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/00_lazyStreamEvaluationGenerators/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/01_lexicalClosures/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/01_lexicalClosures/content.tex",
+          "slug": "lex01",
+          "language": "python",
+          "title": "Closures, Lexical Enclosures, and Free Variable Tracking Invariants",
+          "program_dir": "programs/lex01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/01_lexicalClosures/content.tex",
+          "reason": "too_few_lines",
+          "preview": "fn(): D'oh!"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/01_generatorDelegation/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/02_decorators/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/02_decorators/content.tex",
+          "slug": "dec01",
+          "language": "python",
+          "title": "The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers",
+          "program_dir": "programs/dec01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/02_decorators/content.tex",
+          "slug": "dec02",
+          "language": "python",
+          "title": "The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers",
+          "program_dir": "programs/dec02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/02_decorators/content.tex",
+          "reason": "too_few_lines",
+          "preview": "calling shout"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/02_bidirectionalDataFlowPipelinesGeneratorBasedCoroutines/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/05_first_class_function_c/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/03_nativeCoroutineBridge/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/00_lazy_stream_evaluati_g/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/00_lazy_stream_evaluati_g/content.tex",
+          "slug": "laz01",
+          "language": "python",
+          "title": "Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Exec...",
+          "program_dir": "programs/laz01",
+          "has_output": false
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/00_lazy_stream_evaluati_g/content.tex",
+          "slug": "laz02",
+          "language": "python",
+          "title": "The yield Keyword Architecture: Pausing Function Execution Without Destroying...",
+          "program_dir": "programs/laz02",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/00_lazy_stream_evaluati_g/content.tex",
+          "reason": "too_few_lines",
+          "preview": "gi_frame before next: <frame at 0x..., file \"...\", line 1, code small_gen>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/00_lazy_stream_evaluati_g/content.tex",
+          "reason": "too_few_lines",
+          "preview": "type: <class 'generator'>"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/06_non_preemptive_multitasking_generators_and_coroutines/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/01_generatorDelegation/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/01_generatorDelegation/content.tex",
+          "slug": "gen01",
+          "language": "python",
+          "title": "yield from as Delegated Iteration over Subgenerators and Iterables",
+          "program_dir": "programs/gen01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/01_generatorDelegation/content.tex",
+          "reason": "too_few_lines",
+          "preview": "[1, 2, 3]"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/07_function_execution/content.tex",
-      "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/02_bidirect_data_flow_pip/content.tex",
+      "accepted": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/02_bidirect_data_flow_pip/content.tex",
+          "slug": "bid01",
+          "language": "python",
+          "title": "Consumers and Transformers: Feeding In-Flight Data via the .send() Interface",
+          "program_dir": "programs/bid01",
+          "has_output": false
+        }
+      ],
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/02_bidirect_data_flow_pip/content.tex",
+          "reason": "too_few_lines",
+          "preview": "got: \"D'oh!\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/00_programsAsDataConsumersAndDataProducers/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/03_nativeCoroutineBridge/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/03_nativeCoroutineBridge/content.tex",
+          "reason": "too_few_lines",
+          "preview": "type: <class 'coroutine'>"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/03_nativeCoroutineBridge/content.tex",
+          "reason": "too_few_lines",
+          "preview": "async def fetch():"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/01_theOperatingSystemMediationLayer/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/06_non_preempti_multitas/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/00_the_i_o_boundary_from_runtime_objects_to_external_systems/content.tex",
+      "file": "01_REDUCED_CONTENT/07_function_execution/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/00_theOpenFunctionAndFileObjectConstruction/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/00_programs_as_data_consu/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/00_programs_as_data_consu/content.tex",
+          "reason": "unknown_language",
+          "preview": "import sys"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/00_programs_as_data_consu/content.tex",
+          "reason": "unknown_language",
+          "preview": "import sys"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/00_programs_as_data_consu/content.tex",
+          "reason": "too_few_lines",
+          "preview": "msg = \"Nobody expects the Spanish Inquisition!\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/01_resourceManagementInvariants/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/01_the_operatin_system_me/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 3,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/01_the_operatin_system_me/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import sys"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/01_the_operatin_system_me/content.tex",
+          "reason": "unknown_language",
+          "preview": "import os"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/01_the_operatin_system_me/content.tex",
+          "reason": "unknown_language",
+          "preview": "import sys"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/01_file_opening_closing_and_resource_lifetime/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/00_the_i_o_boundary_from/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/00_readingTextualData/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/01_resource_manageme_inva/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 4,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/01_resource_manageme_inva/content.tex",
+          "reason": "unknown_language",
+          "preview": "import os"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/01_resource_manageme_inva/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"protocol_demo.txt\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/01_resource_manageme_inva/content.tex",
+          "reason": "too_few_lines",
+          "preview": "path = \"with_demo.txt\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/01_resource_manageme_inva/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"manual_close_demo.txt\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/01_writingTextualData/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/01_file_opening_closing_a/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/02_encodingAndDecodingBoundaries/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/02_text_file_reading_and/02_encoding_and_decoding/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/02_text_file_reading_and/02_encoding_and_decoding/content.tex",
+          "reason": "unknown_language",
+          "preview": "text = \"Stiinta\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/02_text_file_reading_and/02_encoding_and_decoding/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"encoding_cost_demo.bin\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/02_text_file_reading_and_writing/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/02_text_file_reading_and/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/00_byteOrientedDataStreams/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/00_byteOrientedDataStreams/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/00_byteOrientedDataStreams/content.tex",
+          "reason": "too_few_lines",
+          "preview": "buf = bytearray(b\"Answer: 41\")"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/00_byteOrientedDataStreams/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"binary_mode_demo.bin\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/01_binaryAccessPatterns/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/01_binaryAccessPatterns/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/01_binaryAccessPatterns/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"seek_demo.bin\""
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/01_binaryAccessPatterns/content.tex",
+          "reason": "unknown_language",
+          "preview": "path = \"chunk_read_demo.bin\""
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/03_binary_file_reading_and_writing/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/03_binary_file_reading_an/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/00_pathsAsStructuredFilesystemReferences/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/00_paths_as_structur_file/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/00_paths_as_structur_file/content.tex",
+          "reason": "too_few_lines",
+          "preview": "from pathlib import Path"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/00_paths_as_structur_file/content.tex",
+          "reason": "too_few_lines",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/01_filesystemInspectionAndManipulation/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/01_filesyst_inspecti_and/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/01_filesyst_inspecti_and/content.tex",
+          "reason": "too_few_lines",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/04_filesystem_path_architecture/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/04_filesyst_path_architec/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/00_jsonDataBoundaries/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/00_jsonDataBoundaries/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 2,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/00_jsonDataBoundaries/content.tex",
+          "reason": "unknown_language",
+          "preview": "import json"
+        },
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/00_jsonDataBoundaries/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import json"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/01_csvTabularData/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/01_pickleSerializMechan/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/01_pickleSerializMechan/content.tex",
+          "reason": "too_few_lines",
+          "preview": "import pickle"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/05_structured_data_interchange/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/05_structur_data_intercha/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/00_expectedFailureModes/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/06_error_handling_in_i_o/00_expectedFailureModes/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/06_error_handling_in_i_o/00_expectedFailureModes/content.tex",
+          "reason": "unknown_language",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/01_defensiveIOPatterns/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/06_error_handling_in_i_o/01_defensiveIOPatterns/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/06_error_handling_in_i_o/01_defensiveIOPatterns/content.tex",
+          "reason": "unknown_language",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/06_error_handling_in_i_o_operations/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/06_error_handling_in_i_o/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/00_streamingLargeInputs/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/00_streamingLargeInputs/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/00_streamingLargeInputs/content.tex",
+          "reason": "unknown_language",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/01_transformingExternalData/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/01_transformingExternalData/content.tex",
       "accepted": [],
-      "rejected_count": 0,
-      "rejected_sample": []
+      "rejected_count": 1,
+      "rejected_sample": [
+        {
+          "file": "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/01_transformingExternalData/content.tex",
+          "reason": "unknown_language",
+          "preview": "from pathlib import Path"
+        }
+      ]
     },
     {
-      "file": "00_CONTENT/08_input_output/07_practical_external_data_pipelines/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/07_practica_external_data/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []
     },
     {
-      "file": "00_CONTENT/08_input_output/content.tex",
+      "file": "01_REDUCED_CONTENT/08_input_output/content.tex",
       "accepted": [],
       "rejected_count": 0,
       "rejected_sample": []

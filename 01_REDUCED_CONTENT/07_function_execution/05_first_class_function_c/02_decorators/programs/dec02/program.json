@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers",
+  "label": "dec02",
+  "linenos": true,
+  "input": null,
+  "output": "calling shout\nNI!",
+  "file": "main.py"
+}

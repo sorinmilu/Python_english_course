@@ -8,23 +8,8 @@ When a signature includes \texttt{*args}, CPython must allocate a fresh \texttt{
 
 Contrast this with the Vectorcall protocol (Python 3.8+): for many C-accelerated and simple Python calls, arguments pass through a contiguous C array of \texttt{PyObject*} pointers with a method flag (\texttt{METH\_VECTORCALL}). No intermediate tuple or dict is constructed. Signatures that force \texttt{*args}/\texttt{**kwargs}---or wrappers that use them---disable this fast path and pay explicit container allocation on every invocation.
 
-\begin{verbatim}
-def flexible(*args, **kwargs):
-    return len(args), len(kwargs)
+%<<<PROGRAM:programs/var01>>>
 
-def fixed(a, b):
-    return a + b
-
-print(flexible(1, 2, 3, x=4))
-print(fixed(1, 2))
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-(3, 1)
-3
-\end{verbatim}
 
 Decorators and forwarding wrappers commonly use \texttt{def wrapper(*args, **kwargs): return fn(*args, **kwargs)}. This preserves call shapes but forces tuple/dict packing at the wrapper boundary even when the underlying callable could have accepted a vectorcall layout.
 

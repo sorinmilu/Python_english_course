@@ -8,36 +8,8 @@ For names bound in the current function scope, CPython emits \texttt{LOAD\_FAST}
 
 For globals and builtins, the compiler emits \texttt{LOAD\_GLOBAL} / \texttt{STORE\_GLOBAL} (or \texttt{LOAD\_NAME} at module level), which perform dictionary lookups in \texttt{f\_globals} and the builtins namespace. These paths carry hash-table overhead on every access.
 
-\begin{verbatim}
-import dis
+%<<<PROGRAM:programs/the01>>>
 
-def local_access(name, score):
-    message = f"{name}: {score}"
-    return message
-
-def global_access():
-    return answer
-
-answer = 42
-
-dis.dis(local_access)
-print("---")
-dis.dis(global_access)
-\end{verbatim}
-
-Possible output excerpt:
-
-\begin{verbatim}
-  2           2 LOAD_FAST                0 (name)
-              4 LOAD_FAST                1 (score)
-             ...
-             14 STORE_FAST               2 (message)
-  3          16 LOAD_FAST                2 (message)
-             18 RETURN_VALUE
----
-  2           0 LOAD_GLOBAL              0 (answer)
-             12 RETURN_VALUE
-\end{verbatim}
 
 Enclosing-scope reads from nested functions use \texttt{LOAD\_DEREF} / \texttt{STORE\_DEREF} on cell objects---heap-allocated indirection slots shared between outer and inner code objects.
 

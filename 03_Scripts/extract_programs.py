@@ -19,8 +19,10 @@ from program_utils import (
 )
 
 
-def find_content_files(root_dir: str) -> list[str]:
-    content_root = os.path.join(root_dir, "00_CONTENT")
+def find_content_files(root_dir: str, content_dir_name: str = "01_REDUCED_CONTENT") -> list[str]:
+    content_root = os.path.join(root_dir, content_dir_name)
+    if not os.path.isdir(content_root):
+        return []
     paths = []
     for dirpath, _dirnames, filenames in os.walk(content_root):
         if "content.tex" in filenames:
@@ -122,6 +124,11 @@ def main() -> int:
         default="..",
         help="Project root directory (default: ..)",
     )
+    parser.add_argument(
+        "--content-dir",
+        default="01_REDUCED_CONTENT",
+        help="Content tree under root to scan (default: 01_REDUCED_CONTENT)",
+    )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
         "--dry-run",
@@ -145,9 +152,9 @@ def main() -> int:
     if not os.path.isabs(report_path):
         report_path = os.path.join(root_dir, report_path)
 
-    content_files = find_content_files(root_dir)
+    content_files = find_content_files(root_dir, args.content_dir)
     if not content_files:
-        print("No content.tex files found under 00_CONTENT/")
+        print(f"No content.tex files found under {args.content_dir}/")
         return 1
 
     all_results = []
@@ -162,6 +169,7 @@ def main() -> int:
 
     report = {
         "mode": "apply" if args.apply else "dry-run",
+        "content_dir": args.content_dir,
         "total_files": len(content_files),
         "total_accepted": total_accepted,
         "total_rejected": total_rejected,

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat01",
+  "linenos": true,
+  "input": null,
+  "output": "even_nums: [10, 20, 42]\nfirst even number: 10\ntotal: 72\nagain total: 72",
+  "file": "main.py"
+}

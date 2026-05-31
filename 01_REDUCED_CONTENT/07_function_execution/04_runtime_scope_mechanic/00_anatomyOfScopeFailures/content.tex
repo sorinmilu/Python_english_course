@@ -6,24 +6,8 @@ Scope failures reveal how the compiler classified names before runtime. Each err
 
 If a name is assigned anywhere in a function, the compiler marks it local for the entire function. A read before that assignment executes \texttt{LOAD\_FAST} on an uninitialized slot.
 
-\begin{verbatim}
-value = 42
+%<<<PROGRAM:programs/ana01>>>
 
-def broken():
-    print(value)
-    value = 100
-
-try:
-    broken()
-except UnboundLocalError as err:
-    print(err)
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-local variable 'value' referenced before assignment
-\end{verbatim}
 
 Bytecode uses \texttt{LOAD\_FAST} for \texttt{value}, not \texttt{LOAD\_GLOBAL}, because the assignment later in the body forced local classification.
 

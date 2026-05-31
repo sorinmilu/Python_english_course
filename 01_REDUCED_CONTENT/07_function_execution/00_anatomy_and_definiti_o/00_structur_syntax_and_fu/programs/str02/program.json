@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\\_\\_cod...",
+  "label": "str02",
+  "linenos": true,
+  "input": null,
+  "output": "co_argcount:    2\nco_varnames:    ('name', 'number', 'text')\nco_consts:      (None, ' says ')\nco_names:       ('upper',)\nco_code length: 58",
+  "file": "main.py"
+}

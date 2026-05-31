@@ -4,70 +4,22 @@ Reading an outer name follows LEGB automatically. Assigning to an outer name req
 
 \subsubsection{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}
 
-\begin{verbatim}
-answer = 42
+%<<<PROGRAM:programs/mut03>>>
 
-def set_answer():
-    answer = 100
-    print(f"inside: {answer}")
-
-set_answer()
-print(f"outside: {answer}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-inside: 100
-outside: 42
-\end{verbatim}
 
 Assignment inside the function creates a local \texttt{answer}; it does not mutate the module binding.
 
 \subsubsection{Overriding Module Scope: The \texttt{global} Declaration Syntax and Module Namespace Mutation}
 
-\begin{verbatim}
-counter = 0
+%<<<PROGRAM:programs/mut02>>>
 
-def increment():
-    global counter
-    counter = counter + 1
-
-increment()
-increment()
-print(counter)
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-2
-\end{verbatim}
 
 \texttt{global} redirects \texttt{STORE\_GLOBAL} to the module namespace dictionary.
 
 \subsubsection{Overriding Nested Intermediary Scopes: The \texttt{nonlocal} Declaration Syntax and Cell Reference Mutation}
 
-\begin{verbatim}
-def make_counter():
-    count = 0
+%<<<PROGRAM:programs/mut01>>>
 
-    def increment():
-        nonlocal count
-        count = count + 1
-        return count
-
-    return increment
-
-counter = make_counter()
-print(counter(), counter(), counter())
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-1 2 3
-\end{verbatim}
 
 \texttt{nonlocal} writes through the closure cell, not a new local slot. Integer rebinding creates a new \texttt{int} object and updates the cell reference.
 

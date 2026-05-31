@@ -148,7 +148,9 @@ qsort
 
 A second useful C callback pattern appears in event libraries. A C API may let the user register a function and an opaque state pointer:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{C event libraries: registering callbacks with an opaque user\_data pointer}{fun24}
+#include <stdio.h>
+
 typedef void (*event_callback_t)(int event_code, void *user_data);
 
 void dispatch_event(event_callback_t callback, void *user_data) {
@@ -165,7 +167,14 @@ int main(void) {
     dispatch_event(print_event, "handler A");
     return 0;
 }
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+handler A received event 42 \\
+\end{iobox}
+
+
 
 The useful application is GUI programming, network libraries, embedded systems, plugin hooks, and low-level event loops. The function pointer supplies the code. The \texttt{void *user\_data} pointer supplies state. This manually emulates what higher-level languages do automatically with closures.
 
@@ -320,7 +329,7 @@ The useful application is event-driven interface programming. The programmer reg
 
 A longer interface-based shape is:
 
-\begin{verbatim}
+\begin{codebox}[]{java}{Java: interface-based callbacks and Dispatcher.run invocation}{fun27}
 interface Callback {
     void call(String message);
 }
@@ -342,7 +351,14 @@ public class Main {
         Dispatcher.run(new Printer());
     }
 }
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+event happened \\
+\end{iobox}
+
+
 
 At source level, \texttt{callback.call(...)} looks like a method call. At JVM level, this creates ordinary method frames. During callback execution:
 
@@ -1847,7 +1863,7 @@ later call:
 
 The key rule is that the environment must outlive the callback. Therefore, allocating the environment on the stack would be wrong if the closure escapes:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{C: returning a closure that points at a stack-allocated environment (dangling pointer)}{fun26}
 struct closure bad_make_multiplier(int factor) {
     struct multiplier_env env;
     env.factor = factor;
@@ -1858,21 +1874,35 @@ struct closure bad_make_multiplier(int factor) {
 
     return c;
 }
-\end{verbatim}
+\end{codebox}
+
+
 
 After \texttt{bad\_make\_multiplier} returns, \texttt{env} no longer exists. The closure contains a dangling pointer.
 
 Some C compilers provide nonstandard closure-like extensions. GCC nested functions can refer to enclosing variables in some modes, and Apple/Clang blocks provide a stronger closure-like extension:
 
-\begin{verbatim}
+\begin{codebox}[]{c}{Clang blocks: capturing lexical state with a non-ISO C closure extension}{fun28}
+#include <stdio.h>
+
 int factor = 3;
 
 int (^multiply)(int) = ^int(int value) {
     return value * factor;
 };
 
-printf("%d\n", multiply(10));
-\end{verbatim}
+int main(void) {
+    printf("%d\n", multiply(10));
+    return 0;
+}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+30 \\
+\end{iobox}
+
+
 
 Blocks can capture surrounding variables and may be copied to the heap when they must outlive their creation scope. This is not ISO C, but it shows what extra compiler/runtime machinery is needed to support closures safely.
 
@@ -1908,7 +1938,7 @@ This is not heap-preserved lexical state. It is lookup in the shell's current va
 
 A callback-like function generator can be approximated with \texttt{eval}, but this is fragile and often unsafe:
 
-\begin{verbatim}
+\begin{codebox}[]{bash}{Bash: approximating callback factories with eval and dynamically defined functions}{fun25}
 make_printer() {
     local name="$1"
     local prefix="$2"
@@ -1918,7 +1948,14 @@ make_printer() {
 
 make_printer print_error "ERROR:"
 print_error "file missing"
-\end{verbatim}
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+ERROR: file missing \\
+\end{iobox}
+
+
 
 This creates a named function whose body contains the chosen prefix text. The useful application is limited script metaprogramming, but it is not the same as a runtime closure object. It is command-text generation.
 

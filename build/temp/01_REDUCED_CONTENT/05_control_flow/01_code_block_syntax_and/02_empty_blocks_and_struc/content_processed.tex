@@ -145,7 +145,7 @@ The final value remains bound after the loop because the \texttt{for} statement 
 
 The \texttt{pass} statement is also useful when defining a function or class before implementing it:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The pass Statement: Syntactically Valid Empty Control-Flow Bodies}{emp02}
 def convert_score(score):
     pass
 
@@ -155,19 +155,21 @@ class EmptyBox:
 print(f"type(convert_score): {type(convert_score)}")
 print(f"type(EmptyBox): {type(EmptyBox)}")
 print(f"type(EmptyBox()): {type(EmptyBox())}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type(convert_score): <class 'function'>
-type(EmptyBox): <class 'type'>
-type(EmptyBox()): <class '__main__.EmptyBox'>
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type(convert\_score): <class 'function'> \\
+type(EmptyBox): <class 'type'> \\
+type(EmptyBox()): <class '\_\_main\_\_.EmptyBox'> \\
+\end{iobox}
+
+
+
 
 The function exists even though its body does no useful work. If it is called, it returns \texttt{None}, because a Python function without an explicit \texttt{return} statement returns \texttt{None} automatically.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The pass Statement: Syntactically Valid Empty Control-Flow Bodies}{emp01}
 def convert_score(score):
     pass
 
@@ -176,15 +178,17 @@ result = convert_score(42)
 print(f"result: {result}")
 print(f"type(result): {type(result)}")
 print(f"dir(result) sample: {dir(result)[:5]}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-result: None
-type(result): <class 'NoneType'>
-dir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__']
-\end{verbatim}
+\begin{iobox}{Expected Output}
+result: None \\
+type(result): <class 'NoneType'> \\
+dir(result) sample: ['\_\_bool\_\_', '\_\_class\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_'] \\
+\end{iobox}
+
+
+
 
 The object \texttt{None} is Python's single built-in object for representing absence of a returned value. Its type is \texttt{NoneType}. The method \texttt{\_\_bool\_\_} is important because \texttt{None} is false in truth-value testing:
 

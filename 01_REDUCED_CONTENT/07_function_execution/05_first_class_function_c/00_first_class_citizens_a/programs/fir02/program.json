@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Callbacks and Callback Chains: Decoupling Structural Execution Graphs",
+  "label": "fir02",
+  "linenos": true,
+  "input": null,
+  "output": "42\n49",
+  "file": "main.py"
+}

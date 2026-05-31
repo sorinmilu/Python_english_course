@@ -13,7 +13,7 @@ Python parameter passing is call-by-object-reference (call-by-sharing): the call
     \item in-place mutation of a shared mutable object is visible through all names referencing it.
 \end{enumerate}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object Referen...}{mem02}
 def change_number(n):
     n = n + 1
 
@@ -27,13 +27,15 @@ change_number(x)
 add_line(quotes)
 
 print(f"x={x}, quotes={quotes}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-x=42, quotes=["D'oh!", 'extra']
-\end{verbatim}
+\begin{iobox}{Expected Output}
+x=42, quotes=["D'oh!", 'extra'] \\
+\end{iobox}
+
+
+
 
 Immutable objects cannot change in place; \texttt{n = n + 1} creates a new integer and rebinds \texttt{n}. Mutable objects can be mutated through shared references.
 
@@ -41,7 +43,7 @@ Immutable objects cannot change in place; \texttt{n = n + 1} creates a new integ
 
 C passes values or pointer copies into callee storage. Python creates a new local binding to the same heap object. The callee cannot rebind the caller's name slot; it can only mutate a shared object or rebind its own local name.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Nam...}{mem01}
 def bad_swap(a, b):
     a, b = b, a
 
@@ -51,14 +53,16 @@ print(f"after bad_swap: x={x!r}, y={y!r}")
 
 x, y = y, x  # caller must rebind explicitly
 print(f"after caller rebind: x={x!r}, y={y!r}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-x='Arthur', y='Patsy'
-after caller rebind: x='Patsy', y='Arthur'
-\end{verbatim}
+\begin{iobox}{Expected Output}
+x='Arthur', y='Patsy' \\
+after caller rebind: x='Patsy', y='Arthur' \\
+\end{iobox}
+
+
+
 
 \subsubsection{Side Effects Matrix: Mutating Mutable Objects In Place vs. Reassigning Local Names}
 

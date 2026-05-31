@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The yield Keyword Architecture: Pausing Function Execution Without Destroying...",
+  "label": "laz02",
+  "linenos": true,
+  "input": null,
+  "output": "type: <class 'generator'>\nD'oh!\nNo soup for you!",
+  "file": "main.py"
+}

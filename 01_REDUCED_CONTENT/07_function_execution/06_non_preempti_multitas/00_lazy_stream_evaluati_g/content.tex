@@ -4,24 +4,8 @@ A generator function contains \texttt{yield}. Calling it returns a generator obj
 
 \subsubsection{The \texttt{yield} Keyword Architecture: Pausing Function Execution Without Destroying Local State}
 
-\begin{verbatim}
-def count_quotes():
-    yield "D'oh!"
-    yield "No soup for you!"
+%<<<PROGRAM:programs/laz02>>>
 
-gen = count_quotes()
-print(f"type: {type(gen)}")
-print(next(gen))
-print(next(gen))
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type: <class 'generator'>
-D'oh!
-No soup for you!
-\end{verbatim}
 
 \texttt{yield} sends a value outward and suspends. Local variables (\texttt{x}, \texttt{y}, loop counters) remain in the generator frame.
 
@@ -29,25 +13,8 @@ No soup for you!
 
 A generator holds \texttt{gi\_code} (the \texttt{PyCodeObject}) and \texttt{gi\_frame} (the heap-allocated \texttt{PyFrameObject} while suspended). \texttt{f\_lasti} records the bytecode offset for resumption. When the generator completes, \texttt{gi\_frame} becomes \texttt{None} and the frame is deallocated.
 
-\begin{verbatim}
-def small_gen():
-    x = "D'oh!"
-    yield x
+%<<<PROGRAM:programs/laz01>>>
 
-gen = small_gen()
-print(f"gi_frame before next: {gen.gi_frame}")
-print(f"f_locals: {gen.gi_frame.f_locals}")
-value = next(gen)
-print(f"yielded: {value!r}, gi_frame after: {gen.gi_frame}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-gi_frame before next: <frame at 0x..., file "...", line 1, code small_gen>
-f_locals: {}
-yielded: "D'oh!", gi_frame after: None
-\end{verbatim}
 
 This confirms the general frame model: CPython keeps evaluation state on the heap so generators can pause without copying locals to a separate structure.
 

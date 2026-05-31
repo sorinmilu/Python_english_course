@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object Referen...",
+  "label": "mem02",
+  "linenos": true,
+  "input": null,
+  "output": "x=42, quotes=[\"D'oh!\", 'extra']",
+  "file": "main.py"
+}

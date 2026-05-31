@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "Clang blocks: capturing lexical state with a non-ISO C closure extension",
+  "label": "fun28",
+  "linenos": true,
+  "input": null,
+  "output": "30",
+  "file": "main.c"
+}

@@ -4,7 +4,7 @@ A decorator is a compile-time meta-programming hook that intercepts function ini
 
 \subsubsection{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec02}
 def make_logged(fn):
     def wrapper(*args, **kwargs):
         print(f"calling {fn.__name__}")
@@ -16,18 +16,20 @@ def shout(text):
     return text.upper()
 
 print(shout("ni!"))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-calling shout
-NI!
-\end{verbatim}
+\begin{iobox}{Expected Output}
+calling shout \\
+NI! \\
+\end{iobox}
+
+
+
 
 The AST transformation is exact:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec01}
 @make_logged
 def shout(text):
     return text.upper()
@@ -36,7 +38,8 @@ def shout(text):
 def shout(text):
     return text.upper()
 shout = make_logged(shout)
-\end{verbatim}
+\end{codebox}
+
 
 Execution order at \texttt{def} time: (1) compile and instantiate the original function object with its \texttt{PyCodeObject}; (2) invoke the decorator, passing that callable reference; (3) receive the wrapper (or replacement) object; (4) rebind the public name to the returned object. The wrapper typically closes over the original via a cell in \texttt{\_\_closure\_\_}.
 

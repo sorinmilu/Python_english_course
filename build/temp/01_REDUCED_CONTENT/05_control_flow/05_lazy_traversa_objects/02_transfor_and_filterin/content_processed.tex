@@ -183,7 +183,7 @@ The source list is reusable. The \texttt{map} iterator is not reusable after exh
 
 The transformation callable does not have to be \texttt{int}. It can be another callable object. A simple named function makes the lazy behavior visible:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra06}
 def loud_text(text):
     print(f"transforming: {text}")
     return text.upper()
@@ -200,20 +200,22 @@ print(next(loud_quotes))
 
 print("asking for second value")
 print(next(loud_quotes))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-map object created
-type(loud_quotes): <class 'map'>
-asking for first value
-transforming: ni
-NI
-asking for second value
-transforming: spam
-SPAM
-\end{verbatim}
+\begin{iobox}{Expected Output}
+map object created \\
+type(loud\_quotes): <class 'map'> \\
+asking for first value \\
+transforming: ni \\
+NI \\
+asking for second value \\
+transforming: spam \\
+SPAM \\
+\end{iobox}
+
+
+
 
 The function is not called when the \texttt{map} object is created. It is called when the iterator is advanced.
 
@@ -250,7 +252,7 @@ filter(predicate, iterable)
 
 The predicate is called for each value. If the predicate result is true, the original value is yielded. If the predicate result is false, the value is skipped.
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra05}
 def is_even(num):
     return num % 2 == 0
 
@@ -264,19 +266,21 @@ print(f"dir(even_nums) sample: {dir(even_nums)[:12]}")
 
 print(f"has __iter__: {'__iter__' in dir(even_nums)}")
 print(f"has __next__: {'__next__' in dir(even_nums)}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-type(nums): <class 'list'>
-type(even_nums): <class 'filter'>
-dir(even_nums) sample: ['__class__', '__delattr__', '__dir__', '__doc__',
-'__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
-'__gt__', '__hash__', '__init__']
-has __iter__: True
-has __next__: True
-\end{verbatim}
+\begin{iobox}{Expected Output}
+type(nums): <class 'list'> \\
+type(even\_nums): <class 'filter'> \\
+dir(even\_nums) sample: ['\_\_class\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', \\
+'\_\_eq\_\_', '\_\_format\_\_', '\_\_ge\_\_', '\_\_getattribute\_\_', '\_\_getstate\_\_', \\
+'\_\_gt\_\_', '\_\_hash\_\_', '\_\_init\_\_'] \\
+has \_\_iter\_\_: True \\
+has \_\_next\_\_: True \\
+\end{iobox}
+
+
+
 
 The \texttt{filter} object is also an iterator. It is lazy and consumable.
 
@@ -304,7 +308,7 @@ The values \texttt{15} and \texttt{99} were tested but not yielded, because the 
 
 A manual version makes the logic explicit:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra04}
 def is_even(num):
     return num % 2 == 0
 
@@ -313,15 +317,17 @@ nums = [10, 15, 20, 42, 99]
 for num in nums:
     if is_even(num):
         print(f"accepted: {num}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-accepted: 10
-accepted: 20
-accepted: 42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+accepted: 10 \\
+accepted: 20 \\
+accepted: 42 \\
+\end{iobox}
+
+
+
 
 The \texttt{filter()} version packages this pattern into a lazy iterator.
 
@@ -368,7 +374,7 @@ The \texttt{filter(None, values)} form keeps only those values whose \texttt{boo
 
 Like \texttt{map}, a \texttt{filter} object is consumed after traversal:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra03}
 def is_even(num):
     return num % 2 == 0
 
@@ -381,14 +387,16 @@ second = list(even_nums)
 
 print(f"first: {first}")
 print(f"second: {second}")
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-first: [10, 20, 42]
-second: []
-\end{verbatim}
+\begin{iobox}{Expected Output}
+first: [10, 20, 42] \\
+second: [] \\
+\end{iobox}
+
+
+
 
 The first materialization consumes the iterator.
 
@@ -411,7 +419,7 @@ Possible output:
 
 This works, but the \texttt{lambda} expression introduces another compact function syntax. For early teaching code, a named function is often clearer:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra02}
 def is_even(num):
     return num % 2 == 0
 
@@ -421,13 +429,15 @@ nums = map(int, texts)
 even_nums = filter(is_even, nums)
 
 print(list(even_nums))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-[10, 20, 42]
-\end{verbatim}
+\begin{iobox}{Expected Output}
+[10, 20, 42] \\
+\end{iobox}
+
+
+
 
 The pipeline is:
 
@@ -442,7 +452,7 @@ The important detail is that \texttt{nums} is itself a \texttt{map} iterator. Th
 
 A final example makes the stream-like behavior visible:
 
-\begin{verbatim}
+\begin{codebox}[]{python}{map() and filter() as Lazy Iterator-Producing Transformations}{tra01}
 def show_int(text):
     print(f"mapping: {text}")
     return int(text)
@@ -459,21 +469,23 @@ large_nums = filter(is_large, nums)
 print("pipeline created")
 print("asking for first accepted value")
 print(next(large_nums))
-\end{verbatim}
+\end{codebox}
 
-Possible output:
 
-\begin{verbatim}
-pipeline created
-asking for first accepted value
-mapping: 10
-filtering: 10
-mapping: 20
-filtering: 20
-mapping: 42
-filtering: 42
-42
-\end{verbatim}
+\begin{iobox}{Expected Output}
+pipeline created \\
+asking for first accepted value \\
+mapping: 10 \\
+filtering: 10 \\
+mapping: 20 \\
+filtering: 20 \\
+mapping: 42 \\
+filtering: 42 \\
+42 \\
+\end{iobox}
+
+
+
 
 The pipeline stops as soon as \texttt{next(large\_nums)} receives one accepted value. The value \texttt{"100"} has not yet been mapped or filtered, because no one has asked for another accepted value.
 

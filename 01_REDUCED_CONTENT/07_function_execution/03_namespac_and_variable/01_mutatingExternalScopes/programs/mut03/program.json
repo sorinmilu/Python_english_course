@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Local Read Access Boundaries vs. the Shadowing Consequence of Assignment",
+  "label": "mut03",
+  "linenos": true,
+  "input": null,
+  "output": "inside: 100\noutside: 42",
+  "file": "main.py"
+}

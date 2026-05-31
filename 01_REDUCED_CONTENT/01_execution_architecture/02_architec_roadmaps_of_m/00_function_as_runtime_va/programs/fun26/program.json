@@ -1,0 +1,9 @@
+{
+  "language": "c",
+  "title": "C: returning a closure that points at a stack-allocated environment (dangling pointer)",
+  "label": "fun26",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.c"
+}

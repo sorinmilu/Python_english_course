@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The pass Statement: Syntactically Valid Empty Control-Flow Bodies",
+  "label": "emp01",
+  "linenos": true,
+  "input": null,
+  "output": "result: None\ntype(result): <class 'NoneType'>\ndir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__']",
+  "file": "main.py"
+}

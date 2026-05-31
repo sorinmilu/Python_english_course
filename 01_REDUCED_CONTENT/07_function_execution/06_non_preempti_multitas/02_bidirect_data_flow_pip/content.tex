@@ -6,24 +6,8 @@ Generator-based coroutines extend \texttt{yield} into a bidirectional channel: t
 
 \texttt{gen.send(value)} resumes the generator and sets \texttt{yield} to receive \texttt{value}. The first \texttt{send} must use \texttt{None} (or precede any non-\texttt{None} send with \texttt{next()}), because execution must reach the first \texttt{yield} before a value can be injected.
 
-\begin{verbatim}
-def echo():
-    while True:
-        received = yield
-        print(f"got: {received!r}")
+%<<<PROGRAM:programs/bid01>>>
 
-gen = echo()
-next(gen)
-gen.send("D'oh!")
-gen.send("Ni!")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-got: "D'oh!"
-got: 'Ni!'
-\end{verbatim}
 
 \subsubsection{Exception Injection with \texttt{.throw()} and Controlled Shutdown with \texttt{.close()}}
 

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+  "label": "tra06",
+  "linenos": true,
+  "input": null,
+  "output": "map object created\ntype(loud_quotes): <class 'map'>\nasking for first value\ntransforming: ni\nNI\nasking for second value\ntransforming: spam\nSPAM",
+  "file": "main.py"
+}

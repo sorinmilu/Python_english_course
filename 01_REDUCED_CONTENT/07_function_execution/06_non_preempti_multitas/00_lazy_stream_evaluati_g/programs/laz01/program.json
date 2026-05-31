@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Exec...",
+  "label": "laz01",
+  "linenos": true,
+  "input": null,
+  "output": "gi_frame before next: <frame at 0x..., file \"...\", line 1, code small_gen>\nf_locals: {}\nyielded: \"D'oh!\", gi_frame after: None",
+  "file": "main.py"
+}

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "map() and filter() as Lazy Iterator-Producing Transformations",
+  "label": "tra04",
+  "linenos": true,
+  "input": null,
+  "output": "accepted: 10\naccepted: 20\naccepted: 42",
+  "file": "main.py"
+}

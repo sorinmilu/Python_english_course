@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The pass Statement: Syntactically Valid Empty Control-Flow Bodies",
+  "label": "emp02",
+  "linenos": true,
+  "input": null,
+  "output": "type(convert_score): <class 'function'>\ntype(EmptyBox): <class 'type'>\ntype(EmptyBox()): <class '__main__.EmptyBox'>",
+  "file": "main.py"
+}

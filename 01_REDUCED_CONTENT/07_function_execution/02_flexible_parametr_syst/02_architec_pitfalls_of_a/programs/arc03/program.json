@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Mutable Default Arguments Trap: Why def func(x=[]) Reuses One Persistent...",
+  "label": "arc03",
+  "linenos": true,
+  "input": null,
+  "output": "a=[\"D'oh!\", 'No soup for you!']\nb=[\"D'oh!\", 'No soup for you!'], a is b: True\nstored default: ([\"D'oh!\", 'No soup for you!'],)",
+  "file": "main.py"
+}

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Variable Scope and Lexical Boundaries: The LEGB Resolution Rules",
+  "label": "the01",
+  "linenos": true,
+  "input": null,
+  "output": "  2           2 LOAD_FAST                0 (name)\n              4 LOAD_FAST                1 (score)\n             ...\n             14 STORE_FAST               2 (message)\n  3          16 LOAD_FAST                2 (message)\n             18 RETURN_VALUE\n---\n  2           0 LOAD_GLOBAL              0 (answer)\n             12 RETURN_VALUE",
+  "file": "main.py"
+}
