@@ -1,0 +1,560 @@
+\subsection{The Hash and Equality Contract}
+
+Hash-based collections do not place objects by walking through a visible sequence of positions. They first ask an object for a hash value. That hash value guides the table lookup. After Python finds a plausible table location, it still needs equality testing to confirm whether the discovered object is truly the object being searched for.
+
+The two operations involved are:
+
+\begin{itemize}
+    \item \texttt{\_\_hash\_\_()}: produces an integer used by the hash table machinery;
+    \item \texttt{\_\_eq\_\_()}: decides whether two objects should be treated as equal.
+\end{itemize}
+
+The relationship between them is strict. If two objects compare equal, they must produce the same hash value. Without that rule, a set or dictionary could place equal objects in incompatible table regions and later fail to find them correctly.
+
+\begin{quote}
+Hashing narrows the search. Equality confirms the match.
+\end{quote}
+
+\subsubsection{\texttt{\_\_hash\_\_()} as the Stable Integer Descriptor Used for Table Placement}
+
+The built-in \texttt{hash()} function calls an object's hash operation. The result is an integer. This integer is not the object's memory address in the ordinary Python-language sense, and it is not the object itself. It is a descriptor used by the hash table implementation.
+
+\begin{verbatim}
+value1 = 42
+value2 = "spam"
+value3 = ("eggs", 42)
+
+print(f"value1: {value1!r}")
+print(f"type(value1): {type(value1)}")
+print(f"hash(value1): {hash(value1)}")
+print()
+
+print(f"value2: {value2!r}")
+print(f"type(value2): {type(value2)}")
+print(f"hash(value2): {hash(value2)}")
+print()
+
+print(f"value3: {value3!r}")
+print(f"type(value3): {type(value3)}")
+print(f"hash(value3): {hash(value3)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value1: 42
+type(value1): <class 'int'>
+hash(value1): 42
+
+value2: 'spam'
+type(value2): <class 'str'>
+hash(value2): -7236028022913602481
+
+value3: ('eggs', 42)
+type(value3): <class 'tuple'>
+hash(value3): 5120461032027266771
+\end{verbatim}
+
+The exact hash value for strings may differ between Python runs. CPython deliberately randomizes string hashing between interpreter processes. The important fact is not the exact number printed. The important fact is that during one execution, the object has a hash value that the table machinery can use.
+
+A few relevant methods can be seen with \texttt{dir()}.
+
+\begin{verbatim}
+value1 = 42
+value2 = "spam"
+value3 = ("eggs", 42)
+
+for name, obj in [("value1", value1), ("value2", value2), ("value3", value3)]:
+    print(f"{name}: {type(obj)}")
+    print(f"  __hash__ in dir: {'__hash__' in dir(obj)}")
+    print(f"  __eq__   in dir: {'__eq__' in dir(obj)}")
+    print(f"  __repr__ in dir: {'__repr__' in dir(obj)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value1: <class 'int'>
+  __hash__ in dir: True
+  __eq__   in dir: True
+  __repr__ in dir: True
+
+value2: <class 'str'>
+  __hash__ in dir: True
+  __eq__   in dir: True
+  __repr__ in dir: True
+
+value3: <class 'tuple'>
+  __hash__ in dir: True
+  __eq__   in dir: True
+  __repr__ in dir: True
+\end{verbatim}
+
+The relevant methods are:
+
+\begin{itemize}
+    \item \texttt{\_\_hash\_\_()}: returns the integer descriptor used for hash-table placement;
+    \item \texttt{\_\_eq\_\_()}: checks value equality;
+    \item \texttt{\_\_repr\_\_()}: produces the developer-facing representation shown by \texttt{repr()} and often by containers.
+\end{itemize}
+
+The hash value becomes visible in set behavior. A set does not store repeated equal elements.
+
+\begin{verbatim}
+numbers = {42, 42, 42}
+words = {"spam", "spam", "eggs"}
+
+print(f"numbers: {numbers!r}")
+print(f"type(numbers): {type(numbers)}")
+print(f"len(numbers): {len(numbers)}")
+print()
+
+print(f"words: {words!r}")
+print(f"type(words): {type(words)}")
+print(f"len(words): {len(words)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+numbers: {42}
+type(numbers): <class 'set'>
+len(numbers): 1
+
+words: {'eggs', 'spam'}
+type(words): <class 'set'>
+len(words): 2
+\end{verbatim}
+
+Inspecting the set object:
+
+\begin{verbatim}
+words = {"spam", "spam", "eggs"}
+
+print(f"type(words): {type(words)}")
+print(f"__contains__ in dir: {'__contains__' in dir(words)}")
+print(f"add          in dir: {'add' in dir(words)}")
+print(f"remove       in dir: {'remove' in dir(words)}")
+print(f"union        in dir: {'union' in dir(words)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(words): <class 'set'>
+__contains__ in dir: True
+add          in dir: True
+remove       in dir: True
+union        in dir: True
+\end{verbatim}
+
+For now, the important set operation is \texttt{\_\_contains\_\_}, which is behind the \texttt{in} operator.
+
+\begin{verbatim}
+words = {"spam", "eggs"}
+
+print(f"{'spam' in words = }")
+print(f"{'larch' in words = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'spam' in words = True
+'larch' in words = False
+\end{verbatim}
+
+When Python evaluates \texttt{'spam' in words}, it does not need the question ``at which index is \texttt{'spam'}?'' A set has no such index. The question is instead: compute the hash for \texttt{'spam'}, use it to find a candidate table location, then use equality testing if a possible match is found.
+
+\subsubsection{\texttt{\_\_eq\_\_()} as the Equality Check Used After Candidate Slot Discovery}
+
+A hash value is not enough to prove equality. Two different objects can have the same hash value. This is called a collision. A collision is not an error. Hash tables are designed to handle it.
+
+Because collisions are possible, Python must still use equality testing after hash-based candidate discovery.
+
+\begin{verbatim}
+a = "spam"
+b = "spam"
+c = "eggs"
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+print(f"c: {c!r}")
+print()
+
+print(f"a == b: {a == b}")
+print(f"a == c: {a == c}")
+print()
+
+print(f"a.__eq__(b): {a.__eq__(b)}")
+print(f"a.__eq__(c): {a.__eq__(c)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: 'spam'
+b: 'spam'
+c: 'eggs'
+
+a == b: True
+a == c: False
+
+a.__eq__(b): True
+a.__eq__(c): False
+\end{verbatim}
+
+The operator \texttt{==} is ordinary syntax for calling equality behavior. For built-in strings, equality means same character sequence. For integers, equality means same numeric value. For tuples, equality means the same length and equal corresponding components.
+
+\begin{verbatim}
+t1 = ("Arthur", 42)
+t2 = ("Arthur", 42)
+t3 = ("Arthur", 43)
+
+print(f"t1: {t1!r}")
+print(f"t2: {t2!r}")
+print(f"t3: {t3!r}")
+print()
+
+print(f"t1 == t2: {t1 == t2}")
+print(f"t1 == t3: {t1 == t3}")
+print()
+
+print(f"hash(t1): {hash(t1)}")
+print(f"hash(t2): {hash(t2)}")
+print(f"hash(t3): {hash(t3)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+t1: ('Arthur', 42)
+t2: ('Arthur', 42)
+t3: ('Arthur', 43)
+
+t1 == t2: True
+t1 == t3: False
+
+hash(t1): -5207665904908724718
+hash(t2): -5207665904908724718
+hash(t3): 7785522842538555942
+\end{verbatim}
+
+The first two tuples are distinct objects, but they compare equal. Because they compare equal, they also have the same hash value.
+
+That is exactly what a hash table needs.
+
+\begin{verbatim}
+seen = set()
+
+t1 = ("Arthur", 42)
+t2 = ("Arthur", 42)
+t3 = ("Arthur", 43)
+
+seen.add(t1)
+seen.add(t2)
+seen.add(t3)
+
+print(f"seen: {seen!r}")
+print(f"len(seen): {len(seen)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+seen: {('Arthur', 42), ('Arthur', 43)}
+len(seen): 2
+\end{verbatim}
+
+The object \texttt{t2} was not added as a third distinct element because the set found an existing equal element. The hash guided Python toward the relevant table region. Equality confirmed that \texttt{t1} and \texttt{t2} represent the same set element.
+
+A dictionary uses the same idea for keys.
+
+\begin{verbatim}
+quote_by_key = {}
+
+key1 = ("Homer", 42)
+key2 = ("Homer", 42)
+
+quote_by_key[key1] = "D'oh!"
+quote_by_key[key2] = "Mmm... donuts."
+
+print(f"quote_by_key: {quote_by_key!r}")
+print(f"len(quote_by_key): {len(quote_by_key)}")
+print(f"quote_by_key[key1]: {quote_by_key[key1]!r}")
+print(f"quote_by_key[key2]: {quote_by_key[key2]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote_by_key: {('Homer', 42): 'Mmm... donuts.'}
+len(quote_by_key): 1
+quote_by_key[key1]: 'Mmm... donuts.'
+quote_by_key[key2]: 'Mmm... donuts.'
+\end{verbatim}
+
+The second assignment did not create a second key. It replaced the value associated with the existing equal key.
+
+This is not list behavior. It is associative mapping behavior. The dictionary key is not a position. It is a hashable lookup object.
+
+\subsubsection{The Required Invariant: Equal Objects Must Produce Equal Hash Values}
+
+The central rule is:
+
+\begin{quote}
+If \texttt{a == b} is true, then \texttt{hash(a) == hash(b)} must also be true.
+\end{quote}
+
+The reverse is not required. If two objects have the same hash value, they do not have to be equal. Equal objects must share a hash value, but shared hash values do not prove equality.
+
+The following examples show the required direction.
+
+\begin{verbatim}
+pairs = [
+    (42, 42),
+    ("spam", "spam"),
+    (("eggs", 42), ("eggs", 42)),
+]
+
+for a, b in pairs:
+    print(f"a: {a!r}")
+    print(f"b: {b!r}")
+    print(f"a == b: {a == b}")
+    print(f"hash(a): {hash(a)}")
+    print(f"hash(b): {hash(b)}")
+    print(f"hash(a) == hash(b): {hash(a) == hash(b)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: 42
+b: 42
+a == b: True
+hash(a): 42
+hash(b): 42
+hash(a) == hash(b): True
+
+a: 'spam'
+b: 'spam'
+a == b: True
+hash(a): -7236028022913602481
+hash(b): -7236028022913602481
+hash(a) == hash(b): True
+
+a: ('eggs', 42)
+b: ('eggs', 42)
+a == b: True
+hash(a): 5120461032027266771
+hash(b): 5120461032027266771
+hash(a) == hash(b): True
+\end{verbatim}
+
+The rule is not merely decorative. It is required because a hash table first uses the hash value to decide where to search. If two equal objects produced unrelated hash values, the table might store one object in one region and search for the other object in a different region.
+
+A simplified lookup can be described like this:
+
+\begin{verbatim}
+candidate_hash = hash(search_key)
+go to the table region suggested by candidate_hash
+for each plausible stored key in that region:
+    if stored_key == search_key:
+        return the associated value
+raise KeyError
+\end{verbatim}
+
+That process assumes that an equal stored key and an equal search key lead into the same hash-based search path. The equal-hash invariant gives Python that guarantee.
+
+This also explains why Python refuses to hash some mutable built-in containers.
+
+\begin{verbatim}
+items = ["spam", "eggs", 42]
+
+print(f"items: {items!r}")
+print(f"type(items): {type(items)}")
+print(f"__hash__ in dir(items): {'__hash__' in dir(items)}")
+print(f"items.__hash__: {items.__hash__}")
+
+try:
+    print(hash(items))
+except TypeError as err:
+    print(f"hash failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: ['spam', 'eggs', 42]
+type(items): <class 'list'>
+__hash__ in dir(items): True
+items.__hash__: None
+hash failed: unhashable type: 'list'
+\end{verbatim}
+
+The name \texttt{\_\_hash\_\_} appears, but its value is \texttt{None}. That is Python's way of saying that list objects are intentionally unhashable.
+
+A list can change its contents.
+
+\begin{verbatim}
+items = ["spam", "eggs", 42]
+
+print(f"before: {items!r}")
+items.append("larch")
+print(f"after:  {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: ['spam', 'eggs', 42]
+after:  ['spam', 'eggs', 42, 'larch']
+\end{verbatim}
+
+If a list were hashable by its contents, its hash value would have to change when its contents changed. That would be dangerous inside a set or dictionary, because the object might already be stored in a table slot chosen from its old hash value.
+
+For the same reason, a tuple is hashable only when all its components are hashable.
+
+\begin{verbatim}
+safe_key = ("Arthur", 42)
+bad_key = ("Arthur", [42])
+
+print(f"safe_key: {safe_key!r}")
+print(f"type(safe_key): {type(safe_key)}")
+print(f"hash(safe_key): {hash(safe_key)}")
+print()
+
+print(f"bad_key: {bad_key!r}")
+print(f"type(bad_key): {type(bad_key)}")
+
+try:
+    print(hash(bad_key))
+except TypeError as err:
+    print(f"hash failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+safe_key: ('Arthur', 42)
+type(safe_key): <class 'tuple'>
+hash(safe_key): -5207665904908724718
+
+bad_key: ('Arthur', [42])
+type(bad_key): <class 'tuple'>
+hash failed: unhashable type: 'list'
+\end{verbatim}
+
+The tuple itself is immutable, but it contains a list. Since the list is mutable and unhashable, the tuple cannot safely produce a content-based hash value.
+
+\subsubsection{Hash Stability: Why Keys and Set Elements Must Not Change Their Hash-Relevant State While Stored}
+
+Hash stability means that an object used as a set element or dictionary key must keep the same hash-relevant state while it is stored in the table.
+
+For immutable built-in objects such as integers, strings, and tuples of hashable elements, this is natural.
+
+\begin{verbatim}
+key = ("Jerry", 42)
+
+quotes = {
+    key: "No soup for you!"
+}
+
+print(f"key: {key!r}")
+print(f"type(key): {type(key)}")
+print(f"hash(key): {hash(key)}")
+print(f"quotes[key]: {quotes[key]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+key: ('Jerry', 42)
+type(key): <class 'tuple'>
+hash(key): -8427085969355501069
+quotes[key]: 'No soup for you!'
+\end{verbatim}
+
+The tuple cannot be changed in place. Its hash-relevant contents are stable. Therefore, it is safe as a dictionary key.
+
+A list is not safe as a key.
+
+\begin{verbatim}
+key = ["Jerry", 42]
+
+print(f"key: {key!r}")
+print(f"type(key): {type(key)}")
+
+try:
+    quotes = {key: "No soup for you!"}
+except TypeError as err:
+    print(f"dictionary construction failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+key: ['Jerry', 42]
+type(key): <class 'list'>
+dictionary construction failed: unhashable type: 'list'
+\end{verbatim}
+
+Python blocks the operation before the list can corrupt the table.
+
+The same rule applies to set elements.
+
+\begin{verbatim}
+safe_item = ("Homer", "D'oh!")
+bad_item = ["Homer", "D'oh!"]
+
+items = set()
+
+items.add(safe_item)
+print(f"items after safe add: {items!r}")
+
+try:
+    items.add(bad_item)
+except TypeError as err:
+    print(f"set add failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items after safe add: {('Homer', "D'oh!")}
+set add failed: unhashable type: 'list'
+\end{verbatim}
+
+The table needs the hash value to remain valid. If an object's hash-relevant state changed after insertion, the table could lose the ability to find the object by normal lookup.
+
+A simplified failure would look like this:
+
+\begin{verbatim}
+object inserted with old hash
+table slot chosen from old hash
+
+object later changes
+new hash is different
+
+lookup uses new hash
+lookup searches a different table region
+stored object is not found correctly
+\end{verbatim}
+
+Built-in mutable containers avoid this failure by being unhashable. User-defined objects can still create this kind of bug if they define equality and hashing carelessly. The rule remains the same:
+
+\begin{quote}
+Do not let a stored key or set element change the data that its hash and equality depend on.
+\end{quote}
+
+The practical summary is:
+
+\begin{itemize}
+    \item \texttt{hash(x)} gives the table a placement/search descriptor;
+    \item \texttt{x == y} confirms whether a candidate object is actually equal;
+    \item equal objects must have equal hash values;
+    \item dictionary keys and set elements must be hash-stable while stored;
+    \item mutable built-in containers such as \texttt{list}, \texttt{dict}, and \texttt{set} are unhashable because their contents can change.
+\end{itemize}

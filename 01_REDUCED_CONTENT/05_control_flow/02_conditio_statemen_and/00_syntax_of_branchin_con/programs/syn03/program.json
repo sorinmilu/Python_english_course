@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Conditional Expressions: Inline Branch Selection with x if condition else y",
+  "label": "syn03",
+  "linenos": true,
+  "input": null,
+  "output": "score: 42\nstatus: failing\ntype(status): <class 'str'>\ndir(status) sample: ['__add__', '__class__', '__contains__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__']",
+  "file": "main.py"
+}

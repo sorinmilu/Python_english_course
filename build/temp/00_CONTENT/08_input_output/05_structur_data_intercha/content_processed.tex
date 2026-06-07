@@ -1,0 +1,7 @@
+\section{Structured Data Interchange}
+
+Many external files do not contain free-form text meant only for human reading. They contain structured data: records, lists, tables, nested fields, numbers, flags, and missing values. In those cases, reading the file as plain text is only the first step. The program must also interpret the structure encoded in that text.
+
+This section introduces two common structured data boundaries: JSON and CSV. JSON stores tree-shaped data that maps naturally to Python dictionaries and lists. CSV stores row-oriented tabular data that maps naturally to sequences of fields or dictionaries keyed by column names.
+
+The central rule is simple: structured data files are still external text files, but their usefulness comes from parsing them into meaningful Python objects and serializing Python objects back into agreed external formats.

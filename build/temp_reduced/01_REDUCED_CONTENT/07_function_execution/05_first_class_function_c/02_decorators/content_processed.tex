@@ -1,0 +1,50 @@
+\subsection{Decorators}
+
+A decorator is a compile-time meta-programming hook that intercepts function initialization. The \texttt{@decorator} syntax rewrites to name rebinding: create the function object from \texttt{def}, pass it through the decorator callable, bind the original name to the returned object. This executes at module load time, not at call time.
+
+\subsubsection{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}
+
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec02}
+def make_logged(fn):
+    def wrapper(*args, **kwargs):
+        print(f"calling {fn.__name__}")
+        return fn(*args, **kwargs)
+    return wrapper
+
+@make_logged
+def shout(text):
+    return text.upper()
+
+print(shout("ni!"))
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{calling shout} \\
+\texttt{NI!} \\
+\end{iobox}
+
+
+
+
+The AST transformation is exact:
+
+\begin{codebox}[]{python}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{dec01}
+@make_logged
+def shout(text):
+    return text.upper()
+
+# equivalent to:
+def shout(text):
+    return text.upper()
+shout = make_logged(shout)
+\end{codebox}
+
+
+Execution order at \texttt{def} time: (1) compile and instantiate the original function object with its \texttt{PyCodeObject}; (2) invoke the decorator, passing that callable reference; (3) receive the wrapper (or replacement) object; (4) rebind the public name to the returned object. The wrapper typically closes over the original via a cell in \texttt{\_\_closure\_\_}.
+
+Stacked decorators apply bottom-up: \texttt{@a @b def f} $\equiv$ \texttt{f = a(b(f))}. Decorator factories (\texttt{@deco(arg)}) add an outer call that returns the actual decorator before the rebind step.
+
+Flexible wrappers use \texttt{*args, **kwargs} forwarding, which forces tuple/dict allocation at the wrapper boundary. \texttt{functools.wraps(fn)} copies metadata (\texttt{\_\_name\_\_}, \texttt{\_\_doc\_\_}, annotations) onto the wrapper and stores the original under \texttt{\_\_wrapped\_\_} for introspection.
+
+The decorated name points to the wrapper's \texttt{PyCodeObject} at call time. The original function remains reachable through the closure cell and optionally \texttt{\_\_wrapped\_\_}; it is not invoked unless the wrapper delegates to it.

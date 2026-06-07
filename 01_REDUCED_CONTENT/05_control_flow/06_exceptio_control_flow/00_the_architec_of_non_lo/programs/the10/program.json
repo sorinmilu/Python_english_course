@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer C...",
+  "label": "the10",
+  "linenos": true,
+  "input": null,
+  "output": "before conversion\nconversion failed\ntype(err): <class 'ValueError'>\nmessage: invalid literal for int() with base 10: 'forty-two'\nafter conversion attempt",
+  "file": "main.py"
+}

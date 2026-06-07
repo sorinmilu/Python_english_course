@@ -1,0 +1,636 @@
+\subsection{Numerical Operator Architecture and Precedence Graphs}
+
+Numerical operators are not magic syntax pasted on top of raw memory. In Python, an operator is an expression-level request sent to runtime objects. The objects involved decide whether the operation is supported and what kind of result object should be produced.
+
+For example:
+
+\begin{verbatim}
+result = 40 + 2
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 42
+type:   <class 'int'>
+\end{verbatim}
+
+The expression \texttt{40 + 2} produces a new integer object. The name \texttt{result} is then bound to that object.
+
+\subsubsection{Standard Arithmetic: Operator Dispatch and Result Object Creation}
+
+The usual arithmetic operators are:
+
+\begin{verbatim}
++    addition
+-    subtraction
+*    multiplication
+/    true division
+//   floor division
+%    remainder
+**   exponentiation
+\end{verbatim}
+
+A first example:
+
+\begin{verbatim}
+a = 42
+b = 8
+
+print(f"a + b:  {a + b}")
+print(f"a - b:  {a - b}")
+print(f"a * b:  {a * b}")
+print(f"a / b:  {a / b}")
+print(f"a // b: {a // b}")
+print(f"a % b:  {a % b}")
+print(f"a ** 2: {a ** 2}")
+
+print()
+print(f"type(a + b):  {type(a + b)}")
+print(f"type(a / b):  {type(a / b)}")
+print(f"type(a // b): {type(a // b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a + b:  50
+a - b:  34
+a * b:  336
+a / b:  5.25
+a // b: 5
+a % b:  2
+a ** 2: 1764
+
+type(a + b):  <class 'int'>
+type(a / b):  <class 'float'>
+type(a // b): <class 'int'>
+\end{verbatim}
+
+Operators are connected to special methods on objects.
+
+\begin{verbatim}
+number = 42
+
+print(f"type(number): {type(number)}")
+
+print()
+print("selected operator methods:")
+print(f"{'__add__':<15} {'__add__' in dir(number)}")
+print(f"{'__sub__':<15} {'__sub__' in dir(number)}")
+print(f"{'__mul__':<15} {'__mul__' in dir(number)}")
+print(f"{'__truediv__':<15} {'__truediv__' in dir(number)}")
+print(f"{'__floordiv__':<15} {'__floordiv__' in dir(number)}")
+print(f"{'__mod__':<15} {'__mod__' in dir(number)}")
+print(f"{'__pow__':<15} {'__pow__' in dir(number)}")
+
+print()
+print(f"number.__add__(8): {number.__add__(8)}")
+print(f"number + 8:        {number + 8}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(number): <class 'int'>
+
+selected operator methods:
+__add__        True
+__sub__        True
+__mul__        True
+__truediv__    True
+__floordiv__   True
+__mod__        True
+__pow__        True
+
+number.__add__(8): 50
+number + 8:        50
+\end{verbatim}
+
+In normal code, we do not call \texttt{\_\_add\_\_()} directly. We write \texttt{number + 8}. The method inspection only shows the object-protocol machinery behind the operator.
+
+Mixed numeric types may produce a wider result type:
+
+\begin{verbatim}
+int_value = 42
+float_value = 0.5
+complex_value = 2j
+
+result1 = int_value + float_value
+result2 = int_value + complex_value
+result3 = float_value + complex_value
+
+print(f"result1: {result1}, type={type(result1)}")
+print(f"result2: {result2}, type={type(result2)}")
+print(f"result3: {result3}, type={type(result3)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result1: 42.5, type=<class 'float'>
+result2: (42+2j), type=<class 'complex'>
+result3: (0.5+2j), type=<class 'complex'>
+\end{verbatim}
+
+The name on the left is not typed. It simply receives the result object produced by the expression.
+
+\subsubsection{Division Divergence: Floating-Point Division (\texttt{/}) vs. Floor Division (\texttt{//})}
+
+Python has two different division operators.
+
+\texttt{/} performs true division and produces a floating-point result for ordinary integer operands:
+
+\begin{verbatim}
+a = 10
+b = 2
+
+result = a / b
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 5.0
+type:   <class 'float'>
+\end{verbatim}
+
+Even though the mathematical result is whole, the result object is a \texttt{float}.
+
+\texttt{//} performs floor division:
+
+\begin{verbatim}
+a = 11
+b = 2
+
+result = a // b
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 5
+type:   <class 'int'>
+\end{verbatim}
+
+Floor division means the result is rounded down toward negative infinity, not merely chopped toward zero.
+
+\begin{verbatim}
+print(f"11 // 2:   {11 // 2}")
+print(f"-11 // 2:  {-11 // 2}")
+print(f"11 // -2:  {11 // -2}")
+print(f"-11 // -2: {-11 // -2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+11 // 2:   5
+-11 // 2:  -6
+11 // -2:  -6
+-11 // -2: 5
+\end{verbatim}
+
+This is a common trap for C programmers. In many C contexts, integer division truncates toward zero. Python's \texttt{//} floors.
+
+With floating-point operands, floor division still floors, but the result is a float:
+
+\begin{verbatim}
+a = 11.0
+b = 2.0
+
+result = a // b
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 5.0
+type:   <class 'float'>
+\end{verbatim}
+
+The practical rule is:
+
+\begin{quote}
+Use \texttt{/} when you want true division. Use \texttt{//} when you want floor division. Do not treat \texttt{//} as C-style integer truncation.
+\end{quote}
+
+\subsubsection{Modular Math (\texttt{\%}) and Exponentiation (\texttt{**}) Mechanics}
+
+The modulo operator \texttt{\%} returns the remainder connected to floor division.
+
+\begin{verbatim}
+a = 42
+b = 8
+
+quotient = a // b
+remainder = a % b
+
+print(f"a:         {a}")
+print(f"b:         {b}")
+print(f"quotient:  {quotient}")
+print(f"remainder: {remainder}")
+
+print()
+print(f"check: {quotient} * {b} + {remainder} = {quotient * b + remainder}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a:         42
+b:         8
+quotient:  5
+remainder: 2
+
+check: 5 * 8 + 2 = 42
+\end{verbatim}
+
+Python keeps this relationship:
+
+\begin{verbatim}
+a == (a // b) * b + (a % b)
+\end{verbatim}
+
+This also applies with negative values:
+
+\begin{verbatim}
+pairs = [
+    (11, 2),
+    (-11, 2),
+    (11, -2),
+    (-11, -2),
+]
+
+for a, b in pairs:
+    q = a // b
+    r = a % b
+
+    print(f"a={a:>4}, b={b:>3} | "
+          f"a//b={q:>4}, a%b={r:>3} | "
+          f"check={q * b + r:>4}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a=  11, b=  2 | a//b=   5, a%b=  1 | check=  11
+a= -11, b=  2 | a//b=  -6, a%b=  1 | check= -11
+a=  11, b= -2 | a//b=  -6, a%b= -1 | check=  11
+a= -11, b= -2 | a//b=   5, a%b= -1 | check= -11
+\end{verbatim}
+
+The function \texttt{divmod()} gives both results at once:
+
+\begin{verbatim}
+a = 42
+b = 8
+
+q, r = divmod(a, b)
+
+print(f"quotient:  {q}")
+print(f"remainder: {r}")
+print(f"type(q):   {type(q)}")
+print(f"type(r):   {type(r)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quotient:  5
+remainder: 2
+type(q):   <class 'int'>
+type(r):   <class 'int'>
+\end{verbatim}
+
+Exponentiation uses \texttt{**}:
+
+\begin{verbatim}
+base = 2
+power = 10
+
+result = base ** power
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 1024
+type:   <class 'int'>
+\end{verbatim}
+
+With integers, large exponentiation can produce arbitrarily large exact integers:
+
+\begin{verbatim}
+big = 2 ** 100
+
+print(f"big: {big}")
+print(f"type: {type(big)}")
+print(f"bit length: {big.bit_length()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+big: 1267650600228229401496703205376
+type: <class 'int'>
+bit length: 101
+\end{verbatim}
+
+A negative exponent produces a floating-point result:
+
+\begin{verbatim}
+result = 2 ** -3
+
+print(f"result: {result}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: 0.125
+type:   <class 'float'>
+\end{verbatim}
+
+So \texttt{**} is still operator dispatch. The result type depends on the operation and operands.
+
+\subsubsection{Unary Operators and Precedence Traps: \texttt{-x}, \texttt{+x}, and \texttt{-2 ** 2}}
+
+Python has unary numeric operators:
+
+\begin{verbatim}
++x
+-x
+\end{verbatim}
+
+Unary plus usually returns the numeric value unchanged:
+
+\begin{verbatim}
+x = 42
+
+print(f"+x: {+x}")
+print(f"type(+x): {type(+x)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
++x: 42
+type(+x): <class 'int'>
+\end{verbatim}
+
+Unary minus negates the value:
+
+\begin{verbatim}
+x = 42
+
+print(f"-x: {-x}")
+print(f"type(-x): {type(-x)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+-x: -42
+type(-x): <class 'int'>
+\end{verbatim}
+
+These operators are also connected to special methods:
+
+\begin{verbatim}
+x = 42
+
+print(f"{'__pos__':<12} {'__pos__' in dir(x)}")
+print(f"{'__neg__':<12} {'__neg__' in dir(x)}")
+
+print()
+print(f"x.__pos__(): {x.__pos__()}")
+print(f"x.__neg__(): {x.__neg__()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+__pos__     True
+__neg__     True
+
+x.__pos__(): 42
+x.__neg__(): -42
+\end{verbatim}
+
+The famous precedence trap is:
+
+\begin{verbatim}
+result = -2 ** 2
+
+print(result)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+-4
+\end{verbatim}
+
+This surprises many students because they read it as:
+
+\begin{verbatim}
+(-2) ** 2
+\end{verbatim}
+
+But Python reads it as:
+
+\begin{verbatim}
+-(2 ** 2)
+\end{verbatim}
+
+A direct comparison:
+
+\begin{verbatim}
+a = -2 ** 2
+b = (-2) ** 2
+c = -(2 ** 2)
+
+print(f"-2 ** 2:    {a}")
+print(f"(-2) ** 2:  {b}")
+print(f"-(2 ** 2):  {c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+-2 ** 2:    -4
+(-2) ** 2:  4
+-(2 ** 2):  -4
+\end{verbatim}
+
+Exponentiation binds more tightly than unary minus on its left side.
+
+There is a second detail: exponentiation binds less tightly than unary operators on its right side.
+
+\begin{verbatim}
+result = 2 ** -2
+
+print(f"2 ** -2: {result}")
+print(f"type:    {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+2 ** -2: 0.25
+type:    <class 'float'>
+\end{verbatim}
+
+This is read as:
+
+\begin{verbatim}
+2 ** (-2)
+\end{verbatim}
+
+For this chapter, the practical warning is enough:
+
+\begin{quote}
+When exponentiation and unary signs appear together, use parentheses unless the intended grouping is visually obvious.
+\end{quote}
+
+\subsubsection{Parentheses as Explicit Precedence Control}
+
+Operator precedence decides how an expression is grouped when parentheses are absent.
+
+A simplified numerical precedence ladder is:
+
+\begin{verbatim}
+highest
+    **                 exponentiation
+    +x, -x             unary plus, unary minus
+    *, /, //, %         multiplication and division family
+    +, -               addition and subtraction
+lowest
+\end{verbatim}
+
+This ladder is simplified for the arithmetic operators used here. It is enough for the present section.
+
+Examples:
+
+\begin{verbatim}
+result1 = 2 + 3 * 4
+result2 = (2 + 3) * 4
+
+print(f"2 + 3 * 4:     {result1}")
+print(f"(2 + 3) * 4:   {result2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+2 + 3 * 4:     14
+(2 + 3) * 4:   20
+\end{verbatim}
+
+Without parentheses, multiplication happens before addition.
+
+Another example:
+
+\begin{verbatim}
+result1 = 20 - 6 // 2
+result2 = (20 - 6) // 2
+
+print(f"20 - 6 // 2:     {result1}")
+print(f"(20 - 6) // 2:   {result2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+20 - 6 // 2:     17
+(20 - 6) // 2:   7
+\end{verbatim}
+
+Parentheses do not create a new numeric type. They only control expression grouping.
+
+\begin{verbatim}
+a = 2 + 3 * 4
+b = (2 + 3) * 4
+
+print(f"a: {a}, type={type(a)}")
+print(f"b: {b}, type={type(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: 14, type=<class 'int'>
+b: 20, type=<class 'int'>
+\end{verbatim}
+
+For teaching and production code, parentheses are often better than relying on the reader to remember every precedence rule.
+
+Poor readability:
+
+\begin{verbatim}
+score = base + bonus * level - penalty // 2 ** round_count
+\end{verbatim}
+
+Clearer:
+
+\begin{verbatim}
+score = base + (bonus * level) - (penalty // (2 ** round_count))
+\end{verbatim}
+
+A complete small script:
+
+\begin{verbatim}
+base = 42
+bonus = 5
+level = 3
+penalty = 16
+round_count = 2
+
+score = base + (bonus * level) - (penalty // (2 ** round_count))
+
+print(f"base:        {base}")
+print(f"bonus:       {bonus}")
+print(f"level:       {level}")
+print(f"penalty:     {penalty}")
+print(f"round_count: {round_count}")
+
+print()
+print(f"score:       {score}")
+print(f"type(score): {type(score)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base:        42
+bonus:       5
+level:       3
+penalty:     16
+round_count: 2
+
+score:       53
+type(score): <class 'int'>
+\end{verbatim}
+
+The practical summary is:
+
+\begin{quote}
+Numerical operators create result objects through type-defined behavior. Operator precedence controls how expressions are grouped before those operations execute. Parentheses are the clearest way to state the grouping that the programmer intends.
+\end{quote}

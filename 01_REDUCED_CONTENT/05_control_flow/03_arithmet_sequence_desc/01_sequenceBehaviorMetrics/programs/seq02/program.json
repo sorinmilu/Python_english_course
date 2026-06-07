@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq02",
+  "linenos": true,
+  "input": null,
+  "output": "type(it1): <class 'range_iterator'>\ntype(it2): <class 'range_iterator'>\nit1 is it2: False\nnext(it1): 1\nnext(it1): 2\nnext(it2): 1",
+  "file": "main.py"
+}

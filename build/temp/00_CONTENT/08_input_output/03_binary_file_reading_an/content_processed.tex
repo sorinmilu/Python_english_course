@@ -1,0 +1,7 @@
+\section{Binary File Reading and Writing}
+
+Binary files are handled as byte streams, not as decoded text. When a file is opened in binary mode, Python does not translate stored bytes into \texttt{str} objects and does not apply text newline handling. The program receives and writes byte-oriented objects such as \texttt{bytes} and \texttt{bytearray}.
+
+This section explains how binary mode exposes the raw storage boundary more directly than text mode. It introduces immutable byte sequences, mutable byte buffers, chunk-based processing for large files, and byte-position navigation with \texttt{seek()} and \texttt{tell()}.
+
+The central rule is simple: use text mode when the data is meant to be decoded as text; use binary mode when the exact byte values must be preserved and controlled directly.

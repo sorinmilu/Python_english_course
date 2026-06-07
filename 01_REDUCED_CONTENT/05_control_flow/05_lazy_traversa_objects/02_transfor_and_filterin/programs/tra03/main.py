@@ -1,12 +1,10 @@
-def is_even(num):
-    return num % 2 == 0
+texts = ["10", "20", "42"]
 
-nums = [10, 20, 42]
+nums = map(int, texts)
 
-even_nums = filter(is_even, nums)
+print(f"type(texts): {type(texts)}")
+print(f"type(nums): {type(nums)}")
+print(f"dir(nums) sample: {dir(nums)[:12]}")
 
-first = list(even_nums)
-second = list(even_nums)
-
-print(f"first: {first}")
-print(f"second: {second}")
+print(f"has __iter__: {'__iter__' in dir(nums)}")
+print(f"has __next__: {'__next__' in dir(nums)}")

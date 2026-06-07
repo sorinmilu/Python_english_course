@@ -1,0 +1,884 @@
+\subsection{The LEGB Rule Invariant}
+
+When Python sees an unqualified name such as \texttt{x}, \texttt{print}, \texttt{len}, or \texttt{answer}, it must decide which object that name refers to. The search follows a stable order known as LEGB:
+
+\begin{verbatim}
+L = Local
+E = Enclosing
+G = Global
+B = Built-in
+\end{verbatim}
+
+This rule applies to ordinary name lookup. It does not mean Python searches every object in memory. It searches a chain of namespaces connected to the current execution point.
+
+The four levels are:
+
+\begin{itemize}
+    \item \textbf{Local}: names inside the currently executing function frame;
+    \item \textbf{Enclosing}: names in outer function frames for nested functions;
+    \item \textbf{Global}: names in the current module namespace;
+    \item \textbf{Built-in}: names from the built-in namespace, such as \texttt{len}, \texttt{print}, \texttt{dict}, and \texttt{TypeError}.
+\end{itemize}
+
+The rule is not decorative terminology. It is the actual direction of lookup for unqualified names.
+
+\subsubsection{Local (L): Active Function-Frame Bindings and CPython Fast-Local Storage}
+
+The local namespace is the first place Python checks when a function body refers to a name.
+
+\begin{verbatim}
+def show_local():
+    quote = "D'oh!"
+    answer = 42
+
+    print(f"quote:  {quote!r}")
+    print(f"answer: {answer!r}")
+
+show_local()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote:  "D'oh!"
+answer: 42
+\end{verbatim}
+
+Inside \texttt{show\_local()}, the names \texttt{quote} and \texttt{answer} are local names. They belong to the active function call frame.
+
+They are not global names.
+
+\begin{verbatim}
+def show_local():
+    quote = "D'oh!"
+    answer = 42
+
+    print("inside function")
+    print(f"'quote' in locals():  {'quote' in locals()}")
+    print(f"'answer' in locals(): {'answer' in locals()}")
+
+show_local()
+
+print()
+print("outside function")
+
+try:
+    print(quote)
+except NameError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside function
+'quote' in locals():  True
+'answer' in locals(): True
+
+outside function
+error type: <class 'NameError'>
+message:    name 'quote' is not defined
+\end{verbatim}
+
+The local names existed while the function frame was active. After the call ended, that frame was gone.
+
+The \texttt{locals()} function displays the current local namespace.
+
+\begin{verbatim}
+def show_local_namespace():
+    name = "Homer"
+    score = 42
+
+    local_map = locals()
+
+    print(f"local_map:       {local_map}")
+    print(f"type(local_map): {type(local_map)}")
+
+show_local_namespace()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+local_map:       {'name': 'Homer', 'score': 42}
+type(local_map): <class 'dict'>
+\end{verbatim}
+
+The displayed local namespace is dictionary-like.
+
+\begin{verbatim}
+def inspect_local_namespace():
+    name = "Homer"
+    score = 42
+
+    local_map = locals()
+
+    print(f"type(local_map): {type(local_map)}")
+    print()
+
+    selected_names = [
+        "keys",
+        "values",
+        "items",
+        "get",
+        "__contains__",
+        "__getitem__",
+    ]
+
+    for attr in selected_names:
+        print(f"{attr:<14} {attr in dir(local_map)}")
+
+    print()
+    print(f"keys:              {list(local_map.keys())}")
+    print(f"local_map['name']: {local_map['name']!r}")
+    print(f"local_map.get('score'): {local_map.get('score')}")
+
+inspect_local_namespace()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(local_map): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__contains__   True
+__getitem__    True
+
+keys:              ['name', 'score']
+local_map['name']: 'Homer'
+local_map.get('score'): 42
+\end{verbatim}
+
+This display is useful for inspection, but it should not be confused with the exact internal storage strategy used by CPython for function locals.
+
+In CPython, ordinary function local variables are stored in an optimized internal layout often called \textit{fast locals}. The function's compiled code object already knows the local variable names.
+
+\begin{verbatim}
+def sample_func(name, score):
+    message = f"{name}: {score}"
+    return message
+
+code_obj = sample_func.__code__
+
+print(f"co_varnames:   {code_obj.co_varnames}")
+print(f"co_argcount:   {code_obj.co_argcount}")
+print(f"co_nlocals:    {code_obj.co_nlocals}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+co_varnames:   ('name', 'score', 'message')
+co_argcount:   2
+co_nlocals:    3
+\end{verbatim}
+
+The code object says that the function frame needs local slots for:
+
+\begin{verbatim}
+name
+score
+message
+\end{verbatim}
+
+That is why local variable access inside a function is not just a normal dictionary lookup every time. CPython can use the compiled local-variable layout.
+
+We can inspect the code object itself.
+
+\begin{verbatim}
+def sample_func(name, score):
+    message = f"{name}: {score}"
+    return message
+
+code_obj = sample_func.__code__
+
+print(f"type(code_obj): {type(code_obj)}")
+print()
+
+selected_names = [
+    "co_varnames",
+    "co_argcount",
+    "co_nlocals",
+    "co_consts",
+    "co_names",
+    "co_code",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(code_obj)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(code_obj): <class 'code'>
+
+co_varnames    True
+co_argcount    True
+co_nlocals     True
+co_consts      True
+co_names       True
+co_code        True
+\end{verbatim}
+
+The local namespace therefore has two useful views:
+
+\begin{itemize}
+    \item the programmer-facing view: local names visible through \texttt{locals()};
+    \item the CPython execution view: optimized local slots described by the code object.
+\end{itemize}
+
+For lookup behavior, the important rule is simpler:
+
+\begin{quote}
+If a name exists in the active local function frame, Python uses that local binding before looking anywhere else.
+\end{quote}
+
+This can shadow a global name.
+
+\begin{verbatim}
+answer = 100
+
+def show_answer():
+    answer = 42
+    print(f"inside function: answer={answer}")
+
+show_answer()
+
+print(f"outside function: answer={answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside function: answer=42
+outside function: answer=100
+\end{verbatim}
+
+Inside the function, \texttt{answer} is found locally first. Python does not continue outward to the global \texttt{answer} because the local one already satisfies the lookup.
+
+\subsubsection{Enclosing (E): Looking Upwards Through Cell Variables of Nested Lexical Scopes}
+
+The enclosing level exists when a function is defined inside another function.
+
+\begin{verbatim}
+def outer():
+    quote = "Nobody expects the Spanish Inquisition!"
+
+    def inner():
+        print(f"inner sees quote: {quote}")
+
+    inner()
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inner sees quote: Nobody expects the Spanish Inquisition!
+\end{verbatim}
+
+The name \texttt{quote} is not local to \texttt{inner()}. It is local to \texttt{outer()}. Since \texttt{inner()} is nested inside \texttt{outer()}, Python can search the enclosing function scope.
+
+The lookup path inside \texttt{inner()} is:
+
+\begin{verbatim}
+1. Local scope of inner()
+2. Enclosing scope of outer()
+3. Global module scope
+4. Built-in scope
+\end{verbatim}
+
+This is lexical nesting. It depends on where the function is defined in the source, not merely where it is called.
+
+\begin{verbatim}
+quote = "global quote"
+
+def outer():
+    quote = "outer quote"
+
+    def inner():
+        print(f"quote: {quote}")
+
+    inner()
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: outer quote
+\end{verbatim}
+
+The name \texttt{quote} is not found inside \texttt{inner()}. Python then checks the enclosing function scope and finds \texttt{outer}'s \texttt{quote}. It does not use the global \texttt{quote} because the enclosing binding was found first.
+
+If the inner function has its own local name, that local name wins.
+
+\begin{verbatim}
+quote = "global quote"
+
+def outer():
+    quote = "outer quote"
+
+    def inner():
+        quote = "inner quote"
+        print(f"quote: {quote}")
+
+    inner()
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: inner quote
+\end{verbatim}
+
+The local level is still first.
+
+A nested function that refers to an outer variable causes CPython to store that outer variable in a cell so the inner function can access it.
+
+\begin{verbatim}
+def outer():
+    quote = "It is only a model."
+
+    def inner():
+        return quote
+
+    return inner
+
+fn = outer()
+
+print(f"fn(): {fn()}")
+print(f"fn.__closure__: {fn.__closure__}")
+print(f"fn.__code__.co_freevars: {fn.__code__.co_freevars}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn(): It is only a model.
+fn.__closure__: (<cell at 0x...: str object at 0x...>,)
+fn.__code__.co_freevars: ('quote',)
+\end{verbatim}
+
+The outer function has already finished, but the returned inner function still remembers the needed enclosing value. That preserved value lives through a closure cell.
+
+The cell object can be inspected.
+
+\begin{verbatim}
+def outer():
+    quote = "It is only a model."
+
+    def inner():
+        return quote
+
+    return inner
+
+fn = outer()
+cell = fn.__closure__[0]
+
+print(f"cell:       {cell}")
+print(f"type(cell): {type(cell)}")
+print()
+
+selected_names = [
+    "cell_contents",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<16} {attr in dir(cell)}")
+
+print()
+print(f"cell.cell_contents: {cell.cell_contents!r}")
+print(f"type(contents):     {type(cell.cell_contents)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+cell:       <cell at 0x...: str object at 0x...>
+type(cell): <class 'cell'>
+
+cell_contents    True
+__class__        True
+__eq__           True
+__repr__         True
+
+cell.cell_contents: 'It is only a model.'
+type(contents):     <class 'str'>
+\end{verbatim}
+
+This is the mechanical basis of enclosing-scope lookup. The inner function does not search an arbitrary dead stack frame. CPython preserves the required enclosing references in closure cells.
+
+The outer function's code object also records which local names become cell variables.
+
+\begin{verbatim}
+def outer():
+    quote = "It is only a model."
+
+    def inner():
+        return quote
+
+    return inner
+
+print(f"outer co_cellvars: {outer.__code__.co_cellvars}")
+
+fn = outer()
+print(f"inner co_freevars: {fn.__code__.co_freevars}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+outer co_cellvars: ('quote',)
+inner co_freevars: ('quote',)
+\end{verbatim}
+
+The name \texttt{quote} is a cell variable from the outer function's point of view. It is a free variable from the inner function's point of view.
+
+The full closure mechanism will be studied later in the section on first-class functions and closures. Here, the important lookup rule is:
+
+\begin{quote}
+If a name is not local, Python looks through enclosing lexical function scopes before checking the module namespace.
+\end{quote}
+
+\subsubsection{Global (G): Module-Level Dictionary Namespaces and Active Script Execution State (\texttt{globals()})}
+
+The global namespace is the namespace of the current module. In a simple script, it is the top-level script namespace.
+
+A name assigned at top level is global to that module.
+
+\begin{verbatim}
+answer = 42
+quote = "No soup for you!"
+
+def show_globals():
+    print(f"answer: {answer}")
+    print(f"quote:  {quote}")
+
+show_globals()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer: 42
+quote:  No soup for you!
+\end{verbatim}
+
+Inside \texttt{show\_globals()}, the names \texttt{answer} and \texttt{quote} are not local. There is no enclosing function scope. Python therefore looks in the global module namespace.
+
+The global namespace is visible through \texttt{globals()}.
+
+\begin{verbatim}
+answer = 42
+quote = "No soup for you!"
+
+global_map = globals()
+
+print(f"type(global_map): {type(global_map)}")
+print(f"'answer' in globals(): {'answer' in global_map}")
+print(f"'quote' in globals():  {'quote' in global_map}")
+print()
+print(f"global_map['answer']: {global_map['answer']}")
+print(f"global_map['quote']:  {global_map['quote']!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(global_map): <class 'dict'>
+'answer' in globals(): True
+'quote' in globals():  True
+
+global_map['answer']: 42
+global_map['quote']:  'No soup for you!'
+\end{verbatim}
+
+The object returned by \texttt{globals()} is a dictionary.
+
+\begin{verbatim}
+answer = 42
+
+global_map = globals()
+
+print(f"type(global_map): {type(global_map)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "__contains__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<14} {attr in dir(global_map)}")
+
+print()
+print(f"global_map.get('answer'): {global_map.get('answer')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(global_map): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__contains__   True
+__getitem__    True
+__setitem__    True
+
+global_map.get('answer'): 42
+\end{verbatim}
+
+This dictionary is the module's namespace dictionary. Top-level assignments place names into it.
+
+\begin{verbatim}
+answer = 42
+
+print(f"before: globals()['answer'] = {globals()['answer']}")
+
+globals()["answer"] = 100
+
+print(f"after:  answer = {answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: globals()['answer'] = 42
+after:  answer = 100
+\end{verbatim}
+
+This works because \texttt{globals()} returns the actual module namespace dictionary.
+
+That does not mean ordinary code should casually mutate \texttt{globals()}. It is usually clearer to use normal assignment at module level. The point here is architectural: the global namespace is a dictionary-like object used for module-level name resolution.
+
+A function can read a global name without any special declaration.
+
+\begin{verbatim}
+answer = 42
+
+def show_answer():
+    print(f"answer inside function: {answer}")
+
+show_answer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer inside function: 42
+\end{verbatim}
+
+But assignment inside a function creates a local binding by default. It does not automatically mutate the global namespace.
+
+\begin{verbatim}
+answer = 42
+
+def change_answer():
+    answer = 100
+    print(f"inside function: answer={answer}")
+
+change_answer()
+
+print(f"outside function: answer={answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside function: answer=100
+outside function: answer=42
+\end{verbatim}
+
+The assignment inside \texttt{change\_answer()} created a local \texttt{answer}. The global \texttt{answer} remained unchanged.
+
+The \texttt{global} declaration, which allows assignment to target the module namespace, belongs to the next subsection. For now, the lookup rule is:
+
+\begin{quote}
+If a name is not local and not found in an enclosing function scope, Python looks in the current module's global namespace.
+\end{quote}
+
+\subsubsection{Built-in (B): The Outer Built-In Namespace Boundary and the \texttt{builtins} Module}
+
+If Python does not find a name in the local, enclosing, or global namespace, it checks the built-in namespace.
+
+This is why names such as \texttt{print}, \texttt{len}, \texttt{dict}, \texttt{list}, \texttt{int}, and \texttt{TypeError} are normally available without import statements.
+
+\begin{verbatim}
+text = "D'oh!"
+
+print(f"len(text): {len(text)}")
+print(f"type(text): {type(text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+len(text): 5
+type(text): <class 'str'>
+\end{verbatim}
+
+The names \texttt{print}, \texttt{len}, and \texttt{type} are not defined locally by this code. They are found in the built-in namespace.
+
+The built-in namespace is exposed through the standard \texttt{builtins} module.
+
+\begin{verbatim}
+import builtins
+
+print(f"builtins.len:   {builtins.len}")
+print(f"builtins.print: {builtins.print}")
+print(f"builtins.dict:  {builtins.dict}")
+print()
+print(f"type(builtins): {type(builtins)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+builtins.len:   <built-in function len>
+builtins.print: <built-in function print>
+builtins.dict:  <class 'dict'>
+
+type(builtins): <class 'module'>
+\end{verbatim}
+
+The module object can be inspected.
+
+\begin{verbatim}
+import builtins
+
+print(f"type(builtins): {type(builtins)}")
+print()
+
+selected_names = [
+    "len",
+    "print",
+    "dict",
+    "list",
+    "int",
+    "TypeError",
+    "__dict__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<12} {attr in dir(builtins)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(builtins): <class 'module'>
+
+len          True
+print        True
+dict         True
+list         True
+int          True
+TypeError    True
+__dict__     True
+\end{verbatim}
+
+A module has a namespace dictionary.
+
+\begin{verbatim}
+import builtins
+
+builtins_map = builtins.__dict__
+
+print(f"type(builtins_map): {type(builtins_map)}")
+print()
+print(f"'len' in builtins_map:   {'len' in builtins_map}")
+print(f"'print' in builtins_map: {'print' in builtins_map}")
+print(f"'dict' in builtins_map:  {'dict' in builtins_map}")
+print()
+print(f"builtins_map['len']: {builtins_map['len']}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(builtins_map): <class 'dict'>
+
+'len' in builtins_map:   True
+'print' in builtins_map: True
+'dict' in builtins_map:  True
+
+builtins_map['len']: <built-in function len>
+\end{verbatim}
+
+The built-in function object \texttt{len} can also be inspected.
+
+\begin{verbatim}
+import builtins
+
+fn = builtins.len
+
+print(f"fn:       {fn}")
+print(f"type(fn): {type(fn)}")
+print()
+
+selected_names = [
+    "__call__",
+    "__name__",
+    "__doc__",
+    "__self__",
+    "__text_signature__",
+]
+
+for attr in selected_names:
+    print(f"{attr:<22} {attr in dir(fn)}")
+
+print()
+print(f"fn.__name__: {fn.__name__!r}")
+print(f"fn('D\\'oh!'): {fn(\"D'oh!\")}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn:       <built-in function len>
+type(fn): <class 'builtin_function_or_method'>
+
+__call__                True
+__name__                True
+__doc__                 True
+__self__                True
+__text_signature__      True
+
+fn.__name__: 'len'
+fn('D\'oh!'): 5
+\end{verbatim}
+
+Built-in names can be shadowed by local or global names. This is usually a bad idea, but it clearly shows LEGB order.
+
+\begin{verbatim}
+len = 42
+
+print(f"global len: {len}")
+print(f"type(len):  {type(len)}")
+print()
+
+try:
+    print(len("D'oh!"))
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+global len: 42
+type(len):  <class 'int'>
+
+error type: <class 'TypeError'>
+message:    'int' object is not callable
+\end{verbatim}
+
+The global name \texttt{len} now points to the integer object \texttt{42}. When Python sees \texttt{len("D'oh!")}, it finds the global \texttt{len} before it reaches the built-in namespace. It then tries to call the integer object, which fails.
+
+The original built-in is still available through \texttt{builtins.len}.
+
+\begin{verbatim}
+import builtins
+
+len = 42
+
+print(f"global len:       {len}")
+print(f"builtins.len(...): {builtins.len(\"D'oh!\")}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+global len:       42
+builtins.len(...): 5
+\end{verbatim}
+
+A local name can also shadow a built-in name.
+
+\begin{verbatim}
+def show_shadowing():
+    list = "This is not the list class."
+
+    print(f"local list:       {list!r}")
+    print(f"type(local list): {type(list)}")
+
+    try:
+        values = list((1, 2, 3))
+    except TypeError as err:
+        print(f"error type: {type(err)}")
+        print(f"message:    {err}")
+
+show_shadowing()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+local list:       'This is not the list class.'
+type(local list): <class 'str'>
+error type: <class 'TypeError'>
+message:    'str' object is not callable
+\end{verbatim}
+
+Inside the function, the local name \texttt{list} hides the built-in class \texttt{list}. Python finds the local string first and stops searching.
+
+The compact rule is:
+
+\begin{quote}
+For an unqualified name, Python searches Local, then Enclosing, then Global, then Built-in. The first binding found is the one used.
+\end{quote}
+
+A complete example can show all four levels.
+
+\begin{verbatim}
+import builtins
+
+name = "global name"
+
+def outer():
+    name = "enclosing name"
+
+    def inner():
+        name = "local name"
+
+        print(f"name:          {name}")
+        print(f"builtins.len:  {builtins.len('D\\'oh!')}")
+
+    inner()
+
+outer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name:          local name
+builtins.len:  5
+\end{verbatim}
+
+If the local \texttt{name} is removed, the enclosing one is found. If the enclosing one is removed, the global one is found. If the global one is removed and no built-in exists with that name, lookup fails with \texttt{NameError}.
+
+That is the LEGB invariant.

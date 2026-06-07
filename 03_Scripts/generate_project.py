@@ -550,7 +550,54 @@ def merge_all_contents(temp_dir, inspected_folders):
             pass
     return "\n\n".join(merged_content)
 
-def process_main_document(root_dir, latex_root, main_latex_file, temp_dir, merged_content, main_placeholder):
+def escape_latex_pdf_string(text: str) -> str:
+    """Escape text for hyperref PDF metadata option values."""
+    replacements = (
+        ("\\", r"\textbackslash{}"),
+        ("{", r"\{"),
+        ("}", r"\}"),
+        ("#", r"\#"),
+        ("%", r"\%"),
+        ("&", r"\&"),
+        ("_", r"\_"),
+    )
+    for old, new in replacements:
+        text = text.replace(old, new)
+    return text
+
+
+def build_pdf_metadata_block(config: dict) -> str:
+    """Build optional \\hypersetup keys from project JSON metadata fields."""
+    field_map = (
+        ("document_title", "pdftitle"),
+        ("document_author", "pdfauthor"),
+        ("document_subject", "pdfsubject"),
+        ("document_keywords", "pdfkeywords"),
+        ("document_creator", "pdfcreator"),
+    )
+    lines: list[str] = []
+    for config_key, hyperref_key in field_map:
+        value = config.get(config_key)
+        if value is None:
+            continue
+        text = str(value).strip()
+        if not text:
+            continue
+        lines.append(f"    {hyperref_key}={{{escape_latex_pdf_string(text)}}},")
+    if not lines:
+        return ""
+    return ",\n" + "\n".join(lines)
+
+
+def process_main_document(
+    root_dir,
+    latex_root,
+    main_latex_file,
+    temp_dir,
+    merged_content,
+    main_placeholder,
+    config=None,
+):
     main_doc_path = os.path.join(root_dir, latex_root, main_latex_file)
     if not os.path.isfile(main_doc_path):
         print(f"Main LaTeX file not found: {shorten_path(main_doc_path, root_dir)}")
@@ -564,6 +611,8 @@ def process_main_document(root_dir, latex_root, main_latex_file, temp_dir, merge
         pass
 
     final_content = main_doc_content.replace(main_placeholder, merged_content)
+    pdf_metadata = build_pdf_metadata_block(config or {})
+    final_content = final_content.replace("%<<<PDF_METADATA>>>", pdf_metadata)
 
     output_main_path = os.path.join(temp_dir, main_latex_file.replace(".tex", "_processed.tex"))
     with open(output_main_path, "w", encoding="utf-8") as outf:
@@ -713,7 +762,15 @@ def main():
         # skipping main document merge silently
         pass
     else:
-        process_main_document(root_dir, latex_root, main_latex_file, temp_dir, merged_content, main_placeholder)
+        process_main_document(
+            root_dir,
+            latex_root,
+            main_latex_file,
+            temp_dir,
+            merged_content,
+            main_placeholder,
+            config=config,
+        )
 
     # If configured, copy an auxiliary directory from the latex root into the build folder.
     # The ground truth source is always under `02_latex/<copy_to_build>` (latex_root/<copy_to_build>).

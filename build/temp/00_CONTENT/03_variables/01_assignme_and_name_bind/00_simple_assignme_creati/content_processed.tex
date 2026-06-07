@@ -1,0 +1,377 @@
+\subsection{Simple Assignment: Creating or Rebinding a Name}
+
+Assignment is the first operation that makes Python variables feel different from C variables. In C, a variable often suggests a typed storage location. In Python, assignment creates or changes a binding between a name and an object.
+
+This continues the model already established earlier: Python variables are not C boxes; they are names that refer to runtime objects. :contentReference[oaicite:0]{index=0}
+
+The basic assignment form is:
+
+\begin{verbatim}
+name = object_expression
+\end{verbatim}
+
+Python first evaluates the expression on the right side. Then it binds the name on the left side to the resulting object.
+
+\begin{verbatim}
+answer = 42
+
+print(answer)
+print(type(answer))
+
+print("selected int methods:")
+print(f"{'bit_length':<15} {'bit_length' in dir(answer)}")
+print(f"{'to_bytes':<15} {'to_bytes' in dir(answer)}")
+print(f"{'__add__':<15} {'__add__' in dir(answer)}")
+
+print()
+print(f"bit length: {answer.bit_length()}")
+print(f"answer + 8: {answer + 8}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+<class 'int'>
+selected int methods:
+bit_length      True
+to_bytes        True
+__add__         True
+
+bit length: 6
+answer + 8: 50
+\end{verbatim}
+
+The name \texttt{answer} does not contain the integer in the C sense. It refers to an integer object. That object has a runtime type, and the type supplies operations such as addition, conversion to string form, and integer-specific methods such as \texttt{bit\_length()}.
+
+\subsubsection{Assignment as Binding, Not Memory Copying}
+
+The assignment:
+
+\begin{verbatim}
+answer = 42
+\end{verbatim}
+
+does not mean: copy the raw binary value \texttt{42} into a named integer box.
+
+A better conceptual picture is:
+
+\begin{verbatim}
+answer  --->  int object 42
+\end{verbatim}
+
+The source name \texttt{answer} is a binding label. The object is the runtime value. The object has a type. The name does not have a declared type.
+
+A simple inspection:
+
+\begin{verbatim}
+answer = 42
+
+print(f"name:  answer")
+print(f"value: {answer}")
+print(f"type:  {type(answer)}")
+print(f"id:    {id(answer)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name:  answer
+value: 42
+type:  <class 'int'>
+id:    140734432946520
+\end{verbatim}
+
+The exact \texttt{id()} value is not important. It is an implementation-level identity number for the object during that run of the program. It lets us observe whether two names refer to the same object.
+
+Assignment can also bind a name to a string object:
+
+\begin{verbatim}
+quote = "No soup for you."
+
+print(f"quote: {quote}")
+print(f"type:  {type(quote)}")
+print(f"id:    {id(quote)}")
+
+print()
+print("selected str methods:")
+print(f"{'upper':<12} {'upper' in dir(quote)}")
+print(f"{'replace':<12} {'replace' in dir(quote)}")
+print(f"{'split':<12} {'split' in dir(quote)}")
+
+print()
+print(quote.upper())
+print(quote.replace("soup", "debugger"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: No soup for you.
+type:  <class 'str'>
+id:    2113631854576
+
+selected str methods:
+upper        True
+replace      True
+split        True
+
+NO SOUP FOR YOU.
+No debugger for you.
+\end{verbatim}
+
+The string object supplies string operations. The name \texttt{quote} only gives us access to that object.
+
+This distinction is essential:
+
+\begin{itemize}
+    \item the name is not the object;
+    \item the name is not the type;
+    \item the name is a binding to an object;
+    \item the object carries its runtime type and behavior.
+\end{itemize}
+
+\subsubsection{Reassignment: Moving a Name from One Object to Another}
+
+A Python name can be rebound. Rebinding means that the name stops referring to one object and starts referring to another object.
+
+\begin{verbatim}
+item = 42
+
+print("first binding")
+print(f"value: {item!r}")
+print(f"type:  {type(item)}")
+print(f"id:    {id(item)}")
+
+print()
+
+item = "It is merely a flesh wound."
+
+print("second binding")
+print(f"value: {item!r}")
+print(f"type:  {type(item)}")
+print(f"id:    {id(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first binding
+value: 42
+type:  <class 'int'>
+id:    140734432946520
+
+second binding
+value: 'It is merely a flesh wound.'
+type:  <class 'str'>
+id:    2113631854928
+\end{verbatim}
+
+The name \texttt{item} did not transform from an integer box into a string box. The binding changed.
+
+Conceptually:
+
+\begin{verbatim}
+first:
+    item  --->  int object 42
+
+second:
+    item  --->  str object "It is merely a flesh wound."
+\end{verbatim}
+
+This is why Python allows this:
+
+\begin{verbatim}
+value = 42
+value = 3.14
+value = "D'oh!"
+value = True
+
+print(value)
+print(type(value))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+True
+<class 'bool'>
+\end{verbatim}
+
+Only the final binding remains accessible through the name \texttt{value}. The earlier objects may still exist for a while because of interpreter internals, caching, constants, or other references, but the name \texttt{value} no longer points to them.
+
+A slightly clearer trace:
+
+\begin{verbatim}
+thing = 42
+print(f"{'step 1':<8} {thing!r:<30} {type(thing)}")
+
+thing = "Chuck Norris can hear sign language."
+print(f"{'step 2':<8} {thing!r:<30} {type(thing)}")
+
+thing = 99.5
+print(f"{'step 3':<8} {thing!r:<30} {type(thing)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+step 1   42                             <class 'int'>
+step 2   'Chuck Norris can hear sign language.' <class 'str'>
+step 3   99.5                           <class 'float'>
+\end{verbatim}
+
+The name stayed the same. The referenced object changed.
+
+This is dynamic binding at the level of assignment. Python does not require the name to keep one declared type for the whole program.
+
+\subsubsection{Object Sharing: Binding Multiple Names to the Same Runtime Object (\texttt{a = b})}
+
+Assignment can also bind a second name to an object that already has a name.
+
+\begin{verbatim}
+a = 42
+b = a
+
+print(f"a value: {a}")
+print(f"b value: {b}")
+
+print()
+print(f"a type: {type(a)}")
+print(f"b type: {type(b)}")
+
+print()
+print(f"a id: {id(a)}")
+print(f"b id: {id(b)}")
+print(f"a is b: {a is b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a value: 42
+b value: 42
+
+a type: <class 'int'>
+b type: <class 'int'>
+
+a id: 140734432946520
+b id: 140734432946520
+a is b: True
+\end{verbatim}
+
+The assignment:
+
+\begin{verbatim}
+b = a
+\end{verbatim}
+
+does not copy the integer object into a new independent object. It binds \texttt{b} to the same object that \texttt{a} already references.
+
+Conceptually:
+
+\begin{verbatim}
+a  ----\
+       ---> int object 42
+b  ----/
+\end{verbatim}
+
+The same behavior can be shown with a string:
+
+\begin{verbatim}
+line1 = "Nobody expects the Spanish Inquisition!"
+line2 = line1
+
+print(f"line1: {line1}")
+print(f"line2: {line2}")
+
+print()
+print(f"type(line1): {type(line1)}")
+print(f"type(line2): {type(line2)}")
+
+print()
+print(f"id(line1): {id(line1)}")
+print(f"id(line2): {id(line2)}")
+print(f"line1 is line2: {line1 is line2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line1: Nobody expects the Spanish Inquisition!
+line2: Nobody expects the Spanish Inquisition!
+
+type(line1): <class 'str'>
+type(line2): <class 'str'>
+
+id(line1): 2113631855760
+id(line2): 2113631855760
+line1 is line2: True
+\end{verbatim}
+
+Again, there are two names but one object.
+
+If one name is later rebound, the other name is not dragged along with it:
+
+\begin{verbatim}
+a = 42
+b = a
+
+print("before rebinding")
+print(f"a = {a}, id(a) = {id(a)}")
+print(f"b = {b}, id(b) = {id(b)}")
+print(f"a is b: {a is b}")
+
+print()
+
+a = 100
+
+print("after rebinding a")
+print(f"a = {a}, id(a) = {id(a)}")
+print(f"b = {b}, id(b) = {id(b)}")
+print(f"a is b: {a is b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before rebinding
+a = 42, id(a) = 140734432946520
+b = 42, id(b) = 140734432946520
+a is b: True
+
+after rebinding a
+a = 100, id(a) = 140734432948376
+b = 42, id(b) = 140734432946520
+a is b: False
+\end{verbatim}
+
+The line:
+
+\begin{verbatim}
+a = 100
+\end{verbatim}
+
+does not edit the old integer object \texttt{42}. It rebinds \texttt{a} to a different integer object. The name \texttt{b} still refers to the original object.
+
+Conceptually:
+
+\begin{verbatim}
+before:
+    a  ----\
+           ---> int object 42
+    b  ----/
+
+after:
+    a  ---> int object 100
+
+    b  ---> int object 42
+\end{verbatim}
+
+This example uses integers, which are immutable objects. Immutable means that the object itself cannot be changed in place. Later, when mutable containers are introduced, the distinction between rebinding a name and mutating a shared object will become even more important.
+
+For now, the rule is:
+
+\begin{quote}
+Assignment binds a name to an object. Assignment from another name copies the reference, not the object. Reassignment moves one name to another object; it does not move all names that previously shared the old object.
+\end{quote}

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EA...",
+  "label": "the05",
+  "linenos": true,
+  "input": null,
+  "output": "index is outside the list",
+  "file": "main.py"
+}

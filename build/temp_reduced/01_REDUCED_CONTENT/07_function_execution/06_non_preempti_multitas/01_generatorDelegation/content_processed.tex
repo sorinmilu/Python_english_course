@@ -1,0 +1,31 @@
+\subsection{Generator Delegation}
+
+\texttt{yield from} delegates iteration to a sub-generator or iterable, forwarding sent values and propagated exceptions through the chain.
+
+\subsubsection{\texttt{yield from} as Delegated Iteration over Subgenerators and Iterables}
+
+\begin{codebox}[]{python}{yield from as Delegated Iteration over Subgenerators and Iterables}{gen01}
+def inner():
+    yield 1
+    yield 2
+
+def outer():
+    yield from inner()
+    yield 3
+
+print(list(outer()))
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{[1, 2, 3]} \\
+\end{iobox}
+
+
+
+
+The outer generator suspends while the inner generator runs, sharing the delegation protocol without manually iterating.
+
+\subsubsection{Propagating Values, Exceptions, and Completion Through Delegated Generator Chains}
+
+\texttt{yield from sub} forwards \texttt{send()}, \texttt{throw()}, and \texttt{close()} to the sub-generator. The completion value of the sub-generator becomes the result of the \texttt{yield from} expression. Exception propagation follows the generator protocol stack.

@@ -1,0 +1,490 @@
+\subsection{Materialization Boundaries}
+
+Lazy traversal objects are useful because they delay work and avoid storing all produced values at once. Objects returned by \texttt{enumerate()}, \texttt{zip()}, \texttt{map()}, and \texttt{filter()} are not result containers. They are iterators. They produce values as the program asks for them.
+
+Sometimes this is exactly what the program needs. A \texttt{for} loop can consume values one at a time without ever storing the entire result stream. Other times, the program really does need stored results: to inspect them repeatedly, index them, count them after production, print them as a complete collection, or pass them to code that expects a concrete sequence.
+
+That crossing point is a materialization boundary.
+
+\begin{quote}
+Materialization means converting a lazy traversal stream into a stored container such as a \texttt{list} or \texttt{tuple}.
+\end{quote}
+
+Before materialization, the program has a traversal process. After materialization, the program has a container holding the produced objects.
+
+\subsubsection{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}
+
+The most common materialization functions are \texttt{list()} and \texttt{tuple()}.
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat08}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names)
+
+stored_list = list(pairs)
+
+print(f"stored_list: {stored_list}")
+print(f"type(stored_list): {type(stored_list)}")
+print(f"dir(stored_list) sample: {dir(stored_list)[:10]}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{stored\_list: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]} \\
+\texttt{type(stored\_list): <class 'list'>} \\
+\texttt{dir(stored\_list) sample: ['\_\_add\_\_', '\_\_class\_\_', '\_\_class\_getitem\_\_',} \\
+\texttt{'\_\_contains\_\_', '\_\_delattr\_\_', '\_\_delitem\_\_', '\_\_dir\_\_', '\_\_doc\_\_',} \\
+\texttt{'\_\_eq\_\_', '\_\_format\_\_']} \\
+\end{iobox}
+
+
+The \texttt{enumerate} object has been consumed. The produced tuples are now stored inside a list.
+
+The resulting list is reusable:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat07}
+names = ["Jerry", "Elaine", "Kramer"]
+
+stored = list(enumerate(names))
+
+print("first traversal")
+for pair in stored:
+    print(pair)
+
+print("second traversal")
+for pair in stored:
+    print(pair)
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{first traversal} \\
+\texttt{(0, 'Jerry')} \\
+\texttt{(1, 'Elaine')} \\
+\texttt{(2, 'Kramer')} \\
+\texttt{second traversal} \\
+\texttt{(0, 'Jerry')} \\
+\texttt{(1, 'Elaine')} \\
+\texttt{(2, 'Kramer')} \\
+\end{iobox}
+
+
+The list can be traversed repeatedly because it is a reusable iterable container. Each \texttt{for} loop creates a new iterator over the stored list.
+
+This is different from reusing the original lazy iterator:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat06}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names)
+
+print("first materialization")
+print(list(pairs))
+
+print("second materialization")
+print(list(pairs))
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{first materialization} \\
+\texttt{[(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]} \\
+\texttt{second materialization} \\
+\texttt{[]} \\
+\end{iobox}
+
+
+The second list is empty because the \texttt{enumerate} iterator was already exhausted by the first \texttt{list()} call.
+
+The same rule applies to \texttt{zip()}:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat05}
+names = ["Jerry", "Elaine", "Kramer"]
+scores = [72, 91, 42]
+
+pairs = zip(names, scores)
+
+stored = list(pairs)
+
+print(f"stored: {stored}")
+print(f"type(stored): {type(stored)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{stored: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]} \\
+\texttt{type(stored): <class 'list'>} \\
+\end{iobox}
+
+
+Before the \texttt{list()} call, \texttt{pairs} is a lazy \texttt{zip} iterator. After the call, \texttt{stored} is a list of tuple objects.
+
+Materializing as a tuple works similarly:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat04}
+names = ["Jerry", "Elaine", "Kramer"]
+scores = [72, 91, 42]
+
+pairs = zip(names, scores)
+
+stored = tuple(pairs)
+
+print(f"stored: {stored}")
+print(f"type(stored): {type(stored)}")
+print(f"dir(stored) sample: {dir(stored)[:10]}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{stored: (('Jerry', 72), ('Elaine', 91), ('Kramer', 42))} \\
+\texttt{type(stored): <class 'tuple'>} \\
+\texttt{dir(stored) sample: ['\_\_add\_\_', '\_\_class\_\_', '\_\_class\_getitem\_\_',} \\
+\texttt{'\_\_contains\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', '\_\_eq\_\_',} \\
+\texttt{'\_\_format\_\_', '\_\_ge\_\_']} \\
+\end{iobox}
+
+
+The outer container is now a tuple. The produced pairs are also tuples. This gives a fixed stored structure.
+
+The choice between \texttt{list()} and \texttt{tuple()} should follow the intended use:
+
+\begin{itemize}
+    \item Use \texttt{list()} when the stored result may need later structural modification.
+    \item Use \texttt{tuple()} when the stored result should be treated as a fixed structure.
+\end{itemize}
+
+For example, a materialized list can be appended to:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine"]
+
+stored = list(enumerate(names))
+stored.append((2, "Kramer"))
+
+print(f"stored: {stored}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+stored: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
+\end{verbatim}
+
+A materialized tuple cannot be appended to:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat03}
+names = ["Jerry", "Elaine"]
+
+stored = tuple(enumerate(names))
+
+try:
+    stored.append((2, "Kramer"))
+except AttributeError as err:
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(err): <class 'AttributeError'>} \\
+\texttt{message: 'tuple' object has no attribute 'append'} \\
+\end{iobox}
+
+
+The tuple stores the produced values, but its structure cannot be expanded.
+
+Materialization is also common after \texttt{map()}:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat02}
+texts = ["10", "20", "42"]
+
+nums_iter = map(int, texts)
+nums = list(nums_iter)
+
+print(f"nums: {nums}")
+print(f"type(nums): {type(nums)}")
+print(f"nums[0]: {nums[0]}")
+print(f"sum(nums): {sum(nums)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{nums: [10, 20, 42]} \\
+\texttt{type(nums): <class 'list'>} \\
+\texttt{nums[0]: 10} \\
+\texttt{sum(nums): 72} \\
+\end{iobox}
+
+
+The stored list can now be indexed, traversed repeatedly, and passed to operations that need all values available.
+
+Without materialization, the iterator is consumed once:
+
+\begin{verbatim}
+texts = ["10", "20", "42"]
+
+nums_iter = map(int, texts)
+
+print(f"first sum: {sum(nums_iter)}")
+print(f"second sum: {sum(nums_iter)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first sum: 72
+second sum: 0
+\end{verbatim}
+
+The second result is \texttt{0} because the \texttt{map} iterator has no remaining values. This is not because the original strings disappeared. It is because the traversal object was exhausted.
+
+If the values are needed more than once, materialize them first:
+
+\begin{verbatim}
+texts = ["10", "20", "42"]
+
+nums = list(map(int, texts))
+
+print(f"first sum: {sum(nums)}")
+print(f"second sum: {sum(nums)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first sum: 72
+second sum: 72
+\end{verbatim}
+
+The list is reusable because the integer objects are now stored in the list.
+
+The same applies to \texttt{filter()}:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat05}
+names = ["Jerry", "Elaine", "Kramer"]
+scores = [72, 91, 42]
+
+pairs = zip(names, scores)
+
+stored = list(pairs)
+
+print(f"stored: {stored}")
+print(f"type(stored): {type(stored)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{stored: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]} \\
+\texttt{type(stored): <class 'list'>} \\
+\end{iobox}
+
+
+
+
+The filtered values are now stored.
+
+Materialization also makes length and indexing available when the target container supports them:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat04}
+names = ["Jerry", "Elaine", "Kramer"]
+scores = [72, 91, 42]
+
+pairs = zip(names, scores)
+
+stored = tuple(pairs)
+
+print(f"stored: {stored}")
+print(f"type(stored): {type(stored)}")
+print(f"dir(stored) sample: {dir(stored)[:10]}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{stored: (('Jerry', 72), ('Elaine', 91), ('Kramer', 42))} \\
+\texttt{type(stored): <class 'tuple'>} \\
+\texttt{dir(stored) sample: ['\_\_add\_\_', '\_\_class\_\_', '\_\_class\_getitem\_\_',} \\
+\texttt{'\_\_contains\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', '\_\_eq\_\_',} \\
+\texttt{'\_\_format\_\_', '\_\_ge\_\_']} \\
+\end{iobox}
+
+
+
+
+A lazy \texttt{filter} object does not support indexing:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat03}
+names = ["Jerry", "Elaine"]
+
+stored = tuple(enumerate(names))
+
+try:
+    stored.append((2, "Kramer"))
+except AttributeError as err:
+    print(f"type(err): {type(err)}")
+    print(f"message: {err}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(err): <class 'AttributeError'>} \\
+\texttt{message: 'tuple' object has no attribute 'append'} \\
+\end{iobox}
+
+
+
+
+The iterator can produce values, but it is not an indexable sequence. If indexed access is needed, materialization is the correct boundary.
+
+The same distinction can be seen with \texttt{map}:
+
+\begin{verbatim}
+texts = ["10", "20", "42"]
+
+nums_iter = map(int, texts)
+
+print(f"type(nums_iter): {type(nums_iter)}")
+print(f"has __next__: {'__next__' in dir(nums_iter)}")
+print(f"has __getitem__: {'__getitem__' in dir(nums_iter)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(nums_iter): <class 'map'>
+has __next__: True
+has __getitem__: False
+\end{verbatim}
+
+A \texttt{map} object is an iterator, not a sequence. It can be advanced with \texttt{next()}, but it cannot be indexed.
+
+Materialization has a cost. A lazy iterator may hold only traversal state and references to its input sources. A list or tuple must store all produced values. For small results, this cost is usually harmless. For very large or infinite streams, materialization may be impossible or wasteful.
+
+A simple comparison:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat01}
+import sys
+
+nums_range = range(1_000_000)
+nums_map = map(lambda n: n * 2, nums_range)
+
+print(f"type(nums_range): {type(nums_range)}")
+print(f"type(nums_map): {type(nums_map)}")
+
+print(f"size of range: {sys.getsizeof(nums_range)} bytes")
+print(f"size of map:   {sys.getsizeof(nums_map)} bytes")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(nums\_range): <class 'range'>} \\
+\texttt{type(nums\_map): <class 'map'>} \\
+\texttt{size of range: 48 bytes} \\
+\texttt{size of map:   48 bytes} \\
+\end{iobox}
+
+
+The exact byte counts are implementation-dependent. The important point is that neither object stores one million transformed integers.
+
+Materializing the transformed values changes the storage situation:
+
+\begin{verbatim}
+import sys
+
+nums = list(map(lambda n: n * 2, range(1_000_000)))
+
+print(f"type(nums): {type(nums)}")
+print(f"len(nums): {len(nums)}")
+print(f"size of nums list object: {sys.getsizeof(nums)} bytes")
+\end{verbatim}
+
+Possible output on one CPython build:
+
+\begin{verbatim}
+type(nums): <class 'list'>
+len(nums): 1000000
+size of nums list object: 8448728 bytes
+\end{verbatim}
+
+The reported list size is only the list container's storage for references. It does not necessarily include the full memory cost of every integer object. The exact number also depends on the CPython build. The structural point is enough: materialization creates a stored collection.
+
+A useful practical pattern is to leave the pipeline lazy until the point where storage is actually needed:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat02}
+texts = ["10", "20", "42"]
+
+nums_iter = map(int, texts)
+nums = list(nums_iter)
+
+print(f"nums: {nums}")
+print(f"type(nums): {type(nums)}")
+print(f"nums[0]: {nums[0]}")
+print(f"sum(nums): {sum(nums)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{nums: [10, 20, 42]} \\
+\texttt{type(nums): <class 'list'>} \\
+\texttt{nums[0]: 10} \\
+\texttt{sum(nums): 72} \\
+\end{iobox}
+
+
+
+
+The transformation and filtering occur when \texttt{list(even\_nums)} consumes the pipeline.
+
+A pipeline can also be consumed directly by another function without explicit materialization:
+
+\begin{verbatim}
+def is_even(num):
+    return num % 2 == 0
+
+texts = ["10", "15", "20", "42", "99"]
+
+total = sum(filter(is_even, map(int, texts)))
+
+print(f"total: {total}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+total: 72
+\end{verbatim}
+
+Here \texttt{sum()} consumes the lazy pipeline. No list is created. This is useful when the program only needs the final aggregate result.
+
+But if the intermediate values must be printed, inspected, reused, or indexed, materialize them:
+
+\begin{codebox}[]{python}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{mat01}
+import sys
+
+nums_range = range(1_000_000)
+nums_map = map(lambda n: n * 2, nums_range)
+
+print(f"type(nums_range): {type(nums_range)}")
+print(f"type(nums_map): {type(nums_map)}")
+
+print(f"size of range: {sys.getsizeof(nums_range)} bytes")
+print(f"size of map:   {sys.getsizeof(nums_map)} bytes")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(nums\_range): <class 'range'>} \\
+\texttt{type(nums\_map): <class 'map'>} \\
+\texttt{size of range: 48 bytes} \\
+\texttt{size of map:   48 bytes} \\
+\end{iobox}
+
+
+
+
+The practical rule is:
+
+\begin{quote}
+Keep traversal lazy while values are only passing through a pipeline. Materialize with \texttt{list()} or \texttt{tuple()} when the produced values must become stored, reusable data.
+\end{quote}
+
+This boundary is one of the most important differences between Python's traversal model and a simple container-based mental model. Not every object that can be looped over is a stored collection. Some objects are active traversal states. Materialization is the explicit step that turns the remaining traversal output into a concrete container.

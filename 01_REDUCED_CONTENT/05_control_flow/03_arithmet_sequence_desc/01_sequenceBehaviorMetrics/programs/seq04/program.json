@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq04",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'AttributeError'>\nmessage: readonly attribute",
+  "file": "main.py"
+}

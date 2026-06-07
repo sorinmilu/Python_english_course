@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "enumerate() as a Lazy Pair Generator for Index-Value Iteration",
+  "label": "enu02",
+  "linenos": true,
+  "input": null,
+  "output": "first: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]\nsecond: []",
+  "file": "main.py"
+}

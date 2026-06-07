@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Exceptional Edges: Non-Local Control Transfers Created by Exceptions",
+  "label": "sta01",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'ValueError'>\nstr(err): invalid literal for int() with base 10: 'forty-two'\nargs: (\"invalid literal for int() with base 10: 'forty-two'\",)\nhas __traceback__: True",
+  "file": "main.py"
+}

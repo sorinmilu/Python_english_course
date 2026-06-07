@@ -4,6 +4,6 @@
   "label": "emp01",
   "linenos": true,
   "input": null,
-  "output": "result: None\ntype(result): <class 'NoneType'>\ndir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__']",
+  "output": "grading finished",
   "file": "main.py"
 }

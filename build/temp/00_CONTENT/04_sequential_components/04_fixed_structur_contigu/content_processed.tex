@@ -1,0 +1,7 @@
+\section{Fixed Structural Contiguity: The Tuple Architecture (\texttt{tuple})}
+
+A tuple is Python's fixed-size sequential structure. It keeps the positional model of a list, but removes the ability to change the sequence after construction. Once a tuple exists, its length and element positions are fixed.
+
+This makes tuples useful for small, stable groups of values: coordinates, records, pairs, return values, and other structures where the number of components is part of the meaning. A tuple should not be read as a weaker list. It has a different role: it represents a sequence whose structure is not meant to be edited.
+
+This section explains tuple syntax, packing and unpacking, single-element tuple construction, structural immutability, the difference between tuple immutability and mutability of referenced objects, and the CPython memory consequences of using a fixed-size reference sequence.

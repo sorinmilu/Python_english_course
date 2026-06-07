@@ -1,0 +1,482 @@
+\subsection{Tuple Syntax and Structural Role}
+
+A tuple is an ordered sequence, like a list, but its structure is fixed after creation. The tuple itself cannot grow, shrink, or have its positions reassigned. For that reason, tuples are commonly used for small fixed groups of related values.
+
+A tuple is not defined mainly by parentheses. It is defined mainly by commas.
+
+\begin{verbatim}
+point = (10, 20)
+person = "Kramer", "Cosmo", 42
+empty = ()
+
+print(f"point:  {point!r}")
+print(f"person: {person!r}")
+print(f"empty:  {empty!r}")
+
+print()
+print(f"type(point):  {type(point)}")
+print(f"type(person): {type(person)}")
+print(f"type(empty):  {type(empty)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+point:  (10, 20)
+person: ('Kramer', 'Cosmo', 42)
+empty:  ()
+
+type(point):  <class 'tuple'>
+type(person): <class 'tuple'>
+type(empty):  <class 'tuple'>
+\end{verbatim}
+
+Tuples support the ordinary sequence operations already introduced: indexing, slicing, length testing, membership testing, and iteration.
+
+\begin{verbatim}
+data = ("spam", "eggs", 42, "larch")
+
+print(f"data: {data!r}")
+print(f"len(data): {len(data)}")
+
+print()
+print(f"data[0]:  {data[0]!r}")
+print(f"data[-1]: {data[-1]!r}")
+print(f"data[1:3]: {data[1:3]!r}")
+
+print()
+print(f"{42 in data = }")
+print(f"{'beans' in data = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: ('spam', 'eggs', 42, 'larch')
+len(data): 4
+
+data[0]:  'spam'
+data[-1]: 'larch'
+data[1:3]: ('eggs', 42)
+
+42 in data = True
+'beans' in data = False
+\end{verbatim}
+
+A quick \texttt{dir()} inspection shows that tuples have sequence behavior, but not list mutation methods.
+
+\begin{verbatim}
+data = ("Jerry", "Elaine", "George")
+
+selected_names = [
+    "__len__",
+    "__getitem__",
+    "__contains__",
+    "count",
+    "index",
+    "append",
+    "extend",
+    "remove",
+    "sort",
+]
+
+print(f"type(data): {type(data)}")
+print()
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(data)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(data): <class 'tuple'>
+
+__len__       True
+__getitem__   True
+__contains__  True
+count         True
+index         True
+append        False
+extend        False
+remove        False
+sort          False
+\end{verbatim}
+
+The methods \texttt{count()} and \texttt{index()} are available because they only inspect the sequence. Methods such as \texttt{append()}, \texttt{remove()}, and \texttt{sort()} are absent because they would require changing the tuple structure.
+
+\subsubsection{Tuple Packing: Comma-Based Construction with or Without Parentheses}
+
+Tuple packing means collecting several expressions into one tuple object.
+
+\begin{verbatim}
+data = "Homer", "Marge", "Bart"
+
+print(f"data: {data!r}")
+print(f"type(data): {type(data)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: ('Homer', 'Marge', 'Bart')
+type(data): <class 'tuple'>
+\end{verbatim}
+
+The commas created the tuple. Parentheses are often written because they make the grouping clearer, but they are not always required.
+
+\begin{verbatim}
+a = "spam", "eggs", 42
+b = ("spam", "eggs", 42)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+
+print()
+print(f"type(a): {type(a)}")
+print(f"type(b): {type(b)}")
+print(f"a == b: {a == b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ('spam', 'eggs', 42)
+b: ('spam', 'eggs', 42)
+
+type(a): <class 'tuple'>
+type(b): <class 'tuple'>
+a == b: True
+\end{verbatim}
+
+Parentheses are still required or strongly useful in some syntactic positions, especially when the tuple must appear as one grouped expression.
+
+\begin{verbatim}
+items = [("Homer", 39), ("Marge", 36), ("Bart", 10)]
+
+print(items)
+
+print()
+for item in items:
+    print(f"item={item!r} type={type(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+[('Homer', 39), ('Marge', 36), ('Bart', 10)]
+
+item=('Homer', 39) type=<class 'tuple'>
+item=('Marge', 36) type=<class 'tuple'>
+item=('Bart', 10) type=<class 'tuple'>
+\end{verbatim}
+
+Without parentheses, the list literal would not have the same structure.
+
+\begin{verbatim}
+items = ["Homer", 39, "Marge", 36]
+
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+['Homer', 39, 'Marge', 36]
+\end{verbatim}
+
+That is a list with four elements, not a list containing two fixed two-element tuples.
+
+Tuple packing is also commonly used to return or pass small records of values.
+
+\begin{verbatim}
+name = "Elaine"
+score = 42
+active = True
+
+record = name, score, active
+
+print(f"record: {record!r}")
+print(f"type(record): {type(record)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+record: ('Elaine', 42, True)
+type(record): <class 'tuple'>
+\end{verbatim}
+
+The practical rule is:
+
+\begin{quote}
+Commas create tuples. Parentheses usually clarify grouping, but the comma is the essential tuple-building signal.
+\end{quote}
+
+\subsubsection{Tuple Unpacking: Decomposing Fixed-Length Structures into Multiple Names}
+
+Tuple unpacking takes the components of a tuple and assigns them to separate names.
+
+\begin{verbatim}
+record = ("Jerry", "comedian", 42)
+
+name, job, score = record
+
+print(f"name:  {name!r}")
+print(f"job:   {job!r}")
+print(f"score: {score!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name:  'Jerry'
+job:   'comedian'
+score: 42
+\end{verbatim}
+
+The number of names on the left must match the number of elements being unpacked, unless extended unpacking is used.
+
+\begin{verbatim}
+record = ("Homer", "Marge", "Bart")
+
+try:
+    first, second = record
+except ValueError as err:
+    print("unpacking failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+unpacking failed
+message: too many values to unpack (expected 2)
+\end{verbatim}
+
+Too many target names also fails.
+
+\begin{verbatim}
+record = ("Homer", "Marge")
+
+try:
+    first, second, third = record
+except ValueError as err:
+    print("unpacking failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+unpacking failed
+message: not enough values to unpack (expected 3, got 2)
+\end{verbatim}
+
+Unpacking is not limited to tuple literals. It works with other iterable objects too, but tuples are the clearest fixed-structure case.
+
+\begin{verbatim}
+point = (10, 20)
+
+x, y = point
+
+print(f"x: {x}")
+print(f"y: {y}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x: 10
+y: 20
+\end{verbatim}
+
+The same idea is useful when iterating through a list of tuples.
+
+\begin{verbatim}
+people = [
+    ("Jerry", 38),
+    ("Elaine", 36),
+    ("George", 37),
+    ("Kramer", 42),
+]
+
+for name, age in people:
+    print(f"{name:<8} age={age}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Jerry    age=38
+Elaine   age=36
+George   age=37
+Kramer   age=42
+\end{verbatim}
+
+Each loop step receives one tuple. The tuple is then unpacked into \texttt{name} and \texttt{age}.
+
+Tuple unpacking also makes value swapping clear.
+
+\begin{verbatim}
+a = "spam"
+b = "eggs"
+
+print("before")
+print(f"a={a!r} b={b!r}")
+
+a, b = b, a
+
+print()
+print("after")
+print(f"a={a!r} b={b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+a='spam' b='eggs'
+
+after
+a='eggs' b='spam'
+\end{verbatim}
+
+The right side creates a packed group of values. The left side unpacks that group into names.
+
+Extended unpacking uses \texttt{*} to collect remaining values into a list.
+
+\begin{verbatim}
+data = ("Nobody", "expects", "the", "Spanish", "Inquisition")
+
+first, second, *rest = data
+
+print(f"first:  {first!r}")
+print(f"second: {second!r}")
+print(f"rest:   {rest!r}")
+print(f"type(rest): {type(rest)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first:  'Nobody'
+second: 'expects'
+rest:   ['the', 'Spanish', 'Inquisition']
+type(rest): <class 'list'>
+\end{verbatim}
+
+The starred target receives a list, not a tuple.
+
+The practical rule is:
+
+\begin{quote}
+Tuple packing combines values into one fixed ordered structure. Tuple unpacking distributes the components of such a structure into separate names.
+\end{quote}
+
+\subsubsection{Single-Element Tuple Syntax: Why \texttt{(x,)} Is a Tuple but \texttt{(x)} Is Not}
+
+A one-element tuple needs a comma.
+
+\begin{verbatim}
+a = (42)
+b = (42,)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+
+print()
+print(f"type(a): {type(a)}")
+print(f"type(b): {type(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: 42
+b: (42,)
+
+type(a): <class 'int'>
+type(b): <class 'tuple'>
+\end{verbatim}
+
+The expression \texttt{(42)} is just the integer \texttt{42} grouped by parentheses. The expression \texttt{(42,)} is a tuple containing one element.
+
+The same rule applies to strings.
+
+\begin{verbatim}
+a = ("Ni")
+b = ("Ni",)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+
+print()
+print(f"type(a): {type(a)}")
+print(f"type(b): {type(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: 'Ni'
+b: ('Ni',)
+
+type(a): <class 'str'>
+type(b): <class 'tuple'>
+\end{verbatim}
+
+The comma is still the tuple marker.
+
+A single-element tuple can also be written without parentheses, but this is usually less readable.
+
+\begin{verbatim}
+a = 42,
+b = (42,)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+print(f"a == b: {a == b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: (42,)
+b: (42,)
+a == b: True
+\end{verbatim}
+
+The trailing comma created the tuple.
+
+This matters when a function or operation expects a tuple. The difference between a value and a one-element tuple is structural.
+
+\begin{verbatim}
+value = "spam"
+one_item_tuple = ("spam",)
+
+print(f"value:          {value!r}")
+print(f"one_item_tuple: {one_item_tuple!r}")
+
+print()
+print(f"len(value):          {len(value)}")
+print(f"len(one_item_tuple): {len(one_item_tuple)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value:          'spam'
+one_item_tuple: ('spam',)
+
+len(value):          4
+len(one_item_tuple): 1
+\end{verbatim}
+
+The string \texttt{"spam"} is a sequence of four one-character strings. The tuple \texttt{("spam",)} is a sequence with one element, and that one element is the whole string \texttt{"spam"}.
+
+The practical rule is:
+
+\begin{quote}
+Parentheses group expressions. Commas build tuples. Therefore \texttt{(x)} is just \texttt{x}, while \texttt{(x,)} is a one-element tuple.
+\end{quote}

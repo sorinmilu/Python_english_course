@@ -4,6 +4,6 @@
   "label": "mat05",
   "linenos": true,
   "input": null,
-  "output": "even_nums: [10, 20, 42]\ntype(even_nums): <class 'list'>",
+  "output": "stored: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]\ntype(stored): <class 'list'>",
   "file": "main.py"
 }

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.12.24)  31 MAY 2026 04:12
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2025/dev/Debian) (preloaded format=pdflatex 2025.12.24)  7 JUN 2026 16:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1545,20 +1545,7 @@ Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
 Package csquotes Info: Redefining alias 'default' -> 'english'.
-(./main_document_processed.aux
-
-LaTeX Warning: Label `lst:fun02' multiply defined.
-
-
-LaTeX Warning: Label `lst:fun02@cref' multiply defined.
-
-
-LaTeX Warning: Label `lst:fun01' multiply defined.
-
-
-LaTeX Warning: Label `lst:fun01@cref' multiply defined.
-
-)
+(./main_document_processed.aux)
 \openout1 = `main_document_processed.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 337.
@@ -1754,7 +1741,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 4.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \hbox (14.61086pt too wide) in paragraph at lines 108--108
+Overfull \hbox (14.61086pt too wide) in paragraph at lines 150--150
  [][] [][][]\T1/cmr/m/n/10.95 Python Com-pil-ers, Ac-cel-er-a-tors, and Trans-l
 a-tors: Cython, Nu-itka, Numba, MyPyC, 
  []
@@ -1767,32 +1754,212 @@ a-tors: Cython, Nu-itka, Numba, MyPyC,
 
 [3]
 
-[4])
+[4]
+Overfull \hbox (4.89952pt too wide) detected at line 579
+ []\T1/cmr/m/n/10.95 1006
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 584
+ []\T1/cmr/m/n/10.95 1026
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 585
+ []\T1/cmr/m/n/10.95 1026
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 589
+ []\T1/cmr/m/n/10.95 1042
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 593
+ []\T1/cmr/m/n/10.95 1057
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 597
+ []\T1/cmr/m/n/10.95 1072
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 598
+ []\T1/cmr/m/n/10.95 1072
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 603
+ []\T1/cmr/m/n/10.95 1087
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 606
+ []\T1/cmr/m/n/10.95 1099
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 610
+ []\T1/cmr/m/n/10.95 1114
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 615
+ []\T1/cmr/m/n/10.95 1128
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 616
+ []\T1/cmr/m/n/10.95 1128
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 617
+ []\T1/cmr/m/n/10.95 1129
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 621
+ []\T1/cmr/m/n/10.95 1133
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 625
+ []\T1/cmr/m/n/10.95 1136
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 626
+ []\T1/cmr/m/n/10.95 1137
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 630
+ []\T1/cmr/m/n/10.95 1140
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 635
+ []\T1/cmr/m/n/10.95 1144
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 636
+ []\T1/cmr/m/n/10.95 1145
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 640
+ []\T1/cmr/m/n/10.95 1148
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 644
+ []\T1/cmr/m/n/10.95 1152
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 648
+ []\T1/cmr/m/n/10.95 1157
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 649
+ []\T1/cmr/m/n/10.95 1157
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 653
+ []\T1/cmr/m/n/10.95 1162
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 657
+ []\T1/cmr/m/n/10.95 1167
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 658
+ []\T1/cmr/m/n/10.95 1167
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 662
+ []\T1/cmr/m/n/10.95 1171
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 667
+ []\T1/cmr/m/n/10.95 1177
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 668
+ []\T1/cmr/m/n/10.95 1177
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 673
+ []\T1/cmr/m/n/10.95 1187
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 679
+ []\T1/cmr/m/n/10.95 1187
+ []
+
+
+
+[5]
+Overfull \hbox (4.89952pt too wide) detected at line 680
+ []\T1/cmr/m/n/10.95 1187
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 684
+ []\T1/cmr/m/n/10.95 1191
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 688
+ []\T1/cmr/m/n/10.95 1196
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 689
+ []\T1/cmr/m/n/10.95 1196
+ []
+
+
+Overfull \hbox (4.89952pt too wide) detected at line 692
+ []\T1/cmr/m/n/10.95 1200
+ []
+
+)
 \tf@toc=\write6
 \openout6 = `main_document_processed.toc'.
 
 
 
-[5]
+[6]
 Chapter 1.
 
 
-[6
+[7
 
 
 ]
 Chapter 2.
 
 
-[7
+[8
 
 ]
 
-[8]
+[9]
 
-[9{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
-
-[10]
+[10{/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 
 [11]
 
@@ -1803,9 +1970,6 @@ Chapter 2.
 [14]
 
 [15]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 653.
-
 
 [16]
 
@@ -1838,24 +2002,18 @@ LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
 [30]
 
 [31]
-
-[32]
-Overfull \hbox (4.46878pt too wide) in paragraph at lines 1437--1438
-\T1/cmr/m/n/10.95 A \T1/cmr/bx/n/10.95 pro-cess vir-tual ma-chine \T1/cmr/m/n/1
-0.95 is a soft-ware ex-e-cu-tion en-vi-ron-ment that runs in-side an or-di-nary
- operating-
+Overfull \hbox (8.0542pt too wide) in paragraph at lines 1470--1470
+[][]\T1/cmr/bx/n/10.95 AST vs In-ter-me-di-ate Rep-re-sen-ta-tion: Tree Struc-t
+ure, Low-er-ing, and Optimization-Friendly
  []
 
 
+
+[32]
 
 [33]
 
 [34]
-Underfull \hbox (badness 1400) in paragraph at lines 1525--1526
-[]|\T1/cmr/m/n/10.95 Function or method calls may use runtime-
- []
-
-
 
 [35]
 
@@ -1866,32 +2024,15 @@ Underfull \hbox (badness 1400) in paragraph at lines 1525--1526
 [38]
 
 [39]
-Underfull \hbox (badness 2213) in paragraph at lines 1743--1743
-[]|\T1/cmr/m/n/10.95 Source-derived syn-tax tree or
- []
-
-
-Underfull \hbox (badness 1675) in paragraph at lines 1745--1746
-[]|\T1/cmr/m/n/10.95 CPython, PHP Zend En-
- []
-
-
-Underfull \hbox (badness 1648) in paragraph at lines 1747--1747
-[]|\T1/cmr/m/n/10.95 Bytecode first, se-lected paths
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1749--1749
-[]|\T1/cmr/m/n/10.95 Command in-ter-pre-ta-tion
- []
-
-
 
 [40]
 
 [41]
 
 [42]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 1971.
+
 
 [43]
 
@@ -1906,11 +2047,6 @@ Underfull \hbox (badness 10000) in paragraph at lines 1749--1749
 [48]
 
 [49]
-Underfull \hbox (badness 1331) in paragraph at lines 2328--2329
-[]|\T1/cmr/m/n/10.95 Requires vir-tual reg-is-ter as-
- []
-
-
 
 [50]
 
@@ -1923,339 +2059,146 @@ Underfull \hbox (badness 1331) in paragraph at lines 2328--2329
 [54]
 
 [55]
-\g__tcobox_out_iow=\write7
-\openout7 = `main_document_processed.listing'.
-
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <6> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2566.
-\pydata@fh@_50198C1AAAC27044BC498367ACCE2F74.data.minted=\write8
-\openout8 = `_50198C1AAAC27044BC498367ACCE2F74.data.minted'.
-
-runsystem(latexminted config  --timestamp 20260531041240 50198C1AAAC27044BC4983
-67ACCE2F74)...executed safely (allowed).
-
- (./_50198C1AAAC27044BC498367ACCE2F74.config.minted)
-runsystem(latexminted cleanconfig  --timestamp 20260531041240 50198C1AAAC27044B
-C498367ACCE2F74)...executed safely (allowed).
-
-
-(./_minted/default.style.minted)
-(./_minted/90B1713B253B5054F629FE2BB10E887B.highlight.minted
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5.
-)
 
 [56]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/30919C2850EA9EBEB6E777A8CB28C2E4.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 2637--2638
-
- []
-
-
 
 [57]
-Overfull \hbox (0.40294pt too wide) in paragraph at lines 2662--2663
- []\T1/cmr/bx/n/10.95 Python: sort-ing keys, GUI han-dlers, web call-backs, and
- data-processing hooks.[] \T1/cmr/m/n/10.95 In Python,
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/186F2E37BD05F14F3CD541AF7A4D8CC6.highlight.minted)
 
 [58]
 
 [59]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/B772F63D8AD240346FED56E81661F245.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 2821--2822
-
- []
-
-
 
 [60]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/0513803014FA51C171B0035015CE9E68.highlight.minted)
-Overfull \hbox (13.02127pt too wide) in paragraph at lines 2899--2900
- []\T1/cmr/bx/n/10.95 JavaScript and V8: DOM events, AJAX, timers, promises, an
-d Node.js call-backs.[] \T1/cmr/m/n/10.95 JavaScript
- []
-
-
 
 [61]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/C16BA195A7AB880769A529884673A9D1.highlight.minted)
 
 [62]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/B43A3A377C9E050DA3590A9D0668ABA8.highlight.minted)
-\openout7 = `main_document_processed.listing'.
-
-
-(./_minted/92995561EDDBB0F4E9ED9BF6385C67CB.highlight.minted)
 
 [63]
+\g__tcobox_out_iow=\write7
 \openout7 = `main_document_processed.listing'.
 
- (./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <6> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 2865.
+\pydata@fh@_50198C1AAAC27044BC498367ACCE2F74.data.minted=\write8
+\openout8 = `_50198C1AAAC27044BC498367ACCE2F74.data.minted'.
+
+runsystem(latexminted config  --timestamp 20260607163845 50198C1AAAC27044BC4983
+67ACCE2F74)...executed safely (allowed).
+
+ (./_50198C1AAAC27044BC498367ACCE2F74.config.minted)
+runsystem(latexminted cleanconfig  --timestamp 20260607163845 50198C1AAAC27044B
+C498367ACCE2F74)...executed safely (allowed).
+
+
+(./_minted/default.style.minted)
+(./_minted/E235C9552A1822D7369B782286F812D1.highlight.minted
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <10> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 3.
+)
 
 [64]
 
 [65]
-Underfull \hbox (badness 5726) in paragraph at lines 3185--3185
-[]|\T1/cmr/bx/n/10.95 Useful call-back ap-pli-ca-
- []
-
-
-Underfull \hbox (badness 1253) in paragraph at lines 3187--3187
-\T1/cmr/m/n/10.95 braries, em-bed-ded call-backs,
- []
-
-
-Underfull \hbox (badness 1009) in paragraph at lines 3189--3189
-[]|\T1/cmr/m/n/10.95 Sorting keys, GUI han-dlers,
- []
-
-
-Underfull \hbox (badness 1681) in paragraph at lines 3191--3191
-[]|\T1/cmr/m/n/10.95 GUI lis-ten-ers, stream op-er-
- []
-
-
-Underfull \hbox (badness 2119) in paragraph at lines 3191--3191
-\T1/cmr/m/n/10.95 a-tions, com-ple-tion han-dlers,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3193--3193
-[]|\T1/cmr/m/n/10.95 JavaScript /
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3193--3193
-[]|\T1/cmr/m/n/10.95 DOM events, AJAX/fetch
- []
-
-
-Underfull \hbox (badness 3354) in paragraph at lines 3193--3193
-\T1/cmr/m/n/10.95 com-ple-tion, timers, Node.js
- []
-
-
-Underfull \hbox (badness 1603) in paragraph at lines 3195--3196
-[]|\T1/cmr/m/n/10.95 Callable value re-solved by Zend
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3197--3197
-[]|\T1/cmtt/m/n/10.95 trap \T1/cmr/m/n/10.95 cleanup han-dlers,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3197--3197
-\T1/cmr/m/n/10.95 command-name dis-patch,
- []
-
-
 
 [66]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/0D77413F963EE6275164A228373ED9D3.highlight.minted)
 
 [67]
 
 [68]
 
 [69]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/F847401610EDB330B5A1AB92A6E76DAD.highlight.minted)
 
 [70]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/DB23DDA04DCA669986325F3BDCD5CA40.highlight.minted)
-\openout7 = `main_document_processed.listing'.
-
-
-(./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
 
 [71]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/6A242D0AB195637827065D6E1C41341A.highlight.minted)
 
 [72]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/FB944D234CBAC74583986B2E6387C0E6.highlight.minted)
 
 [73]
 
 [74]
-Underfull \hbox (badness 10000) in paragraph at lines 3723--3723
-[]|\T1/cmr/m/n/10.95 JavaScript /
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3725--3726
-[]|\T1/cmr/m/n/10.95 Produces functional-interface-
- []
-
-
-Underfull \hbox (badness 4156) in paragraph at lines 3725--3726
-\T1/cmr/m/n/10.95 compatible callable ob-ject; call
- []
-
-
-Underfull \hbox (badness 1215) in paragraph at lines 3727--3727
-[]|\T1/cmr/m/n/10.95 Anonymous func-tions / clo-
- []
-
-
-Underfull \hbox (badness 2644) in paragraph at lines 3731--3731
-[]|\T1/cmr/m/n/10.95 No func-tion ob-jects; in-line
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 3731--3731
-\T1/cmr/m/n/10.95 com-mand text, com-mand
- []
-
-
 
 [75]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/366FECB0D01409A2362933DEDB1669C1.highlight.minted)
 
 [76]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/A82BEEBFFD99717D181FF771FB137CFF.highlight.minted)
 
 [77]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/27D6594D0E4B108AC14A4A41398A3D2B.highlight.minted)
-Overfull \hbox (10.20992pt too wide) in paragraph at lines 3923--3924
- []\T1/cmr/bx/n/10.95 JavaScript / V8: lex-i-cal en-vi-ron-ments for call-backs
-, AJAX, timers, and fac-to-ries.[] \T1/cmr/m/n/10.95 JavaScript
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/ABCC1E2160DE4B0FC2A36EA643E03E8F.highlight.minted)
 
 [78]
-\openout7 = `main_document_processed.listing'.
+Underfull \hbox (badness 2818) in paragraph at lines 3563--3564
+[]|\T1/cmr/m/n/10.95 Kernel can in-ter-rupt run-ning
+ []
 
- (./_minted/7D12BFCFC8759BE108C77BD993F9A35E.highlight.minted)
+
 
 [79]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/60F360AD3CBFEEAB746050BD0629C739.highlight.minted)
-\openout7 = `main_document_processed.listing'.
-
-
-(./_minted/38F5FE60AADFF60CF1563AE3387217F4.highlight.minted)
 
 [80]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/889772B121A9EAC0EB6A2DA9B53D5D70.highlight.minted)
 
 [81]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/9BB3F3D05A97BADD8DACE61ADD4B3E96.highlight.minted)
 
 [82]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/DB7E2B23E4A0EB39849819047181555E.highlight.minted)
-\openout7 = `main_document_processed.listing'.
-
-
-(./_minted/26E4EB3D51885FD26E6A8D5EF5C449BD.highlight.minted)
 
 [83]
 
 [84]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/171ED1B16CF2B27C52E0B85CDD0F4455.highlight.minted)
-\openout7 = `main_document_processed.listing'.
-
-
-(./_minted/844588F583E7A9ACFC59D3E75E41FA45.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 4365--4366
-
- []
-
-
 
 [85]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/0CE4B35A1DB0494B3D329DA39B4EBF80.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 4418--4419
-
- []
-
-
 
 [86]
-Underfull \hbox (badness 10000) in paragraph at lines 4495--4495
-[]|\T1/cmr/m/n/10.95 Python /
- []
-
-
-Underfull \hbox (badness 2393) in paragraph at lines 4495--4496
-[]|\T1/cmr/m/n/10.95 Outer Python frame dis-ap-pears;
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 4497--4497
-[]|\T1/cmr/m/n/10.95 JavaScript /
- []
-
-
-Underfull \hbox (badness 1783) in paragraph at lines 4501--4502
-[]|\T1/cmr/m/n/10.95 Function frame dis-ap-pears; cap-
- []
-
-
-Underfull \hbox (badness 1142) in paragraph at lines 4505--4506
-\T1/cmr/m/n/10.95 er-ated func-tions, sub-shell copies,
- []
-
-
 
 [87]
 
 [88]
 
 [89]
-Chapter 3.
 
-Overfull \hbox (3.08403pt too wide) in paragraph at lines 4572--4572
-[]\T1/cmr/bx/n/12 Chronological Time-line: The Gen-e-sis, Ori-gins, and For-mal
- Re-lease of Python
+[90]
+Underfull \hbox (badness 10000) in paragraph at lines 4121--4122
+[]|\T1/cmr/m/n/10.95 Isolation, CPU
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 4121--4122
+\T1/cmr/m/n/10.95 par-al-lelism, in-de-
+ []
 
-[90
 
-]
+Underfull \hbox (badness 1314) in paragraph at lines 4123--4124
+[]|\T1/cmr/m/n/10.95 Parallel or con-cur-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4125--4126
+[]|\T1/cmr/m/n/10.95 I/O con-cur-rency
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4127--4127
+[]|\T1/cmr/m/n/10.95 Suspended run-time
+ []
+
+
+Underfull \hbox (badness 4096) in paragraph at lines 4129--4129
+[]|\T1/cmr/m/n/10.95 Runtime / frame-work
+ []
+
+
+Overfull \hbox (11.3107pt too wide) in paragraph at lines 4117--4132
+ [] 
+ []
+
+
+Overfull \hbox (2.65457pt too wide) in paragraph at lines 4142--4143
+[]\T1/cmr/m/n/10.95 Thus, operating-system schedul-ing ex-plains how na-tive ex
+-e-cu-tion con-texts share hard-ware. Runtime-
+ []
+
+
 
 [91]
 
@@ -2268,12 +2211,8 @@ Overfull \hbox (3.08403pt too wide) in paragraph at lines 4572--4572
 [95]
 
 [96]
-Chapter 4.
 
-
-[97
-
-]
+[97]
 
 [98]
 
@@ -2286,32 +2225,16 @@ Chapter 4.
 [102]
 
 [103]
-Overfull \hbox (11.7164pt too wide) in paragraph at lines 5124--5125
-[]\T1/cmr/m/n/10.95 In CPython, ob-ject life-time is strongly con-nected to ref
--er-ence count-ing (\T1/cmtt/m/n/10.95 ob_refcnt \T1/cmr/m/n/10.95 in \T1/cmtt/
-m/n/10.95 PyObject_HEAD\T1/cmr/m/n/10.95 ).
- []
-
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5147.
-
 
 [104]
 
 [105]
-Overfull \hbox (28.54926pt too wide) in paragraph at lines 5253--5254
-[]\T1/cmr/m/n/10.95 NaN is not equal even to it-self. Test with \T1/cmtt/m/n/10
-.95 math.isnan()\T1/cmr/m/n/10.95 , not \T1/cmtt/m/n/10.95 ==\T1/cmr/m/n/10.95 
-. Use \T1/cmtt/m/n/10.95 math.isinf() \T1/cmr/m/n/10.95 and \T1/cmtt/m/n/10.95 
-math.isfinite()
- []
-
-
 
 [106]
-Overfull \hbox (6.47182pt too wide) in paragraph at lines 5309--5310
-[]\T1/cmr/m/n/10.95 Python booleans are sin-gle-ton truth-value ob-jects that i
-n-herit from \T1/cmtt/m/n/10.95 int \T1/cmr/m/n/10.95 due to early backward-
+Overfull \hbox (4.46878pt too wide) in paragraph at lines 4874--4875
+\T1/cmr/m/n/10.95 A \T1/cmr/bx/n/10.95 pro-cess vir-tual ma-chine \T1/cmr/m/n/1
+0.95 is a soft-ware ex-e-cu-tion en-vi-ron-ment that runs in-side an or-di-nary
+ operating-
  []
 
 
@@ -2319,93 +2242,68 @@ n-herit from \T1/cmtt/m/n/10.95 int \T1/cmr/m/n/10.95 due to early backward-
 [107]
 
 [108]
+Underfull \hbox (badness 1400) in paragraph at lines 4962--4963
+[]|\T1/cmr/m/n/10.95 Function or method calls may use runtime-
+ []
+
+
 
 [109]
 
 [110]
-Overfull \hbox (43.39604pt too wide) in paragraph at lines 5542--5543
-\T1/cmr/m/n/10.95 target-type rules: \T1/cmtt/m/n/10.95 int("3.14") \T1/cmr/m/n
-/10.95 raises \T1/cmtt/m/n/10.95 ValueError\T1/cmr/m/n/10.95 ; \T1/cmtt/m/n/10.
-95 int(float("3.14")) \T1/cmr/m/n/10.95 trun-cates to-ward zero. \T1/cmtt/m/n/1
-0.95 bool("False")
- []
-
-
-Overfull \hbox (8.8895pt too wide) in paragraph at lines 5555--5556
-[]\T1/cmr/m/n/10.95 These are de-fined in-ter-ac-tions, not silent con-ver-sion
- of un-re-lated do-mains. \T1/cmtt/m/n/10.95 42 + "1" \T1/cmr/m/n/10.95 raises 
-\T1/cmtt/m/n/10.95 TypeError\T1/cmr/m/n/10.95 .
- []
-
-
 
 [111]
 
 [112]
 
 [113]
-Chapter 5.
+Underfull \hbox (badness 2213) in paragraph at lines 5180--5180
+[]|\T1/cmr/m/n/10.95 Source-derived syn-tax tree or
+ []
 
-Overfull \hbox (9.73248pt too wide) in paragraph at lines 5650--5651
-[]\T1/cmr/m/n/10.95 Syntax such as \T1/cmtt/m/n/10.95 len(obj)\T1/cmr/m/n/10.95
- , \T1/cmtt/m/n/10.95 obj[i]\T1/cmr/m/n/10.95 , and \T1/cmtt/m/n/10.95 x in obj
- \T1/cmr/m/n/10.95 del-e-gates to spe-cial meth-ods (\T1/cmtt/m/n/10.95 __len__
-\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 __getitem__\T1/cmr/m/n/10.95 ,
+
+Underfull \hbox (badness 1675) in paragraph at lines 5182--5183
+[]|\T1/cmr/m/n/10.95 CPython, PHP Zend En-
+ []
+
+
+Underfull \hbox (badness 1648) in paragraph at lines 5184--5184
+[]|\T1/cmr/m/n/10.95 Bytecode first, se-lected paths
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 5186--5186
+[]|\T1/cmr/m/n/10.95 Command in-ter-pre-ta-tion
  []
 
 
 
-[114
-
-]
+[114]
 
 [115]
-Overfull \hbox (35.78638pt too wide) in paragraph at lines 5702--5703
-[]\T1/cmr/m/n/10.95 Decoding must match the en-cod-ing used at en-code time. Wr
-ong strict de-cod-ing raises \T1/cmtt/m/n/10.95 UnicodeDecodeError\T1/cmr/m/n/1
-0.95 ;
- []
-
-
 
 [116]
-LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 5723.
-
 
 [117]
 
 [118]
-Overfull \hbox (14.82748pt too wide) in paragraph at lines 5803--5804
-[]\T1/cmr/m/n/10.95 Architecturally, \T1/cmtt/m/n/10.95 split\T1/cmr/m/n/10.95 
-/\T1/cmtt/m/n/10.95 join \T1/cmr/m/n/10.95 form the bound-ary be-tween flat tex
-t and pointer ar-rays of text fragments---
- []
-
-
 
 [119]
-Overfull \hbox (34.06035pt too wide) in paragraph at lines 5851--5852
-\T1/cmtt/m/n/10.95 items[i] = obj \T1/cmr/m/n/10.95 re-places one \T1/cmtt/m/n/
-10.95 PyObject* \T1/cmr/m/n/10.95 slot; the list shell is un-changed. Slice as-
-sign-ment \T1/cmtt/m/n/10.95 items[start:stop]
- []
-
-
 
 [120]
 
 [121]
 
 [122]
-Chapter 6.
 
-
-[123
-
-]
+[123]
 
 [124]
+Underfull \hbox (badness 1331) in paragraph at lines 5765--5766
+[]|\T1/cmr/m/n/10.95 Requires vir-tual reg-is-ter as-
+ []
+
+
 
 [125]
 
@@ -2426,68 +2324,30 @@ Chapter 6.
 [133]
 
 [134]
-Overfull \hbox (25.55652pt too wide) in paragraph at lines 6633--6633
-[]\T1/cmtt/m/n/10.95 first_tok: TokenInfo(type=1 (NAME), string=\TS1/cmtt/m/n/1
-0.95 '\T1/cmtt/m/n/10.95 x\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , start=(1, 0
-), end=(1, 1), line=\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 x = 42\n\TS1/cmtt/m
-/n/10.95 '\T1/cmtt/m/n/10.95 )[] 
- []
-
-
-Overfull \hbox (28.09885pt too wide) in paragraph at lines 6643--6644
-[]\T1/cmr/m/n/10.95 If Python ex-pects in-den-ta-tion and the in-den-ta-tion do
-es not form a valid block, it raises \T1/cmtt/m/n/10.95 IndentationError\T1/cmr
-/m/n/10.95 . 
- []
-
-
-Overfull \hbox (19.89815pt too wide) in paragraph at lines 6665--6665
-[]\T1/cmtt/m/n/10.95 message: expected an indented block after \TS1/cmtt/m/n/10
-.95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on
- line 1 (<bad_indent>, line 2)[] 
- []
-
-
-Overfull \hbox (172.67416pt too wide) in paragraph at lines 6666--6666
-[]\T1/cmtt/m/n/10.95 args: ("expected an indented block after \TS1/cmtt/m/n/10.
-95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on 
-line 1", (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <bad_indent>\TS1/cmtt/m/n/10.
-95 '\T1/cmtt/m/n/10.95 , 2, 1, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 print("N
-i!")\n\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , 2, -1))[] 
- []
-
-
 
 [135]
-Overfull \hbox (19.89815pt too wide) in paragraph at lines 6698--6698
-[]\T1/cmtt/m/n/10.95 message: inconsistent use of tabs and spaces in indentatio
-n (<mixed_tabs_spaces>, line 3)[] 
- []
-
-
-Overfull \hbox (178.33253pt too wide) in paragraph at lines 6699--6699
-[]\T1/cmtt/m/n/10.95 args: (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 inconsisten
-t use of tabs and spaces in indentation\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
-, (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <mixed_tabs_spaces>\TS1/cmtt/m/n/10.
-95 '\T1/cmtt/m/n/10.95 , 3, 1, "\tprint(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
- tab\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 )\n", 3, 0))[] 
- []
-
-
-Overfull \hbox (280.18321pt too wide) in paragraph at lines 6715--6715
-[]\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 TabError\T
-S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
-/n/10.95 IndentationError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1
-/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 SyntaxError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
-n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Exception\TS1/cmtt/m/
-n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 B
-aseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.
-95 '\T1/cmtt/m/n/10.95 object\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[] 
- []
-
-
 
 [136]
+Underfull \hbox (badness 10000) in paragraph at lines 6362--6363
+[]|\T1/cmr/bx/n/10.95 Important sur-round-ing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6366--6367
+[]|\T1/cmr/m/n/10.95 Class load-ing, ver-i-fi-ca-tion,
+ []
+
+
+Underfull \hbox (badness 3375) in paragraph at lines 6368--6368
+[]|\T1/cmr/m/n/10.95 Adaptive in-ter-pre-ta-tion and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 6368--6369
+[]|\T1/cmr/m/n/10.95 Host APIs, event loop,
+ []
+
+
 
 [137]
 
@@ -2500,23 +2360,8 @@ aseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.
 [141]
 
 [142]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/8D477E0FEEEFCE048316B489DA1368FD.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 7177--7180
-
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/DA58FADD0FF724641BB1C7AA96F69F81.highlight.minted)
 
 [143]
-Underfull \hbox (badness 10000) in paragraph at lines 7200--7203
-
- []
-
-
 
 [144]
 
@@ -2527,7 +2372,1573 @@ Underfull \hbox (badness 10000) in paragraph at lines 7200--7203
 [147]
 
 [148]
-Overfull \hbox (200.96602pt too wide) in paragraph at lines 7519--7519
+
+[149]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/90B1713B253B5054F629FE2BB10E887B.highlight.minted)
+
+[150]
+
+[151]
+Overfull \hbox (0.40294pt too wide) in paragraph at lines 7115--7116
+ []\T1/cmr/bx/n/10.95 Python: sort-ing keys, GUI han-dlers, web call-backs, and
+ data-processing hooks.[] \T1/cmr/m/n/10.95 In Python,
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/186F2E37BD05F14F3CD541AF7A4D8CC6.highlight.minted)
+
+[152]
+
+[153]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0513803014FA51C171B0035015CE9E68.highlight.minted)
+
+[154]
+Overfull \hbox (13.02127pt too wide) in paragraph at lines 7345--7346
+ []\T1/cmr/bx/n/10.95 JavaScript and V8: DOM events, AJAX, timers, promises, an
+d Node.js call-backs.[] \T1/cmr/m/n/10.95 JavaScript
+ []
+
+
+
+[155]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/C16BA195A7AB880769A529884673A9D1.highlight.minted)
+
+[156]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/B43A3A377C9E050DA3590A9D0668ABA8.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/92995561EDDBB0F4E9ED9BF6385C67CB.highlight.minted)
+
+[157]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
+
+[158]
+
+[159]
+Underfull \hbox (badness 5726) in paragraph at lines 7631--7631
+[]|\T1/cmr/bx/n/10.95 Useful call-back ap-pli-ca-
+ []
+
+
+Underfull \hbox (badness 1253) in paragraph at lines 7633--7633
+\T1/cmr/m/n/10.95 braries, em-bed-ded call-backs,
+ []
+
+
+Underfull \hbox (badness 1009) in paragraph at lines 7635--7635
+[]|\T1/cmr/m/n/10.95 Sorting keys, GUI han-dlers,
+ []
+
+
+Underfull \hbox (badness 1681) in paragraph at lines 7637--7637
+[]|\T1/cmr/m/n/10.95 GUI lis-ten-ers, stream op-er-
+ []
+
+
+Underfull \hbox (badness 2119) in paragraph at lines 7637--7637
+\T1/cmr/m/n/10.95 a-tions, com-ple-tion han-dlers,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7639--7639
+[]|\T1/cmr/m/n/10.95 JavaScript /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7639--7639
+[]|\T1/cmr/m/n/10.95 DOM events, AJAX/fetch
+ []
+
+
+Underfull \hbox (badness 3354) in paragraph at lines 7639--7639
+\T1/cmr/m/n/10.95 com-ple-tion, timers, Node.js
+ []
+
+
+Underfull \hbox (badness 1603) in paragraph at lines 7641--7642
+[]|\T1/cmr/m/n/10.95 Callable value re-solved by Zend
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7643--7643
+[]|\T1/cmtt/m/n/10.95 trap \T1/cmr/m/n/10.95 cleanup han-dlers,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 7643--7643
+\T1/cmr/m/n/10.95 command-name dis-patch,
+ []
+
+
+
+[160]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0D77413F963EE6275164A228373ED9D3.highlight.minted)
+
+[161]
+
+[162]
+
+[163]
+
+[164]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/DB23DDA04DCA669986325F3BDCD5CA40.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/95C7A405857D14001766C9EF7EB1A17B.highlight.minted)
+
+[165]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/6A242D0AB195637827065D6E1C41341A.highlight.minted)
+
+[166]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/FB944D234CBAC74583986B2E6387C0E6.highlight.minted)
+
+[167]
+
+[168]
+Underfull \hbox (badness 10000) in paragraph at lines 8169--8169
+[]|\T1/cmr/m/n/10.95 JavaScript /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8171--8172
+[]|\T1/cmr/m/n/10.95 Produces functional-interface-
+ []
+
+
+Underfull \hbox (badness 4156) in paragraph at lines 8171--8172
+\T1/cmr/m/n/10.95 compatible callable ob-ject; call
+ []
+
+
+Underfull \hbox (badness 1215) in paragraph at lines 8173--8173
+[]|\T1/cmr/m/n/10.95 Anonymous func-tions / clo-
+ []
+
+
+Underfull \hbox (badness 2644) in paragraph at lines 8177--8177
+[]|\T1/cmr/m/n/10.95 No func-tion ob-jects; in-line
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8177--8177
+\T1/cmr/m/n/10.95 com-mand text, com-mand
+ []
+
+
+
+[169]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/366FECB0D01409A2362933DEDB1669C1.highlight.minted)
+
+[170]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/A82BEEBFFD99717D181FF771FB137CFF.highlight.minted)
+
+[171]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/27D6594D0E4B108AC14A4A41398A3D2B.highlight.minted)
+Overfull \hbox (10.20992pt too wide) in paragraph at lines 8369--8370
+ []\T1/cmr/bx/n/10.95 JavaScript / V8: lex-i-cal en-vi-ron-ments for call-backs
+, AJAX, timers, and fac-to-ries.[] \T1/cmr/m/n/10.95 JavaScript
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/ABCC1E2160DE4B0FC2A36EA643E03E8F.highlight.minted)
+
+[172]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/7D12BFCFC8759BE108C77BD993F9A35E.highlight.minted)
+
+[173]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/60F360AD3CBFEEAB746050BD0629C739.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/38F5FE60AADFF60CF1563AE3387217F4.highlight.minted)
+
+[174]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/889772B121A9EAC0EB6A2DA9B53D5D70.highlight.minted)
+
+[175]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/9BB3F3D05A97BADD8DACE61ADD4B3E96.highlight.minted)
+
+[176]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/DB7E2B23E4A0EB39849819047181555E.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/26E4EB3D51885FD26E6A8D5EF5C449BD.highlight.minted)
+
+[177]
+
+[178]
+
+[179]
+
+[180]
+Underfull \hbox (badness 10000) in paragraph at lines 8920--8920
+[]|\T1/cmr/m/n/10.95 Python /
+ []
+
+
+Underfull \hbox (badness 2393) in paragraph at lines 8920--8921
+[]|\T1/cmr/m/n/10.95 Outer Python frame dis-ap-pears;
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 8922--8922
+[]|\T1/cmr/m/n/10.95 JavaScript /
+ []
+
+
+Underfull \hbox (badness 1783) in paragraph at lines 8926--8927
+[]|\T1/cmr/m/n/10.95 Function frame dis-ap-pears; cap-
+ []
+
+
+Underfull \hbox (badness 1142) in paragraph at lines 8930--8931
+\T1/cmr/m/n/10.95 er-ated func-tions, sub-shell copies,
+ []
+
+
+
+[181]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/FD577B04DDDB8E42EF47E567C880A515.highlight.minted)
+
+[182]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/C4380C4C6C25900736DFED4FBFCB1EB0.highlight.minted)
+
+[183]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0C5AC0972F60790DE387ED8DEC1C162A.highlight.minted)
+
+[184]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/6E223B21096358D43D443D16541C2BE4.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/A33C3E1E752F3BEAACA46EE91C80F5B2.highlight.minted)
+
+[185]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/2D198E3A71255B8307004F35EFD23B63.highlight.minted)
+
+[186]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/5BBD57B9CD541A720F57AB4CBAD8A4A4.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/9F1706872C066AF72D9416A4D19EF466.highlight.minted)
+
+[187]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/E2D7C46A42B7FDF976ACF5812F76DE2D.highlight.minted)
+
+[188]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/4EE99792DF86EEB9F241E70017287998.highlight.minted)
+
+[189]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/CCDE76250AD9DB0407D0F58E63B2CC9E.highlight.minted)
+
+[190]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/E275956CD05D8279A648EF27F0223DF0.highlight.minted)
+
+[191]
+Underfull \hbox (badness 10000) in paragraph at lines 9554--9554
+[]|\T1/cmr/m/n/10.95 Python /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 9556--9556
+[]|\T1/cmr/m/n/10.95 JavaScript /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 9560--9561
+[]|\T1/cmr/m/n/10.95 No built-in sus-pended method
+ []
+
+
+Underfull \hbox (badness 5105) in paragraph at lines 9562--9562
+[]|\T1/cmr/m/n/10.95 Manual state ma-chine, struct,
+ []
+
+
+
+[192]
+
+[193]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/8558924318358D7B2AB85D89D5CDBAE1.highlight.minted)
+
+[194]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/63218578E4C55CDB98653D30D138A035.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/E2F84E4AB92607C82FC034AC5B478D2E.highlight.minted)
+
+[195]
+Overfull \hbox (34.16321pt too wide) in paragraph at lines 9744--9745
+[]\T1/cmr/m/n/10.95 JavaScript's com-mon asyn-chronous pro-gram-ming model late
+r de-vel-oped around promises and \T1/cmtt/m/n/10.95 async\T1/cmr/m/n/10.95 /\T
+1/cmtt/m/n/10.95 await\T1/cmr/m/n/10.95 ,
+ []
+
+\openout7 = `main_document_processed.listing'.
+
+(./_minted/8C2312D8A0D40E78A56B4C04082BBFFE.highlight.minted)
+
+[196]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/AFBFDE01480FDC5A59EBED69D1E27BE2.highlight.minted)
+Overfull \hbox (11.93715pt too wide) in paragraph at lines 9810--9811
+[]\T1/cmr/m/n/10.95 The use-ful ap-pli-ca-tion is game script-ing, em-bed-ded s
+cript-ing, co-op-er-a-tive task sys-tems, and lightweight
+ []
+
+
+
+[197]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/E91064DCAE3F7C67C45AF8CAC6C5478C.highlight.minted)
+
+[198]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/961CA5ED6D034BFE70EBBA127C4B56A8.highlight.minted)
+
+[199]
+
+[200]
+Underfull \hbox (badness 10000) in paragraph at lines 10074--10074
+[]|\T1/cmr/m/n/10.95 Python /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10074--10074
+[]|\T1/cmr/m/n/10.95 Generators with \T1/cmtt/m/n/10.95 send\T1/cmr/m/n/10.95 ;
+ later
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10076--10076
+[]|\T1/cmr/m/n/10.95 JavaScript /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10076--10076
+[]|\T1/cmr/m/n/10.95 Generators with \T1/cmtt/m/n/10.95 next(value)\T1/cmr/m/n/
+10.95 ;
+ []
+
+
+Underfull \hbox (badness 2818) in paragraph at lines 10082--10083
+\T1/cmr/m/n/10.95 man-ages virtual-thread con-tin-u-a-
+ []
+
+
+Underfull \hbox (badness 7963) in paragraph at lines 10084--10084
+[]|\T1/cmr/m/n/10.95 Manual state ma-chines; non-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 10086--10086
+[]|\T1/cmr/m/n/10.95 Manual in-ter-leav-ing, jobs,
+ []
+
+
+
+[201]
+
+[202]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/9698833B93FC8DEC1706F38CE4D70DE9.highlight.minted)
+
+[203]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/CDF0C19932BD5A26626E1B6EE4CC0D49.highlight.minted)
+
+[204]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/2AEE9F85D663D9DCF71609CE0497D45B.highlight.minted)
+
+[205]
+Underfull \hbox (badness 10000) in paragraph at lines 10317--10321
+
+ []
+
+
+
+[206]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/0E3F0AB58FE69F6869B5FB97E29AEEAF.highlight.minted)
+Overfull \hbox (7.37105pt too wide) in paragraph at lines 10409--10410
+ []\T1/cmr/bx/n/10.95 C: \T1/cmtt/m/n/10.95 select\T1/cmr/bx/n/10.95 /\T1/cmtt/
+m/n/10.95 poll\T1/cmr/bx/n/10.95 /\T1/cmtt/m/n/10.95 epoll\T1/cmr/bx/n/10.95 -s
+tyle event loops.[] \T1/cmr/m/n/10.95 C can im-ple-ment con-cur-rency with-out 
+par-al-lelism through
+ []
+
+
+
+[207]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/5F194A048BD1703D29566C39C174B4E8.highlight.minted)
+
+[208]
+
+[209]
+Underfull \hbox (badness 10000) in paragraph at lines 10586--10586
+[]|\T1/cmr/m/n/10.95 One corou-tine ex-e-cutes
+ []
+
+
+Underfull \hbox (badness 1286) in paragraph at lines 10586--10587
+[]|\T1/cmr/m/n/10.95 Task/coroutine ob-jects, Fu-tures,
+ []
+
+
+Underfull \hbox (badness 1803) in paragraph at lines 10588--10589
+[]|\T1/cmr/m/n/10.95 Host queues, promise con-tin-u-a-
+ []
+
+
+
+[210]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/29330F5AF95792DC70E088C47CBA3AB6.highlight.minted)
+
+[211]
+
+[212]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/9FC4E466A06E93A4F79D27127031BD38.highlight.minted)
+
+[213]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/CCBB32A23D95E05D473C3C959D873731.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/F0FEE23E1F48614200A73BD94E00153E.highlight.minted)
+\openout7 = `main_document_processed.listing'.
+
+
+(./_minted/D2B3B373AF48E924B41810134E0D74FA.highlight.minted)
+
+[214]
+
+[215]
+\openout7 = `main_document_processed.listing'.
+
+ (./_minted/1F028CCAF382F259ED02CD71986BC946.highlight.minted)
+
+[216]
+
+[217]
+
+[218]
+Overfull \hbox (14.15657pt too wide) in paragraph at lines 11076--11076
+[]|\T1/cmr/bx/n/10.95 Language/runtime| 
+ []
+
+
+Underfull \hbox (badness 4108) in paragraph at lines 11078--11079
+[]|\T1/cmr/m/n/10.95 Coroutine frames sus-pend into
+ []
+
+
+Underfull \hbox (badness 5091) in paragraph at lines 11080--11080
+[]|\T1/cmr/m/n/10.95 Promises, \T1/cmtt/m/n/10.95 async\T1/cmr/m/n/10.95 /\T1/c
+mtt/m/n/10.95 await\T1/cmr/m/n/10.95 , host
+ []
+
+
+Underfull \hbox (badness 1221) in paragraph at lines 11080--11081
+\T1/cmr/m/n/10.95 con-tin-u-a-tions are stored by en-
+ []
+
+
+Underfull \hbox (badness 2990) in paragraph at lines 11082--11083
+[]|\T1/cmr/m/n/10.95 Fiber pre-serves PHP ex-e-cu-tion
+ []
+
+
+Underfull \hbox (badness 1546) in paragraph at lines 11084--11085
+[]|\T1/cmr/m/n/10.95 Event-loop han-dlers use nor-mal
+ []
+
+
+Underfull \hbox (badness 1509) in paragraph at lines 11086--11086
+[]|\T1/cmr/m/n/10.95 Non-blocking de-scrip-tors, call-
+ []
+
+
+Underfull \hbox (badness 3482) in paragraph at lines 11086--11087
+[]|\T1/cmr/m/n/10.95 No sus-pended C frame; state
+ []
+
+
+Underfull \hbox (badness 3439) in paragraph at lines 11088--11089
+\T1/cmr/m/n/10.95 pro-cesses have sep-a-rate stacks;
+ []
+
+
+
+[219]
+Chapter 3.
+
+Overfull \hbox (3.08403pt too wide) in paragraph at lines 11109--11109
+[]\T1/cmr/bx/n/12 Chronological Time-line: The Gen-e-sis, Ori-gins, and For-mal
+ Re-lease of Python
+ []
+
+
+
+[220
+
+]
+
+[221]
+
+[222]
+
+[223]
+
+[224]
+
+[225]
+
+[226]
+
+[227]
+
+[228]
+
+[229]
+
+[230]
+
+[231]
+
+[232]
+
+[233]
+
+[234]
+
+[235]
+
+[236]
+
+[237]
+
+[238]
+
+[239]
+
+[240]
+
+[241]
+
+[242]
+
+[243]
+
+[244]
+
+[245]
+
+[246]
+
+[247]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 12157.
+
+
+
+[248]
+
+[249]
+
+[250]
+
+[251]
+
+[252]
+
+[253]
+
+[254]
+
+[255]
+
+[256]
+
+[257]
+
+[258]
+
+[259]
+
+[260]
+
+[261]
+
+[262]
+
+[263]
+
+[264]
+
+[265]
+
+[266]
+
+[267]
+
+[268]
+
+[269]
+
+[270]
+
+[271]
+
+[272]
+
+[273]
+
+[274]
+
+[275]
+
+[276]
+
+[277]
+
+[278]
+
+[279]
+
+[280]
+
+[281]
+
+[282]
+
+[283]
+
+[284]
+Overfull \hbox (2588.79857pt too wide) in paragraph at lines 14330--14330
+[]\T1/cmtt/m/n/10.95 The word \emph{stack} appears in several different places 
+when Python execution is discussed, and confusing these places leads to bad men
+tal models. In CPython there is not one single stack that explains everything. 
+There is the native C stack of the CPython process, there is the Python-level c
+hain of frames created by Python calls, and there is the bytecode evaluation st
+ack used inside a frame while expressions are being executed. These three struc
+tures are related, but they are not the same object and they do not have the sa
+me purpose.[] 
+ []
+
+
+Overfull \hbox (3262.14471pt too wide) in paragraph at lines 14332--14332
+[]\T1/cmtt/m/n/10.95 The native stack belongs to CPython as a compiled C progra
+m. When the operating system starts the \texttt{python} executable, it creates 
+a normal native process. That process has a native stack, just like any C progr
+am. CPython\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 s own C functions use this s
+tack when they call one another. Internal interpreter functions, parser functio
+ns, allocator functions, import-system functions, and extension-module function
+s all execute through ordinary native machine calls. At this level, the stack i
+s the same kind of stack discussed earlier for C: a region of process memory us
+ed for native call frames, return addresses, saved registers, and local C execu
+tion state.[] 
+ []
+
+
+Overfull \hbox (285.84158pt too wide) in paragraph at lines 14334--14334
+[]\T1/cmtt/m/n/10.95 However, a Python function call is not simply the same thi
+ng as a C function call visible to the programmer. When the programmer writes:[
+] 
+ []
+
+
+
+[285]
+
+[286]
+
+[287]
+
+[288]
+
+[289]
+
+[290]
+
+[291]
+
+[292]
+
+[293]
+
+[294]
+
+[295]
+
+[296]
+
+[297]
+
+[298]
+
+[299]
+
+[300]
+
+[301]
+
+[302]
+
+[303]
+
+[304]
+
+[305]
+
+[306]
+
+[307]
+
+[308]
+
+[309]
+
+[310]
+
+[311]
+
+[312]
+
+[313]
+
+[314]
+
+[315]
+
+[316]
+
+[317]
+
+[318]
+
+[319]
+
+[320]
+
+[321]
+
+[322]
+
+[323]
+
+[324]
+
+[325]
+
+[326]
+
+[327]
+
+[328]
+
+[329]
+
+[330]
+
+[331]
+
+[332]
+
+[333]
+
+[334]
+
+[335]
+
+[336]
+
+[337]
+
+[338]
+
+[339]
+
+[340]
+
+[341]
+
+[342]
+
+[343]
+
+[344]
+
+[345]
+
+[346]
+
+[347]
+
+[348]
+
+[349]
+
+[350]
+
+[351]
+
+[352]
+
+[353]
+
+[354]
+
+[355]
+
+[356]
+
+[357]
+
+[358]
+
+[359]
+
+[360]
+
+[361]
+
+[362]
+
+[363]
+
+[364]
+
+[365]
+
+[366]
+
+[367]
+
+[368]
+Chapter 4.
+
+
+[369
+
+]
+
+[370]
+
+[371]
+
+[372]
+
+[373]
+
+[374]
+
+[375]
+
+[376]
+
+[377]
+
+[378]
+
+[379]
+
+[380]
+Overfull \hbox (4.42178pt too wide) in paragraph at lines 20357--20357
+[][]\T1/cmr/bx/n/10.95 Underscore Con-ven-tions: In-ter-nal Names, Throw-away N
+ames, and Spe-cial Method Bound-
+ []
+
+
+
+[381]
+
+[382]
+
+[383]
+
+[384]
+
+[385]
+
+[386]
+
+[387]
+
+[388]
+
+[389]
+
+[390]
+
+[391]
+
+[392]
+
+[393]
+
+[394]
+
+[395]
+
+[396]
+
+[397]
+
+[398]
+
+[399]
+
+[400]
+
+[401]
+
+[402]
+
+[403]
+
+[404]
+
+[405]
+
+[406]
+
+[407]
+
+[408]
+
+[409]
+
+[410]
+
+[411]
+
+[412]
+
+[413]
+
+[414]
+
+[415]
+
+[416]
+
+[417]
+Overfull \hbox (138.72394pt too wide) in paragraph at lines 22704--22704
+[]\T1/cmtt/m/n/10.95 product: 1000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000[] 
+ []
+
+
+
+[418]
+Overfull \hbox (127.4072pt too wide) in paragraph at lines 22756--22756
+[]\T1/cmtt/m/n/10.95 sys.int_info(bits_per_digit=30, sizeof_digit=4, default_ma
+x_str_digits=4300, str_digits_check_threshold=640) 
+ []
+
+
+
+[419]
+
+[420]
+
+[421]
+
+[422]
+
+[423]
+
+[424]
+
+[425]
+
+[426]
+
+[427]
+
+[428]
+
+[429]
+
+[430]
+
+[431]
+
+[432]
+
+[433]
+
+[434]
+
+[435]
+
+[436]
+
+[437]
+
+[438]
+
+[439]
+
+[440]
+
+[441]
+
+[442]
+
+[443]
+
+[444]
+
+[445]
+
+[446]
+
+[447]
+
+[448]
+
+[449]
+
+[450]
+
+[451]
+
+[452]
+
+[453]
+
+[454]
+
+[455]
+
+[456]
+
+[457]
+
+[458]
+
+[459]
+
+[460]
+
+[461]
+
+[462]
+
+[463]
+
+[464]
+
+[465]
+
+[466]
+
+[467]
+
+[468]
+
+[469]
+
+[470]
+
+[471]
+
+[472]
+
+[473]
+
+[474]
+
+[475]
+
+[476]
+
+[477]
+
+[478]
+
+[479]
+
+[480]
+
+[481]
+
+[482]
+
+[483]
+Chapter 5.
+
+
+[484
+
+]
+
+[485]
+
+[486]
+
+[487]
+
+[488]
+
+[489]
+
+[490]
+
+[491]
+
+[492]
+
+[493]
+
+[494]
+
+[495]
+
+[496]
+
+[497]
+
+[498]
+
+[499]
+
+[500]
+
+[501]
+
+[502]
+
+[503]
+
+[504]
+
+[505]
+
+[506]
+
+[507]
+
+[508]
+
+[509]
+
+[510]
+
+[511]
+
+[512]
+
+[513]
+
+[514]
+
+[515]
+
+[516]
+
+[517]
+
+[518]
+
+[519]
+\g__tikzsymbols_savebox_F_0 g 0 G_10.95_Snowman_1_box=\box107
+\g__tikzsymbols_savebox_F_0 g 0 G_10.95_dSmiley_1_yellow_box=\box108
+
+Overfull \hbox (0.94159pt too wide) in paragraph at lines 29373--29374
+[]\T1/cmr/m/n/10.95 The name must be known by Python's Uni-code database. The s
+tan-dard li-brary mod-ule \T1/cmtt/m/n/10.95 unicodedata
+ []
+
+
+
+[520]
+
+[521]
+
+[522]
+
+[523]
+
+[524]
+LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 29671.
+
+
+
+[525]
+
+[526]
+
+[527]
+
+[528]
+
+[529]
+
+[530]
+
+[531]
+
+[532]
+
+[533]
+
+[534]
+
+[535]
+
+[536]
+
+[537]
+
+[538]
+
+[539]
+
+[540]
+
+[541]
+
+[542]
+
+[543]
+
+[544]
+
+[545]
+
+[546]
+
+[547]
+
+[548]
+
+[549]
+
+[550]
+
+[551]
+
+[552]
+
+[553]
+
+[554]
+Overfull \hbox (11.32454pt too wide) in paragraph at lines 31644--31645
+[]\T1/cmr/m/n/10.95 For sim-ple En-glish text, \T1/cmtt/m/n/10.95 .lower() \T1/
+cmr/m/n/10.95 is of-ten enough. For broader Uni-code text com-par-i-son, \T1/cm
+tt/m/n/10.95 .casefold()
+ []
+
+
+
+[555]
+
+[556]
+
+[557]
+
+[558]
+
+[559]
+
+[560]
+
+[561]
+
+[562]
+
+[563]
+
+[564]
+
+[565]
+
+[566]
+
+[567]
+
+[568]
+
+[569]
+
+[570]
+
+[571]
+
+[572]
+
+[573]
+
+[574]
+
+[575]
+
+[576]
+
+[577]
+
+[578]
+
+[579]
+
+[580]
+
+[581]
+
+[582]
+
+[583]
+
+[584]
+
+[585]
+
+[586]
+
+[587]
+
+[588]
+
+[589]
+
+[590]
+
+[591]
+
+[592]
+
+[593]
+
+[594]
+
+[595]
+
+[596]
+
+[597]
+
+[598]
+
+[599]
+
+[600]
+
+[601]
+
+[602]
+
+[603]
+
+[604]
+
+[605]
+
+[606]
+
+[607]
+Chapter 6.
+
+
+[608
+
+]
+
+[609]
+
+[610]
+
+[611]
+
+[612]
+
+[613]
+
+[614]
+
+[615]
+
+[616]
+
+[617]
+
+[618]
+
+[619]
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 35711--35711
+[]\T1/cmtt/m/n/10.95 first_tok: TokenInfo(type=1 (NAME), string=\TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 x\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , start=(1, 0
+), end=(1, 1), line=\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 x = 42\n\TS1/cmtt/m
+/n/10.95 '\T1/cmtt/m/n/10.95 )[] 
+ []
+
+
+Overfull \hbox (28.09885pt too wide) in paragraph at lines 35721--35722
+[]\T1/cmr/m/n/10.95 If Python ex-pects in-den-ta-tion and the in-den-ta-tion do
+es not form a valid block, it raises \T1/cmtt/m/n/10.95 IndentationError\T1/cmr
+/m/n/10.95 . 
+ []
+
+
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 35743--35743
+[]\T1/cmtt/m/n/10.95 message: expected an indented block after \TS1/cmtt/m/n/10
+.95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on
+ line 1 (<bad_indent>, line 2)[] 
+ []
+
+
+Overfull \hbox (172.67416pt too wide) in paragraph at lines 35744--35744
+[]\T1/cmtt/m/n/10.95 args: ("expected an indented block after \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 if\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 statement on 
+line 1", (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <bad_indent>\TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 , 2, 1, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 print("N
+i!")\n\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , 2, -1))[] 
+ []
+
+
+
+[620]
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 35776--35776
+[]\T1/cmtt/m/n/10.95 message: inconsistent use of tabs and spaces in indentatio
+n (<mixed_tabs_spaces>, line 3)[] 
+ []
+
+
+Overfull \hbox (178.33253pt too wide) in paragraph at lines 35777--35777
+[]\T1/cmtt/m/n/10.95 args: (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 inconsisten
+t use of tabs and spaces in indentation\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
+, (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 <mixed_tabs_spaces>\TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 , 3, 1, "\tprint(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ tab\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 )\n", 3, 0))[] 
+ []
+
+
+Overfull \hbox (280.18321pt too wide) in paragraph at lines 35793--35793
+[]\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 TabError\T
+S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
+/n/10.95 IndentationError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 SyntaxError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Exception\TS1/cmtt/m/
+n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 B
+aseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 object\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[] 
+ []
+
+
+
+[621]
+
+[622]
+
+[623]
+
+[624]
+
+[625]
+
+[626]
+
+[627]
+
+[628]
+
+[629]
+
+[630]
+
+[631]
+
+[632]
+
+[633]
+
+[634]
+
+[635]
+Overfull \hbox (200.96602pt too wide) in paragraph at lines 36740--36740
 []\T1/cmtt/m/n/10.95 dir(status) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
 95 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cm
 tt/m/n/10.95 __class__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/1
@@ -2541,23 +3952,23 @@ _\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
  []
 
 
-Overfull \hbox (121.74883pt too wide) in paragraph at lines 7567--7567
+
+[636]
+Overfull \hbox (121.74883pt too wide) in paragraph at lines 36788--36788
 []\T1/cmtt/m/n/10.95 message = "Chuck Norris counted to infinity twice." if nam
 e == "Chuck" and power >= 40 else "ordinary case"[] 
  []
 
 
 
-[149]
+[637]
 
-[150]
+[638]
 
-[151]
+[639]
 
-[152]
-
-[153]
-Overfull \hbox (172.67416pt too wide) in paragraph at lines 7880--7880
+[640]
+Overfull \hbox (172.67416pt too wide) in paragraph at lines 37100--37100
 []\T1/cmtt/m/n/10.95 dir(result) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
 95 __bool__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/c
 mtt/m/n/10.95 __class__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/
@@ -2572,188 +3983,240 @@ T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n
 
 
 
-[154]
+[641]
 
-[155]
+[642]
 
-[156]
-
-[157]
-
-[158]
-
-[159]
-
-[160]
-
-[161]
-
-[162]
-
-[163]
-
-[164]
-
-[165]
-
-[166]
-
-[167]
-
-[168]
-
-[169]
-
-[170]
-
-[171]
-
-[172]
-
-[173]
-
-[174]
-
-[175]
-
-[176]
-
-[177]
-
-[178]
-
-[179]
-
-[180]
-
-[181]
-
-[182]
-
-[183]
-
-[184]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/074FF1E33EC74754E41B24F065BDBF5F.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 9895--9903
-
+[643]
+Overfull \hbox (172.67416pt too wide) in paragraph at lines 37289--37289
+[]\T1/cmtt/m/n/10.95 dir(result) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
+95 __abs__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 __and__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cm
+tt/m/n/10.95 '\T1/cmtt/m/n/10.95 __bool__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __ceil__\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __class__\TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __delattr__\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 __dir__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ][] 
  []
 
 
 
-[185]
-\openout7 = `main_document_processed.listing'.
+[644]
 
- (./_minted/3C2FF66F2924FF3C5D66CE54D71818D3.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 9961--9968
+[645]
 
- []
+[646]
 
-\openout7 = `main_document_processed.listing'.
+[647]
 
-(./_minted/032D9B7DA90A8D6BA895DD1616C2820D.highlight.minted)
+[648]
 
-[186]
-Underfull \hbox (badness 10000) in paragraph at lines 10012--10015
+[649]
 
- []
+[650]
 
-\openout7 = `main_document_processed.listing'.
+[651]
 
-(./_minted/C5D181038451FB6C55A460C887B17CC3.highlight.minted)
+[652]
 
-[187]
-Underfull \hbox (badness 10000) in paragraph at lines 10082--10084
+[653]
 
- []
+[654]
 
-\openout7 = `main_document_processed.listing'.
+[655]
 
-(./_minted/04FC4E830132BF309B9FFFB3431277C2.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 10124--10125
+[656]
 
- []
+[657]
 
+[658]
 
+[659]
 
-[188]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/E1D8E9E69B5BCA013F630EB5FB473943.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 10164--10173
-
- []
-
-
-
-[189]
-
-[190]
-
-[191]
-
-[192]
-\openout7 = `main_document_processed.listing'.
-
- (./_minted/3226498E2DF7AA85CA09D15F9B45B535.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 10463--10465
-
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/538DCF0E3DAB08631A4E93870335863B.highlight.minted)
-
-[193]
-Underfull \hbox (badness 10000) in paragraph at lines 10489--10492
-
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/C76DBC13F8BBB6B986AE2036A6FD722A.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 10516--10518
-
+[660]
+Overfull \hbox (399.009pt too wide) in paragraph at lines 38433--38433
+[]\T1/cmtt/m/n/10.95 dir(lines) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmt
+t/m/n/10.95 __class__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10
+.95 '\T1/cmtt/m/n/10.95 __class_getitem__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __contains__\TS1/cmtt/m/n/10.95 '\T
+1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __delattr__\TS1/cmtt
+/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __deli
+tem__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 __dir__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 __doc__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/
+n/10.95 '\T1/cmtt/m/n/10.95 __eq__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS
+1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __format__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 ][] 
  []
 
 
 
-[194]
-\openout7 = `main_document_processed.listing'.
+[661]
 
- (./_minted/0345CBAD9A3F8C74AB955E1FE53C53D0.highlight.minted)
+[662]
 
-[195]
-Underfull \hbox (badness 10000) in paragraph at lines 10617--10619
-
+[663]
+Overfull \hbox (178.33253pt too wide) in paragraph at lines 38586--38586
+[]\T1/cmtt/m/n/10.95 dir(attempt) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 __abs__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10
+.95 '\T1/cmtt/m/n/10.95 __and__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __bool__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
+95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __ceil__\TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __class__\TS1/cmtt/m/n/
+10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __delattr__
+\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
+95 __dir__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ][] 
  []
 
-\openout7 = `main_document_processed.listing'.
 
-(./_minted/B2CCE7763E4514DE9AF41AAA0F0B86AB.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 10665--10669
-
+Overfull \hbox (200.96602pt too wide) in paragraph at lines 38588--38588
+[]\T1/cmtt/m/n/10.95 dir(password_ok) sample: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 __abs__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 __add__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/
+n/10.95 '\T1/cmtt/m/n/10.95 __and__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \T
+S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __bool__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n
+/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __ceil__\TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __class__\TS1/cmtt/
+m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 __delat
+tr__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n
+/10.95 __dir__\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ][] 
  []
 
 
 
-[196]
+[664]
 
-[197]
+[665]
 
-[198]
+[666]
 
-[199]
+[667]
 
-[200]
+[668]
 
-[201]
+[669]
 
-[202]
+[670]
 
-[203]
-Overfull \hbox (2.92303pt too wide) in paragraph at lines 11151--11151
+[671]
+Overfull \hbox (7.54156pt too wide) in paragraph at lines 39146--39147
+[]\T1/cmr/m/n/10.95 The loop per-forms the re-peated \T1/cmtt/m/n/10.95 next() 
+\T1/cmr/m/n/10.95 calls and ex-its cleanly when the it-er-a-tor raises \T1/cmtt
+/m/n/10.95 StopIteration\T1/cmr/m/n/10.95 . 
+ []
+
+
+
+[672]
+
+[673]
+
+[674]
+
+[675]
+
+[676]
+
+[677]
+
+[678]
+
+[679]
+
+[680]
+
+[681]
+
+[682]
+
+[683]
+
+[684]
+
+[685]
+
+[686]
+
+[687]
+
+[688]
+
+[689]
+
+[690]
+
+[691]
+
+[692]
+
+[693]
+
+[694]
+
+[695]
+
+[696]
+
+[697]
+
+[698]
+
+[699]
+
+[700]
+
+[701]
+
+[702]
+
+[703]
+
+[704]
+
+[705]
+
+[706]
+
+[707]
+
+[708]
+
+[709]
+
+[710]
+
+[711]
+
+[712]
+
+[713]
+
+[714]
+
+[715]
+
+[716]
+
+[717]
+
+[718]
+
+[719]
+
+[720]
+
+[721]
+
+[722]
+
+[723]
+
+[724]
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 42625--42625
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ValueError
 \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt
 /m/n/10.95 Exception\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt
@@ -2763,7 +4226,7 @@ Overfull \hbox (2.92303pt too wide) in paragraph at lines 11151--11151
  []
 
 
-Overfull \hbox (121.74883pt too wide) in paragraph at lines 11152--11152
+Overfull \hbox (121.74883pt too wide) in paragraph at lines 42626--42626
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 KeyError\T
 S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
 /n/10.95 LookupError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt
@@ -2774,7 +4237,7 @@ ct\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[]
  []
 
 
-Overfull \hbox (133.06557pt too wide) in paragraph at lines 11153--11153
+Overfull \hbox (133.06557pt too wide) in paragraph at lines 42627--42627
 []\T1/cmtt/m/n/10.95 (<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 IndexError
 \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt
 /m/n/10.95 LookupError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cm
@@ -2786,54 +4249,196 @@ ject\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[]
 
 
 
-[204]
+[725]
 
-[205]
+[726]
 
-[206]
+[727]
 
-[207]
+[728]
 
-[208]
+[729]
 
-[209]
+[730]
 
-[210]
+[731]
 
-[211]
-Overfull \hbox (2.50345pt too wide) in paragraph at lines 11651--11652
-[]\T1/cmr/m/n/10.95 on \T1/cmr/m/it/10.95 any \T1/cmr/m/n/10.95 exit path---nor
-mal, \T1/cmtt/m/n/10.95 return\T1/cmr/m/n/10.95 , han-dled ex-cep-tion, or prop
-agation---calls \T1/cmtt/m/n/10.95 __exit__(exc_type,
- []
+[732]
 
+[733]
 
+[734]
 
-[212]
-Overfull \hbox (28.31369pt too wide) in paragraph at lines 11675--11676
-\T1/cmr/m/n/10.95 When Python code raises an ex-cep-tion, CPython does not rely
- on hard-ware traps or portable \T1/cmtt/m/n/10.95 setjmp\T1/cmr/m/n/10.95 /\T1
-/cmtt/m/n/10.95 longjmp
- []
+[735]
 
+[736]
 
+[737]
 
-[213]
+[738]
 
-[214]
+[739]
+
+[740]
+
+[741]
+
+[742]
+
+[743]
+
+[744]
+
+[745]
+
+[746]
+
+[747]
+
+[748]
+
+[749]
+
+[750]
+
+[751]
+
+[752]
 Chapter 7.
 
 
-[215
+[753
 
 ]
 
-[216]
+[754]
 
-[217]
+[755]
+Overfull \hbox (116.09045pt too wide) in paragraph at lines 44560--44560
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : "What\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 s the deal with air
+line food?", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 It is only a mode
+l.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }[] 
+ []
 
-[218]
-Overfull \hbox (18.34691pt too wide) in paragraph at lines 11912--11912
+
+
+[756]
+
+[757]
+
+[758]
+
+[759]
+
+[760]
+
+[761]
+
+[762]
+
+[763]
+
+[764]
+
+[765]
+
+[766]
+
+[767]
+
+[768]
+
+[769]
+
+[770]
+
+[771]
+
+[772]
+
+[773]
+
+[774]
+
+[775]
+
+[776]
+
+[777]
+
+[778]
+
+[779]
+
+[780]
+
+[781]
+
+[782]
+
+[783]
+
+[784]
+
+[785]
+
+[786]
+
+[787]
+
+[788]
+
+[789]
+
+[790]
+
+[791]
+
+[792]
+
+[793]
+
+[794]
+
+[795]
+
+[796]
+
+[797]
+
+[798]
+
+[799]
+
+[800]
+
+[801]
+
+[802]
+
+[803]
+
+[804]
+
+[805]
+
+[806]
+
+[807]
+
+[808]
+Overfull \hbox (43.4187pt too wide) in paragraph at lines 47933--47941
+ [] 
+ []
+
+
+
+[809]
+Overfull \hbox (18.34691pt too wide) in paragraph at lines 47985--47985
 [][]\T1/cmr/bx/n/10.95 Containment and Scope Test-ing: Iden-ti-fy-ing Sub-sets 
 \T1/cmtt/m/n/10.95 .issubset() \T1/cmr/bx/n/10.95 and Su-per-sets \T1/cmtt/m/n/
 10.95 .issuperset() 
@@ -2841,438 +4446,1343 @@ Overfull \hbox (18.34691pt too wide) in paragraph at lines 11912--11912
 
 
 
-[219]
+[810]
 
-[220]
-Overfull \hbox (4.9531pt too wide) in paragraph at lines 12017--12018
-\T1/cmtt/m/n/10.95 keys()\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 values()\T1/cmr
-/m/n/10.95 , and \T1/cmtt/m/n/10.95 items() \T1/cmr/m/n/10.95 re-turn lightweig
-ht view ob-jects (\T1/cmtt/m/n/10.95 dict_keys\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/
-10.95 dict_values\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 dict_items\T1/cmr/m/n/1
-0.95 )
+[811]
+
+[812]
+
+[813]
+
+[814]
+Overfull \hbox (116.09045pt too wide) in paragraph at lines 48334--48334
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : "What\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 s the deal with air
+line food?", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 It is only a mode
+l.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
  []
 
 
 
-[221]
+[815]
 
-[222]
+[816]
+
+[817]
+
+[818]
+
+[819]
+
+[820]
+Overfull \hbox (427.30086pt too wide) in paragraph at lines 48710--48710
+[]\T1/cmtt/m/n/10.95 profile: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 name\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 L
+isa\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 age\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : 8, \TS1/cmtt/m/n/10.95 '\T1/
+cmtt/m/n/10.95 quotes\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : ["If anyone want
+s me, I\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ll be in my room."], \TS1/cmtt/m
+/n/10.95 '\T1/cmtt/m/n/10.95 scores\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : {\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 math\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 : 10, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 music\TS1/cmtt/m/n/10.95 '\T1
+/cmtt/m/n/10.95 : 10}, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 tags\TS1/cmtt/m/
+n/10.95 '\T1/cmtt/m/n/10.95 : {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 student\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 saxophone\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }} 
+ []
+
+
+
+[821]
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 48751--48751
+[]\T1/cmtt/m/n/10.95 profile after:  {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 n
+ame\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 Homer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 quotes\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : ["D\TS1/cmtt/m/n/
+10.95 '\T1/cmtt/m/n/10.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Mmm... 
+donuts\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m
+/n/10.95 Why you little!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ]}[] 
+ []
+
+
+
+[822]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 48842--48842
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthu
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[823]
+Overfull \hbox (138.72394pt too wide) in paragraph at lines 48928--48928
+[]\T1/cmtt/m/n/10.95 items_view: dict_items([(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n
+/10.95 Homer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , "D\TS1/cmtt/m/n/10.95 '\T
+1/cmtt/m/n/10.95 oh!"), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt
+/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No sou
+p for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ), (\TS1/cmtt/m/n/10.95 '\T1/
+cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10
+.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 )])[] 
+ []
+
+
+
+[824]
+Overfull \hbox (53.84837pt too wide) in paragraph at lines 48999--48999
+[]\T1/cmtt/m/n/10.95 quote_by_name: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Ho
+mer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[825]
+
+[826]
+
+[827]
+
+[828]
+
+[829]
+
+[830]
+Overfull \hbox (42.53163pt too wide) in paragraph at lines 49377--49377
+[]\T1/cmtt/m/n/10.95 pairs: [(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!"), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/
+cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 A
+rthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 )] 
+ []
+
+
+Overfull \hbox (53.84837pt too wide) in paragraph at lines 49380--49380
+[]\T1/cmtt/m/n/10.95 quote_by_name: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Ho
+mer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }[] 
+ []
+
+
+
+[831]
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 49429--49429
+[]\T1/cmtt/m/n/10.95 construction failed: dictionary update sequence element #1
+ has length 3; 2 is required 
+ []
+
+
+Overfull \hbox (53.84837pt too wide) in paragraph at lines 49479--49479
+[]\T1/cmtt/m/n/10.95 quote_by_name: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Ho
+mer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }[] 
+ []
+
+
+
+[832]
+
+[833]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 49576--49576
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthu
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[834]
+
+[835]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 49720--49720
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthu
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[836]
+Overfull \hbox (133.06557pt too wide) in paragraph at lines 49751--49751
+[]\T1/cmtt/m/n/10.95 quotes: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 These pretzels are makin
+g me thirsty.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1
+/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 } 
+ []
+
+
+
+[837]
+
+[838]
+
+[839]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 49952--49952
+[]\T1/cmtt/m/n/10.95 before: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthu
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[840]
+Overfull \hbox (19.12294pt too wide) in paragraph at lines 50012--50022
+ [] 
+ []
+
+
+Overfull \hbox (48.19pt too wide) in paragraph at lines 50052--50052
+[]\T1/cmtt/m/n/10.95 len= 6 size= 272 data={\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 key_0\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : 0, \TS1/cmtt/m/n/10.95 '\T1
+/cmtt/m/n/10.95 key_1\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : 1, \TS1/cmtt/m/n
+/10.95 '\T1/cmtt/m/n/10.95 key_2\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : 2, \T
+S1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 key_3\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 : 3, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 key_4\TS1/cmtt/m/n/10.95 '\T1/
+cmtt/m/n/10.95 : 4, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 key_5\TS1/cmtt/m/n/
+10.95 '\T1/cmtt/m/n/10.95 : 5}[] 
+ []
+
+
+
+[841]
+
+[842]
+
+[843]
+
+[844]
+
+[845]
+
+[846]
+
+[847]
+
+[848]
+
+[849]
+Overfull \hbox (59.50674pt too wide) in paragraph at lines 50634--50634
+[]\T1/cmtt/m/n/10.95 quote_map: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : ["D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Mmm... donuts\TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 ], \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No
+ soup for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T
+1/cmtt/m/n/10.95 Serenity now!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ]} 
+ []
+
+
+
+[850]
+Overfull \hbox (144.38231pt too wide) in paragraph at lines 50739--50739
+[]\T1/cmtt/m/n/10.95 items_view:  dict_items([(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 Homer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , "D\TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 oh!"), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No so
+up for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ), (\TS1/cmtt/m/n/10.95 '\T1
+/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 )])[] 
+ []
+
+
+
+[851]
+
+[852]
+
+[853]
+
+[854]
+Overfull \hbox (144.38231pt too wide) in paragraph at lines 50938--50938
+[]\T1/cmtt/m/n/10.95 items_view:  dict_items([(\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 Homer\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , "D\TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 oh!"), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No so
+up for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ), (\TS1/cmtt/m/n/10.95 '\T1
+/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 )])[] 
+ []
+
+
+
+[855]
+
+[856]
+
+[857]
+
+[858]
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 51229--51229
+[]\T1/cmtt/m/n/10.95 base after:  {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Home
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 oh!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Serenity now!\TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Art
+hur\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }[] 
+ []
+
+
+
+[859]
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 51254--51254
+[]\T1/cmtt/m/n/10.95 base: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Homer\TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : "D\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 o
+h!", \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmtt/
+m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthur\
+TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.9
+5 It is only a model.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 } 
+ []
+
+
+
+[860]
+
+[861]
+Overfull \hbox (87.7986pt too wide) in paragraph at lines 51395--51395
+[]\T1/cmtt/m/n/10.95 after merge: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Home
+r\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 Mmm... donuts\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 
+'\T1/cmtt/m/n/10.95 Jerry\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : \TS1/cmtt/m/
+n/10.95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/1
+0.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Arthur\TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 : \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 }[] 
+ []
+
+
+
+[862]
 Chapter 8.
-\openout7 = `main_document_processed.listing'.
 
-(./_minted/560989A442D6F1AA4E0AC0D9765BA00F.highlight.minted)
 
-[223
+[863
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 12060--12065
 
+[864]
+
+[865]
+
+[866]
+Overfull \hbox (150.04068pt too wide) in paragraph at lines 51607--51607
+[]\T1/cmtt/m/n/10.95 __annotations__: {\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
+name\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : <class \TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 str\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, \TS1/cmtt/m/n/10.95
+ '\T1/cmtt/m/n/10.95 score\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : <class \TS1
+/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 int\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
+>, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 mood\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/
+n/10.95 : <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 str\TS1/cmtt/m/n/10.95
+ '\T1/cmtt/m/n/10.95 >, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 return\TS1/cmtt
+/m/n/10.95 '\T1/cmtt/m/n/10.95 : <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95
+ str\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >}[] 
  []
 
 
-Overfull \hbox (5.3211pt too wide) in paragraph at lines 12098--12099
-\T1/cmr/m/n/10.95 A \T1/cmtt/m/n/10.95 lambda \T1/cmr/m/n/10.95 ex-pres-sion cr
-e-ates the same kind of func-tion ob-ject as \T1/cmtt/m/n/10.95 def\T1/cmr/m/n/
-10.95 . The com-piler emits a \T1/cmtt/m/n/10.95 PyCodeObject
- []
 
-\openout7 = `main_document_processed.listing'.
+[867]
 
-(./_minted/CC256329AE39EE19F3D3DD8ECE86A971.highlight.minted)
+[868]
 
-[224]
-Underfull \hbox (badness 10000) in paragraph at lines 12113--12115
+[869]
 
- []
+[870]
 
+[871]
 
-Overfull \hbox (68.44202pt too wide) in paragraph at lines 12131--12132
-[]\T1/cmr/m/n/10.95 This de-sign trades stack ef-fi-ciency for run-time flex-i-
-bil-ity: frames can be in-tro-spected via \T1/cmtt/m/n/10.95 inspect.currentfra
-me()\T1/cmr/m/n/10.95 ,
- []
+[872]
 
-\openout7 = `main_document_processed.listing'.
+[873]
 
-(./_minted/CEE0B42C3EC76A2D09AB0EE492F80643.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12146--12147
+[874]
 
- []
+[875]
 
-\openout7 = `main_document_processed.listing'.
+[876]
 
-(./_minted/18DD0161F076CC02D256E69D5B3D86B8.highlight.minted)
+[877]
 
-[225]
-Underfull \hbox (badness 10000) in paragraph at lines 12173--12175
+[878]
 
- []
+[879]
 
-\openout7 = `main_document_processed.listing'.
+[880]
 
-(./_minted/9C1A44EB9A7F27D7BD4567FB6F2C616A.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12199--12201
+[881]
 
- []
+[882]
 
-\openout7 = `main_document_processed.listing'.
+[883]
 
-(./_minted/05F61859D58EAE7AA554AD16BD077257.highlight.minted)
+[884]
 
-[226]
-Underfull \hbox (badness 10000) in paragraph at lines 12226--12228
+[885]
 
- []
+[886]
 
-\openout7 = `main_document_processed.listing'.
+[887]
 
-(./_minted/46DED444F9346923AD635309E84C597A.highlight.minted)
+[888]
 
-[227]
-Underfull \hbox (badness 10000) in paragraph at lines 12274--12275
+[889]
 
- []
+[890]
 
-\openout7 = `main_document_processed.listing'.
+[891]
 
-(./_minted/1A14EAD891464FBC1C3E66018BC9D1B2.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12300--12302
+[892]
 
+[893]
+Overfull \hbox (93.45697pt too wide) in paragraph at lines 53300--53300
+[]\T1/cmtt/m/n/10.95 after item assignment: [\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 Mmm... donuts.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 No soup for you!\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 
+, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 These pretzels are making me thirsty.
+\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ][] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 12312--12312
+
+[894]
+
+[895]
+
+[896]
+
+[897]
+Underfull \hbox (badness 10000) in paragraph at lines 53563--53563
 []|\T1/cmr/bx/n/10.95 Operation in-side
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 12316--12316
+Underfull \hbox (badness 10000) in paragraph at lines 53567--53567
 []|\T1/cmtt/m/n/10.95 text =
  []
 
 
-Overfull \hbox (1.63469pt too wide) in paragraph at lines 12310--12323
+Overfull \hbox (1.63469pt too wide) in paragraph at lines 53561--53576
  [] 
  []
 
 
 
-[228]
-\openout7 = `main_document_processed.listing'.
+[898]
 
- (./_minted/40F287898FAB21D6CEB313A7E6940E4D.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12349--12351
+[899]
 
- []
+[900]
 
-\openout7 = `main_document_processed.listing'.
+[901]
 
-(./_minted/AF523B846496B5E483C8B6DBD6AE0061.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12376--12379
+[902]
 
- []
+[903]
 
+[904]
 
+[905]
 
-[229]
-Overfull \hbox (14.20161pt too wide) in paragraph at lines 12438--12439
-\T1/cmr/m/n/10.95 (\T1/cmtt/m/n/10.95 METH_VECTORCALL\T1/cmr/m/n/10.95 ). No in
--ter-me-di-ate tu-ple or dict is con-structed. Sig-na-tures that force \T1/cmtt
-/m/n/10.95 *args\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 **kwargs\T1/cmr/m/n/10.95
- ---
- []
+[906]
 
-\openout7 = `main_document_processed.listing'.
+[907]
 
-(./_minted/CFDA1621505AFA26066E477CD616D925.highlight.minted)
-
-[230]
-Underfull \hbox (badness 10000) in paragraph at lines 12453--12455
-
+[908]
+Overfull \hbox (65.16512pt too wide) in paragraph at lines 54192--54192
+[]\T1/cmtt/m/n/10.95 sig.parameters:       OrderedDict([(\TS1/cmtt/m/n/10.95 '\
+T1/cmtt/m/n/10.95 name\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , <Parameter "nam
+e">), (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 score\TS1/cmtt/m/n/10.95 '\T1/cm
+tt/m/n/10.95 , <Parameter "score">)]) 
  []
 
 
 
-[231]
-\openout7 = `main_document_processed.listing'.
+[909]
 
- (./_minted/E4CE37E09EAD7510D7270A04F61FC430.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12550--12553
+[910]
 
+[911]
+
+[912]
+
+[913]
+
+[914]
+
+[915]
+Overfull \hbox (31.21489pt too wide) in paragraph at lines 54700--54700
+[]\T1/cmtt/m/n/10.95 message:    divide() got some positional-only arguments pa
+ssed as keyword arguments: \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 a, b\TS1/cmt
+t/m/n/10.95 '[] 
  []
 
 
 
-[232]
-\openout7 = `main_document_processed.listing'.
+[916]
 
- (./_minted/F842CFE01D5BB61032A0D960FBA93E19.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12576--12579
-
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/D3724A39BC26E0C59E9CD3CF72210B23.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12603--12604
-
+[917]
+Overfull \hbox (31.21489pt too wide) in paragraph at lines 54791--54791
+[]\T1/cmtt/m/n/10.95 message:    scale() got some positional-only arguments pas
+sed as keyword arguments: \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 value\TS1/cmt
+t/m/n/10.95 '[] 
  []
 
 
 
-[233]
-\openout7 = `main_document_processed.listing'.
+[918]
 
- (./_minted/CB96A6335FF54EAB6C42F0C902EFE290.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12646--12655
+[919]
 
- []
+[920]
 
-\openout7 = `main_document_processed.listing'.
+[921]
 
-(./_minted/7366158F19F438DB23F7B2834275F5ED.highlight.minted)
+[922]
 
-[234]
-Underfull \hbox (badness 10000) in paragraph at lines 12688--12690
+[923]
 
- []
+[924]
 
-\openout7 = `main_document_processed.listing'.
+[925]
 
-(./_minted/79327DC623798CFC0CAA218F2873AD53.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12713--12714
-
- []
-
-\openout7 = `main_document_processed.listing'.
-
-(./_minted/24BE525A927962E64C03B8D47E6DCE4B.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12740--12741
-
+[926]
+Overfull \hbox (8.5814pt too wide) in paragraph at lines 55374--55374
+[]\T1/cmtt/m/n/10.95 lines: (\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 The answer
+ is 42.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/
+m/n/10.95 Chuck Norris can divide by zero.\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.
+95 , \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 It is only a model.\TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 )[] 
  []
 
 
 
-[235]
-\openout7 = `main_document_processed.listing'.
+[927]
 
- (./_minted/DCF2B9E4F71C5B811AB83DDC19CE2F90.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12781--12782
+[928]
 
+[929]
+
+[930]
+
+[931]
+
+[932]
+
+[933]
+
+[934]
+
+[935]
+
+[936]
+
+[937]
+
+[938]
+
+[939]
+
+[940]
+
+[941]
+
+[942]
+
+[943]
+
+[944]
+
+[945]
+
+[946]
+
+[947]
+
+[948]
+
+[949]
+Overfull \hbox (14.1015pt too wide) in paragraph at lines 56937--56938
+[]\T1/cmr/m/n/10.95 Here, \T1/cmtt/m/n/10.95 display_quote() \T1/cmr/m/n/10.95 
+con-sumes \T1/cmtt/m/n/10.95 uppercase \T1/cmr/m/n/10.95 and for-wards the re-m
+ain-ing op-tions to \T1/cmtt/m/n/10.95 final_display()\T1/cmr/m/n/10.95 . 
  []
 
 
 
-[236]
+[950]
 
-[237]
-\openout7 = `main_document_processed.listing'.
+[951]
 
- (./_minted/7F3381AE0B28C48EA5868CB1E7D267D6.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12864--12866
+[952]
 
- []
+[953]
 
-\openout7 = `main_document_processed.listing'.
+[954]
 
-(./_minted/7823524CF1311CCF81088603DB7200D2.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12892--12894
+[955]
 
- []
+[956]
 
-\openout7 = `main_document_processed.listing'.
+[957]
 
-(./_minted/4FC7083F1FC229CECDD1353F765EF898.highlight.minted)
+[958]
 
-[238]
-Underfull \hbox (badness 10000) in paragraph at lines 12915--12916
+[959]
 
- []
+[960]
 
-\openout7 = `main_document_processed.listing'.
+[961]
 
-(./_minted/71BF7BFE8E6DE3A3A33D2FFDFD320DDB.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12951--12956
+[962]
 
- []
+[963]
 
+[964]
 
-Overfull \hbox (16.39143pt too wide) in paragraph at lines 12961--12962
-\T1/cmr/m/n/10.95 ject ref-er-ences. Mu-ta-ble cells share one ob-ject across i
-n-vo-ca-tions of the same clo-sure (\T1/cmtt/m/n/10.95 items.append(...)\T1/cmr
-/m/n/10.95 );
- []
+[965]
 
+[966]
 
+[967]
 
-[239]
-\openout7 = `main_document_processed.listing'.
+[968]
 
- (./_minted/D8294D51886D4A918C420FFB68AD6262.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 12992--12994
+[969]
 
- []
+[970]
 
-\openout7 = `main_document_processed.listing'.
+[971]
 
-(./_minted/6804B3EE7B8FBD669ADAB986BA2D504C.highlight.minted)
-Overfull \hbox (10.22443pt too wide) in paragraph at lines 13015--13016
-[]\T1/cmr/m/n/10.95 Stacked dec-o-ra-tors ap-ply bottom-up: \T1/cmtt/m/n/10.95 
-@a @b def f $\OMS/cmsy/m/n/10.95 ^^Q$ \T1/cmtt/m/n/10.95 f = a(b(f))\T1/cmr/m/n
-/10.95 . Dec-o-ra-tor fac-to-ries (\T1/cmtt/m/n/10.95 @deco(arg)\T1/cmr/m/n/10.
-95 )
- []
+[972]
 
+[973]
 
+[974]
 
-[240]
-\openout7 = `main_document_processed.listing'.
+[975]
 
- (./_minted/7D6A2D8C8BCB2C9346BF094DAD5B9B84.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 13046--13049
+[976]
 
- []
+[977]
 
-\openout7 = `main_document_processed.listing'.
+[978]
 
-(./_minted/516FAAC77E752050E36F8D8BB3C6581D.highlight.minted)
+[979]
 
-[241]
-Underfull \hbox (badness 10000) in paragraph at lines 13074--13077
+[980]
 
- []
+[981]
 
-\openout7 = `main_document_processed.listing'.
+[982]
 
-(./_minted/0019BE5DABE8AE3DDE8150D8CC2010FE.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 13113--13114
+[983]
 
- []
+[984]
 
+[985]
 
+[986]
 
-[242]
-\openout7 = `main_document_processed.listing'.
+[987]
 
- (./_minted/B73AB674E6147DCB60D5E9A5E19AC456.highlight.minted)
-Underfull \hbox (badness 10000) in paragraph at lines 13148--13150
+[988]
 
+[989]
+
+[990]
+
+[991]
+Underfull \hbox (badness 10000) in paragraph at lines 59603--59604
+[]|\T1/cmr/m/n/10.95 updates cur-rent func-tion
  []
 
 
 
-[243]
+[992]
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 59679--59679
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it 
+is not associated with a value[] 
+ []
 
-[244]
+
+
+[993]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 59732--59732
+[]\T1/cmtt/m/n/10.95 err:       cannot access local variable \TS1/cmtt/m/n/10.9
+5 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it i
+s not associated with a value 
+ []
+
+
+Overfull \hbox (36.87326pt too wide) in paragraph at lines 59741--59741
+[]\T1/cmtt/m/n/10.95 err.args: ("cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it 
+is not associated with a value",)[] 
+ []
+
+
+
+[994]
+Overfull \hbox (59.50674pt too wide) in paragraph at lines 59772--59772
+[]\T1/cmtt/m/n/10.95 UnboundLocalError: cannot access local variable \TS1/cmtt/
+m/n/10.95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 wh
+ere it is not associated with a value[] 
+ []
+
+
+
+[995]
+Overfull \hbox (31.21489pt too wide) in paragraph at lines 59814--59814
+[]\T1/cmtt/m/n/10.95 err_obj:      cannot access local variable \TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where i
+t is not associated with a value[] 
+ []
+
+
+
+[996]
+
+[997]
+
+[998]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 60016--60016
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 score\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it i
+s not associated with a value[] 
+ []
+
+
+
+[999]
+
+[1000]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 60153--60153
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 score\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it i
+s not associated with a value[] 
+ []
+
+
+
+[1001]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 60212--60212
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 items\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it i
+s not associated with a value[] 
+ []
+
+
+
+[1002]
+Overfull \hbox (48.19pt too wide) in paragraph at lines 60345--60345
+[]\T1/cmtt/m/n/10.95 print(f"issubclass(UnboundLocalError, NameError): {issubcl
+ass(UnboundLocalError, NameError)}") 
+ []
+
+
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 60346--60346
+[]\T1/cmtt/m/n/10.95 print(f"issubclass(NameError, Exception):         {issubcl
+ass(NameError, Exception)}")[] 
+ []
+
+
+
+[1003]
+Overfull \hbox (314.13344pt too wide) in paragraph at lines 60396--60396
+[]\T1/cmtt/m/n/10.95 UnboundLocalError.__mro__: (<class \TS1/cmtt/m/n/10.95 '\T
+1/cmtt/m/n/10.95 UnboundLocalError\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <c
+lass \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 NameError\TS1/cmtt/m/n/10.95 '\T1/
+cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Exception\TS1/
+cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/
+10.95 BaseException\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, <class \TS1/cmtt/
+m/n/10.95 '\T1/cmtt/m/n/10.95 object\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >)[
+] 
+ []
+
+
+
+[1004]
+Overfull \hbox (14.23978pt too wide) in paragraph at lines 60424--60424
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 value\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it i
+s not associated with a value[] 
+ []
+
+
+
+[1005]
+
+[1006]
+
+[1007]
+
+[1008]
+
+[1009]
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 60739--60739
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it 
+is not associated with a value[] 
+ []
+
+
+Overfull \hbox (19.89815pt too wide) in paragraph at lines 60766--60766
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 answer\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it 
+is not associated with a value[] 
+ []
+
+
+
+[1010]
+
+[1011]
+
+[1012]
+
+[1013]
+
+[1014]
+
+[1015]
+
+[1016]
+
+[1017]
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 61283--61283
+[]\T1/cmtt/m/n/10.95 message:    cannot access local variable \TS1/cmtt/m/n/10.
+95 '\T1/cmtt/m/n/10.95 message\TS1/cmtt/m/n/10.95 ' \T1/cmtt/m/n/10.95 where it
+ is not associated with a value[] 
+ []
+
+
+
+[1018]
+
+[1019]
+Underfull \hbox (badness 10000) in paragraph at lines 61384--61384
+[]|\T1/cmr/m/n/10.95 Local/global/free/built-in clas-si-fi-ca-
+ []
+
+
+
+[1020]
+
+[1021]
+
+[1022]
+
+[1023]
+
+[1024]
+
+[1025]
+
+[1026]
+
+[1027]
+
+[1028]
+Overfull \hbox (138.72394pt too wide) in paragraph at lines 61936--61936
+[]\T1/cmtt/m/n/10.95 actions:       [<function quote_one at 0x...>, <function q
+uote_two at 0x...>, <function quote_three at 0x...>] 
+ []
+
+
+
+[1029]
+
+[1030]
+
+[1031]
+
+[1032]
+
+[1033]
+
+[1034]
+
+[1035]
+
+[1036]
+
+[1037]
+
+[1038]
+
+[1039]
+
+[1040]
+
+[1041]
+
+[1042]
+
+[1043]
+
+[1044]
+
+[1045]
+
+[1046]
+
+[1047]
+
+[1048]
+Overfull \hbox (251.89136pt too wide) in paragraph at lines 63210--63210
+[]\T1/cmtt/m/n/10.95 fn.__closure__: (<cell at 0x...: str object at 0x...>, <ce
+ll at 0x...: str object at 0x...>, <cell at 0x...: int object at 0x...>)[] 
+ []
+
+
+
+[1049]
+
+[1050]
+
+[1051]
+
+[1052]
+
+[1053]
+
+[1054]
+
+[1055]
+
+[1056]
+
+[1057]
+
+[1058]
+
+[1059]
+
+[1060]
+
+[1061]
+
+[1062]
+
+[1063]
+
+[1064]
+
+[1065]
+
+[1066]
+
+[1067]
+Overfull \hbox (2.92303pt too wide) in paragraph at lines 64425--64425
+[]\T1/cmtt/m/n/10.95 message:    bad_logged.<locals>.wrapper() takes 1 position
+al argument but 2 were given[] 
+ []
+
+
+
+[1068]
+
+[1069]
+Overfull \hbox (82.14023pt too wide) in paragraph at lines 64544--64544
+[]\T1/cmtt/m/n/10.95 build_line.__annotations__: {\TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 name\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : <class \TS1/cmtt/m/n/1
+0.95 '\T1/cmtt/m/n/10.95 str\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >, \TS1/cmt
+t/m/n/10.95 '\T1/cmtt/m/n/10.95 score\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 : 
+<class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 int\TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 >, \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 return\TS1/cmtt/m/n/10.95
+ '\T1/cmtt/m/n/10.95 : <class \TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 str\TS1/c
+mtt/m/n/10.95 '\T1/cmtt/m/n/10.95 >}[] 
+ []
+
+
+
+[1070]
+
+[1071]
+
+[1072]
+
+[1073]
+
+[1074]
+
+[1075]
+
+[1076]
+
+[1077]
+
+[1078]
+
+[1079]
+
+[1080]
+
+[1081]
+
+[1082]
+
+[1083]
+
+[1084]
+
+[1085]
+
+[1086]
+
+[1087]
+
+[1088]
+
+[1089]
+
+[1090]
+
+[1091]
+
+[1092]
+
+[1093]
+
+[1094]
+
+[1095]
+
+[1096]
+
+[1097]
+
+[1098]
+
+[1099]
+
+[1100]
+
+[1101]
+
+[1102]
+
+[1103]
+
+[1104]
+
+[1105]
+
+[1106]
+
+[1107]
+
+[1108]
+
+[1109]
+
+[1110]
+
+[1111]
+
+[1112]
+
+[1113]
+
+[1114]
+
+[1115]
+
+[1116]
+
+[1117]
+
+[1118]
+
+[1119]
+Overfull \hbox (12.26544pt too wide) in paragraph at lines 67751--67752
+[]\T1/cmr/m/n/10.95 The outer corou-tine \T1/cmtt/m/n/10.95 build_line() \T1/cm
+r/m/n/10.95 sus-pends while wait-ing for \T1/cmtt/m/n/10.95 get_name() \T1/cmr/
+m/n/10.95 to fin-ish. When \T1/cmtt/m/n/10.95 get_name()
+ []
+
+
+
+[1120]
+
+[1121]
+
+[1122]
+
+[1123]
+
+[1124]
+
+[1125]
+
+[1126]
+Underfull \hbox (badness 10000) in paragraph at lines 68221--68222
+[]|\T1/cmr/m/n/10.95 returned re-sult through
+ []
+
+
+
+[1127]
 Chapter 9.
 
 
-[245
+[1128
 
 ]
 
-[246]
+[1129]
 
-[247]
+[1130]
 
-[248]
+[1131]
 
-[249]
-Overfull \hbox (20.83215pt too wide) in paragraph at lines 13444--13445
-\T1/cmr/m/n/10.95 Mismatched en-cod-ings sur-face as \T1/cmtt/m/n/10.95 Unicode
-DecodeError \T1/cmr/m/n/10.95 or \T1/cmtt/m/n/10.95 UnicodeEncodeError\T1/cmr/m
-/n/10.95 . De-fault \T1/cmtt/m/n/10.95 errors="strict"
+[1132]
+
+[1133]
+
+[1134]
+
+[1135]
+
+[1136]
+
+[1137]
+
+[1138]
+
+[1139]
+
+[1140]
+
+[1141]
+
+[1142]
+
+[1143]
+
+[1144]
+
+[1145]
+
+[1146]
+
+[1147]
+
+[1148]
+
+[1149]
+
+[1150]
+
+[1151]
+
+[1152]
+
+[1153]
+
+[1154]
+
+[1155]
+
+[1156]
+
+[1157]
+
+[1158]
+
+[1159]
+Overfull \hbox (25.55652pt too wide) in paragraph at lines 69857--69857
+[]\T1/cmtt/m/n/10.95 print(f"data.replace(b\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10
+.95 Nobody\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 , b\TS1/cmtt/m/n/10.95 '\T1/c
+mtt/m/n/10.95 Everybody\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 ) -> {data.repla
+ce(b\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Nobody\TS1/cmtt/m/n/10.95 '\T1/cmtt
+/m/n/10.95 , b\TS1/cmtt/m/n/10.95 '\T1/cmtt/m/n/10.95 Everybody\TS1/cmtt/m/n/10
+.95 '\T1/cmtt/m/n/10.95 )}")[] 
  []
 
 
 
-[250]
-Overfull \hbox (48.23837pt too wide) in paragraph at lines 13541--13542
-\T1/cmtt/m/n/10.95 pathlib.Path \T1/cmr/m/n/10.95 is an er-gonomic struc-tural 
-ab-strac-tion: \T1/cmtt/m/n/10.95 / \T1/cmr/m/n/10.95 over-load com-poses com-p
-o-nents, \T1/cmtt/m/n/10.95 .name\T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .parent\
-T1/cmr/m/n/10.95 /\T1/cmtt/m/n/10.95 .suffix
- []
+[1160]
 
+[1161]
 
+[1162]
 
-[251]
+[1163]
 
-[252]
+[1164]
 
-[253]
-Overfull \hbox (49.8578pt too wide) in paragraph at lines 13698--13699
-\T1/cmr/m/n/10.95 ``Easier to ask for-give-ness than per-mis-sion'': at-tempt \
-T1/cmtt/m/n/10.95 open\T1/cmr/m/n/10.95 /read and catch \T1/cmtt/m/n/10.95 File
-NotFoundError\T1/cmr/m/n/10.95 , \T1/cmtt/m/n/10.95 PermissionError\T1/cmr/m/n/
-10.95 ,
- []
+[1165]
 
+[1166]
 
+[1167]
 
-[254]
+[1168]
 
-[255] (./main_document_processed.lof)
+[1169]
+
+[1170]
+
+[1171]
+
+[1172]
+
+[1173]
+
+[1174]
+
+[1175]
+
+[1176]
+
+[1177]
+
+[1178]
+
+[1179]
+
+[1180]
+
+[1181]
+
+[1182]
+
+[1183]
+
+[1184]
+
+[1185]
+
+[1186]
+
+[1187]
+
+[1188]
+
+[1189]
+
+[1190]
+
+[1191]
+
+[1192]
+
+[1193]
+
+[1194]
+
+[1195]
+
+[1196]
+
+[1197]
+
+[1198]
+
+[1199]
+
+[1200]
+
+[1201]
+
+[1202]
+
+[1203]
+
+[1204]
+
+[1205] (./main_document_processed.lof)
 \tf@lof=\write9
 \openout9 = `main_document_processed.lof'.
 
  (./main_document_processed.bbl
 
-[256
+[1206
 
-]
+])
 
-LaTeX Warning: Empty `thebibliography' environment on input line 3.
-
-)
-
-[257
+[1207
 
 ] (./main_document_processed.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
-
-
-LaTeX Warning: There were multiply-defined labels.
-
 Package rerunfilecheck Info: File `main_document_processed.out' has not changed
 .
-(rerunfilecheck)             Checksum: CFFB77E92B11C8D08009ED313E09999A;43843.
+(rerunfilecheck)             Checksum: 2AD493D32F102A68A656947A6921F639;56351.
  ) 
 Here is how much of TeX's memory you used:
- 54776 strings out of 473197
- 1274261 string characters out of 5718604
- 1971271 words of memory out of 5000000
- 76061 multiletter control sequences out of 15000+600000
- 584796 words of font info for 93 fonts, out of 8000000 for 9000
+ 55862 strings out of 473197
+ 1279852 string characters out of 5718604
+ 1973226 words of memory out of 5000000
+ 75967 multiletter control sequences out of 15000+600000
+ 584151 words of font info for 90 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 130i,13n,124p,875b,1510s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 130i,13n,124p,922b,1510s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></us
-r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-
-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmsy6.pfb></usr/share/texmf/fonts/type1/public/cm
--super/sfbx1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1200.pfb>
-</usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb></usr/share/texmf/fo
-nts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf/fonts/type1/public/cm-
-super/sfbx2488.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfit1000.pfb><
-/usr/share/texmf/fonts/type1/public/cm-super/sfrm0600.pfb></usr/share/texmf/fon
-ts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fonts/type1/public/cm-s
-uper/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx0800.pfb></
-usr/share/texmf/fonts/type1/public/cm-super/sfsx0900.pfb></usr/share/texmf/font
-s/type1/public/cm-super/sfsx3583.pfb></usr/share/texmf/fonts/type1/public/cm-su
-per/sfti1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0800.pfb></u
-sr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb></usr/share/texmf/fonts
-/type1/public/cm-super/sftt1000.pfb></usr/share/texmf/fonts/type1/public/cm-sup
-er/sftt1095.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1200.pfb></us
-r/share/texmf/fonts/type1/public/cm-super/sftt1440.pfb>
-Output written on main_document_processed.pdf (257 pages, 1252089 bytes).
+r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share
+/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf/
+fonts/type1/public/cm-super/sfbx1095.pfb></usr/share/texmf/fonts/type1/public/c
+m-super/sfbx1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfbx1440.pfb
+></usr/share/texmf/fonts/type1/public/cm-super/sfbx2074.pfb></usr/share/texmf/f
+onts/type1/public/cm-super/sfbx2488.pfb></usr/share/texmf/fonts/type1/public/cm
+-super/sfit1000.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfrm0600.pfb>
+</usr/share/texmf/fonts/type1/public/cm-super/sfrm0800.pfb></usr/share/texmf/fo
+nts/type1/public/cm-super/sfrm1095.pfb></usr/share/texmf/fonts/type1/public/cm-
+super/sfsx0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx0900.pfb><
+/usr/share/texmf/fonts/type1/public/cm-super/sfsx3583.pfb></usr/share/texmf/fon
+ts/type1/public/cm-super/sfti1095.pfb></usr/share/texmf/fonts/type1/public/cm-s
+uper/sftt0800.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb></
+usr/share/texmf/fonts/type1/public/cm-super/sftt1000.pfb></usr/share/texmf/font
+s/type1/public/cm-super/sftt1095.pfb></usr/share/texmf/fonts/type1/public/cm-su
+per/sftt1200.pfb></usr/share/texmf/fonts/type1/public/cm-super/sftt1440.pfb>
+Output written on main_document_processed.pdf (1207 pages, 2886437 bytes).
 PDF statistics:
- 2695 PDF objects out of 2984 (max. 8388607)
- 2335 compressed objects within 24 object streams
- 847 named destinations out of 1000 (max. 500000)
- 1445 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 7381 PDF objects out of 7423 (max. 8388607)
+ 6038 compressed objects within 61 object streams
+ 2074 named destinations out of 2487 (max. 500000)
+ 1713 words of extra memory for PDF output out of 10000 (max. 10000000)
 

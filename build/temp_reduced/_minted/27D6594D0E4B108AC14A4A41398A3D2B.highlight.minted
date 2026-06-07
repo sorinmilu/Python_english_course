@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{make\PYGZus{}counter}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{count} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{next\PYGZus{}value}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
+        \PYG{k}{nonlocal} \PYG{n}{count}
+        \PYG{n}{count} \PYG{o}{+}\PYG{o}{=} \PYG{l+m+mi}{1}
+        \PYG{k}{return} \PYG{n}{count}
+
+    \PYG{k}{return} \PYG{n}{next\PYGZus{}value}
+
+
+\PYG{n}{counter} \PYG{o}{=} \PYG{n}{make\PYGZus{}counter}\PYG{p}{(}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{counter}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{counter}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{counter}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}
+\end{MintedVerbatim}

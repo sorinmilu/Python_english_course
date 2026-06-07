@@ -1,0 +1,21 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{n+nv}{\PYGZdl{}fiberA} \PYG{o}{=} \PYG{k}{new} \PYG{n+nx}{Fiber}\PYG{p}{(}\PYG{k}{function} \PYG{p}{()} \PYG{p}{\PYGZob{}}
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{A start}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+    \PYG{n+nx}{Fiber}\PYG{o}{::}\PYG{n+na}{suspend}\PYG{p}{();}
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{A done}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+\PYG{p}{\PYGZcb{});}
+
+\PYG{n+nv}{\PYGZdl{}fiberB} \PYG{o}{=} \PYG{k}{new} \PYG{n+nx}{Fiber}\PYG{p}{(}\PYG{k}{function} \PYG{p}{()} \PYG{p}{\PYGZob{}}
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{B start}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+    \PYG{n+nx}{Fiber}\PYG{o}{::}\PYG{n+na}{suspend}\PYG{p}{();}
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{B done}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+\PYG{p}{\PYGZcb{});}
+
+\PYG{n+nv}{\PYGZdl{}fiberA}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{start}\PYG{p}{();}
+\PYG{n+nv}{\PYGZdl{}fiberB}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{start}\PYG{p}{();}
+
+\PYG{n+nv}{\PYGZdl{}fiberA}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{resume}\PYG{p}{();}
+\PYG{n+nv}{\PYGZdl{}fiberB}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{resume}\PYG{p}{();}
+\end{MintedVerbatim}

@@ -1,0 +1,857 @@
+\subsection{Memory Semantics of Parameter Passing}
+
+A function call does not move variables from the caller into the callee. It evaluates argument expressions, obtains object references, creates a new function frame, and binds the function's parameter names to those same objects.
+
+This is the central point: the callee receives access to objects, not ownership of the caller's variable names.
+
+In C, it is natural to ask whether something is passed by value or by pointer. In Python, that question must be translated. Python names are already references to objects. Function parameters are new local names created inside the callee frame. Those local names are bound to the objects produced by the caller's argument expressions.
+
+So the call boundary does not copy the full object. It also does not give the callee direct control over the caller's name slot. It shares the object reference.
+
+\subsubsection{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object References into New Local Bindings}
+
+Python's parameter passing model is often called \textit{call by object}, \textit{call by object reference}, or \textit{call by sharing}. The names differ, but the mechanism is simple:
+
+\begin{enumerate}
+    \item the caller evaluates the argument expression;
+    \item the result is an object reference;
+    \item the callee frame is created;
+    \item the parameter name inside the callee is bound to that same object;
+    \item reassignment of the parameter name affects only the callee's local binding;
+    \item in-place mutation of the shared object is visible through all names that still reference that object.
+\end{enumerate}
+
+Start with an immutable object, such as an integer.
+
+\begin{verbatim}
+def inspect_number(n):
+    print("inside inspect_number()")
+    print(f"n:        {n}")
+    print(f"type(n):  {type(n)}")
+    print(f"id(n):    {id(n)}")
+
+x = 42
+
+print("before call")
+print(f"x:        {x}")
+print(f"type(x):  {type(x)}")
+print(f"id(x):    {id(x)}")
+print()
+
+inspect_number(x)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before call
+x:        42
+type(x):  <class 'int'>
+id(x):    140731031890376
+
+inside inspect_number()
+n:        42
+type(n):  <class 'int'>
+id(n):    140731031890376
+\end{verbatim}
+
+The exact identity number is not important. The useful observation is that \texttt{x} in the caller and \texttt{n} in the callee refer to the same integer object during the call.
+
+The object can be inspected.
+
+\begin{verbatim}
+x = 42
+
+print(f"type(x): {type(x)}")
+print()
+
+selected_names = [
+    "__add__",
+    "__sub__",
+    "__mul__",
+    "__eq__",
+    "__repr__",
+    "bit_length",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(x)}")
+
+print()
+print(f"x + 8:              {x + 8}")
+print(f"x.bit_length():     {x.bit_length()}")
+print(f"x.__add__(8):       {x.__add__(8)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(x): <class 'int'>
+
+__add__        True
+__sub__        True
+__mul__        True
+__eq__         True
+__repr__       True
+bit_length     True
+
+x + 8:              50
+x.bit_length():     6
+x.__add__(8):       50
+\end{verbatim}
+
+The integer object is immutable. There is no operation that changes the integer object \texttt{42} into another integer object. Arithmetic creates another integer object and binds a name to it.
+
+\begin{verbatim}
+def change_number(n):
+    print("inside change_number(), before reassignment")
+    print(f"n:     {n}")
+    print(f"id(n): {id(n)}")
+    print()
+
+    n = n + 1
+
+    print("inside change_number(), after reassignment")
+    print(f"n:     {n}")
+    print(f"id(n): {id(n)}")
+
+x = 42
+
+print("caller, before call")
+print(f"x:     {x}")
+print(f"id(x): {id(x)}")
+print()
+
+change_number(x)
+
+print()
+print("caller, after call")
+print(f"x:     {x}")
+print(f"id(x): {id(x)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller, before call
+x:     42
+id(x): 140731031890376
+
+inside change_number(), before reassignment
+n:     42
+id(n): 140731031890376
+
+inside change_number(), after reassignment
+n:     43
+id(n): 140731031890408
+
+caller, after call
+x:     42
+id(x): 140731031890376
+\end{verbatim}
+
+The assignment:
+
+\begin{verbatim}
+n = n + 1
+\end{verbatim}
+
+does not modify the caller's \texttt{x}. It creates or obtains another integer object and rebinds the local name \texttt{n}. The caller's name \texttt{x} still points to the original object.
+
+The same call boundary behaves differently when the object is mutable.
+
+\begin{verbatim}
+def add_line(lines):
+    print("inside add_line(), before mutation")
+    print(f"lines:     {lines}")
+    print(f"id(lines): {id(lines)}")
+    print()
+
+    lines.append("Nobody expects the Spanish Inquisition!")
+
+    print("inside add_line(), after mutation")
+    print(f"lines:     {lines}")
+    print(f"id(lines): {id(lines)}")
+
+quotes = ["D'oh!", "No soup for you!"]
+
+print("caller, before call")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+print()
+
+add_line(quotes)
+
+print()
+print("caller, after call")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller, before call
+quotes:     ["D'oh!", 'No soup for you!']
+id(quotes): 2283758137600
+
+inside add_line(), before mutation
+lines:     ["D'oh!", 'No soup for you!']
+id(lines): 2283758137600
+
+inside add_line(), after mutation
+lines:     ["D'oh!", 'No soup for you!', 'Nobody expects the Spanish Inquisition!']
+id(lines): 2283758137600
+
+caller, after call
+quotes:     ["D'oh!", 'No soup for you!', 'Nobody expects the Spanish Inquisition!']
+id(quotes): 2283758137600
+\end{verbatim}
+
+The local parameter name \texttt{lines} and the caller name \texttt{quotes} refer to the same list object. The function does not modify the caller's name. It modifies the shared list object.
+
+The list object has mutating methods.
+
+\begin{verbatim}
+quotes = ["D'oh!", "No soup for you!"]
+
+print(f"type(quotes): {type(quotes)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "insert",
+    "pop",
+    "clear",
+    "__len__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(quotes)}")
+
+print()
+quotes.append("These pretzels are making me thirsty.")
+print(f"after append: {quotes}")
+
+quotes[0] = "Mmm... donuts."
+print(f"after item assignment: {quotes}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(quotes): <class 'list'>
+
+append         True
+extend         True
+insert         True
+pop            True
+clear          True
+__len__        True
+__getitem__    True
+__setitem__    True
+
+after append: ["D'oh!", 'No soup for you!', 'These pretzels are making me thirsty.']
+after item assignment: ['Mmm... donuts.', 'No soup for you!', 'These pretzels are making me thirsty.']
+\end{verbatim}
+
+The important distinction is not whether the object was passed differently. The call mechanism is the same. The object type determines what can happen after the reference is shared.
+
+\begin{itemize}
+    \item An immutable object cannot be changed in place.
+    \item A mutable object can be changed in place.
+    \item Reassigning a parameter name never reassigns the caller's name.
+\end{itemize}
+
+\subsubsection{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Names Bound to Shared Heap Objects}
+
+A C programmer often carries two mental models into function calls:
+
+\begin{itemize}
+    \item passing a primitive value copies the value into the callee;
+    \item passing a pointer copies an address into the callee, so the callee can access external storage through that pointer.
+\end{itemize}
+
+Python should not be forced into that exact pair of categories. Python source code does not expose variable boxes in the same way.
+
+In C, a local variable such as \texttt{int x} names a storage location that directly contains an integer value. In Python, a name such as \texttt{x} is a binding to an object. The integer object lives independently from the name.
+
+A Python call creates a new local name in the callee frame. That local name is bound to the same object as the argument expression.
+
+\begin{verbatim}
+def show_binding(n):
+    print("callee frame")
+    print(f"n:     {n}")
+    print(f"id(n): {id(n)}")
+
+x = 42
+
+print("caller frame")
+print(f"x:     {x}")
+print(f"id(x): {id(x)}")
+print()
+
+show_binding(x)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller frame
+x:     42
+id(x): 140731031890376
+
+callee frame
+n:     42
+id(n): 140731031890376
+\end{verbatim}
+
+A C-like but wrong description would be:
+
+\begin{quote}
+The Python variable \texttt{x} is passed into \texttt{n}.
+\end{quote}
+
+A better description is:
+
+\begin{quote}
+The object referenced by \texttt{x} is also referenced by the new local name \texttt{n}.
+\end{quote}
+
+Now compare reassignment.
+
+\begin{verbatim}
+def reassign_number(n):
+    print("inside reassign_number()")
+    print(f"before: n={n}, id(n)={id(n)}")
+
+    n = 100
+
+    print(f"after:  n={n}, id(n)={id(n)}")
+
+x = 42
+
+print("caller before")
+print(f"x={x}, id(x)={id(x)}")
+print()
+
+reassign_number(x)
+
+print()
+print("caller after")
+print(f"x={x}, id(x)={id(x)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+x=42, id(x)=140731031890376
+
+inside reassign_number()
+before: n=42, id(n)=140731031890376
+after:  n=100, id(n)=140731031892232
+
+caller after
+x=42, id(x)=140731031890376
+\end{verbatim}
+
+The assignment \texttt{n = 100} changes the local binding inside the callee. It does not reach backward into the caller's frame and change \texttt{x}.
+
+The same is true for lists if the parameter name itself is rebound.
+
+\begin{verbatim}
+def reassign_list(lines):
+    print("inside reassign_list()")
+    print(f"before: lines={lines}")
+    print(f"before: id(lines)={id(lines)}")
+    print()
+
+    lines = ["It is only a model.", "Ni!"]
+
+    print(f"after:  lines={lines}")
+    print(f"after:  id(lines)={id(lines)}")
+
+quotes = ["D'oh!", "No soup for you!"]
+
+print("caller before")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+print()
+
+reassign_list(quotes)
+
+print()
+print("caller after")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+quotes:     ["D'oh!", 'No soup for you!']
+id(quotes): 2283758137600
+
+inside reassign_list()
+before: lines=["D'oh!", 'No soup for you!']
+before: id(lines)=2283758137600
+
+after:  lines=['It is only a model.', 'Ni!']
+after:  id(lines)=2283758110976
+
+caller after
+quotes:     ["D'oh!", 'No soup for you!']
+id(quotes): 2283758137600
+\end{verbatim}
+
+Even though the original object was mutable, the function did not mutate it. It only made the local parameter name point to a different list.
+
+This is the crucial difference:
+
+\begin{verbatim}
+lines.append("Ni!")
+\end{verbatim}
+
+mutates the object referenced by \texttt{lines}.
+
+\begin{verbatim}
+lines = ["Ni!"]
+\end{verbatim}
+
+rebinds the local name \texttt{lines}.
+
+The first operation can be visible to the caller if the caller also references the same object. The second operation is local to the callee frame.
+
+A useful C comparison is this:
+
+\begin{itemize}
+    \item Python does not copy the full object into the callee.
+    \item Python also does not pass the caller's variable slot itself.
+    \item Python creates a new local binding to the same object.
+\end{itemize}
+
+So Python parameter passing resembles pointer sharing only in the sense that the callee can reach the same heap object. It does not resemble C pointer parameters in the sense of allowing direct reassignment of the caller's variable slot.
+
+This is why a Python function cannot swap two caller names by ordinary assignment.
+
+\begin{verbatim}
+def bad_swap(a, b):
+    print("inside bad_swap(), before")
+    print(f"a={a!r}, b={b!r}")
+
+    a, b = b, a
+
+    print("inside bad_swap(), after")
+    print(f"a={a!r}, b={b!r}")
+
+x = "Arthur"
+y = "Patsy"
+
+print("caller before")
+print(f"x={x!r}, y={y!r}")
+print()
+
+bad_swap(x, y)
+
+print()
+print("caller after")
+print(f"x={x!r}, y={y!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+x='Arthur', y='Patsy'
+
+inside bad_swap(), before
+a='Arthur', b='Patsy'
+inside bad_swap(), after
+a='Patsy', b='Arthur'
+
+caller after
+x='Arthur', y='Patsy'
+\end{verbatim}
+
+The swap happened only inside the callee frame. The caller's names were not changed.
+
+The correct Python way is to return the new values and let the caller rebind its own names.
+
+\begin{verbatim}
+def make_swapped(a, b):
+    return b, a
+
+x = "Arthur"
+y = "Patsy"
+
+print("before")
+print(f"x={x!r}, y={y!r}")
+
+x, y = make_swapped(x, y)
+
+print()
+print("after")
+print(f"x={x!r}, y={y!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+x='Arthur', y='Patsy'
+
+after
+x='Patsy', y='Arthur'
+\end{verbatim}
+
+The callee returns one tuple object. The caller unpacks that tuple and explicitly rebinds its own names.
+
+\subsubsection{Side Effects Matrix: Mutating Mutable Objects In Place vs. Reassigning Local Names}
+
+The main source of confusion is that mutation and reassignment look superficially similar in prose. They are not the same operation.
+
+\begin{center}
+\begin{tabular}{|p{0.22\linewidth}|p{0.24\linewidth}|p{0.24\linewidth}|p{0.20\linewidth}|}
+\hline
+\textbf{Operation inside function} & \textbf{Object kind} & \textbf{What changes?} & \textbf{Caller sees it?} \\
+\hline
+\texttt{n = n + 1} & immutable \texttt{int} & local name \texttt{n} is rebound & no \\
+\hline
+\texttt{text = text.upper()} & immutable \texttt{str} & local name \texttt{text} is rebound & no \\
+\hline
+\texttt{items.append(x)} & mutable \texttt{list} & shared list object is mutated & yes \\
+\hline
+\texttt{items[0] = x} & mutable \texttt{list} & shared list object is mutated & yes \\
+\hline
+\texttt{items = []} & mutable \texttt{list} & local name \texttt{items} is rebound & no \\
+\hline
+\end{tabular}
+\end{center}
+
+The table can be tested directly.
+
+\begin{verbatim}
+def change_int(n):
+    print("change_int()")
+    print(f"before: n={n}, id(n)={id(n)}")
+    n = n + 1
+    print(f"after:  n={n}, id(n)={id(n)}")
+
+x = 42
+
+print("caller before")
+print(f"x={x}, id(x)={id(x)}")
+print()
+
+change_int(x)
+
+print()
+print("caller after")
+print(f"x={x}, id(x)={id(x)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+x=42, id(x)=140731031890376
+
+change_int()
+before: n=42, id(n)=140731031890376
+after:  n=43, id(n)=140731031890408
+
+caller after
+x=42, id(x)=140731031890376
+\end{verbatim}
+
+The caller sees no change because no shared object was mutated. The local name \texttt{n} was rebound.
+
+Strings behave the same way because strings are immutable.
+
+\begin{verbatim}
+def change_text(text):
+    print("change_text()")
+    print(f"before: text={text!r}, id(text)={id(text)}")
+    text = text.upper()
+    print(f"after:  text={text!r}, id(text)={id(text)}")
+
+msg = "d'oh!"
+
+print("caller before")
+print(f"msg={msg!r}, id(msg)={id(msg)}")
+print()
+
+change_text(msg)
+
+print()
+print("caller after")
+print(f"msg={msg!r}, id(msg)={id(msg)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+msg="d'oh!", id(msg)=2283758078832
+
+change_text()
+before: text="d'oh!", id(text)=2283758078832
+after:  text="D'OH!", id(text)=2283758068400
+
+caller after
+msg="d'oh!", id(msg)=2283758078832
+\end{verbatim}
+
+The method \texttt{upper()} does not modify the original string. It returns a new string. The local name \texttt{text} is then rebound to that new string.
+
+The string object can be inspected.
+
+\begin{verbatim}
+msg = "d'oh!"
+
+print(f"type(msg): {type(msg)}")
+print()
+
+selected_names = [
+    "upper",
+    "lower",
+    "replace",
+    "split",
+    "__len__",
+    "__getitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(msg)}")
+
+print()
+print(f"msg.upper():      {msg.upper()}")
+print(f"msg.replace():    {msg.replace('d', 'D')}")
+print(f"original msg:     {msg}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(msg): <class 'str'>
+
+upper          True
+lower          True
+replace        True
+split          True
+__len__        True
+__getitem__    True
+
+msg.upper():      D'OH!
+msg.replace():    D'oh!
+original msg:     d'oh!
+\end{verbatim}
+
+Now compare a list mutation.
+
+\begin{verbatim}
+def mutate_list(items):
+    print("mutate_list()")
+    print(f"before: items={items}")
+    print(f"before: id(items)={id(items)}")
+    print()
+
+    items.append("Chuck Norris can hear sign language.")
+
+    print(f"after:  items={items}")
+    print(f"after:  id(items)={id(items)}")
+
+facts = ["The answer is 42."]
+
+print("caller before")
+print(f"facts:     {facts}")
+print(f"id(facts): {id(facts)}")
+print()
+
+mutate_list(facts)
+
+print()
+print("caller after")
+print(f"facts:     {facts}")
+print(f"id(facts): {id(facts)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+facts:     ['The answer is 42.']
+id(facts): 2283758137600
+
+mutate_list()
+before: items=['The answer is 42.']
+before: id(items)=2283758137600
+
+after:  items=['The answer is 42.', 'Chuck Norris can hear sign language.']
+after:  id(items)=2283758137600
+
+caller after
+facts:     ['The answer is 42.', 'Chuck Norris can hear sign language.']
+id(facts): 2283758137600
+\end{verbatim}
+
+The caller sees the change because the list object itself was changed.
+
+Now compare local rebinding of a list parameter.
+
+\begin{verbatim}
+def replace_list(items):
+    print("replace_list()")
+    print(f"before: items={items}")
+    print(f"before: id(items)={id(items)}")
+    print()
+
+    items = ["This is an ex-list."]
+
+    print(f"after:  items={items}")
+    print(f"after:  id(items)={id(items)}")
+
+facts = ["The answer is 42."]
+
+print("caller before")
+print(f"facts:     {facts}")
+print(f"id(facts): {id(facts)}")
+print()
+
+replace_list(facts)
+
+print()
+print("caller after")
+print(f"facts:     {facts}")
+print(f"id(facts): {id(facts)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+caller before
+facts:     ['The answer is 42.']
+id(facts): 2283758137600
+
+replace_list()
+before: items=['The answer is 42.']
+before: id(items)=2283758137600
+
+after:  items=['This is an ex-list.']
+after:  id(items)=2283758110976
+
+caller after
+facts:     ['The answer is 42.']
+id(facts): 2283758137600
+\end{verbatim}
+
+The caller sees no change because the function did not mutate the original list. It created a new list and rebound the local name \texttt{items}.
+
+The same distinction applies to dictionaries.
+
+\begin{verbatim}
+def mutate_dict(data):
+    data["quote"] = "These pretzels are making me thirsty."
+
+def reassign_dict(data):
+    data = {"quote": "It is only a model."}
+    print(f"inside reassign_dict(): {data}")
+
+info = {"answer": 42}
+
+print("before")
+print(f"info:     {info}")
+print(f"id(info): {id(info)}")
+print()
+
+mutate_dict(info)
+
+print("after mutate_dict()")
+print(f"info:     {info}")
+print(f"id(info): {id(info)}")
+print()
+
+reassign_dict(info)
+
+print()
+print("after reassign_dict()")
+print(f"info:     {info}")
+print(f"id(info): {id(info)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+info:     {'answer': 42}
+id(info): 2283758217728
+
+after mutate_dict()
+info:     {'answer': 42, 'quote': 'These pretzels are making me thirsty.'}
+id(info): 2283758217728
+
+inside reassign_dict(): {'quote': 'It is only a model.'}
+
+after reassign_dict()
+info:     {'answer': 42, 'quote': 'These pretzels are making me thirsty.'}
+id(info): 2283758217728
+\end{verbatim}
+
+The dictionary object can be inspected too.
+
+\begin{verbatim}
+info = {"answer": 42}
+
+print(f"type(info): {type(info)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "update",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(info)}")
+
+print()
+print(f"info.keys():        {list(info.keys())}")
+print(f"info.get('answer'): {info.get('answer')}")
+info.update({"quote": "Ni!"})
+print(f"after update:       {info}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(info): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+update         True
+__getitem__    True
+__setitem__    True
+
+info.keys():        ['answer']
+info.get('answer'): 42
+after update:       {'answer': 42, 'quote': 'Ni!'}
+\end{verbatim}
+
+The final rule is compact:
+
+\begin{quote}
+Function calls share objects, not caller variable slots. Mutation changes a shared object. Reassignment changes only the local name.
+\end{quote}
+
+This rule explains most apparent contradictions in Python parameter passing.

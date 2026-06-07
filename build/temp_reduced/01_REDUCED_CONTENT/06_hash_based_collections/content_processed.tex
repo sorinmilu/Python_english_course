@@ -1,0 +1,7 @@
+\chapter{Hash-Based Collections and Associative Mappings}
+
+Sequential containers organize components by position. Hash-based containers organize access around membership, identity rules, and key-based lookup. This chapter moves from the ordered world of strings, lists, and tuples into the non-sequential storage architecture used by \texttt{set}, \texttt{frozenset}, and \texttt{dict}.
+
+The central mechanism is hashing. Python uses hash values, together with equality checks, to place and retrieve elements in internal tables. This makes sets efficient for uniqueness and membership testing, and dictionaries efficient for associating stable keys with stored values.
+
+The chapter first examines sets as unordered domains of unique hashable elements. It then studies mathematical set operations, in-place set mutation, and structural relationship tests. The final part turns to dictionaries, where the same hash-table principles support key-value mapping, dynamic views, insertion-order behavior, safe lookup, mutation, merging, and deletion.

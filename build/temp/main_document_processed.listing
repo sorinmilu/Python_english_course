@@ -1,9 +1,13 @@
-def echo():
-    while True:
-        received = yield
-        print(f"got: {received!r}")
+struct connection {
+    int fd;
+    char input_buffer[4096];
+    size_t input_used;
+    void (*on_readable)(struct connection *);
+};
 
-gen = echo()
-next(gen)
-gen.send("D'oh!")
-gen.send("Ni!")
+while (1) {
+    wait_for_ready_file_descriptors();
+
+    for each ready connection:
+        connection->on_readable(connection);
+}

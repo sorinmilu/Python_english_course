@@ -1,0 +1,15 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{bad\PYGZus{}src} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}}
+\PYG{l+s+s2}{if True:}
+\PYG{l+s+s2}{print(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Ni!}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{)}
+\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}\PYGZdq{}}
+
+\PYG{k}{try}\PYG{p}{:}
+    \PYG{n+nb}{compile}\PYG{p}{(}\PYG{n}{bad\PYGZus{}src}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZlt{}bad\PYGZus{}indent\PYGZgt{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{exec}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{IndentationError} \PYG{k}{as} \PYG{n}{err}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{type(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{message: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{args: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{o}{.}\PYG{n}{args}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{has lineno: }\PYG{l+s+si}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{lineno}\PYG{l+s+s1}{\PYGZsq{}}\PYG{+w}{ }\PYG{o+ow}{in}\PYG{+w}{ }\PYG{n+nb}{dir}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{line number: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{o}{.}\PYG{n}{lineno}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

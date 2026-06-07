@@ -1,0 +1,999 @@
+\subsection{Return Semantics and Frame Termination}
+
+A function call creates a temporary execution frame. That frame contains the local names of the function call and the current execution position inside the function body. When the function finishes, the frame is terminated. The caller receives one object reference as the result of the call.
+
+That result may be an integer, a string, a list, a tuple, \texttt{None}, or any other Python object. The caller does not receive the whole local namespace of the callee. It receives only the object explicitly or implicitly returned by the function.
+
+This subsection studies four related mechanisms:
+
+\begin{itemize}
+    \item explicit frame termination through \texttt{return};
+    \item implicit return of \texttt{None};
+    \item multiple return values as ordinary tuple packing;
+    \item recursive calls as repeated frame creation.
+\end{itemize}
+
+\subsubsection{The \texttt{return} Statement: Explicit Value Transfer from Callee Frame to Caller Frame}
+
+The \texttt{return} statement ends the current function call and transfers one object reference back to the caller.
+
+\begin{verbatim}
+def get_answer():
+    print("inside get_answer()")
+    return 42
+
+print("before call")
+
+value = get_answer()
+
+print("after call")
+print(f"value:       {value}")
+print(f"type(value): {type(value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before call
+inside get_answer()
+after call
+value:       42
+type(value): <class 'int'>
+\end{verbatim}
+
+The call expression \texttt{get\_answer()} is replaced by the returned object. In this example, the caller receives a reference to the integer object \texttt{42}, then binds the name \texttt{value} to that object.
+
+The execution shape is:
+
+\begin{verbatim}
+caller frame:
+    reaches: value = get_answer()
+
+callee frame:
+    runs get_answer()
+    reaches: return 42
+    terminates
+
+caller frame:
+    receives returned object
+    binds: value -> 42
+\end{verbatim}
+
+A \texttt{return} statement does not merely send a value. It also stops the active function call immediately. Any normal statement after that \texttt{return} in the same path is not executed.
+
+\begin{verbatim}
+def get_quote():
+    print("line 1: entering function")
+    return "Nobody expects the Spanish Inquisition!"
+    print("line 3: this line is unreachable")
+
+result = get_quote()
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line 1: entering function
+result: Nobody expects the Spanish Inquisition!
+\end{verbatim}
+
+The last \texttt{print()} inside the function is not executed because the frame has already terminated.
+
+The returned object can be inspected like any other object.
+
+\begin{verbatim}
+def get_quote():
+    return "No soup for you!"
+
+text = get_quote()
+
+print(f"text:       {text!r}")
+print(f"type(text): {type(text)}")
+print()
+
+selected_names = [
+    "upper",
+    "lower",
+    "replace",
+    "split",
+    "__len__",
+    "__getitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(text)}")
+
+print()
+print(f"text.upper():        {text.upper()}")
+print(f"text.replace(...):   {text.replace('soup', 'cake')}")
+print(f"len(text):           {len(text)}")
+print(f"text[0]:             {text[0]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:       'No soup for you!'
+type(text): <class 'str'>
+
+upper          True
+lower          True
+replace        True
+split          True
+__len__        True
+__getitem__    True
+
+text.upper():        NO SOUP FOR YOU!
+text.replace(...):   No cake for you!
+len(text):           16
+text[0]:             'N'
+\end{verbatim}
+
+The function call did not return a special ``function result'' container. It returned a normal \texttt{str} object.
+
+A function may contain several \texttt{return} statements. Only one return path is taken during one call.
+
+\begin{verbatim}
+def describe_number(n):
+    print(f"checking n={n}")
+
+    if n == 42:
+        return "the answer"
+
+    if n < 0:
+        return "negative"
+
+    return "ordinary"
+
+for value in [42, -3, 7]:
+    result = describe_number(value)
+    print(f"{value:>4} -> {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+checking n=42
+  42 -> the answer
+checking n=-3
+  -3 -> negative
+checking n=7
+   7 -> ordinary
+\end{verbatim}
+
+Each call has its own frame. Each frame reaches one return path, gives one object back to the caller, and terminates.
+
+The returned object may also be a mutable object. In that case, the caller receives a reference to that mutable object.
+
+\begin{verbatim}
+def make_lines():
+    lines = []
+    lines.append("D'oh!")
+    lines.append("It is only a model.")
+    return lines
+
+result = make_lines()
+
+print(f"result:       {result}")
+print(f"type(result): {type(result)}")
+print()
+
+selected_names = ["append", "pop", "clear", "__len__", "__getitem__"]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(result)}")
+
+print()
+result.append("Chuck Norris can divide by zero.")
+
+print(f"after append: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result:       ["D'oh!", 'It is only a model.']
+type(result): <class 'list'>
+
+append         True
+pop            True
+clear          True
+__len__        True
+__getitem__    True
+
+after append: ["D'oh!", 'It is only a model.', 'Chuck Norris can divide by zero.']
+\end{verbatim}
+
+The local name \texttt{lines} existed inside the function frame. After the frame terminates, that local name is gone. But the list object itself remains alive because the caller now has a reference to it through \texttt{result}.
+
+So this is wrong:
+
+\begin{quote}
+The function returns its local variable.
+\end{quote}
+
+The more precise description is:
+
+\begin{quote}
+The function returns the object currently referenced by that local name.
+\end{quote}
+
+\subsubsection{Implicit Return Defaults: Why Functions Without \texttt{return} Produce \texttt{None}}
+
+A function that reaches the end of its body without executing a \texttt{return} statement returns \texttt{None} automatically.
+
+\begin{verbatim}
+def print_fact():
+    print("Chuck Norris does not sleep. He waits.")
+
+result = print_fact()
+
+print()
+print(f"result:       {result!r}")
+print(f"type(result): {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Chuck Norris does not sleep. He waits.
+
+result:       None
+type(result): <class 'NoneType'>
+\end{verbatim}
+
+The function produced visible output, but it did not explicitly return a useful object to the caller. Printing and returning are different actions.
+
+\begin{itemize}
+    \item \texttt{print()} sends text to the standard output stream.
+    \item \texttt{return} sends an object back to the caller.
+\end{itemize}
+
+The object \texttt{None} is Python's standard object for ``no useful value was returned here.''
+
+It can be inspected.
+
+\begin{verbatim}
+x = None
+
+print(f"x:       {x!r}")
+print(f"type(x): {type(x)}")
+print()
+
+selected_names = [
+    "__bool__",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(x)}")
+
+print()
+print(f"bool(None): {bool(None)}")
+print(f"repr(None): {repr(None)}")
+print(f"x is None:  {x is None}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+x:       None
+type(x): <class 'NoneType'>
+
+__bool__    True
+__class__   True
+__eq__      True
+__repr__    True
+
+bool(None): False
+repr(None): None
+x is None:  True
+\end{verbatim}
+
+There is normally only one \texttt{None} object in a running Python process. For this reason, code usually checks it with \texttt{is None}, not \texttt{== None}.
+
+The distinction between printing and returning is one of the most important early function mistakes.
+
+\begin{verbatim}
+def noisy_add(a, b):
+    print(a + b)
+
+def real_add(a, b):
+    return a + b
+
+x = noisy_add(20, 22)
+y = real_add(20, 22)
+
+print()
+print(f"x: {x!r}")
+print(f"y: {y!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+
+x: None
+y: 42
+\end{verbatim}
+
+The function \texttt{noisy\_add()} prints \texttt{42}, but the caller receives \texttt{None}. The function \texttt{real\_add()} returns \texttt{42}, so the caller can store it, pass it to another function, or use it in a larger expression.
+
+This difference becomes visible when composing function calls.
+
+\begin{verbatim}
+def noisy_add(a, b):
+    print(a + b)
+
+def real_add(a, b):
+    return a + b
+
+print("using real_add inside another expression:")
+total = real_add(10, 32) * 2
+print(f"total: {total}")
+
+print()
+print("using noisy_add inside another expression:")
+bad_total = noisy_add(10, 32)
+print(f"bad_total: {bad_total!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+using real_add inside another expression:
+total: 84
+
+using noisy_add inside another expression:
+42
+bad_total: None
+\end{verbatim}
+
+If we tried to multiply the result of \texttt{noisy\_add(10, 32)} directly, Python would fail because the returned object is \texttt{None}, not an integer.
+
+\begin{verbatim}
+def noisy_add(a, b):
+    print(a + b)
+
+try:
+    value = noisy_add(10, 32) * 2
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+error type: <class 'TypeError'>
+message:    unsupported operand type(s) for *: 'NoneType' and 'int'
+\end{verbatim}
+
+The function call printed \texttt{42}, but the expression tried to multiply \texttt{None} by \texttt{2}. These are separate events.
+
+An explicit empty \texttt{return} also returns \texttt{None}.
+
+\begin{verbatim}
+def stop_early(flag):
+    print("entered function")
+
+    if flag:
+        print("stopping early")
+        return
+
+    print("finished normally")
+
+a = stop_early(True)
+b = stop_early(False)
+
+print()
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+entered function
+stopping early
+entered function
+finished normally
+
+a: None
+b: None
+\end{verbatim}
+
+Both calls return \texttt{None}. The difference is only where the frame terminated.
+
+\subsubsection{Multiple Return Values as Tuple Packing: The Real Structure Behind \texttt{return a, b}}
+
+Python functions do not truly return several independent values. A function always returns one object reference. When the source code says \texttt{return a, b}, Python creates a tuple and returns that tuple.
+
+\begin{verbatim}
+def get_pair():
+    a = "Homer"
+    b = 42
+    return a, b
+
+result = get_pair()
+
+print(f"result:       {result}")
+print(f"type(result): {type(result)}")
+print()
+print(f"first item:   {result[0]!r}")
+print(f"second item:  {result[1]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result:       ('Homer', 42)
+type(result): <class 'tuple'>
+
+first item:   'Homer'
+second item:  42
+\end{verbatim}
+
+The source line:
+
+\begin{verbatim}
+return a, b
+\end{verbatim}
+
+really means:
+
+\begin{verbatim}
+make tuple object containing references to a and b
+return that one tuple object
+\end{verbatim}
+
+The tuple object can be inspected.
+
+\begin{verbatim}
+def get_pair():
+    return "Jerry", "These pretzels are making me thirsty."
+
+pair = get_pair()
+
+print(f"pair:       {pair}")
+print(f"type(pair): {type(pair)}")
+print()
+
+selected_names = [
+    "count",
+    "index",
+    "__len__",
+    "__getitem__",
+    "__contains__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(pair)}")
+
+print()
+print(f"len(pair):             {len(pair)}")
+print(f"pair[0]:               {pair[0]!r}")
+print(f"pair.count('Jerry'):   {pair.count('Jerry')}")
+print(f"'Jerry' in pair:       {'Jerry' in pair}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pair:       ('Jerry', 'These pretzels are making me thirsty.')
+type(pair): <class 'tuple'>
+
+count          True
+index          True
+__len__        True
+__getitem__    True
+__contains__   True
+
+len(pair):             2
+pair[0]:               'Jerry'
+pair.count('Jerry'):   1
+'Jerry' in pair:       True
+\end{verbatim}
+
+The caller may keep the tuple as one object.
+
+\begin{verbatim}
+def get_status():
+    return "ok", 200, "D'oh!"
+
+status = get_status()
+
+print(f"status:       {status}")
+print(f"type(status): {type(status)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+status:       ('ok', 200, "D'oh!")
+type(status): <class 'tuple'>
+\end{verbatim}
+
+Or the caller may immediately unpack the tuple into several names.
+
+\begin{verbatim}
+def get_status():
+    return "ok", 200, "D'oh!"
+
+label, code, message = get_status()
+
+print(f"label:   {label!r}")
+print(f"code:    {code!r}")
+print(f"message: {message!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+label:   'ok'
+code:    200
+message: "D'oh!"
+\end{verbatim}
+
+The function did not return into three different caller variables. The function returned one tuple. Then the caller unpacked that tuple.
+
+This can be made explicit:
+
+\begin{verbatim}
+def get_status():
+    return "ok", 200, "D'oh!"
+
+temp = get_status()
+
+label = temp[0]
+code = temp[1]
+message = temp[2]
+
+print(f"temp:    {temp}")
+print(f"label:   {label!r}")
+print(f"code:    {code!r}")
+print(f"message: {message!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+temp:    ('ok', 200, "D'oh!")
+label:   'ok'
+code:    200
+message: "D'oh!"
+\end{verbatim}
+
+Tuple unpacking requires the number of target names to match the number of elements, unless starred unpacking is used.
+
+\begin{verbatim}
+def get_three():
+    return "Arthur", "Patsy", "Bridgekeeper"
+
+try:
+    a, b = get_three()
+except ValueError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'ValueError'>
+message:    too many values to unpack (expected 2)
+\end{verbatim}
+
+The error belongs to the unpacking operation in the caller, not to the \texttt{return} statement itself.
+
+Starred unpacking can collect the overflow into a list.
+
+\begin{verbatim}
+def get_names():
+    return "Arthur", "Patsy", "Robin", "Galahad"
+
+first, second, *others = get_names()
+
+print(f"first:        {first!r}")
+print(f"second:       {second!r}")
+print(f"others:       {others}")
+print(f"type(others): {type(others)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first:        'Arthur'
+second:       'Patsy'
+others:       ['Robin', 'Galahad']
+type(others): <class 'list'>
+\end{verbatim}
+
+Notice the detail: the returned object is a tuple, but the starred target receives a list.
+
+The list can also be inspected.
+
+\begin{verbatim}
+def get_names():
+    return "Arthur", "Patsy", "Robin", "Galahad"
+
+first, second, *others = get_names()
+
+print(f"type(others): {type(others)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "pop",
+    "__len__",
+    "__getitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(others)}")
+
+print()
+others.append("Lancelot")
+print(f"others after append: {others}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(others): <class 'list'>
+
+append         True
+extend         True
+pop            True
+__len__        True
+__getitem__    True
+
+others after append: ['Robin', 'Galahad', 'Lancelot']
+\end{verbatim}
+
+So the complete structure is:
+
+\begin{verbatim}
+return a, b, c:
+    creates tuple (a, b, c)
+    returns that tuple object
+
+x, y, z = function_call():
+    receives tuple
+    unpacks tuple into names x, y, z
+
+x, *rest = function_call():
+    receives tuple
+    binds first element to x
+    collects remaining elements into a new list
+\end{verbatim}
+
+\subsubsection{Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth Boundaries}
+
+A recursive function is a function that calls itself. This does not reuse the same active frame. Each call creates a new frame with its own local names.
+
+The simplest useful recursive example is a sum over a decreasing integer range.
+
+\begin{verbatim}
+def sum_down(n):
+    print(f"enter sum_down({n})")
+
+    if n == 0:
+        print("base case reached")
+        return 0
+
+    result = n + sum_down(n - 1)
+
+    print(f"leave sum_down({n}) -> {result}")
+    return result
+
+total = sum_down(4)
+
+print()
+print(f"total: {total}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+enter sum_down(4)
+enter sum_down(3)
+enter sum_down(2)
+enter sum_down(1)
+enter sum_down(0)
+base case reached
+leave sum_down(1) -> 1
+leave sum_down(2) -> 3
+leave sum_down(3) -> 6
+leave sum_down(4) -> 10
+
+total: 10
+\end{verbatim}
+
+The call sequence first goes downward:
+
+\begin{verbatim}
+sum_down(4)
+    calls sum_down(3)
+        calls sum_down(2)
+            calls sum_down(1)
+                calls sum_down(0)
+\end{verbatim}
+
+Then the returns come back upward:
+
+\begin{verbatim}
+sum_down(0) returns 0
+sum_down(1) receives 0 and returns 1 + 0
+sum_down(2) receives 1 and returns 2 + 1
+sum_down(3) receives 3 and returns 3 + 3
+sum_down(4) receives 6 and returns 4 + 6
+\end{verbatim}
+
+The base case is the condition that stops the repeated calls. Without a base case, or without progress toward the base case, recursion does not terminate normally.
+
+\begin{verbatim}
+def bad_count(n):
+    print(f"bad_count({n})")
+    return bad_count(n)
+
+try:
+    bad_count(42)
+except RecursionError as err:
+    print()
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+bad_count(42)
+bad_count(42)
+bad_count(42)
+...
+error type: <class 'RecursionError'>
+message:    maximum recursion depth exceeded
+\end{verbatim}
+
+Python prevents infinite recursive frame creation by enforcing a recursion depth limit.
+
+The current limit can be inspected with the standard \texttt{sys} module.
+
+\begin{verbatim}
+import sys
+
+limit = sys.getrecursionlimit()
+
+print(f"recursion limit: {limit}")
+print(f"type(limit):     {type(limit)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+recursion limit: 1000
+type(limit):     <class 'int'>
+\end{verbatim}
+
+The exact value may differ if the process changed it earlier. The important point is that recursive calls consume stack depth because every active call needs its own frame.
+
+We can inspect active frames with the standard \texttt{inspect} module. This is not ordinary application code, but it is useful for seeing the mechanics.
+
+\begin{verbatim}
+import inspect
+
+def show_frame(n):
+    frame = inspect.currentframe()
+
+    print(f"n:             {n}")
+    print(f"type(frame):   {type(frame)}")
+    print(f"function name: {frame.f_code.co_name}")
+    print(f"local names:   {list(frame.f_locals.keys())}")
+
+show_frame(42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+n:             42
+type(frame):   <class 'frame'>
+function name: show_frame
+local names:   ['n', 'frame']
+\end{verbatim}
+
+The frame object also has inspectable attributes.
+
+\begin{verbatim}
+import inspect
+
+def show_frame():
+    frame = inspect.currentframe()
+
+    selected_names = [
+        "f_code",
+        "f_locals",
+        "f_globals",
+        "f_back",
+        "f_lineno",
+    ]
+
+    print(f"type(frame): {type(frame)}")
+    print()
+
+    for name in selected_names:
+        print(f"{name:<12} {name in dir(frame)}")
+
+show_frame()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(frame): <class 'frame'>
+
+f_code       True
+f_locals     True
+f_globals    True
+f_back       True
+f_lineno     True
+\end{verbatim}
+
+A recursive call chain has several frames alive at the same time. The deepest active call can look backward through previous caller frames using \texttt{f\_back}.
+
+\begin{verbatim}
+import inspect
+
+def show_chain(n):
+    if n > 0:
+        return show_chain(n - 1)
+
+    frame = inspect.currentframe()
+    depth = 0
+
+    while frame is not None:
+        name = frame.f_code.co_name
+        print(f"{depth:>2}: {name}")
+        frame = frame.f_back
+        depth += 1
+
+show_chain(3)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ 0: show_chain
+ 1: show_chain
+ 2: show_chain
+ 3: show_chain
+ 4: <module>
+\end{verbatim}
+
+The repeated name \texttt{show\_chain} does not mean there is one frame being reused. It means there are several active frames, all running the same function code object with different local states.
+
+A clearer recursive sum can print local state at each level.
+
+\begin{verbatim}
+def sum_down(n, depth=0):
+    pad = "  " * depth
+    print(f"{pad}enter n={n}")
+
+    if n == 0:
+        print(f"{pad}return 0")
+        return 0
+
+    sub_total = sum_down(n - 1, depth + 1)
+    result = n + sub_total
+
+    print(f"{pad}return {result}")
+    return result
+
+answer = sum_down(4)
+
+print()
+print(f"answer: {answer}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+enter n=4
+  enter n=3
+    enter n=2
+      enter n=1
+        enter n=0
+        return 0
+      return 1
+    return 3
+  return 6
+return 10
+
+answer: 10
+\end{verbatim}
+
+This indentation is only printed text, but it mirrors the nested frame structure. Each call waits for the smaller call to finish. When the smaller call returns, the waiting call continues.
+
+The base case is not an optional decoration. It is the exit door.
+
+\begin{verbatim}
+def sum_down(n):
+    if n == 0:
+        return 0
+
+    return n + sum_down(n - 1)
+
+print(sum_down(4))
+\end{verbatim}
+
+This version works for \texttt{4}, but it is incomplete as a general function because negative input moves away from the base case.
+
+\begin{verbatim}
+def sum_down(n):
+    if n == 0:
+        return 0
+
+    return n + sum_down(n - 1)
+
+try:
+    print(sum_down(-1))
+except RecursionError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+The problem is not that recursion is mysterious. The problem is that the function never reaches \texttt{n == 0} when it starts at \texttt{-1} and keeps subtracting.
+
+A safer version checks the input boundary.
+
+\begin{verbatim}
+def sum_down(n):
+    if n < 0:
+        raise ValueError("n must be zero or positive")
+
+    if n == 0:
+        return 0
+
+    return n + sum_down(n - 1)
+
+for value in [4, 0, -1]:
+    try:
+        result = sum_down(value)
+        print(f"sum_down({value:>2}) -> {result}")
+    except ValueError as err:
+        print(f"sum_down({value:>2}) -> {type(err).__name__}: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+sum_down( 4) -> 10
+sum_down( 0) -> 0
+sum_down(-1) -> ValueError: n must be zero or positive
+\end{verbatim}
+
+Recursive programming requires three concrete questions:
+
+\begin{itemize}
+    \item What is the smallest case that can be answered immediately?
+    \item How does each recursive call move toward that smallest case?
+    \item What does the caller do with the returned object when the smaller call finishes?
+\end{itemize}
+
+For \texttt{sum\_down(n)}, the answers are simple:
+
+\begin{itemize}
+    \item \texttt{n == 0} returns \texttt{0};
+    \item each call uses \texttt{n - 1};
+    \item each waiting caller adds its own \texttt{n} to the returned subtotal.
+\end{itemize}
+
+That is the whole machine. Recursion is repeated frame allocation plus delayed continuation. The function does not magically loop inside one frame. It creates a chain of calls, reaches a base case, and then unwinds by returning one object at a time.

@@ -1,0 +1,293 @@
+\subsection{Structural Summary}
+
+The preceding sections separate two ideas that are often confused:
+
+\begin{itemize}
+    \item Python names are dynamically bound.
+    \item Python objects are strongly typed at runtime.
+\end{itemize}
+
+This means that Python is flexible at the level of assignment, but strict at the level of operation. A name may point to different objects at different moments, but each object still brings its own type rules with it.
+
+\begin{verbatim}
+value = 42
+print(f"value={value!r:<10} type={type(value)}")
+
+value = "42"
+print(f"value={value!r:<10} type={type(value)}")
+
+value = None
+print(f"value={value!r:<10} type={type(value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value=42         type=<class 'int'>
+value='42'       type=<class 'str'>
+value=None       type=<class 'NoneType'>
+\end{verbatim}
+
+The name \texttt{value} moved. The objects did not lose their type identity.
+
+\subsubsection{Categorizing Python as a Dynamically Bound, Strongly Verified Runtime Typing Environment}
+
+Python is dynamically typed because names do not have fixed declared types.
+
+There is no declaration such as:
+
+\begin{verbatim}
+int value;
+\end{verbatim}
+
+Instead, assignment binds a name to an object:
+
+\begin{verbatim}
+value = 42
+\end{verbatim}
+
+Later, the same name can be rebound:
+
+\begin{verbatim}
+value = "No soup for you."
+\end{verbatim}
+
+A compact trace:
+
+\begin{verbatim}
+value = 42
+
+print("first binding")
+print(f"value: {value!r}")
+print(f"type:  {type(value)}")
+print(f"id:    {id(value)}")
+
+value = "No soup for you."
+
+print()
+print("second binding")
+print(f"value: {value!r}")
+print(f"type:  {type(value)}")
+print(f"id:    {id(value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first binding
+value: 42
+type:  <class 'int'>
+id:    140734432946520
+
+second binding
+value: 'No soup for you.'
+type:  <class 'str'>
+id:    2209266113904
+\end{verbatim}
+
+This is dynamic binding.
+
+However, Python is also strongly checked at runtime. The interpreter does not ignore object types when operations execute.
+
+\begin{verbatim}
+left = "3"
+right = 4
+
+try:
+    result = left + right
+    print(result)
+except TypeError as err:
+    print("operation failed")
+    print(f"message: {err}")
+    print(f"type(err): {type(err)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+operation failed
+message: can only concatenate str (not "int") to str
+type(err): <class 'TypeError'>
+\end{verbatim}
+
+The failure is not caused by the name \texttt{left}. It is caused by the object reached through \texttt{left}. That object is a string, and string addition does not accept an integer as the right operand.
+
+The correct operation must be stated explicitly:
+
+\begin{verbatim}
+text_number = "3"
+real_number = 4
+
+numeric_result = int(text_number) + real_number
+text_result = text_number + str(real_number)
+
+print(f"numeric_result: {numeric_result!r}, type={type(numeric_result)}")
+print(f"text_result:    {text_result!r}, type={type(text_result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+numeric_result: 7, type=<class 'int'>
+text_result:    '34', type=<class 'str'>
+\end{verbatim}
+
+So the proper classification is not simply ``dynamic''.
+
+A more precise description is:
+
+\begin{quote}
+Python uses dynamically bound names and strongly verified runtime operations.
+\end{quote}
+
+That means:
+
+\begin{itemize}
+    \item names can be rebound freely;
+    \item objects carry runtime types;
+    \item operators consult object behavior;
+    \item unsupported combinations fail instead of being silently converted;
+    \item explicit conversion is the programmer's responsibility.
+\end{itemize}
+
+\subsubsection{The Practical Rule: Names Are Flexible, Objects Keep Their Runtime Type}
+
+The practical rule for reading Python code is:
+
+\begin{quote}
+A name may change what it references, but the object it currently references keeps its type and behavior.
+\end{quote}
+
+Example:
+
+\begin{verbatim}
+thing = 42
+
+print("integer phase")
+print(f"thing: {thing!r}")
+print(f"type:  {type(thing)}")
+print(f"bit_length available: {'bit_length' in dir(thing)}")
+print(f"upper available:      {'upper' in dir(thing)}")
+
+thing = "D'oh!"
+
+print()
+print("string phase")
+print(f"thing: {thing!r}")
+print(f"type:  {type(thing)}")
+print(f"bit_length available: {'bit_length' in dir(thing)}")
+print(f"upper available:      {'upper' in dir(thing)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+integer phase
+thing: 42
+type:  <class 'int'>
+bit_length available: True
+upper available:      False
+
+string phase
+thing: "D'oh!"
+type:  <class 'str'>
+bit_length available: False
+upper available:      True
+\end{verbatim}
+
+The name \texttt{thing} did not carry the methods. The current object did.
+
+The same rule explains operation behavior:
+
+\begin{verbatim}
+thing = 42
+print(thing + 8)
+
+thing = "D'oh!"
+print(thing + "!")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+50
+D'oh!
+\end{verbatim}
+
+Both uses of \texttt{+} work, but they do not mean exactly the same operation:
+
+\begin{itemize}
+    \item for integers, \texttt{+} performs numeric addition;
+    \item for strings, \texttt{+} performs text concatenation.
+\end{itemize}
+
+The object type decides which behavior is available.
+
+If the operation is not defined, Python rejects it:
+
+\begin{verbatim}
+thing = "42"
+
+try:
+    print(thing + 8)
+except TypeError as err:
+    print("operation failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+operation failed
+message: can only concatenate str (not "int") to str
+\end{verbatim}
+
+A final compact script:
+
+\begin{verbatim}
+values = [42, 3.14, 2 + 5j, True, None, "No soup for you."]
+
+for value in values:
+    print(f"{repr(value):<20} type={type(value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42                   type=<class 'int'>
+3.14                 type=<class 'float'>
+(2+5j)               type=<class 'complex'>
+True                 type=<class 'bool'>
+None                 type=<class 'NoneType'>
+'No soup for you.'   type=<class 'str'>
+\end{verbatim}
+
+Every value is an object with a runtime type. A name can point to any of them, but it does not erase their differences.
+
+The structural summary for this whole section is:
+
+\begin{verbatim}
+assignment:
+    flexible name-to-object binding
+
+reassignment:
+    same name, possibly different object type
+
+type():
+    exact current runtime type
+
+isinstance():
+    category or family test
+
+operation:
+    checked against the current objects involved
+
+conversion:
+    explicit when crossing type boundaries
+\end{verbatim}
+
+The final rule is:
+
+\begin{quote}
+Python is permissive about rebinding names, but strict about what objects can do together.
+\end{quote}

@@ -1,0 +1,411 @@
+\subsection{Deleting Names}
+
+Assignment creates or changes a binding between a name and an object. The statement \texttt{del} can remove such a binding.
+
+The simplest form is:
+
+\begin{verbatim}
+del name
+\end{verbatim}
+
+This does not mean: destroy the object immediately. It means: remove this name from the current namespace.
+
+Start with an ordinary binding:
+
+\begin{verbatim}
+quote = "No soup for you."
+
+print(f"quote: {quote}")
+print(f"type(quote): {type(quote)}")
+print(f"id(quote):   {id(quote)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: No soup for you.
+type(quote): <class 'str'>
+id(quote):   2168389812912
+\end{verbatim}
+
+The name \texttt{quote} refers to a string object. After \texttt{del quote}, that name no longer exists in the current namespace.
+
+\subsubsection{Removing a Binding with \texttt{del}}
+
+The statement \texttt{del} removes a name binding.
+
+\begin{verbatim}
+line = "Nobody expects the Spanish Inquisition!"
+
+print("before del")
+print(f"line: {line}")
+print(f"type(line): {type(line)}")
+
+del line
+
+print("after del")
+print(line)
+\end{verbatim}
+
+This program does not finish normally. After \texttt{del line}, the name \texttt{line} is no longer bound. Trying to read it raises a \texttt{NameError}.
+
+A safer version catches the error:
+
+\begin{verbatim}
+line = "Nobody expects the Spanish Inquisition!"
+
+print("before del")
+print(f"line: {line}")
+print(f"type(line): {type(line)}")
+
+del line
+
+print()
+print("after del")
+
+try:
+    print(line)
+except NameError as err:
+    print("name lookup failed")
+    print(f"error object: {err}")
+    print(f"type(err):    {type(err)}")
+
+    print()
+    print("selected NameError methods/attributes:")
+    print(f"{'args':<12} {'args' in dir(err)}")
+    print(f"{'add_note':<12} {'add_note' in dir(err)}")
+    print(f"{'with_traceback':<12} {'with_traceback' in dir(err)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before del
+line: Nobody expects the Spanish Inquisition!
+type(line): <class 'str'>
+
+after del
+name lookup failed
+error object: name 'line' is not defined
+type(err):    <class 'NameError'>
+
+selected NameError methods/attributes:
+args         True
+add_note     True
+with_traceback True
+\end{verbatim}
+
+The important point is not the exception syntax. The important point is the binding change:
+
+\begin{verbatim}
+before:
+    line ---> str object "Nobody expects the Spanish Inquisition!"
+
+after:
+    line no longer exists as a usable name here
+\end{verbatim}
+
+The object and the name are different things. \texttt{del line} deletes the binding named \texttt{line}. It does not mean that the programmer has directly reached into memory and destroyed a string object.
+
+A name can also be rebound after deletion:
+
+\begin{verbatim}
+fact = "Chuck Norris counted to infinity. Twice."
+
+print(f"fact: {fact}")
+print(f"type(fact): {type(fact)}")
+
+del fact
+
+fact = 42
+
+print()
+print("after deletion and new assignment")
+print(f"fact: {fact}")
+print(f"type(fact): {type(fact)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fact: Chuck Norris counted to infinity. Twice.
+type(fact): <class 'str'>
+
+after deletion and new assignment
+fact: 42
+type(fact): <class 'int'>
+\end{verbatim}
+
+This is a new binding using the same source-code name. The old binding was removed. Then assignment created a new binding.
+
+Conceptually:
+
+\begin{verbatim}
+step 1:
+    fact ---> str object "Chuck Norris counted to infinity. Twice."
+
+step 2:
+    del fact
+    fact is not bound
+
+step 3:
+    fact ---> int object 42
+\end{verbatim}
+
+The word \texttt{del} is therefore about removing a reference from a namespace. It is not the same operation as setting a name to \texttt{None}.
+
+Compare:
+
+\begin{verbatim}
+value = "D'oh!"
+value = None
+
+print(f"value: {value}")
+print(f"type(value): {type(value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: None
+type(value): <class 'NoneType'>
+\end{verbatim}
+
+Here the name still exists. It is bound to the singleton object \texttt{None}.
+
+With \texttt{del}, the name itself is removed:
+
+\begin{verbatim}
+value = "D'oh!"
+del value
+
+try:
+    print(value)
+except NameError as err:
+    print(f"cannot read value: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+cannot read value: name 'value' is not defined
+\end{verbatim}
+
+So the difference is:
+
+\begin{verbatim}
+value = None   -> name exists and refers to None
+del value      -> name no longer exists here
+\end{verbatim}
+
+For ordinary beginner code, \texttt{del} is not used often with simple variables. It is more common later with container elements, module cleanup, or cases where the programmer deliberately wants to remove a name.
+
+\subsubsection{Name Deletion, Object Reachability, and Possible Reference Count Changes}
+
+Deleting one name does not necessarily make the object unreachable. If another name still refers to the same object, the object is still usable.
+
+\begin{verbatim}
+a = "It is merely a flesh wound."
+b = a
+
+print("before del a")
+print(f"a: {a}")
+print(f"b: {b}")
+print(f"id(a): {id(a)}")
+print(f"id(b): {id(b)}")
+print(f"a is b: {a is b}")
+
+del a
+
+print()
+print("after del a")
+print(f"b: {b}")
+print(f"id(b): {id(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before del a
+a: It is merely a flesh wound.
+b: It is merely a flesh wound.
+id(a): 2168389813296
+id(b): 2168389813296
+a is b: True
+
+after del a
+b: It is merely a flesh wound.
+id(b): 2168389813296
+\end{verbatim}
+
+Before deletion:
+
+\begin{verbatim}
+a ----\
+      ---> str object "It is merely a flesh wound."
+b ----/
+\end{verbatim}
+
+After \texttt{del a}:
+
+\begin{verbatim}
+b ---> str object "It is merely a flesh wound."
+\end{verbatim}
+
+The object is still reachable through \texttt{b}. Therefore, it cannot be treated as gone.
+
+This is the key rule:
+
+\begin{quote}
+An object can remain alive as long as it is reachable from at least one active reference.
+\end{quote}
+
+In CPython, the main Python implementation, object lifetime is strongly connected to reference counting. A reference count is the number of active references that CPython is currently tracking for an object. When a binding is removed, the object's reference count may decrease.
+
+This can be observed with the standard \texttt{sys} module:
+
+\begin{verbatim}
+import sys
+
+quote = "These pretzels are making me thirsty."
+
+print(f"quote: {quote}")
+print(f"type(quote): {type(quote)}")
+
+print()
+print(f"refcount through quote: {sys.getrefcount(quote)}")
+
+alias = quote
+
+print()
+print("after alias = quote")
+print(f"quote is alias: {quote is alias}")
+print(f"refcount through quote: {sys.getrefcount(quote)}")
+
+del alias
+
+print()
+print("after del alias")
+print(f"refcount through quote: {sys.getrefcount(quote)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+quote: These pretzels are making me thirsty.
+type(quote): <class 'str'>
+
+refcount through quote: 4
+
+after alias = quote
+quote is alias: True
+refcount through quote: 5
+
+after del alias
+refcount through quote: 4
+\end{verbatim}
+
+The exact numbers should not be memorized. They depend on interpreter details, temporary references, constants, and how the code is executed. Also, \texttt{sys.getrefcount()} itself temporarily receives the object as an argument, so the displayed count includes that temporary reference.
+
+The useful observation is the direction:
+
+\begin{itemize}
+    \item creating another binding can increase the reference count;
+    \item deleting that binding can decrease the reference count;
+    \item the object remains reachable while at least one usable reference remains.
+\end{itemize}
+
+A clearer example uses a list because lists are normally not reused as constants in the same way small integers or some strings may be.
+
+\begin{verbatim}
+import sys
+
+items = ["spam", "eggs", 42]
+
+print(f"items: {items}")
+print(f"type(items): {type(items)}")
+
+print("selected list methods:")
+print(f"{'append':<12} {'append' in dir(items)}")
+print(f"{'extend':<12} {'extend' in dir(items)}")
+print(f"{'pop':<12} {'pop' in dir(items)}")
+
+print()
+print(f"initial refcount: {sys.getrefcount(items)}")
+
+same_items = items
+
+print()
+print("after same_items = items")
+print(f"items is same_items: {items is same_items}")
+print(f"refcount: {sys.getrefcount(items)}")
+
+del same_items
+
+print()
+print("after del same_items")
+print(f"refcount: {sys.getrefcount(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: ['spam', 'eggs', 42]
+type(items): <class 'list'>
+selected list methods:
+append       True
+extend       True
+pop          True
+
+initial refcount: 2
+
+after same_items = items
+items is same_items: True
+refcount: 3
+
+after del same_items
+refcount: 2
+\end{verbatim}
+
+Again, the exact count is not the lesson. The lesson is that bindings participate in reachability.
+
+If the last reachable name is deleted, the program can no longer access the object through that name:
+
+\begin{verbatim}
+items = ["spam", "eggs", 42]
+
+print(f"items before del: {items}")
+
+del items
+
+try:
+    print(items)
+except NameError as err:
+    print("items is no longer a usable name")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items before del: ['spam', 'eggs', 42]
+items is no longer a usable name
+message: name 'items' is not defined
+\end{verbatim}
+
+At that point, if no other references exist, CPython can usually reclaim the object immediately by reference counting. Other Python implementations may use different memory-management strategies. Even in CPython, object lifetime can be affected by reference cycles, temporary references, exception traces, interned constants, and implementation details.
+
+Therefore the careful rule is:
+
+\begin{quote}
+\texttt{del} removes a binding. Removing a binding may reduce an object's reference count. If the object becomes unreachable, the interpreter may reclaim it. The programmer should not read \texttt{del name} as a direct memory-free instruction.
+\end{quote}
+
+For this chapter, the practical mental model is enough:
+
+\begin{verbatim}
+assignment  -> create or change a name-to-object binding
+reassignment -> move a name to another object
+a = b       -> bind another name to the same object
+del name    -> remove one name-to-object binding
+\end{verbatim}

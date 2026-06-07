@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \\_\\_boo...",
+  "label": "log07",
+  "linenos": true,
+  "input": null,
+  "output": "items: []\ntype(items): <class 'list'>\nbool(items): False\nlen(items): 0\nhas __len__: True\nhas __bool__: False",
+  "file": "main.py"
+}

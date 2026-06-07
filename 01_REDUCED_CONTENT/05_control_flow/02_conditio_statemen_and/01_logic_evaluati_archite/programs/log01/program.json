@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Comparison Chaining: Interpreting Expressions Such as a < b < c",
+  "label": "log01",
+  "linenos": true,
+  "input": null,
+  "output": "a: 10\nb: 20\nc: 30\ncheck: True\ntype(check): <class 'bool'>\ndir(check) sample: ['__abs__', '__add__', '__and__', '__bool__']",
+  "file": "main.py"
+}

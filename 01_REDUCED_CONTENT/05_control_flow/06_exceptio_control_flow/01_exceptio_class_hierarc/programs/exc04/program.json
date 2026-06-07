@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Risk of Bare except and Over-Broad Exception Traps",
+  "label": "exc04",
+  "linenos": true,
+  "input": null,
+  "output": "'10' -> 10\n'20' -> 20\n'bad' -> invalid integer text\nmessage: invalid literal for int() with base 10: 'bad'\n'42' -> 42",
+  "file": "main.py"
+}

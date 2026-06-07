@@ -1,0 +1,15 @@
+\chapter{Variables and Singular Data Types}
+
+A Python program does not begin with objects floating in isolation. It begins with names that allow the programmer to reach objects, inspect them, combine them, and replace them with other objects during execution. This chapter introduces that layer: how Python names are written, how assignment binds names to objects, and how the simplest built-in value domains behave once those bindings exist.
+
+For a C programmer, this is one of the first places where Python must be read differently. A Python variable is not a declared memory box with a fixed storage type. It is a name in a namespace, and that name can be bound to an integer object, a floating-point object, a string object, a boolean object, \texttt{None}, or another runtime object. The object carries the type; the name provides access to it.
+
+The chapter therefore starts with identifiers and syntax rules, because a name must first be valid source text before it can become a runtime binding. It then moves to assignment, reassignment, object sharing, unpacking, augmented assignment, and deletion. These operations establish the practical binding model used everywhere else in Python.
+
+After that, the chapter studies singular data types: \texttt{int}, \texttt{float}, \texttt{complex}, \texttt{bool}, and \texttt{None}. These are the direct, non-container value domains that appear constantly in ordinary programs. The goal is not only to know their syntax, but to understand their runtime behavior: exact integer growth, floating-point approximation, complex-number boundaries, boolean singleton values, and \texttt{None} as the explicit object of absence.
+
+The chapter ends by connecting dynamic assignment with strong runtime operation checking. Python allows a name to move freely from one object to another, but it does not allow arbitrary operations between incompatible objects. This gives the central rule for the whole chapter:
+
+\begin{quote}
+Names are flexible bindings. Objects keep their runtime type. Operations are checked against the objects involved.
+\end{quote}

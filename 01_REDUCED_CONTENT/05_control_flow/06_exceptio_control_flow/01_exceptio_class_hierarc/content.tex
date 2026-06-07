@@ -12,27 +12,7 @@ Exception handling is runtime type selection applied to non-local control flow.
 
 An exception object has a type, just like an integer, string, list, tuple, or dictionary has a type.
 
-\begin{verbatim}
-try:
-    number = int("forty-two")
-except ValueError as err:
-    print(f"err: {err}")
-    print(f"type(err): {type(err)}")
-    print(f"is ValueError: {isinstance(err, ValueError)}")
-    print(f"is Exception: {isinstance(err, Exception)}")
-    print(f"is BaseException: {isinstance(err, BaseException)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-err: invalid literal for int() with base 10: 'forty-two'
-type(err): <class 'ValueError'>
-is ValueError: True
-is Exception: True
-is BaseException: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc15>>>
 The object bound to \texttt{err} is a \texttt{ValueError} object. Because \texttt{ValueError} inherits from \texttt{Exception}, and \texttt{Exception} inherits from \texttt{BaseException}, the same object also counts as an \texttt{Exception} and as a \texttt{BaseException}.
 
 The class route can be inspected with \texttt{\_\_mro\_\_}. MRO means method resolution order: the ordered chain of classes Python searches through for inherited behavior.
@@ -53,52 +33,12 @@ Possible output:
 
 This tells us that \texttt{KeyError} and \texttt{IndexError} are both more specific forms of \texttt{LookupError}. Therefore, a handler for \texttt{LookupError} can catch both dictionary missing-key failures and sequence invalid-index failures.
 
-\begin{verbatim}
-data = ["soup", "pretzels"]
-
-try:
-    print(data[42])
-except LookupError as err:
-    print("lookup failed")
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-lookup failed
-type(err): <class 'IndexError'>
-message: list index out of range
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc14>>>
 The actual exception object is an \texttt{IndexError}, but it is caught by \texttt{LookupError} because \texttt{IndexError} is a child class of \texttt{LookupError}.
 
 The exception object also has attributes and inherited methods:
 
-\begin{verbatim}
-try:
-    score = int("D'oh!")
-except ValueError as err:
-    print(f"type(err): {type(err)}")
-    print(f"dir(err) sample: {dir(err)[:12]}")
-    print(f"err.args: {err.args}")
-    print(f"str(err): {str(err)}")
-    print(f"repr(err): {repr(err)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'ValueError'>
-dir(err) sample: ['__cause__', '__class__', '__context__', '__delattr__',
-'__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__',
-'__getattribute__', '__getstate__']
-err.args: ("invalid literal for int() with base 10: \"D'oh!\"",)
-str(err): invalid literal for int() with base 10: "D'oh!"
-repr(err): ValueError('invalid literal for int() with base 10: "D\'oh!"')
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc13>>>
 The \texttt{args} attribute stores the construction arguments of the exception object. The \texttt{str()} conversion gives the human-readable message. The \texttt{repr()} conversion shows a more explicit object representation.
 
 \subsubsection{Matching Specific Exceptions Before General Exceptions}
@@ -109,98 +49,22 @@ This means specific handlers must come before general handlers.
 
 Correct order:
 
-\begin{verbatim}
-text = "forty-two"
-
-try:
-    number = int(text)
-    print(f"number: {number}")
-except ValueError:
-    print("specific handler: invalid integer text")
-except Exception:
-    print("general handler: some other ordinary exception")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-specific handler: invalid integer text
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc12>>>
 The \texttt{ValueError} handler runs because it appears first and matches the raised exception exactly.
 
 Bad order:
 
-\begin{verbatim}
-text = "forty-two"
-
-try:
-    number = int(text)
-    print(f"number: {number}")
-except Exception:
-    print("general handler: catches the ValueError first")
-except ValueError:
-    print("specific handler: unreachable here")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-general handler: catches the ValueError first
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc11>>>
 The \texttt{ValueError} handler is structurally useless here. The broader \texttt{Exception} handler already caught the object.
 
 The same problem appears with \texttt{LookupError}, \texttt{KeyError}, and \texttt{IndexError}.
 
-\begin{verbatim}
-scores = {
-    "Jerry": 72,
-    "Elaine": 91,
-}
-
-name = "Kramer"
-
-try:
-    print(scores[name])
-except KeyError:
-    print("specific handler: missing dictionary key")
-except LookupError:
-    print("general lookup handler")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-specific handler: missing dictionary key
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc10>>>
 Here the specific \texttt{KeyError} handler comes first. That is correct if missing dictionary keys need special treatment.
 
 If the broader handler comes first, it catches the same exception:
 
-\begin{verbatim}
-scores = {
-    "Jerry": 72,
-    "Elaine": 91,
-}
-
-name = "Kramer"
-
-try:
-    print(scores[name])
-except LookupError:
-    print("general lookup handler")
-except KeyError:
-    print("specific handler: unreachable here")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-general lookup handler
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc09>>>
 The practical rule is:
 
 \begin{quote}
@@ -219,29 +83,7 @@ except SomeError as e:
 
 The name \texttt{e} is not special. It is just a local name bound to the exception object. More descriptive names such as \texttt{err} are often clearer in teaching code.
 
-\begin{verbatim}
-values = ["10", "twenty", "42"]
-
-for text in values:
-    try:
-        number = int(text)
-        print(f"{text!r:>8} -> {number:>3}")
-    except ValueError as err:
-        print(f"{text!r:>8} -> conversion failed")
-        print(f"error type: {type(err)}")
-        print(f"error args: {err.args}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-    '10' ->  10
-'twenty' -> conversion failed
-error type: <class 'ValueError'>
-error args: ("invalid literal for int() with base 10: 'twenty'",)
-    '42' ->  42
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc08>>>
 Capturing the object is useful when the program needs the error message, the exact type, the construction arguments, or traceback-related information.
 
 Another example with dictionary lookup:
@@ -277,56 +119,12 @@ For a \texttt{KeyError}, the missing key is commonly stored in \texttt{err.args}
 
 The captured exception object exists only because the exceptional route was taken. If no exception occurs, the \texttt{except} block is not entered, and the exception name is not created by that block.
 
-\begin{verbatim}
-text = "42"
-
-try:
-    number = int(text)
-    print(f"number: {number}")
-except ValueError as err:
-    print(f"conversion failed: {err}")
-
-print("after try")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-number: 42
-after try
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc07>>>
 No \texttt{ValueError} object was created here, because the conversion succeeded.
 
 Capturing is also useful when several exception types share one handler:
 
-\begin{verbatim}
-items = ["soup", "pretzels"]
-
-cases = [0, 42, "bad"]
-
-for index in cases:
-    try:
-        item = items[index]
-        print(f"index {index!r}: {item}")
-    except (IndexError, TypeError) as err:
-        print(f"index {index!r}: lookup failed")
-        print(f"error type: {type(err)}")
-        print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-index 0: soup
-index 42: lookup failed
-error type: <class 'IndexError'>
-message: list index out of range
-index 'bad': lookup failed
-error type: <class 'TypeError'>
-message: list indices must be integers or slices, not str
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc06>>>
 The tuple in:
 
 \begin{verbatim}
@@ -356,130 +154,29 @@ Catch the exception class that represents the failure you actually know how to h
 
 Bad pattern:
 
-\begin{verbatim}
-texts = ["10", "20", "bad", "42"]
-
-for text in texts:
-    try:
-        number = int(text)
-        print(f"{text!r} -> {number}")
-    except:
-        print("ignored an error")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-'10' -> 10
-'20' -> 20
-ignored an error
-'42' -> 42
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc05>>>
 The program hides what kind of error occurred. It also makes future bugs harder to diagnose, because unrelated mistakes would be swallowed by the same handler.
 
 Better pattern:
 
-\begin{verbatim}
-texts = ["10", "20", "bad", "42"]
-
-for text in texts:
-    try:
-        number = int(text)
-        print(f"{text!r} -> {number}")
-    except ValueError as err:
-        print(f"{text!r} -> invalid integer text")
-        print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-'10' -> 10
-'20' -> 20
-'bad' -> invalid integer text
-message: invalid literal for int() with base 10: 'bad'
-'42' -> 42
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc04>>>
 Now the handler says exactly what it expects: \texttt{int()} may fail because the text is not a valid integer.
 
 Over-broad \texttt{Exception} handlers can also hide bugs:
 
-\begin{verbatim}
-items = ["10", "20", "42"]
-
-try:
-    for item in items:
-        number = int(item)
-        total = total + number
-except Exception as err:
-    print("some error happened")
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-some error happened
-type(err): <class 'NameError'>
-message: name 'total' is not defined
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc03>>>
 The real problem is not bad input. The real problem is a programmer mistake: \texttt{total} was used before being assigned. A broad handler catches it, but catching it does not make the program correct.
 
 A better version initializes the state and catches only conversion failures:
 
-\begin{verbatim}
-items = ["10", "20", "42"]
-total = 0
-
-for item in items:
-    try:
-        number = int(item)
-    except ValueError as err:
-        print(f"invalid integer text: {item!r}")
-        print(f"message: {err}")
-    else:
-        total = total + number
-
-print(f"total: {total}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-total: 72
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc02>>>
 The handler is now narrow. It catches the failure the program intends to recover from. Other programming mistakes are allowed to surface.
 
 There are cases where a broad handler is useful, such as logging an unexpected failure before re-raising it. But swallowing a broad exception silently is usually dangerous.
 
 Acceptable diagnostic pattern:
 
-\begin{verbatim}
-try:
-    number = int("D'oh!")
-except Exception as err:
-    print("unexpected failure during conversion block")
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-    raise
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-unexpected failure during conversion block
-type(err): <class 'ValueError'>
-message: invalid literal for int() with base 10: "D'oh!"
-Traceback (most recent call last):
-  ...
-ValueError: invalid literal for int() with base 10: "D'oh!"
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc01>>>
 The handler records information, then \texttt{raise} sends the same exception onward. Re-raising will be discussed later in the propagation section.
 
 The practical rules are:

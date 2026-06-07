@@ -1,0 +1,221 @@
+\subsection{Writing Textual Data}
+
+Writing textual data means sending Python \texttt{str} objects toward an external file resource. In text mode, Python does not store the \texttt{str} object itself. It encodes the string into bytes using the file's encoding, then sends those bytes through the file object to the operating system.
+
+The visible operation is simple: call a method such as \texttt{write()} or \texttt{writelines()}. The architectural operation is layered: runtime text becomes encoded external data.
+
+\subsubsection{Writing Strings with \texttt{.write()}}
+
+The \texttt{.write()} method writes one string to a text file. It does not automatically add a newline. If a newline is needed, the string must contain \texttt{\textbackslash n} explicitly.
+
+\begin{verbatim}
+path = "write_demo.txt"
+
+line1 = "Line 1: It's just a flesh wound.\n"
+line2 = "Line 2: The answer is 42.\n"
+
+print("Objects before writing:")
+print(f"path        = {path}")
+print(f"type(path)  = {type(path)}")
+print(f"type(line1) = {type(line1)}")
+
+print()
+print("Selected names from dir(line1):")
+for name in ["encode", "upper", "replace", "split", "strip", "endswith"]:
+    print(f"{name:10} -> {name in dir(line1)}")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    print()
+    print("File object inside the with block:")
+    print(f"file_obj       = {file_obj}")
+    print(f"type(file_obj) = {type(file_obj)}")
+
+    print()
+    print("Selected names from dir(file_obj):")
+    for name in ["write", "writelines", "flush", "close", "encoding", "mode"]:
+        print(f"{name:12} -> {name in dir(file_obj)}")
+
+    count1 = file_obj.write(line1)
+    count2 = file_obj.write(line2)
+
+print()
+print("Return values from write():")
+print(f"count1 = {count1}")
+print(f"count2 = {count2}")
+print("These counts are character counts in text mode.")
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print()
+print("File content read back:")
+print(content)
+\end{verbatim}
+
+The method \texttt{write()} returns the number of characters written in text mode. This is not the same thing as the number of stored bytes in every case, because some characters may require more than one byte when encoded as UTF-8.
+
+The file object receives only strings in text mode. Passing a number directly is an error. The number must first be converted to text.
+
+\begin{verbatim}
+path = "write_number_demo.txt"
+
+answer = 42
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    try:
+        file_obj.write(answer)
+    except TypeError as err:
+        print("Direct integer writing failed.")
+        print(f"type(err) = {type(err)}")
+        print(f"err       = {err}")
+
+    file_obj.write(f"The converted answer is {answer}.\n")
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print()
+print("Correct file content:")
+print(content)
+\end{verbatim}
+
+The rule is strict: text files accept \texttt{str} objects. Formatting with an f-string, calling \texttt{str()}, or using \texttt{.format()} creates the string that can cross the text-output boundary.
+
+\subsubsection{Writing Multiple Lines with \texttt{.writelines()}}
+
+The \texttt{.writelines()} method writes several strings from an iterable object. The name can be misleading: it does not add newline characters. It writes exactly the strings it receives.
+
+\begin{verbatim}
+path = "writelines_demo.txt"
+
+lines = [
+    "First: D'oh!\n",
+    "Second: Serenity now!\n",
+    "Third: Nobody expects the Spanish Inquisition!\n",
+]
+
+print("The lines object:")
+print(f"lines       = {lines}")
+print(f"type(lines) = {type(lines)}")
+print(f"len(lines)  = {len(lines)}")
+
+print()
+print("Selected names from dir(lines):")
+for name in ["append", "extend", "insert", "pop", "sort", "reverse"]:
+    print(f"{name:10} -> {name in dir(lines)}")
+
+print()
+print("Inspecting each element:")
+for index, line in enumerate(lines):
+    print(f"{index}: {line!r}")
+    print(f"   type(line) = {type(line)}")
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    result = file_obj.writelines(lines)
+
+print()
+print("Return value from writelines():")
+print(f"result = {result}")
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print()
+print("File content read back:")
+print(content)
+\end{verbatim}
+
+Unlike \texttt{write()}, \texttt{writelines()} returns \texttt{None}. Its purpose is not to report a character count. Its purpose is to consume an iterable of strings and send them to the file object.
+
+The newline rule is visible if the strings do not contain \texttt{\textbackslash n}.
+
+\begin{verbatim}
+path = "writelines_no_newlines_demo.txt"
+
+parts = [
+    "Spam",
+    " eggs",
+    " and",
+    " spam",
+    ".",
+]
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.writelines(parts)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print("Content written without explicit newline characters:")
+print(repr(content))
+print(content)
+\end{verbatim}
+
+The output is one continuous text sequence because \texttt{writelines()} does not invent line separators. If the file must contain separate lines, the strings must already contain newline characters, or the program must add them before writing.
+
+\subsubsection{Newline Management: Explicit \texttt{\textbackslash n}, Platform Differences, and Universal Newline Translation}
+
+A newline is not an invisible formatting wish. It is data. In Python source code, the escape sequence \texttt{\textbackslash n} represents a line break inside a string.
+
+\begin{verbatim}
+path = "newline_demo.txt"
+
+line1 = "George: It's not a lie if you believe it.\n"
+line2 = "Elaine: Yada yada yada.\n"
+line3 = "Kramer: Giddy up.\n"
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write(line1)
+    file_obj.write(line2)
+    file_obj.write(line3)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print("Normal printed content:")
+print(content)
+
+print("Representation with newline characters visible:")
+print(repr(content))
+
+print()
+print("Split into logical lines:")
+for line_number, line in enumerate(content.splitlines(), start=1):
+    print(f"{line_number:02d}: {line}")
+\end{verbatim}
+
+The printed version shows separate lines. The \texttt{repr()} version shows the actual \texttt{\textbackslash n} markers inside the string representation. This is useful when debugging text files, because normal printing can hide where line breaks are stored.
+
+Different operating systems historically used different newline byte sequences in text files. Unix-like systems use line feed. Windows text files commonly use carriage return plus line feed. Python text mode provides newline translation so code can usually work with \texttt{\textbackslash n} as the ordinary in-memory newline representation.
+
+The following program shows the usual text-mode behavior without relying on a specific platform.
+
+\begin{verbatim}
+path = "newline_translation_demo.txt"
+
+lines = [
+    "Line A: The runtime string uses \\n in source code.\n",
+    "Line B: Python text mode handles normal newline translation.\n",
+    "Line C: 42 remains portable enough.\n",
+]
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.writelines(lines)
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print("Text read back:")
+print(content)
+
+print("Representation read back:")
+print(repr(content))
+
+print()
+print("Object type:")
+print(f"type(content) = {type(content)}")
+\end{verbatim}
+
+For ordinary text files, this is the desired behavior. The program writes and reads strings using \texttt{\textbackslash n}. Python handles the platform-specific external representation in text mode.
+
+When exact newline bytes matter, that is no longer ordinary text handling. The file should be treated more carefully, often in binary mode or with explicit newline settings. For normal text writing, the practical rule is simple: include \texttt{\textbackslash n} where a new line is part of the intended file content, and remember that neither \texttt{write()} nor \texttt{writelines()} adds it automatically.

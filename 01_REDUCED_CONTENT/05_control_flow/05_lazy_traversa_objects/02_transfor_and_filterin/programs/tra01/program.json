@@ -4,6 +4,6 @@
   "label": "tra01",
   "linenos": true,
   "input": null,
-  "output": "pipeline created\nasking for first accepted value\nmapping: 10\nfiltering: 10\nmapping: 20\nfiltering: 20\nmapping: 42\nfiltering: 42\n42",
+  "output": "first: [10, 20, 42]\nsecond: []",
   "file": "main.py"
 }

@@ -1,0 +1,7 @@
+\section{Filesystem Path Architecture}
+
+A file operation always begins with a reference to a location. That reference is the path. It may look like a simple string, but it encodes filesystem structure: directory names, final file names, suffixes, roots, separators, and the difference between relative and absolute addressing.
+
+This section explains how Python represents and manipulates paths before any actual file content is read or written. It contrasts plain string paths with \texttt{pathlib.Path} objects, shows how the current working directory affects relative paths, and introduces portable path construction across Windows and POSIX-style systems.
+
+The central rule is simple: a path is not the file itself. It is a structured reference that Python passes to the operating system when the program wants to inspect, create, open, move, or delete filesystem entries.

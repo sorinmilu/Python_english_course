@@ -1,0 +1,9 @@
+\section{Code Block Syntax and Indentation Semantics}
+
+Before Python can execute branches, loops, exception handlers, functions, or classes, it must first know which statements belong together. This is the purpose of block syntax. A block is not merely a group of lines that look related to the human reader. It is a structural unit that the tokenizer and parser must recognize before the program can become executable.
+
+Python makes an unusually direct design choice here: indentation defines block membership. The left margin is therefore not decoration. It is part of the language's structural machinery. A line moved one indentation level to the left or right may no longer belong to the same control-flow region. In Python, visual alignment is executable information.
+
+For programmers coming from C, C++, or Java, this requires a deliberate mental adjustment. Curly-brace languages separate formal block delimiters from human formatting. Python removes that separation. The visible shape of the program and the grammatical structure of the program are forced to match.
+
+This section explains that mechanism from both the programmer's view and the tokenizer's view: why Python uses syntactic whitespace, how indentation replaces explicit block tokens, how invalid indentation becomes a syntax error, and why mixed tabs and spaces can make the block structure ambiguous.

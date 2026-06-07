@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Virtual Indexing Lookups: How the range Object Computes Values Arithmetically...",
+  "label": "seq08",
+  "linenos": true,
+  "input": null,
+  "output": "nums: range(0, 20, 2)\npart: range(4, 14, 2)\ntype(part): <class 'range'>\nlist(part): [4, 6, 8, 10, 12]",
+  "file": "main.py"
+}

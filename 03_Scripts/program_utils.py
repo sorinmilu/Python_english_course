@@ -19,6 +19,9 @@ LANGUAGE_EXTENSIONS = {
 }
 
 MIN_NONEMPTY_LINES = 6  # more than 5 non-empty lines
+MIN_MARKED_C_EXAMPLE_LINES = 4
+
+C_EXAMPLE_COMMENT_RE = re.compile(r"/\*\s*C example\b", re.IGNORECASE)
 
 TRACE_PATTERNS = (
     r"creates generator object",
@@ -53,6 +56,11 @@ def count_non_empty_lines(body: str) -> int:
     return len(non_empty_lines(body))
 
 
+def is_marked_c_example(body: str) -> bool:
+    """True when the author tagged the block as an illustrative C snippet."""
+    return bool(C_EXAMPLE_COMMENT_RE.search(body))
+
+
 def detect_language(body: str) -> tuple[str | None, float]:
     """Return (language, confidence) using strong markers only."""
     lines = non_empty_lines(body)
@@ -67,8 +75,15 @@ def detect_language(body: str) -> tuple[str | None, float]:
     if re.search(r"function\s+\w+\s*\([^)]*\$\w+", sample):
         scores["php"] = max(scores.get("php", 0), 0.9)
 
-    if re.search(r"#include\s*[<\"]", sample) or re.search(r"\bint\s+main\s*\(", sample):
-        scores["c"] = 0.95
+    if is_marked_c_example(body):
+        scores["c"] = 0.98
+    if (
+        re.search(r"#include\s*[<\"]", sample)
+        or re.search(r"\bint\s+main\s*\(", body)
+        or re.search(r"\btypedef\b.+\(\*", sample)
+        or re.search(r"\bprintf\s*\(", sample)
+    ):
+        scores["c"] = max(scores.get("c", 0), 0.95)
     if re.search(r"\bstruct\s+\w+\s*\{", sample):
         scores["c"] = max(scores.get("c", 0), 0.85)
 
@@ -87,6 +102,25 @@ def detect_language(body: str) -> tuple[str | None, float]:
     if re.search(r"^\s*(?:async\s+)?def\s+\w+\s*\(", sample, re.MULTILINE):
         scores["python"] = 0.95
     if re.search(r"\bimport\s+asyncio\b", sample) or re.search(r"\byield\b", sample):
+        scores["python"] = max(scores.get("python", 0), 0.85)
+    if re.search(r"\bprint\s*\(\s*f[\"']", sample):
+        scores["python"] = max(scores.get("python", 0), 0.9)
+    if re.search(r"^\s*elif\s+.+\s*:", sample, re.MULTILINE):
+        scores["python"] = max(scores.get("python", 0), 0.9)
+    if (
+        re.search(r"^\s*if\s+.+\s*:", body, re.MULTILINE)
+        and re.search(r"^\s*else\s*:", body, re.MULTILINE)
+        and re.search(r"\bprint\s*\(", body)
+        and not re.search(r"\bprintf\s*\(", body)
+    ):
+        scores["python"] = max(scores.get("python", 0), 0.85)
+    if (
+        re.search(r"\bprint\s*\(", sample)
+        and len(re.findall(r"^\s*[A-Za-z_]\w*\s*=", sample, re.MULTILINE)) >= 2
+        and not re.search(r"\b(?:const|let|var)\s+", sample)
+        and "$" not in sample
+        and "<?php" not in sample
+    ):
         scores["python"] = max(scores.get("python", 0), 0.85)
 
     if not scores:
@@ -120,11 +154,16 @@ def is_diagram_or_trace(body: str) -> bool:
 
 def is_extractable_program(body: str) -> tuple[bool, str, str | None]:
     """Return (accepted, reason, language)."""
-    if count_non_empty_lines(body) < MIN_NONEMPTY_LINES:
+    marked_c = is_marked_c_example(body)
+    min_lines = MIN_MARKED_C_EXAMPLE_LINES if marked_c else MIN_NONEMPTY_LINES
+    if count_non_empty_lines(body) < min_lines:
         return False, "too_few_lines", None
 
     if is_diagram_or_trace(body):
         return False, "diagram_or_trace", None
+
+    if marked_c:
+        return True, "ok", "c"
 
     lang, confidence = detect_language(body)
     if lang is None or confidence < 0.75:
@@ -207,6 +246,7 @@ def infer_title(prose_before: str, body: str, lang: str) -> str:
 
 def escape_latex_text(text: str) -> str:
     """Escape characters that break LaTeX text mode (codebox titles, iobox lines, etc.)."""
+    text = text.replace("\\", r"\textbackslash{}")
     replacements = (
         ("&", r"\&"),
         ("%", r"\%"),
@@ -215,6 +255,25 @@ def escape_latex_text(text: str) -> str:
     for old, new in replacements:
         text = text.replace(old, new)
     text = re.sub(r"(?<!\\)_", r"\\_", text)
+    return text
+
+
+def escape_latex_monospace(text: str) -> str:
+    """Escape characters that break \\texttt{...} (program iobox lines)."""
+    replacements = (
+        ("\\", r"\textbackslash{}"),
+        ("{", r"\{"),
+        ("}", r"\}"),
+        ("#", r"\#"),
+        ("$", r"\$"),
+        ("%", r"\%"),
+        ("&", r"\&"),
+        ("_", r"\_"),
+        ("~", r"\textasciitilde{}"),
+        ("^", r"\textasciicircum{}"),
+    )
+    for old, new in replacements:
+        text = text.replace(old, new)
     return text
 
 
@@ -229,7 +288,10 @@ def format_iobox_body(text: str) -> str:
         lines.pop()
     if not lines:
         return ""
-    return "\n".join(escape_latex_text(line.rstrip()) + " \\\\" for line in lines)
+    return "\n".join(
+        r"\texttt{" + escape_latex_monospace(line.rstrip()) + "}" + r" \\"
+        for line in lines
+    )
 
 
 def parse_program_token(token: str) -> tuple[str, dict[str, Any]]:

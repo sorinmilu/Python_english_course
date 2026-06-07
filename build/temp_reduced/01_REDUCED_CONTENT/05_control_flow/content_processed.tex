@@ -1,0 +1,7 @@
+\chapter{Control Flow Graphs, Lazy Traversal, and Exception Routing}
+
+A Python program is written as linear source text, but it does not execute as a simple uninterrupted list of lines. Conditions create alternative routes, loops create repeated routes, iterator-based traversal creates value-producing routes, and exceptions create non-local routes that can jump out of the current block or function. To understand Python control flow properly, the program must be read as an execution graph, not merely as text.
+
+This chapter builds that graph-based view step by step. It begins with the structural rules that define blocks and indentation, then moves into conditional decision trees, loop mechanics, lazy traversal objects, and the iterator protocol. The goal is to show that Python's high-level syntax is supported by precise runtime mechanisms: truth-value testing, iterator production, iterator exhaustion, short-circuit evaluation, and exception propagation.
+
+For a programmer coming from C, this chapter is especially important because Python moves several familiar responsibilities into different mechanisms. Counting loops are replaced by iterable traversal. Manual error-code routing is often replaced by exceptions. Explicit block delimiters are replaced by syntactic indentation. These are not cosmetic differences. They change how execution paths are formed, interrupted, resumed, and completed.

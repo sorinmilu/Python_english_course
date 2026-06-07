@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Exception Classes as Runtime Types",
+  "label": "exc15",
+  "linenos": true,
+  "input": null,
+  "output": "err: invalid literal for int() with base 10: 'forty-two'\ntype(err): <class 'ValueError'>\nis ValueError: True\nis Exception: True\nis BaseException: True",
+  "file": "main.py"
+}

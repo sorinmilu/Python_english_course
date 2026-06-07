@@ -1,0 +1,12 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{fs}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{require}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}fs\PYGZdq{}}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{n+nx}{fs}\PYG{p}{.}\PYG{n+nx}{readFile}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}notes.txt\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}utf8\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kd}{function}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{error}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{data}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n+nx}{error}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{error}\PYG{p}{(}\PYG{n+nx}{error}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{k}{return}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{log}\PYG{p}{(}\PYG{n+nx}{data}\PYG{p}{)}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{p}{;}
+\end{MintedVerbatim}

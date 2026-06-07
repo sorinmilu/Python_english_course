@@ -1,0 +1,311 @@
+\subsection{The Memory Layout Paradigm Contrast}
+
+A Python list looks like a flexible array, but it should not be understood as a C array of raw values. The similarity is positional access: both C arrays and Python lists allow access by numeric index. The difference is what is stored in each position.
+
+A C array usually stores raw values directly. A CPython list stores references to Python objects. This means that the list's internal slot storage is contiguous, but the actual objects referenced by those slots may live in different heap locations.
+
+\begin{verbatim}
+items = ["spam", 42, 3.14, True]
+
+print(f"items: {items!r}")
+print(f"type(items): {type(items)}")
+print(f"len(items): {len(items)}")
+
+print()
+print("selected list attributes")
+for name in ["append", "extend", "insert", "pop", "remove", "sort", "copy"]:
+    print(f"{name:<8} {name in dir(items)}")
+
+print()
+for index, item in enumerate(items):
+    print(f"index={index} value={item!r:<8} type={type(item)} id={id(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: ['spam', 42, 3.14, True]
+type(items): <class 'list'>
+len(items): 4
+
+selected list attributes
+append   True
+extend   True
+insert   True
+pop      True
+remove   True
+sort     True
+copy     True
+
+index=0 value='spam'   type=<class 'str'> id=140619786560368
+index=1 value=42       type=<class 'int'> id=140619796012304
+index=2 value=3.14     type=<class 'float'> id=140619786981552
+index=3 value=True     type=<class 'bool'> id=140619795594560
+\end{verbatim}
+
+The list has four positions. Each position refers to one Python object. The objects are allowed to have different types because the list does not store their raw physical representation directly inside its own slot array.
+
+\subsubsection{The C Array Blueprint: Fixed, Contiguous Structures Storing Homogeneous Raw Primitive Values Directly}
+
+In C, an array such as the following stores integer values directly in adjacent memory cells:
+
+\begin{verbatim}
+int nums[4] = {10, 20, 30, 42};
+\end{verbatim}
+
+Conceptually, the storage looks like this:
+
+\begin{verbatim}
++----+----+----+----+
+| 10 | 20 | 30 | 42 |
++----+----+----+----+
+  0    1    2    3
+\end{verbatim}
+
+The array positions contain the actual integer values. If an \texttt{int} occupies four bytes on that platform, then the array body contains four consecutive integer-sized storage cells.
+
+Python's built-in \texttt{array} module can be used to demonstrate this homogeneous-storage idea from Python code. It is not a normal Python list. It is a compact array constrained to one primitive storage code.
+
+\begin{verbatim}
+from array import array
+import sys
+
+nums = array("i", [10, 20, 30, 42])
+
+print(f"nums: {nums}")
+print(f"type(nums): {type(nums)}")
+print(f"len(nums): {len(nums)}")
+print(f"item size: {nums.itemsize} bytes")
+print(f"data bytes: {len(nums) * nums.itemsize}")
+print(f"object size: {sys.getsizeof(nums)} bytes")
+
+print()
+for index, nr in enumerate(nums):
+    print(f"index={index} value={nr}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+nums: array('i', [10, 20, 30, 42])
+type(nums): <class 'array.array'>
+len(nums): 4
+item size: 4 bytes
+data bytes: 16
+object size: 96 bytes
+
+index=0 value=10
+index=1 value=20
+index=2 value=30
+index=3 value=42
+\end{verbatim}
+
+The important restriction is visible in the type code \texttt{"i"}. This array is for integer storage. It is not a general container for arbitrary Python objects.
+
+A C-style fixed numeric array has three main properties:
+
+\begin{itemize}
+    \item the elements have one declared storage format;
+    \item the element values are stored directly in the array body;
+    \item indexing can compute the address of an element by using the base address and the element size.
+\end{itemize}
+
+For example, in a simple C mental model:
+
+\begin{verbatim}
+address of nums[i] = base address + i * sizeof(int)
+\end{verbatim}
+
+That model works because every element has the same physical size and the same direct storage format.
+
+A normal Python list is different.
+
+\begin{verbatim}
+items = [10, "twenty", 30.0, True]
+
+print(f"items: {items!r}")
+print(f"type(items): {type(items)}")
+
+print()
+for index, item in enumerate(items):
+    print(f"index={index} value={item!r:<10} type={type(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: [10, 'twenty', 30.0, True]
+type(items): <class 'list'>
+
+index=0 value=10         type=<class 'int'>
+index=1 value='twenty'   type=<class 'str'>
+index=2 value=30.0       type=<class 'float'>
+index=3 value=True       type=<class 'bool'>
+\end{verbatim}
+
+This cannot be a direct array of raw \texttt{int}, raw \texttt{str}, raw \texttt{float}, and raw \texttt{bool} data stored in one uniform primitive layout. The list can be heterogeneous because its slots store references.
+
+\subsubsection{The Python List Blueprint: A Contiguous Array Storing Heterogeneous \texttt{PyObject*} References on the Heap}
+
+In CPython, a list stores a contiguous array of object references. At the C level, each slot stores a \texttt{PyObject*}. This is a pointer to a Python object.
+
+A simplified picture is:
+
+\begin{verbatim}
+Python list object
++------------------------------------+
+| current length                     |
+| allocated slot capacity            |
+| pointer to internal slot array     |
++------------------------------------+
+
+internal slot array
++-----------+-----------+-----------+-----------+
+| PyObject* | PyObject* | PyObject* | PyObject* |
++-----------+-----------+-----------+-----------+
+     |           |           |           |
+     v           v           v           v
+   "spam"       42         3.14        True
+\end{verbatim}
+
+The list's slot array is contiguous. The Python objects reached through those slots are separate objects.
+
+This explains why the same object can appear in several positions.
+
+\begin{verbatim}
+inner = ["larch"]
+
+items = [inner, inner, inner]
+
+print(f"items: {items!r}")
+print(f"id(inner): {id(inner)}")
+
+print()
+for index, item in enumerate(items):
+    print(f"index={index} id(item)={id(item)} item={item!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: [['larch'], ['larch'], ['larch']]
+id(inner): 140619786871040
+
+index=0 id(item)=140619786871040 item=['larch']
+index=1 id(item)=140619786871040 item=['larch']
+index=2 id(item)=140619786871040 item=['larch']
+\end{verbatim}
+
+The outer list does not contain three independent inner lists. It contains three references to the same inner list object.
+
+If that inner object is mutated, all three positions appear to change because all three positions lead to the same object.
+
+\begin{verbatim}
+inner = ["larch"]
+items = [inner, inner, inner]
+
+items[0].append(42)
+
+print(f"items: {items!r}")
+
+print()
+for index, item in enumerate(items):
+    print(f"index={index} id(item)={id(item)} item={item!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: [['larch', 42], ['larch', 42], ['larch', 42]]
+
+index=0 id(item)=140619786871040 item=['larch', 42]
+index=1 id(item)=140619786871040 item=['larch', 42]
+index=2 id(item)=140619786871040 item=['larch', 42]
+\end{verbatim}
+
+This is not three mutations. It is one mutation observed through three references.
+
+Replacing a list element is a different operation. It changes one slot in the outer list so that the slot points to another object.
+
+\begin{verbatim}
+items = ["spam", "eggs", "bacon"]
+
+old_obj = items[1]
+
+print("before replacement")
+print(f"items: {items!r}")
+print(f"old_obj:  {old_obj!r:<8} id={id(old_obj)}")
+print(f"items[1]: {items[1]!r:<8} id={id(items[1])}")
+
+items[1] = "beans"
+
+print()
+print("after replacement")
+print(f"items: {items!r}")
+print(f"old_obj:  {old_obj!r:<8} id={id(old_obj)}")
+print(f"items[1]: {items[1]!r:<8} id={id(items[1])}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before replacement
+items: ['spam', 'eggs', 'bacon']
+old_obj:  'eggs'   id=140619786560432
+items[1]: 'eggs'   id=140619786560432
+
+after replacement
+items: ['spam', 'beans', 'bacon']
+old_obj:  'eggs'   id=140619786560432
+items[1]: 'beans'  id=140619786560560
+\end{verbatim}
+
+The old string object was not edited. The list slot at index \texttt{1} was redirected to another object.
+
+The same distinction matters with mutable objects.
+
+\begin{verbatim}
+a = ["Jerry"]
+b = ["Elaine"]
+
+items = [a, b]
+
+print("before")
+print(f"items: {items!r}")
+print(f"id(a): {id(a)}")
+print(f"id(items[0]): {id(items[0])}")
+
+a.append("Kramer")
+
+print()
+print("after mutating a")
+print(f"items: {items!r}")
+print(f"a:     {a!r}")
+print(f"id(a): {id(a)}")
+print(f"id(items[0]): {id(items[0])}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+items: [['Jerry'], ['Elaine']]
+id(a): 140619786871232
+id(items[0]): 140619786871232
+
+after mutating a
+items: [['Jerry', 'Kramer'], ['Elaine']]
+a:     ['Jerry', 'Kramer']
+id(a): 140619786871232
+id(items[0]): 140619786871232
+\end{verbatim}
+
+The outer list did not change its first slot. The object referenced by that slot changed internally.
+
+The practical rule is:
+
+\begin{quote}
+A Python list owns a sequence of reference slots. It does not contain independent physical copies of all objects assigned into those slots.
+\end{quote}
+
+This is the foundation for understanding assignment, shallow copies, repeated inner lists, slice assignment, and the difference between replacing a list element and mutating the object found at that element.

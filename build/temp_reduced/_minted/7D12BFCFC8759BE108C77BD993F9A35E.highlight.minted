@@ -1,0 +1,9 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{function}\PYG{+w}{ }\PYG{n+nx}{loadUser}\PYG{p}{(}\PYG{n+nx}{userId}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n+nx}{fetch}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}/users/\PYGZdq{}}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{n+nx}{userId}\PYG{p}{)}
+\PYG{+w}{        }\PYG{p}{.}\PYG{n+nx}{then}\PYG{p}{(}\PYG{n+nx}{response}\PYG{+w}{ }\PYG{p}{=\PYGZgt{}}\PYG{+w}{ }\PYG{n+nx}{response}\PYG{p}{.}\PYG{n+nx}{json}\PYG{p}{(}\PYG{p}{)}\PYG{p}{)}
+\PYG{+w}{        }\PYG{p}{.}\PYG{n+nx}{then}\PYG{p}{(}\PYG{n+nx}{user}\PYG{+w}{ }\PYG{p}{=\PYGZgt{}}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{            }\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{log}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Loaded user:\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{userId}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{user}\PYG{p}{.}\PYG{n+nx}{name}\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}\PYG{p}{)}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

@@ -28,31 +28,7 @@ move by 1
 
 The \texttt{range()} object stores this kind of description.
 
-\begin{verbatim}
-nums = range(0, 5, 1)
-
-print(f"nums: {nums}")
-print(f"type(nums): {type(nums)}")
-print(f"dir(nums) sample: {dir(nums)[:12]}")
-
-print(f"nums.start: {nums.start}")
-print(f"nums.stop: {nums.stop}")
-print(f"nums.step: {nums.step}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-nums: range(0, 5)
-type(nums): <class 'range'>
-dir(nums) sample: ['__bool__', '__class__', '__contains__', '__delattr__', '__dir__',
-'__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__',
-'__gt__']
-nums.start: 0
-nums.stop: 5
-nums.step: 1
-\end{verbatim}
-
+%<<<PROGRAM:programs/the06>>>
 The printed representation \texttt{range(0, 5)} is already a clue. Python does not print:
 
 \begin{verbatim}
@@ -71,31 +47,7 @@ The important exposed attributes are:
 
 The object also provides sequence-like methods through special methods. For example, \texttt{\_\_len\_\_()} gives the number of values described by the range, and \texttt{\_\_getitem\_\_()} computes an item at a requested index.
 
-\begin{verbatim}
-nums = range(10, 20, 2)
-
-print(f"nums: {nums}")
-print(f"len(nums): {len(nums)}")
-print(f"nums.__len__(): {nums.__len__()}")
-
-print(f"nums[0]: {nums[0]}")
-print(f"nums[1]: {nums[1]}")
-print(f"nums[2]: {nums[2]}")
-print(f"nums.__getitem__(3): {nums.__getitem__(3)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-nums: range(10, 20, 2)
-len(nums): 5
-nums.__len__(): 5
-nums[0]: 10
-nums[1]: 12
-nums[2]: 14
-nums.__getitem__(3): 16
-\end{verbatim}
-
+%<<<PROGRAM:programs/the05>>>
 The values are obtained from the arithmetic rule:
 
 \begin{verbatim}
@@ -109,26 +61,7 @@ No separate stored array of these integers is required for the \texttt{range} ob
 
 This can be compared with a list created from the same range:
 
-\begin{verbatim}
-nums_range = range(10, 20, 2)
-nums_list = list(nums_range)
-
-print(f"nums_range: {nums_range}")
-print(f"nums_list: {nums_list}")
-
-print(f"type(nums_range): {type(nums_range)}")
-print(f"type(nums_list): {type(nums_list)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-nums_range: range(10, 20, 2)
-nums_list: [10, 12, 14, 16, 18]
-type(nums_range): <class 'range'>
-type(nums_list): <class 'list'>
-\end{verbatim}
-
+%<<<PROGRAM:programs/the04>>>
 The list is materialized. It contains element slots. The range is descriptive. It contains the arithmetic boundaries.
 
 This distinction matters because a loop does not need the whole list at once:
@@ -164,59 +97,12 @@ In CPython implementation terms, the object may also keep derived internal infor
 
 This is called \texttt{O(1)} memory use. Here, \texttt{O(1)} means that the storage size stays fixed as the logical sequence length grows.
 
-\begin{verbatim}
-import sys
-
-small_range = range(10)
-large_range = range(1_000_000)
-huge_range = range(1_000_000_000)
-
-print(f"small_range: {small_range}")
-print(f"large_range: {large_range}")
-print(f"huge_range:  {huge_range}")
-
-print(f"size of small_range: {sys.getsizeof(small_range)} bytes")
-print(f"size of large_range: {sys.getsizeof(large_range)} bytes")
-print(f"size of huge_range:  {sys.getsizeof(huge_range)} bytes")
-\end{verbatim}
-
-Possible output on one CPython build:
-
-\begin{verbatim}
-small_range: range(0, 10)
-large_range: range(0, 1000000)
-huge_range:  range(0, 1000000000)
-size of small_range: 48 bytes
-size of large_range: 48 bytes
-size of huge_range:  48 bytes
-\end{verbatim}
-
+%<<<PROGRAM:programs/the03>>>
 The exact byte count is implementation-dependent. Another Python build may report a different number. The relevant observation is that all three range objects have the same reported size on the same build.
 
 The contrast with a list is immediate:
 
-\begin{verbatim}
-import sys
-
-nums_range = range(1_000_000)
-nums_list = list(nums_range)
-
-print(f"type(nums_range): {type(nums_range)}")
-print(f"type(nums_list): {type(nums_list)}")
-
-print(f"size of nums_range: {sys.getsizeof(nums_range)} bytes")
-print(f"size of nums_list:  {sys.getsizeof(nums_list)} bytes")
-\end{verbatim}
-
-Possible output on one CPython build:
-
-\begin{verbatim}
-type(nums_range): <class 'range'>
-type(nums_list): <class 'list'>
-size of nums_range: 48 bytes
-size of nums_list:  8000056 bytes
-\end{verbatim}
-
+%<<<PROGRAM:programs/the02>>>
 The list size shown here is only the size of the list container's internal reference array. It does not even fully count the memory of every integer object that may be referenced. The range object avoids that problem because it does not contain one reference slot per value.
 
 This is the concrete storage difference:
@@ -231,30 +117,7 @@ list(range(1_000_000)):
 
 The word \enquote{lazy} should be read literally here. A \texttt{range} delays value production until a value is demanded by indexing, iteration, membership testing, or materialization.
 
-\begin{verbatim}
-nums = range(0, 10)
-
-print("range object created")
-print(f"nums: {nums}")
-
-print("now asking for one value")
-print(f"nums[4]: {nums[4]}")
-
-print("now materializing all values")
-print(f"list(nums): {list(nums)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-range object created
-nums: range(0, 10)
-now asking for one value
-nums[4]: 4
-now materializing all values
-list(nums): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-\end{verbatim}
-
+%<<<PROGRAM:programs/the01>>>
 The conversion with \texttt{list(nums)} is the materialization boundary. Before that line, the program has a range descriptor. After that line, the program has an actual list containing the produced values.
 
 The same rule applies to very large ranges:

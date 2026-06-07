@@ -6,16 +6,7 @@ External state can change between inspection and use. Patterns differ in whether
 
 ``Easier to ask forgiveness than permission'': attempt \texttt{open}/read and catch \texttt{FileNotFoundError}, \texttt{PermissionError}, or broader \texttt{OSError}. The handled failure matches the attempted operation.
 
-\begin{verbatim}
-from pathlib import Path
-path = Path("maybe.txt")
-try:
-    text = path.read_text(encoding="utf-8")
-except FileNotFoundError:
-    text = ""
-print(text)
-\end{verbatim}
-
+%<<<PROGRAM:programs/def01>>>
 \subsubsection{LBYL File Access: Checking Conditions Before Opening}
 
 ``Look before you leap'': test \texttt{exists()}/\texttt{is\_file()} first. Cheaper when failure is common and checks are cheap; vulnerable to time-of-check/time-of-use races.

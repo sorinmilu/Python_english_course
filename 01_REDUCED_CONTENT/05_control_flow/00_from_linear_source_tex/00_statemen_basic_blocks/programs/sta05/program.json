@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Sequential Flow: The Default Fall-Through Path from One Statement to the Next",
+  "label": "sta05",
+  "linenos": true,
+  "input": null,
+  "output": "quote: Nobody expects the Spanish Inquisition!\ncount: 3\nresult: 42",
+  "file": "main.py"
+}

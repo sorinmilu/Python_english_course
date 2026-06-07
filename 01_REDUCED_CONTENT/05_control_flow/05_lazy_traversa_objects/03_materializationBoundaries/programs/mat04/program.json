@@ -4,6 +4,6 @@
   "label": "mat04",
   "linenos": true,
   "input": null,
-  "output": "len(even_nums): 3\neven_nums[0]: 10\neven_nums[-1]: 42",
+  "output": "stored: (('Jerry', 72), ('Elaine', 91), ('Kramer', 42))\ntype(stored): <class 'tuple'>\ndir(stored) sample: ['__add__', '__class__', '__class_getitem__',\n'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',\n'__format__', '__ge__']",
   "file": "main.py"
 }

@@ -1,0 +1,16 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{function}\PYG{o}{*}\PYG{+w}{ }\PYG{n+nx}{accumulator}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kd}{let}\PYG{+w}{ }\PYG{n+nx}{total}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{k+kc}{true}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{value}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{k}{yield}\PYG{+w}{ }\PYG{n+nx}{total}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n+nx}{total}\PYG{+w}{ }\PYG{o}{+=}\PYG{+w}{ }\PYG{n+nx}{value}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{acc}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{accumulator}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{log}\PYG{p}{(}\PYG{n+nx}{acc}\PYG{p}{.}\PYG{n+nx}{next}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{value}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{   }\PYG{c+c1}{// 0}
+\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{log}\PYG{p}{(}\PYG{n+nx}{acc}\PYG{p}{.}\PYG{n+nx}{next}\PYG{p}{(}\PYG{l+m+mf}{5}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{value}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// 5}
+\PYG{n+nx}{console}\PYG{p}{.}\PYG{n+nx}{log}\PYG{p}{(}\PYG{n+nx}{acc}\PYG{p}{.}\PYG{n+nx}{next}\PYG{p}{(}\PYG{l+m+mf}{7}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{value}\PYG{p}{)}\PYG{p}{;}\PYG{+w}{  }\PYG{c+c1}{// 12}
+\end{MintedVerbatim}

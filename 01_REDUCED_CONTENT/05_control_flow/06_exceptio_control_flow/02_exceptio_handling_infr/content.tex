@@ -10,15 +10,7 @@ Python exception handling is structured around protected regions and guaranteed 
 
 The \texttt{else} clause runs only if the \texttt{try} block completes without raising. It is not an \texttt{if}-\texttt{else} branch; it is a success-only continuation compiled after the handler table.
 
-\begin{verbatim}
-try:
-    number = int(text)
-except ValueError as err:
-    print(f"conversion failed: {err}")
-else:
-    print(f"number: {number}")   # runs only on clean try completion
-\end{verbatim}
-
+%<<<PROGRAM:programs/exc01>>>
 Architecturally, \texttt{else} keeps the protected region narrow: only the risky operation sits in \texttt{try}; code that depends on success but is not itself failure-prone moves to \texttt{else}, preventing accidental handler capture of downstream exceptions.
 
 \subsubsection{Cleansing and Post-Processing: The Unconditional Execution Invariants of the \texttt{finally} Block}

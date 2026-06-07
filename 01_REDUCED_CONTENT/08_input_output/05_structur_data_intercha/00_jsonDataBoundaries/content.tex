@@ -18,17 +18,7 @@ print(type(data), data["name"], data["tags"][0])
 
 \texttt{json.loads} parses in-memory strings; \texttt{json.load} reads from a text file object. Both construct a new object graph on the heap.
 
-\begin{verbatim}
-import json
-from pathlib import Path
-
-path = Path("demo.json")
-path.write_text('{"show": "Simpsons", "line": "D\'oh!"}', encoding="utf-8")
-with open(path, encoding="utf-8") as f:
-    data = json.load(f)
-print(data)
-\end{verbatim}
-
+%<<<PROGRAM:programs/jso01>>>
 \subsubsection{Writing Python Structures Back to JSON with \texttt{json.dump()} and \texttt{json.dumps()}}
 
 Serialization walks Python objects and emits UTF-8 text with JSON lexical rules (double-quoted keys/strings).

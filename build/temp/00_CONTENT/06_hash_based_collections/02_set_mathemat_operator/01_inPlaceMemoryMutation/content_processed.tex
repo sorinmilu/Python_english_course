@@ -1,0 +1,453 @@
+\subsection{In-Place Memory Mutation}
+
+The previous subsection described set calculations that create new sets. For example, \texttt{a | b} produces a result without changing \texttt{a} or \texttt{b}. Python also provides mutating versions of these operations. These methods change the left-hand set object in place.
+
+The word ``destructive'' does not mean that the object becomes invalid. It means that the previous membership state is overwritten by a new membership state.
+
+\begin{quote}
+A non-mutating set calculation produces a new set. An in-place set update changes the existing set object.
+\end{quote}
+
+This distinction can be seen with \texttt{id()}.
+
+\begin{verbatim}
+names = {"Homer", "Marge"}
+extra = {"Lisa", "Bart"}
+
+print(f"before: {names!r}")
+print(f"id before: {id(names)}")
+
+names.update(extra)
+
+print()
+print(f"after:  {names!r}")
+print(f"id after:  {id(names)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Homer', 'Marge'}
+id before: 2199812636800
+
+after:  {'Bart', 'Lisa', 'Homer', 'Marge'}
+id after:  2199812636800
+\end{verbatim}
+
+The set object has the same identity before and after the call. Its internal membership domain changed.
+
+\subsubsection{Destructive Union Updates via \texttt{.update()}}
+
+The method \texttt{.update()} performs an in-place union. It adds all elements from another iterable into the existing set.
+
+\begin{verbatim}
+left = {"spam", "eggs"}
+right = {"eggs", "larch", 42}
+
+print(f"left before: {left!r}")
+
+result = left.update(right)
+
+print(f"left after:  {left!r}")
+print(f"right:       {right!r}")
+print(f"result:      {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left before: {'eggs', 'spam'}
+left after:  {42, 'eggs', 'larch', 'spam'}
+right:       {42, 'eggs', 'larch'}
+result:      None
+\end{verbatim}
+
+The method returns \texttt{None} because the useful result is the changed state of \texttt{left}. This is the same convention seen in other in-place mutation methods.
+
+The non-mutating version and mutating version differ like this:
+
+\begin{verbatim}
+a = {"Arthur", "Brian"}
+b = {"Brian", "Lancelot"}
+
+new_set = a | b
+
+print("after a | b")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+print(f"new_set: {new_set!r}")
+
+a.update(b)
+
+print()
+print("after a.update(b)")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+after a | b
+a:       {'Arthur', 'Brian'}
+b:       {'Lancelot', 'Brian'}
+new_set: {'Arthur', 'Lancelot', 'Brian'}
+
+after a.update(b)
+a:       {'Arthur', 'Lancelot', 'Brian'}
+b:       {'Lancelot', 'Brian'}
+\end{verbatim}
+
+The expression \texttt{a | b} leaves \texttt{a} unchanged. The call \texttt{a.update(b)} changes \texttt{a}.
+
+The method can accept more than one iterable.
+
+\begin{verbatim}
+items = {"spam"}
+
+items.update(["eggs", "spam"], ("larch", 42), {"ni"})
+
+print(f"items: {items!r}")
+print(f"type(items): {type(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: {'eggs', 42, 'spam', 'ni', 'larch'}
+type(items): <class 'set'>
+\end{verbatim}
+
+Each source is traversed, and each hashable value is inserted into the target set. Duplicate values collapse automatically.
+
+The inserted values must still be hashable.
+
+\begin{verbatim}
+items = {"spam"}
+
+try:
+    items.update(["eggs", ["bad", "list"]])
+except TypeError as err:
+    print(f"update failed: {err}")
+
+print(f"items after failure: {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+update failed: unhashable type: 'list'
+items after failure: {'eggs', 'spam'}
+\end{verbatim}
+
+The set may already have been partly changed before the error occurred. In-place mutation is immediate; it is not a guaranteed all-or-nothing transaction.
+
+\subsubsection{Destructive Intersection Updates via \texttt{.intersection\_update()}}
+
+The method \texttt{.intersection\_update()} keeps only elements that also appear in the supplied iterable or iterables. It changes the target set in place.
+
+\begin{verbatim}
+allowed = {"Homer", "Marge", "Lisa", "Bart"}
+present = {"Lisa", "Bart", "Burns"}
+
+print(f"allowed before: {allowed!r}")
+
+result = allowed.intersection_update(present)
+
+print(f"allowed after:  {allowed!r}")
+print(f"present:        {present!r}")
+print(f"result:         {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+allowed before: {'Lisa', 'Homer', 'Bart', 'Marge'}
+allowed after:  {'Lisa', 'Bart'}
+present:        {'Lisa', 'Burns', 'Bart'}
+result:         None
+\end{verbatim}
+
+The set \texttt{allowed} was reduced. Only values also found in \texttt{present} survived.
+
+The non-mutating and mutating forms differ like this:
+
+\begin{verbatim}
+a = {"spam", "eggs", "larch"}
+b = {"eggs", "beans", "larch"}
+
+new_set = a & b
+
+print("after a & b")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+print(f"new_set: {new_set!r}")
+
+a.intersection_update(b)
+
+print()
+print("after a.intersection_update(b)")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+after a & b
+a:       {'eggs', 'spam', 'larch'}
+b:       {'eggs', 'beans', 'larch'}
+new_set: {'eggs', 'larch'}
+
+after a.intersection_update(b)
+a:       {'eggs', 'larch'}
+b:       {'eggs', 'beans', 'larch'}
+\end{verbatim}
+
+The operator \texttt{\&} creates a new result. The method \texttt{.intersection\_update()} overwrites the membership state of \texttt{a}.
+
+The method can also accept several iterables. The target keeps only values found in all of them.
+
+\begin{verbatim}
+names = {"Jerry", "Elaine", "George", "Kramer"}
+group1 = ["Jerry", "Elaine", "Newman"]
+group2 = {"Elaine", "Jerry", "Puddy"}
+
+names.intersection_update(group1, group2)
+
+print(f"names: {names!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: {'Elaine', 'Jerry'}
+\end{verbatim}
+
+The final set contains only names present in the original \texttt{names}, in \texttt{group1}, and in \texttt{group2}.
+
+\subsubsection{Destructive Difference Updates via \texttt{.difference\_update()}}
+
+The method \texttt{.difference\_update()} removes from the target set all elements found in the supplied iterable or iterables.
+
+\begin{verbatim}
+items = {"spam", "eggs", "larch", "beans"}
+blocked = {"eggs", "beans"}
+
+print(f"items before: {items!r}")
+
+result = items.difference_update(blocked)
+
+print(f"items after:  {items!r}")
+print(f"blocked:      {blocked!r}")
+print(f"result:       {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items before: {'eggs', 'beans', 'larch', 'spam'}
+items after:  {'larch', 'spam'}
+blocked:      {'eggs', 'beans'}
+result:       None
+\end{verbatim}
+
+The target set lost the values that were present in \texttt{blocked}. The \texttt{blocked} set itself was not changed.
+
+The operation is directional. It removes from the target. It does not compute a balanced disagreement between both sets.
+
+\begin{verbatim}
+a = {"Arthur", "Brian", "Lancelot"}
+b = {"Brian", "Galahad"}
+
+a.difference_update(b)
+
+print(f"a after difference_update: {a!r}")
+print(f"b:                         {b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a after difference_update: {'Arthur', 'Lancelot'}
+b:                         {'Brian', 'Galahad'}
+\end{verbatim}
+
+Only \texttt{"Brian"} was removed from \texttt{a}. The value \texttt{"Galahad"} did not matter because it was not present in \texttt{a}.
+
+The method can receive more than one iterable.
+
+\begin{verbatim}
+names = {"Homer", "Marge", "Lisa", "Bart", "Maggie"}
+
+names.difference_update(["Homer", "Bart"], {"Maggie"})
+
+print(f"names: {names!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: {'Lisa', 'Marge'}
+\end{verbatim}
+
+The target set removed all values found in either removal source.
+
+The non-mutating version is \texttt{.difference()} or the \texttt{-} operator.
+
+\begin{verbatim}
+original = {"spam", "eggs", "larch"}
+blocked = {"eggs"}
+
+new_set = original - blocked
+
+print(f"original after '-': {original!r}")
+print(f"new_set:            {new_set!r}")
+
+original.difference_update(blocked)
+
+print()
+print(f"original after difference_update: {original!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+original after '-': {'eggs', 'spam', 'larch'}
+new_set:            {'spam', 'larch'}
+
+original after difference_update: {'spam', 'larch'}
+\end{verbatim}
+
+The first calculation creates a new set. The update method changes the existing set.
+
+\subsubsection{Destructive Symmetric Difference Updates via \texttt{.symmetric\_difference\_update()}}
+
+The method \texttt{.symmetric\_difference\_update()} changes the target set so that it keeps only values that appear in exactly one of the two sources: the original target or the supplied iterable.
+
+\begin{verbatim}
+left = {"spam", "eggs", "larch"}
+right = {"eggs", "beans", "larch", 42}
+
+print(f"left before: {left!r}")
+
+result = left.symmetric_difference_update(right)
+
+print(f"left after:  {left!r}")
+print(f"right:       {right!r}")
+print(f"result:      {result!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left before: {'eggs', 'larch', 'spam'}
+left after:  {42, 'beans', 'spam'}
+right:       {42, 'eggs', 'beans', 'larch'}
+result:      None
+\end{verbatim}
+
+The values \texttt{"eggs"} and \texttt{"larch"} were removed because they appeared in both. The values \texttt{"beans"} and \texttt{42} were added because they appeared only in \texttt{right}. The value \texttt{"spam"} remained because it appeared only in the original \texttt{left}.
+
+This operation can be understood as two simultaneous actions:
+
+\begin{itemize}
+    \item remove elements shared by both sides;
+    \item add elements that appear only in the supplied iterable.
+\end{itemize}
+
+The non-mutating and mutating forms differ like this:
+
+\begin{verbatim}
+a = {"Jerry", "Elaine", "George"}
+b = {"Jerry", "Elaine", "Kramer"}
+
+new_set = a ^ b
+
+print("after a ^ b")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+print(f"new_set: {new_set!r}")
+
+a.symmetric_difference_update(b)
+
+print()
+print("after a.symmetric_difference_update(b)")
+print(f"a:       {a!r}")
+print(f"b:       {b!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+after a ^ b
+a:       {'Elaine', 'George', 'Jerry'}
+b:       {'Elaine', 'Kramer', 'Jerry'}
+new_set: {'George', 'Kramer'}
+
+after a.symmetric_difference_update(b)
+a:       {'George', 'Kramer'}
+b:       {'Elaine', 'Kramer', 'Jerry'}
+\end{verbatim}
+
+The operator \texttt{\textasciicircum{}} produces a new set. The method \texttt{.symmetric\_difference\_update()} rewrites the target set.
+
+Unlike \texttt{.update()}, \texttt{.intersection\_update()}, and \texttt{.difference\_update()}, this method takes one main iterable argument.
+
+\begin{verbatim}
+base = {"Arthur", "Brian", "Lancelot"}
+other = ["Brian", "Galahad", "Arthur"]
+
+base.symmetric_difference_update(other)
+
+print(f"base: {base!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+base: {'Galahad', 'Lancelot'}
+\end{verbatim}
+
+The list was accepted as an iterable source. The result remains a set.
+
+The in-place set update methods can be summarized as follows:
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Method} & \textbf{Meaning} & \textbf{Target Set After Call} \\
+\hline
+\texttt{.update()} & Destructive union & Everything from target and source \\
+\texttt{.intersection\_update()} & Destructive intersection & Only values common to all sources \\
+\texttt{.difference\_update()} & Destructive difference & Target values not found in sources \\
+\texttt{.symmetric\_difference\_update()} & Destructive symmetric difference & Values found on exactly one side \\
+\end{tabular}
+\end{center}
+
+All these methods return \texttt{None}. Their purpose is to mutate the existing set object.
+
+\begin{verbatim}
+items = {"spam", "eggs"}
+other = {"eggs", "larch"}
+
+print(f"start id: {id(items)}")
+print(f"start items: {items!r}")
+
+items.update(other)
+
+print()
+print(f"after update id: {id(items)}")
+print(f"after update items: {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start id: 2199812636800
+start items: {'eggs', 'spam'}
+
+after update id: 2199812636800
+after update items: {'eggs', 'larch', 'spam'}
+\end{verbatim}
+
+The object identity is stable. The membership domain changed in place.

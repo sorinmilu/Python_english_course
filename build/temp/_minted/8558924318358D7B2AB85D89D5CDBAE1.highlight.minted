@@ -1,0 +1,15 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{accumulator}\PYG{p}{(}\PYG{p}{)}\PYG{p}{:}
+    \PYG{n}{total} \PYG{o}{=} \PYG{l+m+mi}{0}
+
+    \PYG{k}{while} \PYG{k+kc}{True}\PYG{p}{:}
+        \PYG{n}{value} \PYG{o}{=} \PYG{k}{yield} \PYG{n}{total}
+        \PYG{n}{total} \PYG{o}{+}\PYG{o}{=} \PYG{n}{value}
+
+
+\PYG{n}{acc} \PYG{o}{=} \PYG{n}{accumulator}\PYG{p}{(}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n+nb}{next}\PYG{p}{(}\PYG{n}{acc}\PYG{p}{)}\PYG{p}{)}      \PYG{c+c1}{\PYGZsh{} starts coroutine, yields 0}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{acc}\PYG{o}{.}\PYG{n}{send}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{)}\PYG{p}{)}    \PYG{c+c1}{\PYGZsh{} sends 5, yields 5}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{acc}\PYG{o}{.}\PYG{n}{send}\PYG{p}{(}\PYG{l+m+mi}{7}\PYG{p}{)}\PYG{p}{)}    \PYG{c+c1}{\PYGZsh{} sends 7, yields 12}
+\end{MintedVerbatim}

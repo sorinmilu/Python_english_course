@@ -1,0 +1,377 @@
+\subsection{Immutable Sequence Invariants}
+
+A tuple is an immutable sequence. This means that the tuple's structure cannot be changed after the tuple object has been created. Its length is fixed, its positions are fixed, and its slots cannot be reassigned.
+
+This does not mean that every object referenced by the tuple is immutable. The tuple is structurally immutable. The referenced objects keep their own type and their own mutability rules.
+
+\begin{verbatim}
+data = ("spam", "eggs", 42)
+
+print(f"data: {data!r}")
+print(f"type(data): {type(data)}")
+print(f"len(data): {len(data)}")
+
+print()
+for index, item in enumerate(data):
+    print(f"index={index} value={item!r:<8} type={type(item)} id={id(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: ('spam', 'eggs', 42)
+type(data): <class 'tuple'>
+len(data): 3
+
+index=0 value='spam'   type=<class 'str'> id=140619786560368
+index=1 value='eggs'   type=<class 'str'> id=140619786560432
+index=2 value=42       type=<class 'int'> id=140619796012304
+\end{verbatim}
+
+A tuple is therefore similar to a list in one internal sense: it stores references to Python objects. The crucial difference is that the tuple's reference slots are fixed after construction.
+
+\begin{verbatim}
+data = ("Jerry", "Elaine", "George")
+
+selected_names = [
+    "__len__",
+    "__getitem__",
+    "__contains__",
+    "count",
+    "index",
+    "append",
+    "extend",
+    "remove",
+    "pop",
+    "sort",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(data)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+__len__       True
+__getitem__   True
+__contains__  True
+count         True
+index         True
+append        False
+extend        False
+remove        False
+pop           False
+sort          False
+\end{verbatim}
+
+The tuple supports inspection operations. It does not expose list-style mutation operations.
+
+\subsubsection{Structural Definition: Fixed-Size, Read-Only Sequential Storage of \texttt{PyObject*} Addresses}
+
+At the CPython implementation level, a tuple can be understood as a fixed-size sequence of object-reference slots. Each slot stores a \texttt{PyObject*}, meaning a pointer to a Python object.
+
+A simplified picture is:
+
+\begin{verbatim}
+tuple object
++------------------------------------+
+| length                             |
+| fixed slot array                   |
++------------------------------------+
+
+fixed slot array
++-----------+-----------+-----------+
+| PyObject* | PyObject* | PyObject* |
++-----------+-----------+-----------+
+     |           |           |
+     v           v           v
+  "spam"      "eggs"        42
+\end{verbatim}
+
+The tuple owns the sequence of slots. It does not store raw primitive values directly in those slots. The slots contain references.
+
+This is why a tuple can contain heterogeneous objects.
+
+\begin{verbatim}
+data = ("Homer", 39, 3.14, True)
+
+print(f"data: {data!r}")
+
+print()
+for index, item in enumerate(data):
+    print(f"index={index} value={item!r:<8} type={type(item)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: ('Homer', 39, 3.14, True)
+
+index=0 value='Homer'  type=<class 'str'>
+index=1 value=39       type=<class 'int'>
+index=2 value=3.14     type=<class 'float'>
+index=3 value=True     type=<class 'bool'>
+\end{verbatim}
+
+The tuple's slots all store references. The referenced objects can have different types.
+
+The fixed-size rule appears when trying to replace an element.
+
+\begin{verbatim}
+data = ("Homer", "Marge", "Bart")
+
+try:
+    data[0] = "Lisa"
+except TypeError as err:
+    print("assignment failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+assignment failed
+message: 'tuple' object does not support item assignment
+\end{verbatim}
+
+The tuple refuses slot reassignment.
+
+A tuple also cannot grow or shrink.
+
+\begin{verbatim}
+data = ("Homer", "Marge")
+
+try:
+    data.append("Bart")
+except AttributeError as err:
+    print("append failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+append failed
+message: 'tuple' object has no attribute 'append'
+\end{verbatim}
+
+The operation is not merely forbidden at runtime. The tuple type does not even provide an \texttt{append()} method.
+
+Concatenation creates a new tuple. It does not extend the old tuple.
+
+\begin{verbatim}
+a = ("Homer", "Marge")
+old_id = id(a)
+
+b = a + ("Bart",)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+
+print()
+print(f"id(a): {id(a)}")
+print(f"old_id == id(a): {old_id == id(a)}")
+print(f"id(b): {id(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ('Homer', 'Marge')
+b: ('Homer', 'Marge', 'Bart')
+
+id(a): 140619786871232
+old_id == id(a): True
+id(b): 140619786871488
+\end{verbatim}
+
+The original tuple \texttt{a} did not change. The expression \texttt{a + ("Bart",)} created another tuple object.
+
+The same applies to repetition.
+
+\begin{verbatim}
+data = ("Ni!",)
+
+result = data * 3
+
+print(f"data:   {data!r}")
+print(f"result: {result!r}")
+
+print()
+print(f"data is result: {data is result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data:   ('Ni!',)
+result: ('Ni!', 'Ni!', 'Ni!')
+
+data is result: False
+\end{verbatim}
+
+The repeated tuple is a new tuple. The original tuple remains fixed.
+
+The practical rule is:
+
+\begin{quote}
+A tuple is a fixed-size sequence of reference slots. The slots can be read, but they cannot be reassigned, inserted, deleted, appended to, or sorted in place.
+\end{quote}
+
+\subsubsection{The Concept of Transitive Mutability: Why a Tuple Is Structurally Unalterable, Yet May Reference Internally Mutable Objects}
+
+Tuple immutability applies to the tuple's own structure. It does not automatically freeze every object referenced by the tuple.
+
+A tuple can contain a list.
+
+\begin{verbatim}
+data = ("Homer", ["Bart", "Lisa"])
+
+print(f"data: {data!r}")
+print(f"type(data): {type(data)}")
+print(f"type(data[1]): {type(data[1])}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+data: ('Homer', ['Bart', 'Lisa'])
+type(data): <class 'tuple'>
+type(data[1]): <class 'list'>
+\end{verbatim}
+
+The tuple cannot replace its second slot.
+
+\begin{verbatim}
+data = ("Homer", ["Bart", "Lisa"])
+
+try:
+    data[1] = ["Maggie"]
+except TypeError as err:
+    print("tuple slot replacement failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+tuple slot replacement failed
+message: 'tuple' object does not support item assignment
+\end{verbatim}
+
+But the list referenced by the second slot can still mutate.
+
+\begin{verbatim}
+data = ("Homer", ["Bart", "Lisa"])
+
+print("before")
+print(f"data: {data!r}")
+print(f"id(data):    {id(data)}")
+print(f"id(data[1]): {id(data[1])}")
+
+data[1].append("Maggie")
+
+print()
+print("after")
+print(f"data: {data!r}")
+print(f"id(data):    {id(data)}")
+print(f"id(data[1]): {id(data[1])}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+data: ('Homer', ['Bart', 'Lisa'])
+id(data):    140619786871360
+id(data[1]): 140619786870656
+
+after
+data: ('Homer', ['Bart', 'Lisa', 'Maggie'])
+id(data):    140619786871360
+id(data[1]): 140619786870656
+\end{verbatim}
+
+The tuple object did not change its slots. The second slot still points to the same list object. That list object changed internally.
+
+The structure is:
+
+\begin{verbatim}
+tuple
++-----------+-----------+
+| PyObject* | PyObject* |
++-----------+-----------+
+     |           |
+     v           v
+  "Homer"     list object
+              ["Bart", "Lisa", "Maggie"]
+\end{verbatim}
+
+The tuple slot still points to the same list. The list's own contents changed.
+
+This is called transitive mutability in practice: an immutable container can reference mutable objects. The container is fixed, but mutation may still happen inside objects reached through it.
+
+A more direct example:
+
+\begin{verbatim}
+inner = ["spam"]
+
+data = (inner, inner)
+
+print("before")
+print(f"data: {data!r}")
+print(f"data[0] is data[1]: {data[0] is data[1]}")
+
+inner.append(42)
+
+print()
+print("after")
+print(f"data: {data!r}")
+print(f"data[0] is data[1]: {data[0] is data[1]}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+data: (['spam'], ['spam'])
+data[0] is data[1]: True
+
+after
+data: (['spam', 42], ['spam', 42])
+data[0] is data[1]: True
+\end{verbatim}
+
+The tuple contains two references to the same list object. Mutating that one list is visible through both tuple positions.
+
+This also affects hashability. A tuple can be used as a dictionary key only if all its components are hashable.
+
+\begin{verbatim}
+good_key = ("Homer", 42)
+bad_key = ("Homer", [42])
+
+print(f"hash(good_key): {hash(good_key)}")
+
+try:
+    print(hash(bad_key))
+except TypeError as err:
+    print("hash failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+hash(good_key): -4189771609282103040
+hash failed
+message: unhashable type: 'list'
+\end{verbatim}
+
+The exact hash value can differ between runs. The important point is that a tuple containing a list is not hashable, because the list is mutable and unhashable.
+
+The practical rule is:
+
+\begin{quote}
+Tuple immutability is structural, not magical. The tuple cannot change which objects its slots reference, but mutable objects referenced by those slots can still change themselves.
+\end{quote}

@@ -1,0 +1,12 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{make\PYGZus{}multiplier}\PYG{p}{(}\PYG{n}{factor}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{multiply}\PYG{p}{(}\PYG{n}{value}\PYG{p}{)}\PYG{p}{:}
+        \PYG{k}{return} \PYG{n}{value} \PYG{o}{*} \PYG{n}{factor}
+
+    \PYG{k}{return} \PYG{n}{multiply}
+
+
+\PYG{n}{times\PYGZus{}three} \PYG{o}{=} \PYG{n}{make\PYGZus{}multiplier}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{p}{)}
+
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{times\PYGZus{}three}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{)}\PYG{p}{)}
+\end{MintedVerbatim}

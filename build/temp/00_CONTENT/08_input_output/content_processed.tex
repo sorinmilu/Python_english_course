@@ -1,0 +1,7 @@
+\chapter{Input/Output Architecture, File Streams, and External Data Boundaries}
+
+A Python program becomes practically useful when it crosses the boundary between internal runtime objects and external data systems. Values held in names, lists, dictionaries, strings, and byte sequences exist inside the running interpreter, but files, terminals, directories, streams, and serialized data formats belong to the operating-system environment outside that runtime.
+
+This chapter explains that boundary from the ground up. It begins with standard streams and operating-system mediation, then moves through file construction, resource lifetime, text and binary access, filesystem paths, structured formats such as JSON and CSV, defensive error handling, and complete external data pipelines.
+
+The central idea is that input/output is not just reading and writing. It is controlled translation between Python objects and external representations, managed through stream objects, encodings, buffers, paths, file handles, exceptions, and operating-system rules.

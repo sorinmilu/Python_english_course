@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Virtual Indexing Lookups: How the range Object Computes Values Arithmetically...",
+  "label": "seq10",
+  "linenos": true,
+  "input": null,
+  "output": "nums: range(10, 20, 2)\ntype(nums): <class 'range'>\ndir(nums) sample: ['__bool__', '__class__', '__contains__', '__delattr__',\n'__dir__', '__doc__', '__eq__', '__format__', '__ge__',\n'__getattribute__', '__getitem__', '__gt__']\nnums.start: 10\nnums.stop: 20\nnums.step: 2\nnums[0]: 10\nnums[1]: 12\nnums[2]: 14\nnums[3]: 16",
+  "file": "main.py"
+}

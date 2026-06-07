@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Conditional Edges: Branching Execution Paths Created by if, elif, and else",
+  "label": "sta03",
+  "linenos": true,
+  "input": null,
+  "output": "even",
+  "file": "main.py"
+}

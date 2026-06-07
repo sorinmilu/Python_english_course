@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{text} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Stiinta}\PYG{l+s+s2}{\PYGZdq{}}
+\PYG{k}{try}\PYG{p}{:}
+    \PYG{n}{text}\PYG{o}{.}\PYG{n}{encode}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{ascii}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{UnicodeEncodeError} \PYG{k}{as} \PYG{n}{err}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}
+
+\PYG{n}{data} \PYG{o}{=} \PYG{n}{text}\PYG{o}{.}\PYG{n}{encode}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{utf\PYGZhy{}8}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{n}{data}\PYG{o}{.}\PYG{n}{decode}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{utf\PYGZhy{}8}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}\PYG{p}{)}
+\end{MintedVerbatim}

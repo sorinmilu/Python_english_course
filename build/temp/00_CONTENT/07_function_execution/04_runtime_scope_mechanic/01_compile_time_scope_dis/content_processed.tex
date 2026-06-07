@@ -1,0 +1,1265 @@
+\subsection{Compile-Time Scope Disambiguation}
+
+Python name lookup feels dynamic because values are resolved while the program runs. But the classification of many names is decided earlier, when Python compiles the function body.
+
+Before a function runs, Python has already inspected its syntax and decided which names are local, which names are global-style lookups, which names are free variables from enclosing scopes, and which names must be stored in closure cells.
+
+This distinction is essential:
+
+\begin{itemize}
+    \item name \textbf{classification} is mostly static and syntax-driven;
+    \item object \textbf{value lookup} is dynamic and happens at runtime.
+\end{itemize}
+
+That is why a function can fail with \texttt{UnboundLocalError} before it ever considers a global name with the same spelling. The compiler has already decided that the name is local.
+
+\subsubsection{How the Python Compiler Scans Syntax Trees for Assignment Targets}
+
+Python first parses source code into a syntax tree. That tree contains assignment targets, reads, function definitions, calls, literals, and other syntactic structures.
+
+The standard \texttt{ast} module lets us inspect this representation.
+
+\begin{verbatim}
+import ast
+
+source = """
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+"""
+
+tree = ast.parse(source)
+
+print(f"type(tree): {type(tree)}")
+print()
+print(ast.dump(tree, indent=4))
+\end{verbatim}
+
+The output is long, but the important part contains two different uses of \texttt{answer} inside \texttt{broken()}:
+
+\begin{verbatim}
+Name(id='answer', ctx=Load())
+Name(id='answer', ctx=Store())
+\end{verbatim}
+
+The \texttt{Load()} context means the name is being read. The \texttt{Store()} context means the name is an assignment target.
+
+The AST object can be inspected.
+
+\begin{verbatim}
+import ast
+
+tree = ast.parse("x = 42")
+
+print(f"type(tree): {type(tree)}")
+print()
+
+selected_names = [
+    "body",
+    "type_ignores",
+    "_fields",
+    "__class__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(tree)}")
+
+print()
+print(f"tree.body: {tree.body}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(tree): <class 'ast.Module'>
+
+body           True
+type_ignores   True
+_fields        True
+__class__      True
+
+tree.body: [<ast.Assign object at 0x...>]
+\end{verbatim}
+
+The first statement is an \texttt{ast.Assign} object.
+
+\begin{verbatim}
+import ast
+
+tree = ast.parse("x = 42")
+assign_node = tree.body[0]
+
+print(f"assign_node:       {assign_node}")
+print(f"type(assign_node): {type(assign_node)}")
+print()
+
+selected_names = [
+    "targets",
+    "value",
+    "lineno",
+    "col_offset",
+    "_fields",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(assign_node)}")
+
+print()
+print(f"targets: {assign_node.targets}")
+print(f"value:   {assign_node.value}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+assign_node:       <ast.Assign object at 0x...>
+type(assign_node): <class 'ast.Assign'>
+
+targets        True
+value          True
+lineno         True
+col_offset     True
+_fields        True
+
+targets: [<ast.Name object at 0x...>]
+value:   <ast.Constant object at 0x...>
+\end{verbatim}
+
+The assignment target is an \texttt{ast.Name} object with \texttt{Store} context.
+
+\begin{verbatim}
+import ast
+
+tree = ast.parse("x = 42")
+target_node = tree.body[0].targets[0]
+
+print(f"type(target_node): {type(target_node)}")
+print()
+
+selected_names = [
+    "id",
+    "ctx",
+    "lineno",
+    "col_offset",
+    "_fields",
+]
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(target_node)}")
+
+print()
+print(f"target_node.id:  {target_node.id!r}")
+print(f"target_node.ctx: {target_node.ctx}")
+print(f"type(ctx):       {type(target_node.ctx)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(target_node): <class 'ast.Name'>
+
+id           True
+ctx          True
+lineno       True
+col_offset   True
+_fields      True
+
+target_node.id:  'x'
+target_node.ctx: <ast.Store object at 0x...>
+type(ctx):       <class 'ast.Store'>
+\end{verbatim}
+
+Now compare a name read.
+
+\begin{verbatim}
+import ast
+
+tree = ast.parse("print(x)")
+call_node = tree.body[0].value
+name_node = call_node.args[0]
+
+print(f"type(name_node): {type(name_node)}")
+print(f"name_node.id:    {name_node.id!r}")
+print(f"name_node.ctx:   {name_node.ctx}")
+print(f"type(ctx):       {type(name_node.ctx)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(name_node): <class 'ast.Name'>
+name_node.id:    'x'
+name_node.ctx:   <ast.Load object at 0x...>
+type(ctx):       <class 'ast.Load'>
+\end{verbatim}
+
+The compiler uses this kind of syntactic information to decide scope categories. A name that appears as an assignment target inside a function is local by default, unless a \texttt{global} or \texttt{nonlocal} declaration changes that rule.
+
+This is true even if the assignment is textually after the read.
+
+\begin{verbatim}
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+
+try:
+    broken()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'answer' where it is not associated with a value
+\end{verbatim}
+
+The compiler saw the assignment target \texttt{answer} in the function body. Therefore, \texttt{answer} became a local variable for that function. The earlier read tries to read the local slot before a value has been stored there.
+
+A dead-looking assignment still affects classification.
+
+\begin{verbatim}
+answer = 42
+
+def broken():
+    if False:
+        answer = 100
+
+    return answer
+
+try:
+    print(broken())
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'answer' where it is not associated with a value
+\end{verbatim}
+
+The branch does not execute, but the assignment target exists in the function syntax. The compiler does not need the branch to run before it classifies \texttt{answer} as local.
+
+The code object reveals the decision.
+
+\begin{verbatim}
+answer = 42
+
+def broken():
+    if False:
+        answer = 100
+
+    return answer
+
+print(f"co_varnames: {broken.__code__.co_varnames}")
+print(f"co_names:    {broken.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+co_varnames: ('answer',)
+co_names:    ()
+\end{verbatim}
+
+The name \texttt{answer} is a local variable of \texttt{broken()}, even though the assignment never runs.
+
+The rule is:
+
+\begin{quote}
+For ordinary function bodies, assignment syntax classifies a name as local for the whole function unless \texttt{global} or \texttt{nonlocal} overrides that classification.
+\end{quote}
+
+\subsubsection{Pre-Determining Local Scope Allocation Flags via Symbol Tables Prior to Execution}
+
+The standard \texttt{symtable} module exposes Python's symbol-table analysis. This is closer to the compiler's scope reasoning than plain AST inspection.
+
+\begin{verbatim}
+import symtable
+
+source = """
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+"""
+
+table = symtable.symtable(source, "demo.py", "exec")
+
+print(f"table:       {table}")
+print(f"type(table): {type(table)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+table:       <SymbolTable for module demo.py>
+type(table): <class 'symtable.SymbolTable'>
+\end{verbatim}
+
+The symbol table object can be inspected.
+
+\begin{verbatim}
+import symtable
+
+source = """
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+"""
+
+table = symtable.symtable(source, "demo.py", "exec")
+
+print(f"type(table): {type(table)}")
+print()
+
+selected_names = [
+    "get_name",
+    "get_type",
+    "get_symbols",
+    "get_children",
+    "lookup",
+    "is_nested",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(table)}")
+
+print()
+print(f"table name: {table.get_name()}")
+print(f"table type: {table.get_type()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(table): <class 'symtable.SymbolTable'>
+
+get_name         True
+get_type         True
+get_symbols      True
+get_children     True
+lookup           True
+is_nested        True
+
+table name: top
+table type: module
+\end{verbatim}
+
+The module-level symbol table has a child table for the function.
+
+\begin{verbatim}
+import symtable
+
+source = """
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+"""
+
+module_table = symtable.symtable(source, "demo.py", "exec")
+children = module_table.get_children()
+
+print(f"children:       {children}")
+print(f"type(children): {type(children)}")
+print()
+
+func_table = children[0]
+
+print(f"func name: {func_table.get_name()}")
+print(f"func type: {func_table.get_type()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+children:       [<Function SymbolTable for broken in demo.py>]
+type(children): <class 'list'>
+
+func name: broken
+func type: function
+\end{verbatim}
+
+The child list is a normal list.
+
+\begin{verbatim}
+import symtable
+
+source = """
+def broken():
+    answer = 100
+"""
+
+module_table = symtable.symtable(source, "demo.py", "exec")
+children = module_table.get_children()
+
+print(f"type(children): {type(children)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "pop",
+    "__len__",
+    "__getitem__",
+    "__iter__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(children)}")
+
+print()
+print(f"len(children): {len(children)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(children): <class 'list'>
+
+append         True
+extend         True
+pop            True
+__len__        True
+__getitem__    True
+__iter__       True
+
+len(children): 1
+\end{verbatim}
+
+Now inspect the symbol for \texttt{answer} inside the function.
+
+\begin{verbatim}
+import symtable
+
+source = """
+answer = 42
+
+def broken():
+    print(answer)
+    answer = 100
+"""
+
+module_table = symtable.symtable(source, "demo.py", "exec")
+func_table = module_table.get_children()[0]
+
+symbol = func_table.lookup("answer")
+
+print(f"symbol:       {symbol}")
+print(f"type(symbol): {type(symbol)}")
+print()
+
+selected_names = [
+    "get_name",
+    "is_local",
+    "is_global",
+    "is_referenced",
+    "is_assigned",
+    "is_free",
+    "is_parameter",
+]
+
+for name in selected_names:
+    print(f"{name:<18} {name in dir(symbol)}")
+
+print()
+print(f"name:          {symbol.get_name()}")
+print(f"is_local:      {symbol.is_local()}")
+print(f"is_global:     {symbol.is_global()}")
+print(f"is_referenced: {symbol.is_referenced()}")
+print(f"is_assigned:   {symbol.is_assigned()}")
+print(f"is_free:       {symbol.is_free()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+symbol:       <symbol 'answer'>
+type(symbol): <class 'symtable.Symbol'>
+
+get_name           True
+is_local           True
+is_global          True
+is_referenced      True
+is_assigned        True
+is_free            True
+is_parameter       True
+
+name:          answer
+is_local:      True
+is_global:     False
+is_referenced: True
+is_assigned:   True
+is_free:       False
+\end{verbatim}
+
+The symbol table reports that \texttt{answer} is local and assigned inside the function. This happens before the function is ever called.
+
+Compare a function that only reads \texttt{answer}.
+
+\begin{verbatim}
+import symtable
+
+source = """
+answer = 42
+
+def show():
+    print(answer)
+"""
+
+module_table = symtable.symtable(source, "demo.py", "exec")
+func_table = module_table.get_children()[0]
+symbol = func_table.lookup("answer")
+
+print(f"name:          {symbol.get_name()}")
+print(f"is_local:      {symbol.is_local()}")
+print(f"is_global:     {symbol.is_global()}")
+print(f"is_referenced: {symbol.is_referenced()}")
+print(f"is_assigned:   {symbol.is_assigned()}")
+print(f"is_free:       {symbol.is_free()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name:          answer
+is_local:      False
+is_global:     True
+is_referenced: True
+is_assigned:   False
+is_free:       False
+\end{verbatim}
+
+Now \texttt{answer} is classified as global from the function's point of view.
+
+The compiled code objects agree with the symbol table.
+
+\begin{verbatim}
+answer = 42
+
+def show():
+    print(answer)
+
+def broken():
+    print(answer)
+    answer = 100
+
+print("show")
+print(f"co_varnames: {show.__code__.co_varnames}")
+print(f"co_names:    {show.__code__.co_names}")
+print()
+
+print("broken")
+print(f"co_varnames: {broken.__code__.co_varnames}")
+print(f"co_names:    {broken.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+show
+co_varnames: ()
+co_names:    ('print', 'answer')
+
+broken
+co_varnames: ('answer',)
+co_names:    ('print',)
+\end{verbatim}
+
+The symbol-table decision affects the bytecode instruction choice.
+
+\begin{verbatim}
+import dis
+
+answer = 42
+
+def show():
+    print(answer)
+
+def broken():
+    print(answer)
+    answer = 100
+
+print("show:")
+dis.dis(show)
+
+print()
+print("broken:")
+dis.dis(broken)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+show:
+... LOAD_GLOBAL              ... (answer)
+
+broken:
+... LOAD_FAST                ... (answer)
+... STORE_FAST               ... (answer)
+\end{verbatim}
+
+The exact bytecode format depends on Python version, but the difference remains:
+
+\begin{itemize}
+    \item global-style names use global lookup instructions;
+    \item local names use local-slot instructions.
+\end{itemize}
+
+The symbol table is therefore a compile-time planning artifact. It pre-determines how names will be accessed when the function eventually runs.
+
+\subsubsection{Static Name Binding Invariants vs. Dynamic Late-Binding Value Resolution}
+
+The classification of a name is static for a compiled function. The value found through that classification may still be dynamic.
+
+A function that reads a global name does not freeze that global value when the function is defined.
+
+\begin{verbatim}
+message = "D'oh!"
+
+def show_message():
+    print(message)
+
+show_message()
+
+message = "No soup for you!"
+
+show_message()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+D'oh!
+No soup for you!
+\end{verbatim}
+
+The function \texttt{show\_message()} performs a global lookup each time it is called. It does not store the original string as a hidden constant.
+
+The code object shows that \texttt{message} is a global-style name.
+
+\begin{verbatim}
+message = "D'oh!"
+
+def show_message():
+    print(message)
+
+print(f"co_varnames: {show_message.__code__.co_varnames}")
+print(f"co_names:    {show_message.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+co_varnames: ()
+co_names:    ('print', 'message')
+\end{verbatim}
+
+The classification is fixed:
+
+\begin{verbatim}
+message is looked up as a global name
+\end{verbatim}
+
+The value is not fixed:
+
+\begin{verbatim}
+whatever object the module namespace binds to message at call time is used
+\end{verbatim}
+
+This is late binding of values.
+
+The same idea appears with functions.
+
+\begin{verbatim}
+def action():
+    return "first action"
+
+def run_action():
+    print(action())
+
+run_action()
+
+def action():
+    return "second action"
+
+run_action()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first action
+second action
+\end{verbatim}
+
+The function \texttt{run\_action()} looks up the global name \texttt{action} when it runs. After the second \texttt{def action():} executes, the global name \texttt{action} refers to a different function object.
+
+The function object can be inspected before and after rebinding.
+
+\begin{verbatim}
+def action():
+    return "first action"
+
+old_action = action
+
+def action():
+    return "second action"
+
+print(f"old_action: {old_action}")
+print(f"action:     {action}")
+print(f"same object: {old_action is action}")
+print()
+print(f"old_action(): {old_action()}")
+print(f"action():     {action()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+old_action: <function action at 0x...>
+action:     <function action at 0x...>
+same object: False
+
+old_action(): first action
+action():     second action
+\end{verbatim}
+
+The global name was rebound. Code that looks up the global name later sees the new object.
+
+This contrasts with local classification.
+
+\begin{verbatim}
+message = "global message"
+
+def broken():
+    print(message)
+    message = "local message"
+
+try:
+    broken()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'message' where it is not associated with a value
+\end{verbatim}
+
+Even though the global \texttt{message} exists at runtime, the compiled function does not use the global lookup path for \texttt{message}. The local classification is fixed by syntax.
+
+The invariant is:
+
+\begin{quote}
+The compiler decides the namespace access category. Runtime execution retrieves the current object from that category.
+\end{quote}
+
+A default argument behaves differently from a global lookup. The default object is stored when the function is defined.
+
+\begin{verbatim}
+message = "D'oh!"
+
+def show_default(text=message):
+    print(text)
+
+show_default()
+
+message = "No soup for you!"
+
+show_default()
+show_default(message)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+D'oh!
+D'oh!
+No soup for you!
+\end{verbatim}
+
+The default value captured the old object at definition time. The global lookup in a function body would see the new object at call time.
+
+Compare both in one example.
+
+\begin{verbatim}
+message = "D'oh!"
+
+def show_both(text=message):
+    print(f"default text: {text}")
+    print(f"global name:  {message}")
+
+show_both()
+
+message = "No soup for you!"
+
+print()
+show_both()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+default text: D'oh!
+global name:  D'oh!
+
+default text: D'oh!
+global name:  No soup for you!
+\end{verbatim}
+
+The default \texttt{text} is stored in \texttt{\_\_defaults\_\_}. The name \texttt{message} inside the function body is looked up dynamically as a global.
+
+\begin{verbatim}
+message = "D'oh!"
+
+def show_both(text=message):
+    print(text)
+    print(message)
+
+print(f"defaults:    {show_both.__defaults__}")
+print(f"co_varnames: {show_both.__code__.co_varnames}")
+print(f"co_names:    {show_both.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+defaults:    ("D'oh!",)
+co_varnames: ('text',)
+co_names:    ('print', 'message')
+\end{verbatim}
+
+This example separates three ideas:
+
+\begin{itemize}
+    \item \texttt{text} is a local parameter;
+    \item its default object was stored at definition time;
+    \item \texttt{message} in the body is a global lookup resolved at call time.
+\end{itemize}
+
+So Python is not simply ``dynamic'' or ``static'' in one flat sense. Its behavior is split:
+
+\begin{center}
+\begin{tabular}{|p{0.38\linewidth}|p{0.46\linewidth}|}
+\hline
+\textbf{Mechanism} & \textbf{When it is decided} \\
+\hline
+Local/global/free/built-in classification & compile time / function creation path \\
+\hline
+Default argument object creation & definition time, when \texttt{def} executes \\
+\hline
+Global value lookup inside function body & call time, when instruction executes \\
+\hline
+Local value availability & call time, depending on executed assignments \\
+\hline
+Closure cell value lookup & call time, through preserved cell object \\
+\hline
+\end{tabular}
+\end{center}
+
+The important practical rule is:
+
+\begin{quote}
+The place Python will search is decided early. The object found in that place may still change before the search happens.
+\end{quote}
+
+\subsubsection{The Loop Variable Closure Trap: Why Nested Functions May See the Final Loop Value}
+
+A common closure trap appears when nested functions are created inside a loop.
+
+\begin{verbatim}
+funcs = []
+
+for i in range(3):
+    def show_i():
+        return i
+
+    funcs.append(show_i)
+
+for fn in funcs:
+    print(fn())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+2
+2
+2
+\end{verbatim}
+
+Many beginners expect:
+
+\begin{verbatim}
+0
+1
+2
+\end{verbatim}
+
+But all three functions refer to the same name \texttt{i}. They do not each receive a frozen copy of the loop value.
+
+At module level, \texttt{i} is a global name. After the loop finishes, \texttt{i} is bound to \texttt{2}. Each function performs a global lookup of \texttt{i} when called.
+
+This can be inspected.
+
+\begin{verbatim}
+funcs = []
+
+for i in range(3):
+    def show_i():
+        return i
+
+    funcs.append(show_i)
+
+fn = funcs[0]
+
+print(f"fn(): {fn()}")
+print(f"i after loop: {i}")
+print()
+print(f"fn.__code__.co_varnames: {fn.__code__.co_varnames}")
+print(f"fn.__code__.co_names:    {fn.__code__.co_names}")
+print(f"fn.__closure__:          {fn.__closure__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn(): 2
+i after loop: 2
+
+fn.__code__.co_varnames: ()
+fn.__code__.co_names:    ('i',)
+fn.__closure__:          None
+\end{verbatim}
+
+At module level, the nested-looking function is not inside another function scope. It uses global lookup for \texttt{i}.
+
+Inside an outer function, the trap uses closure cells.
+
+\begin{verbatim}
+def make_funcs():
+    funcs = []
+
+    for i in range(3):
+        def show_i():
+            return i
+
+        funcs.append(show_i)
+
+    return funcs
+
+funcs = make_funcs()
+
+for fn in funcs:
+    print(fn())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+2
+2
+2
+\end{verbatim}
+
+Now \texttt{i} is not global. It is a local variable of \texttt{make\_funcs()} that becomes a closure cell because \texttt{show\_i()} refers to it.
+
+All three inner functions share that same cell.
+
+\begin{verbatim}
+def make_funcs():
+    funcs = []
+
+    for i in range(3):
+        def show_i():
+            return i
+
+        funcs.append(show_i)
+
+    return funcs
+
+funcs = make_funcs()
+
+for index, fn in enumerate(funcs):
+    cell = fn.__closure__[0]
+
+    print(f"function {index}")
+    print(f"  result:          {fn()}")
+    print(f"  closure:         {fn.__closure__}")
+    print(f"  freevars:        {fn.__code__.co_freevars}")
+    print(f"  cell contents:   {cell.cell_contents}")
+    print(f"  cell id:         {id(cell)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+function 0
+  result:          2
+  closure:         (<cell at 0x...: int object at 0x...>,)
+  freevars:        ('i',)
+  cell contents:   2
+  cell id:         2293100811520
+
+function 1
+  result:          2
+  closure:         (<cell at 0x...: int object at 0x...>,)
+  freevars:        ('i',)
+  cell contents:   2
+  cell id:         2293100811520
+
+function 2
+  result:          2
+  closure:         (<cell at 0x...: int object at 0x...>,)
+  freevars:        ('i',)
+  cell contents:   2
+  cell id:         2293100811520
+\end{verbatim}
+
+The same cell id appears for all three functions. They share one closure cell for \texttt{i}. After the loop ends, that cell contains the final loop value.
+
+The cell object is a normal inspectable object.
+
+\begin{verbatim}
+def make_funcs():
+    funcs = []
+
+    for i in range(3):
+        def show_i():
+            return i
+
+        funcs.append(show_i)
+
+    return funcs
+
+cell = make_funcs()[0].__closure__[0]
+
+print(f"type(cell): {type(cell)}")
+print()
+
+selected_names = [
+    "cell_contents",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(cell)}")
+
+print()
+print(f"cell.cell_contents: {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(cell): <class 'cell'>
+
+cell_contents    True
+__class__        True
+__eq__           True
+__repr__         True
+
+cell.cell_contents: 2
+\end{verbatim}
+
+The problem is not that the loop calls the functions too late in a vague sense. The exact mechanism is:
+
+\begin{verbatim}
+1. The loop repeatedly rebinds the same name i.
+2. Each inner function refers to that same variable cell.
+3. The functions are called after the loop has finished.
+4. The cell now contains the final value, 2.
+5. Every function reads that same cell.
+\end{verbatim}
+
+A common fix is to capture the current value as a default argument.
+
+\begin{verbatim}
+def make_funcs():
+    funcs = []
+
+    for i in range(3):
+        def show_i(i=i):
+            return i
+
+        funcs.append(show_i)
+
+    return funcs
+
+funcs = make_funcs()
+
+for fn in funcs:
+    print(fn())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+0
+1
+2
+\end{verbatim}
+
+This works because default argument objects are evaluated when the \texttt{def} statement executes. Each loop iteration executes a new \texttt{def} statement and stores the current object referenced by \texttt{i} as that function's default.
+
+Inspect the functions.
+
+\begin{verbatim}
+def make_funcs():
+    funcs = []
+
+    for i in range(3):
+        def show_i(i=i):
+            return i
+
+        funcs.append(show_i)
+
+    return funcs
+
+funcs = make_funcs()
+
+for index, fn in enumerate(funcs):
+    print(f"function {index}")
+    print(f"  result:       {fn()}")
+    print(f"  defaults:     {fn.__defaults__}")
+    print(f"  varnames:     {fn.__code__.co_varnames}")
+    print(f"  freevars:     {fn.__code__.co_freevars}")
+    print(f"  closure:      {fn.__closure__}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+function 0
+  result:       0
+  defaults:     (0,)
+  varnames:     ('i',)
+  freevars:     ()
+  closure:      None
+
+function 1
+  result:       1
+  defaults:     (1,)
+  varnames:     ('i',)
+  freevars:     ()
+  closure:      None
+
+function 2
+  result:       2
+  defaults:     (2,)
+  varnames:     ('i',)
+  freevars:     ()
+  closure:      None
+\end{verbatim}
+
+Now each function has its own local parameter \texttt{i} with its own stored default. There is no shared closure cell for \texttt{i}.
+
+Another fix is to use a factory function. The factory creates a new enclosing scope for each value.
+
+\begin{verbatim}
+def make_one_func(value):
+    def show_value():
+        return value
+
+    return show_value
+
+funcs = []
+
+for i in range(3):
+    funcs.append(make_one_func(i))
+
+for fn in funcs:
+    print(fn())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+0
+1
+2
+\end{verbatim}
+
+Each call to \texttt{make\_one\_func(i)} creates a separate frame and a separate closure cell for \texttt{value}.
+
+\begin{verbatim}
+def make_one_func(value):
+    def show_value():
+        return value
+
+    return show_value
+
+funcs = []
+
+for i in range(3):
+    funcs.append(make_one_func(i))
+
+for index, fn in enumerate(funcs):
+    cell = fn.__closure__[0]
+
+    print(f"function {index}")
+    print(f"  result:        {fn()}")
+    print(f"  freevars:      {fn.__code__.co_freevars}")
+    print(f"  cell contents: {cell.cell_contents}")
+    print(f"  cell id:       {id(cell)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+function 0
+  result:        0
+  freevars:      ('value',)
+  cell contents: 0
+  cell id:       2293100811520
+
+function 1
+  result:        1
+  freevars:      ('value',)
+  cell contents: 1
+  cell id:       2293100811392
+
+function 2
+  result:        2
+  freevars:      ('value',)
+  cell contents: 2
+  cell id:       2293100811648
+\end{verbatim}
+
+Now the cell ids are different. Each returned function closes over a different cell.
+
+The loop variable closure trap is therefore not a special loop bug. It is a direct consequence of two ordinary rules:
+
+\begin{itemize}
+    \item closures preserve variables through cells, not frozen textual values;
+    \item the value inside a cell is read when the inner function runs, not when the inner function is created.
+\end{itemize}
+
+The compact rule is:
+
+\begin{quote}
+If a nested function refers to a loop variable, it usually refers to the variable itself, not a snapshot of its value. Use a default argument or a factory function when each generated function must remember a separate value.
+\end{quote}

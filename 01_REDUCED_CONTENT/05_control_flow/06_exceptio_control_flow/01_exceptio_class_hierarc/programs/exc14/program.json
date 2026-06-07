@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Exception Classes as Runtime Types",
+  "label": "exc14",
+  "linenos": true,
+  "input": null,
+  "output": "lookup failed\ntype(err): <class 'IndexError'>\nmessage: list index out of range",
+  "file": "main.py"
+}

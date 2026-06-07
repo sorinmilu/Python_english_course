@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...",
+  "label": "the02",
+  "linenos": true,
+  "input": null,
+  "output": "type(nums_range): <class 'range'>\ntype(nums_list): <class 'list'>\nsize of nums_range: 48 bytes\nsize of nums_list:  8000056 bytes",
+  "file": "main.py"
+}

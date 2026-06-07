@@ -1,0 +1,5 @@
+\section{Unordered Unique Domains: The Set Architecture (\texttt{set})}
+
+A \texttt{set} is Python's built-in structure for representing a collection of unique elements. Unlike a list or tuple, it does not preserve components as a positional sequence. The central question for a set is not ``what is stored at index three?'', but ``does this value belong to the collection?''
+
+This section studies sets as hash-based membership domains. We will examine their syntax, their automatic duplicate removal, their requirement that elements be hashable, their mutation operations, and the immutable \texttt{frozenset} variant. The goal is to understand \texttt{set} not as a strange list, but as a different storage architecture built for uniqueness and efficient membership testing.

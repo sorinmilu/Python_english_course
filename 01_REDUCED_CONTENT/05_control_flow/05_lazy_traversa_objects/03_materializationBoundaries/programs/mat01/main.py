@@ -1,11 +1,10 @@
-def is_even(num):
-    return num % 2 == 0
+import sys
 
-texts = ["10", "15", "20", "42", "99"]
+nums_range = range(1_000_000)
+nums_map = map(lambda n: n * 2, nums_range)
 
-even_nums = list(filter(is_even, map(int, texts)))
+print(f"type(nums_range): {type(nums_range)}")
+print(f"type(nums_map): {type(nums_map)}")
 
-print(f"even_nums: {even_nums}")
-print(f"first even number: {even_nums[0]}")
-print(f"total: {sum(even_nums)}")
-print(f"again total: {sum(even_nums)}")
+print(f"size of range: {sys.getsizeof(nums_range)} bytes")
+print(f"size of map:   {sys.getsizeof(nums_map)} bytes")

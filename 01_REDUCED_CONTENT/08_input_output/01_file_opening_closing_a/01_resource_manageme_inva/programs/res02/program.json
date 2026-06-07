@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Manual Closing with .close() and the Risk of Leaked File Handles",
+  "label": "res02",
+  "linenos": true,
+  "input": null,
+  "output": null,
+  "file": "main.py"
+}

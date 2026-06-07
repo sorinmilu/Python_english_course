@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "enumerate() as a Lazy Pair Generator for Index-Value Iteration",
+  "label": "enu04",
+  "linenos": true,
+  "input": null,
+  "output": "pair1: (0, 'Jerry')\npair2: (1, 'Elaine')\npair3: (2, 'Kramer')\ntype(pair1): <class 'tuple'>\ndir(pair1) sample: ['__add__', '__class__', '__class_getitem__',\n'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',\n'__format__', '__ge__']",
+  "file": "main.py"
+}

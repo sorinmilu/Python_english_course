@@ -1,0 +1,298 @@
+\subsection{Enumerated Traversal}
+
+A normal \texttt{for} loop gives the next value from an iterable. Sometimes that is enough. Other times, the program also needs the position of that value: the first item, the second item, the third item, and so on.
+
+A beginner coming from C may try to solve this by manually combining \texttt{range()} and indexing:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for i in range(len(names)):
+    print(f"{i}: {names[i]}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+0: Jerry
+1: Elaine
+2: Kramer
+\end{verbatim}
+
+This works, but it is not the usual Python shape. The loop is no longer directly traversing the values. It is traversing numeric positions and then using those positions to index the list.
+
+Python provides \texttt{enumerate()} for the more direct case: traverse the values and receive a counter beside each value.
+
+\begin{quote}
+\texttt{enumerate()} turns a value stream into an index-value stream, without building a separate list of pairs in advance.
+\end{quote}
+
+\subsubsection{\texttt{enumerate()} as a Lazy Pair Generator for Index-Value Iteration}
+
+The \texttt{enumerate()} function receives an iterable and returns an \texttt{enumerate} object. That object is itself an iterator. Each call to \texttt{next()} produces a pair containing the current index and the current value.
+
+\begin{codebox}[]{python}{enumerate() as a Lazy Pair Generator for Index-Value Iteration}{enu05}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names)
+
+print(f"type(names): {type(names)}")
+print(f"type(pairs): {type(pairs)}")
+print(f"dir(pairs) sample: {dir(pairs)[:12]}")
+
+print(f"has __iter__: {'__iter__' in dir(pairs)}")
+print(f"has __next__: {'__next__' in dir(pairs)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(names): <class 'list'>} \\
+\texttt{type(pairs): <class 'enumerate'>} \\
+\texttt{dir(pairs) sample: ['\_\_class\_\_', '\_\_class\_getitem\_\_', '\_\_delattr\_\_',} \\
+\texttt{'\_\_dir\_\_', '\_\_doc\_\_', '\_\_eq\_\_', '\_\_format\_\_', '\_\_ge\_\_',} \\
+\texttt{'\_\_getattribute\_\_', '\_\_getstate\_\_', '\_\_gt\_\_', '\_\_hash\_\_']} \\
+\texttt{has \_\_iter\_\_: True} \\
+\texttt{has \_\_next\_\_: True} \\
+\end{iobox}
+
+
+Because the object has \texttt{\_\_iter\_\_()} and \texttt{\_\_next\_\_()}, it is an iterator. It is consumed as it advances.
+
+Manual inspection with \texttt{next()} shows what it produces:
+
+\begin{codebox}[]{python}{enumerate() as a Lazy Pair Generator for Index-Value Iteration}{enu04}
+names = ["Jerry", "Elaine", "Kramer"]
+pairs = enumerate(names)
+
+pair1 = next(pairs)
+pair2 = next(pairs)
+pair3 = next(pairs)
+
+print(f"pair1: {pair1}")
+print(f"pair2: {pair2}")
+print(f"pair3: {pair3}")
+
+print(f"type(pair1): {type(pair1)}")
+print(f"dir(pair1) sample: {dir(pair1)[:10]}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{pair1: (0, 'Jerry')} \\
+\texttt{pair2: (1, 'Elaine')} \\
+\texttt{pair3: (2, 'Kramer')} \\
+\texttt{type(pair1): <class 'tuple'>} \\
+\texttt{dir(pair1) sample: ['\_\_add\_\_', '\_\_class\_\_', '\_\_class\_getitem\_\_',} \\
+\texttt{'\_\_contains\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', '\_\_eq\_\_',} \\
+\texttt{'\_\_format\_\_', '\_\_ge\_\_']} \\
+\end{iobox}
+
+
+Each produced object is a tuple. The first component is the index. The second component is the original value.
+
+The tuple can be unpacked directly in the \texttt{for} loop header:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for i, name in enumerate(names):
+    print(f"{i:>2} | {name}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ 0 | Jerry
+ 1 | Elaine
+ 2 | Kramer
+\end{verbatim}
+
+The loop header:
+
+\begin{verbatim}
+for i, name in enumerate(names):
+\end{verbatim}
+
+means that each produced pair is decomposed into two names. The first tuple element is assigned to \texttt{i}. The second tuple element is assigned to \texttt{name}.
+
+This is equivalent to writing the unpacking manually inside the loop:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for pair in enumerate(names):
+    i = pair[0]
+    name = pair[1]
+    print(f"{i:>2} | {name}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ 0 | Jerry
+ 1 | Elaine
+ 2 | Kramer
+\end{verbatim}
+
+The unpacked version is usually clearer because the structure of the pair is visible in the loop header.
+
+The starting index can be changed with the \texttt{start} argument:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for i, name in enumerate(names, start=1):
+    print(f"{i:>2}. {name}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ 1. Jerry
+ 2. Elaine
+ 3. Kramer
+\end{verbatim}
+
+This is useful when displaying human-facing numbering. Python list indexes normally start at \texttt{0}, but printed lists often start at \texttt{1}.
+
+The \texttt{enumerate()} object is lazy. It does not immediately create all pairs.
+
+\begin{codebox}[]{python}{enumerate() as a Lazy Pair Generator for Index-Value Iteration}{enu03}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names, start=1)
+
+print(f"pairs: {pairs}")
+print("nothing has been printed from the names yet")
+
+print(f"next(pairs): {next(pairs)}")
+print(f"next(pairs): {next(pairs)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{pairs: <enumerate object at 0x...>} \\
+\texttt{nothing has been printed from the names yet} \\
+\texttt{next(pairs): (1, 'Jerry')} \\
+\texttt{next(pairs): (2, 'Elaine')} \\
+\end{iobox}
+
+
+The exact memory address will differ. The important fact is that \texttt{pairs} is a traversal object. It yields pairs only when asked.
+
+If all pairs are needed as stored data, the object can be materialized:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names, start=1)
+stored_pairs = list(pairs)
+
+print(f"stored_pairs: {stored_pairs}")
+print(f"type(stored_pairs): {type(stored_pairs)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+stored_pairs: [(1, 'Jerry'), (2, 'Elaine'), (3, 'Kramer')]
+type(stored_pairs): <class 'list'>
+\end{verbatim}
+
+The call to \texttt{list(pairs)} consumes the \texttt{enumerate} iterator and stores the remaining produced tuples in a list.
+
+After consumption, the same \texttt{enumerate} object has no remaining values:
+
+\begin{codebox}[]{python}{enumerate() as a Lazy Pair Generator for Index-Value Iteration}{enu02}
+names = ["Jerry", "Elaine", "Kramer"]
+
+pairs = enumerate(names)
+
+first = list(pairs)
+second = list(pairs)
+
+print(f"first: {first}")
+print(f"second: {second}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{first: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]} \\
+\texttt{second: []} \\
+\end{iobox}
+
+
+This follows the iterator exhaustion rule from the previous section. The \texttt{enumerate} object is not the same kind of reusable source as the original list. It is a traversal in progress.
+
+To traverse again, create a new \texttt{enumerate} object from the original iterable:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+first = list(enumerate(names))
+second = list(enumerate(names))
+
+print(f"first: {first}")
+print(f"second: {second}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
+second: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
+\end{verbatim}
+
+The original list is reusable. Each call to \texttt{enumerate(names)} creates a new iterator over it.
+
+The values produced by \texttt{enumerate()} reflect the current traversal of the underlying iterable. For simple teaching code, avoid changing the list while enumerating it, because that mixes traversal with structural mutation.
+
+Clear version:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for i, name in enumerate(names):
+    print(f"{i}: {name}")
+\end{verbatim}
+
+Avoid this shape while learning:
+
+\begin{verbatim}
+names = ["Jerry", "Elaine", "Kramer"]
+
+for i, name in enumerate(names):
+    names.append("Newman")
+    print(f"{i}: {name}")
+\end{verbatim}
+
+The second program changes the traversal source while it is being traversed. That is a separate mutation problem, not a useful demonstration of \texttt{enumerate()}.
+
+A compact practical example:
+
+\begin{codebox}[]{python}{enumerate() as a Lazy Pair Generator for Index-Value Iteration}{enu01}
+quotes = [
+    "No soup for you!",
+    "Nobody expects the Spanish Inquisition!",
+    "D'oh!",
+]
+
+for line_no, quote in enumerate(quotes, start=1):
+    print(f"{line_no:>2} | {quote}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{ 1 | No soup for you!} \\
+\texttt{ 2 | Nobody expects the Spanish Inquisition!} \\
+\texttt{ 3 | D'oh!} \\
+\end{iobox}
+
+
+The \texttt{enumerate()} call supplies the line number. The list supplies the quote. The loop receives both together.
+
+The practical rule is:
+
+\begin{quote}
+Use \texttt{enumerate()} when you need both the traversal value and a counter. It is clearer than manually looping over \texttt{range(len(obj))} when the value itself is the main object being processed.
+\end{quote}

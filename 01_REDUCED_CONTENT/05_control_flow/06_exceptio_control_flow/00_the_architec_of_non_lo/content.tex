@@ -16,19 +16,7 @@ In C, failure is often represented through returned values or modified output pa
 
 A simplified C-style pattern looks like this:
 
-\begin{verbatim}
-/* C-style idea, not Python */
-FILE *fp = fopen("data.txt", "r");
-
-if (fp == NULL) {
-    printf("could not open file\n");
-    return 1;
-}
-
-read_from_file(fp);
-fclose(fp);
-\end{verbatim}
-
+%<<<PROGRAM:programs/the11>>>
 The failure information stays local unless the programmer explicitly forwards it. Every caller must remember to check the returned value. If the programmer forgets a check, the program may continue with invalid state.
 
 Another common C-style pattern is pointer checking:
@@ -46,58 +34,12 @@ The programmer manually asks whether the pointer is usable before dereferencing 
 
 Python can also use ordinary conditional checks, but its exception mechanism changes the default failure route. If an operation cannot complete normally, it can raise an exception instead of returning a special error value.
 
-\begin{verbatim}
-text = "forty-two"
-
-print("before conversion")
-
-try:
-    number = int(text)
-    print(f"number: {number}")
-except ValueError as err:
-    print("conversion failed")
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-
-print("after conversion attempt")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-before conversion
-conversion failed
-type(err): <class 'ValueError'>
-message: invalid literal for int() with base 10: 'forty-two'
-after conversion attempt
-\end{verbatim}
-
+%<<<PROGRAM:programs/the10>>>
 The expression \texttt{int(text)} does not return a special error number. It raises a \texttt{ValueError}. The ordinary route inside the \texttt{try} block is abandoned, and execution jumps to the matching \texttt{except} block.
 
 The exception object is a runtime object:
 
-\begin{verbatim}
-text = "forty-two"
-
-try:
-    number = int(text)
-except ValueError as err:
-    print(f"type(err): {type(err)}")
-    print(f"dir(err) sample: {dir(err)[:10]}")
-    print(f"err.args: {err.args}")
-    print(f"has __traceback__: {'__traceback__' in dir(err)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'ValueError'>
-dir(err) sample: ['__cause__', '__class__', '__context__', '__delattr__',
-'__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__']
-err.args: ("invalid literal for int() with base 10: 'forty-two'",)
-has __traceback__: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/the09>>>
 The \texttt{args} attribute stores the construction arguments carried by the exception. The \texttt{\_\_traceback\_\_} attribute connects the exception to traceback information. Later sections will examine how tracebacks preserve the route of failure through active frames.
 
 The important control-flow difference is this:
@@ -147,55 +89,10 @@ lookup attempt finished
 
 The dictionary object is an ordinary runtime object:
 
-\begin{verbatim}
-scores = {
-    "Jerry": 72,
-    "Elaine": 91,
-    "Kramer": 42,
-}
-
-print(f"type(scores): {type(scores)}")
-print(f"dir(scores) sample: {dir(scores)[:12]}")
-print(f"has __getitem__: {'__getitem__' in dir(scores)}")
-print(f"has get: {'get' in dir(scores)}")
-print(f"has keys: {'keys' in dir(scores)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(scores): <class 'dict'>
-dir(scores) sample: ['__class__', '__class_getitem__', '__contains__',
-'__delattr__', '__delitem__', '__dir__', '__doc__', '__eq__',
-'__format__', '__ge__', '__getattribute__', '__getitem__']
-has __getitem__: True
-has get: True
-has keys: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/the08>>>
 The \texttt{\_\_getitem\_\_()} method is involved in bracket lookup such as \texttt{scores[name]}. If the key is absent, that lookup raises \texttt{KeyError}. The \texttt{get()} method offers a different design: return a fallback value instead of raising.
 
-\begin{verbatim}
-scores = {
-    "Jerry": 72,
-    "Elaine": 91,
-    "Kramer": 42,
-}
-
-name = "Newman"
-score = scores.get(name, "not found")
-
-print(f"name: {name}")
-print(f"score: {score}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-name: Newman
-score: not found
-\end{verbatim}
-
+%<<<PROGRAM:programs/the07>>>
 Both approaches are valid in different situations. The bracket form treats a missing key as an exceptional route. The \texttt{get()} form treats a missing key as an ordinary value-selection route.
 
 \subsubsection{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}
@@ -204,28 +101,7 @@ Two common styles appear in Python error-handling discussions: LBYL and EAFP.
 
 LBYL means ``look before you leap.'' In this style, the program checks whether an operation appears safe before performing it.
 
-\begin{verbatim}
-scores = {
-    "Jerry": 72,
-    "Elaine": 91,
-    "Kramer": 42,
-}
-
-name = "Newman"
-
-if name in scores:
-    score = scores[name]
-    print(f"{name}: {score}")
-else:
-    print(f"{name} was not found")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-Newman was not found
-\end{verbatim}
-
+%<<<PROGRAM:programs/the06>>>
 The condition checks membership before the lookup. The lookup happens only if the key is present.
 
 EAFP means ``easier to ask forgiveness than permission.'' In this style, the program attempts the operation directly and handles the exception if the operation fails.
@@ -274,46 +150,12 @@ The EAFP version avoids duplicating the key lookup logic. This can be useful whe
 
 A list example makes the difference clear:
 
-\begin{verbatim}
-items = ["soup", "pretzels"]
-
-index = 2
-
-if index < len(items):
-    print(f"item: {items[index]}")
-else:
-    print("index is outside the list")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-index is outside the list
-\end{verbatim}
-
+%<<<PROGRAM:programs/the05>>>
 That is the LBYL version. It checks the index before using it.
 
 The EAFP version is:
 
-\begin{verbatim}
-items = ["soup", "pretzels"]
-
-index = 2
-
-try:
-    print(f"item: {items[index]}")
-except IndexError as err:
-    print("index is outside the list")
-    print(f"type(err): {type(err)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-index is outside the list
-type(err): <class 'IndexError'>
-\end{verbatim}
-
+%<<<PROGRAM:programs/the04>>>
 The list object supports indexed access through \texttt{\_\_getitem\_\_()}:
 
 \begin{verbatim}
@@ -342,65 +184,17 @@ Neither LBYL nor EAFP is universally correct. They are different ways to arrange
 
 LBYL is often clearer when the condition is cheap, direct, and part of the intended ordinary logic:
 
-\begin{verbatim}
-age_text = ""
-
-if age_text:
-    age = int(age_text)
-    print(f"age: {age}")
-else:
-    print("no age was entered")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-no age was entered
-\end{verbatim}
-
+%<<<PROGRAM:programs/the03>>>
 Here the empty-string check expresses an ordinary input condition. There is no need to force that case through an exception.
 
 EAFP is often clearer when the operation itself is the authoritative test:
 
-\begin{verbatim}
-age_text = "forty-two"
-
-try:
-    age = int(age_text)
-    print(f"age: {age}")
-except ValueError:
-    print("age text was not a valid integer")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-age text was not a valid integer
-\end{verbatim}
-
+%<<<PROGRAM:programs/the02>>>
 Checking every possible invalid integer string manually would be awkward and incomplete. The conversion operation already knows the valid format. Letting \texttt{int()} decide and catching \texttt{ValueError} gives a precise route.
 
 A useful combined version is:
 
-\begin{verbatim}
-age_text = "forty-two"
-
-if age_text:
-    try:
-        age = int(age_text)
-        print(f"age: {age}")
-    except ValueError:
-        print("age text was not a valid integer")
-else:
-    print("no age was entered")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-age text was not a valid integer
-\end{verbatim}
-
+%<<<PROGRAM:programs/the01>>>
 The empty-input case is ordinary branching. The invalid-format case is exceptional routing.
 
 The practical rule is:

@@ -1,0 +1,525 @@
+\subsection{Iterable vs. Iterator}
+
+The words \emph{iterable} and \emph{iterator} are closely related, but they do not name the same thing. Confusing them makes Python loops look more mysterious than they really are.
+
+An iterable is an object that can provide a traversal object. An iterator is the traversal object itself. The iterable is the source. The iterator is the moving cursor over that source.
+
+\begin{quote}
+An iterable can be asked to begin traversal. An iterator is the object that performs the traversal step by step.
+\end{quote}
+
+This distinction explains why a list, tuple, string, and \texttt{range} can be traversed many times, while a specific iterator is consumed as it advances.
+
+\subsubsection{Iterable Objects: Objects That Can Produce an Iterator via \texttt{iter()}}
+
+An iterable object is an object that can be passed to \texttt{iter()}. If the call succeeds, Python receives an iterator that can produce values one at a time.
+
+Examples of common iterable objects include strings, lists, tuples, dictionaries, sets, and \texttt{range} objects. In this chapter, the most important examples are strings, lists, tuples, and ranges.
+
+\begin{verbatim}
+text = "Ni!"
+items = ["soup", "pretzels", "muffin"]
+coords = (10, 20, 30)
+steps = range(1, 4)
+
+print(f"type(text): {type(text)}")
+print(f"type(items): {type(items)}")
+print(f"type(coords): {type(coords)}")
+print(f"type(steps): {type(steps)}")
+
+print(f"has __iter__ text: {'__iter__' in dir(text)}")
+print(f"has __iter__ items: {'__iter__' in dir(items)}")
+print(f"has __iter__ coords: {'__iter__' in dir(coords)}")
+print(f"has __iter__ steps: {'__iter__' in dir(steps)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(text): <class 'str'>
+type(items): <class 'list'>
+type(coords): <class 'tuple'>
+type(steps): <class 'range'>
+has __iter__ text: True
+has __iter__ items: True
+has __iter__ coords: True
+has __iter__ steps: True
+\end{verbatim}
+
+The presence of \texttt{\_\_iter\_\_} is the important signal here. It means the object can produce an iterator.
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+
+it = iter(items)
+
+print(f"items: {items}")
+print(f"type(items): {type(items)}")
+print(f"type(it): {type(it)}")
+print(f"items is it: {items is it}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: ['soup', 'pretzels', 'muffin']
+type(items): <class 'list'>
+type(it): <class 'list_iterator'>
+items is it: False
+\end{verbatim}
+
+The list and the iterator are different objects. The list stores the elements. The iterator stores the traversal position.
+
+The same iterable can produce more than one iterator:
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+
+it1 = iter(items)
+it2 = iter(items)
+
+print(f"type(it1): {type(it1)}")
+print(f"type(it2): {type(it2)}")
+print(f"it1 is it2: {it1 is it2}")
+
+print(f"next(it1): {next(it1)}")
+print(f"next(it1): {next(it1)}")
+print(f"next(it2): {next(it2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(it1): <class 'list_iterator'>
+type(it2): <class 'list_iterator'>
+it1 is it2: False
+next(it1): soup
+next(it1): pretzels
+next(it2): soup
+\end{verbatim}
+
+Advancing \texttt{it1} does not advance \texttt{it2}. They are separate traversal objects over the same list.
+
+A \texttt{range} behaves the same way:
+
+\begin{verbatim}
+steps = range(1, 4)
+
+it1 = iter(steps)
+it2 = iter(steps)
+
+print(f"type(steps): {type(steps)}")
+print(f"type(it1): {type(it1)}")
+print(f"steps is it1: {steps is it1}")
+
+print(f"next(it1): {next(it1)}")
+print(f"next(it2): {next(it2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(steps): <class 'range'>
+type(it1): <class 'range_iterator'>
+steps is it1: False
+next(it1): 1
+next(it2): 1
+\end{verbatim}
+
+The \texttt{range} object remains a compact arithmetic descriptor. Each call to \texttt{iter(steps)} creates a fresh iterator over that descriptor.
+
+For an iterable, some important methods are:
+
+\begin{itemize}
+    \item \texttt{\_\_iter\_\_()}: produces an iterator;
+    \item \texttt{\_\_len\_\_()}: often gives the number of elements or described values;
+    \item \texttt{\_\_getitem\_\_()}: often supports indexed access, depending on the object type;
+    \item \texttt{\_\_contains\_\_()}: often supports membership tests with \texttt{in}.
+\end{itemize}
+
+Example with a tuple:
+
+\begin{verbatim}
+coords = (10, 20, 30)
+
+print(f"type(coords): {type(coords)}")
+print(f"dir(coords) sample: {dir(coords)[:12]}")
+
+print(f"len(coords): {len(coords)}")
+print(f"coords[1]: {coords[1]}")
+print(f"20 in coords: {20 in coords}")
+
+print(f"coords.__iter__(): {coords.__iter__()}")
+print(f"coords.__len__(): {coords.__len__()}")
+print(f"coords.__getitem__(1): {coords.__getitem__(1)}")
+print(f"coords.__contains__(20): {coords.__contains__(20)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(coords): <class 'tuple'>
+dir(coords) sample: ['__add__', '__class__', '__class_getitem__',
+'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',
+'__format__', '__ge__', '__getattribute__', '__getitem__']
+len(coords): 3
+coords[1]: 20
+20 in coords: True
+coords.__iter__(): <tuple_iterator object at 0x...>
+coords.__len__(): 3
+coords.__getitem__(1): 20
+coords.__contains__(20): True
+\end{verbatim}
+
+The exact memory address printed for the iterator will differ between executions. The important fact is that \texttt{coords.\_\_iter\_\_()} returns a \texttt{tuple\_iterator} object.
+
+\subsubsection{Iterator Objects: Objects That Return Successive Values via \texttt{next()}}
+
+An iterator is an object that can return the next value in a traversal. It does this through \texttt{\_\_next\_\_()}, which is called by the built-in \texttt{next()} function.
+
+\begin{verbatim}
+items = ["soup", "pretzels", "muffin"]
+it = iter(items)
+
+print(f"type(it): {type(it)}")
+print(f"dir(it) sample: {dir(it)[:12]}")
+print(f"has __iter__: {'__iter__' in dir(it)}")
+print(f"has __next__: {'__next__' in dir(it)}")
+
+print(f"next(it): {next(it)}")
+print(f"next(it): {next(it)}")
+print(f"next(it): {next(it)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(it): <class 'list_iterator'>
+dir(it) sample: ['__class__', '__delattr__', '__dir__', '__doc__',
+'__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
+'__gt__', '__hash__', '__init__']
+has __iter__: True
+has __next__: True
+next(it): soup
+next(it): pretzels
+next(it): muffin
+\end{verbatim}
+
+Each call to \texttt{next(it)} advances the iterator. The iterator remembers where it is. That position is internal state.
+
+The special method call is visible directly:
+
+\begin{verbatim}
+items = ["soup", "pretzels"]
+it = iter(items)
+
+print(f"it.__next__(): {it.__next__()}")
+print(f"next(it): {next(it)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+it.__next__(): soup
+next(it): pretzels
+\end{verbatim}
+
+The built-in \texttt{next(it)} and the direct call \texttt{it.\_\_next\_\_()} advance the same iterator. They are not separate traversal channels.
+
+An iterator also has \texttt{\_\_iter\_\_()}, but for an iterator this method usually returns the iterator itself:
+
+\begin{verbatim}
+items = ["soup", "pretzels"]
+it = iter(items)
+
+same_it = iter(it)
+
+print(f"type(it): {type(it)}")
+print(f"type(same_it): {type(same_it)}")
+print(f"it is same_it: {it is same_it}")
+
+print(f"next(it): {next(it)}")
+print(f"next(same_it): {next(same_it)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(it): <class 'list_iterator'>
+type(same_it): <class 'list_iterator'>
+it is same_it: True
+next(it): soup
+next(same_it): pretzels
+\end{verbatim}
+
+This is a crucial distinction:
+
+\begin{itemize}
+    \item Calling \texttt{iter()} on a list creates a new iterator.
+    \item Calling \texttt{iter()} on a list iterator returns the same iterator.
+\end{itemize}
+
+That is why iterators are not automatically reusable.
+
+The same idea appears with \texttt{range} iterators:
+
+\begin{verbatim}
+steps = range(1, 4)
+it = iter(steps)
+
+print(f"type(steps): {type(steps)}")
+print(f"type(it): {type(it)}")
+
+print(f"iter(steps) is iter(steps): {iter(steps) is iter(steps)}")
+print(f"iter(it) is it: {iter(it) is it}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(steps): <class 'range'>
+type(it): <class 'range_iterator'>
+iter(steps) is iter(steps): False
+iter(it) is it: True
+\end{verbatim}
+
+The \texttt{range} object can produce fresh iterators. The \texttt{range\_iterator} is already the moving traversal object.
+
+This explains the exact mechanism behind a \texttt{for} loop:
+
+\begin{verbatim}
+for value in iterable:
+    body
+\end{verbatim}
+
+is conceptually:
+
+\begin{verbatim}
+_iterator = iter(iterable)
+
+while True:
+    try:
+        value = next(_iterator)
+    except StopIteration:
+        break
+
+    body
+\end{verbatim}
+
+The \texttt{for} loop does not need a length. It needs an iterator that either produces a next value or raises \texttt{StopIteration}.
+
+\subsubsection{Iterator Exhaustion: Why Some Traversal Objects Cannot Be Reused After Completion}
+
+Iterator exhaustion means that an iterator has reached the end of its traversal stream. Once exhausted, further calls to \texttt{next()} keep raising \texttt{StopIteration}.
+
+\begin{verbatim}
+items = ["soup", "pretzels"]
+it = iter(items)
+
+print(f"next(it): {next(it)}")
+print(f"next(it): {next(it)}")
+
+try:
+    print(next(it))
+except StopIteration as err:
+    print(f"type(err): {type(err)}")
+    print("iterator is exhausted")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+next(it): soup
+next(it): pretzels
+type(err): <class 'StopIteration'>
+iterator is exhausted
+\end{verbatim}
+
+The iterator does not automatically restart. It remains at the exhausted position.
+
+\begin{verbatim}
+items = ["soup", "pretzels"]
+it = iter(items)
+
+for item in it:
+    print(f"first traversal: {item}")
+
+for item in it:
+    print(f"second traversal: {item}")
+
+print("done")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first traversal: soup
+first traversal: pretzels
+done
+\end{verbatim}
+
+The second loop prints nothing because it receives the same already-exhausted iterator.
+
+By contrast, looping over the original list twice works:
+
+\begin{verbatim}
+items = ["soup", "pretzels"]
+
+for item in items:
+    print(f"first traversal: {item}")
+
+for item in items:
+    print(f"second traversal: {item}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first traversal: soup
+first traversal: pretzels
+second traversal: soup
+second traversal: pretzels
+\end{verbatim}
+
+The list is reusable because each \texttt{for} loop calls \texttt{iter(items)} and receives a fresh iterator.
+
+The same difference can be shown with \texttt{range}:
+
+\begin{verbatim}
+steps = range(1, 4)
+
+for n in steps:
+    print(f"first range traversal: {n}")
+
+for n in steps:
+    print(f"second range traversal: {n}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first range traversal: 1
+first range traversal: 2
+first range traversal: 3
+second range traversal: 1
+second range traversal: 2
+second range traversal: 3
+\end{verbatim}
+
+But if the iterator itself is reused:
+
+\begin{verbatim}
+steps = range(1, 4)
+it = iter(steps)
+
+for n in it:
+    print(f"first iterator traversal: {n}")
+
+for n in it:
+    print(f"second iterator traversal: {n}")
+
+print("finished")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first iterator traversal: 1
+first iterator traversal: 2
+first iterator traversal: 3
+finished
+\end{verbatim}
+
+Again, the second traversal prints nothing because the same iterator has already been consumed.
+
+This matters when assigning iterators to names:
+
+\begin{verbatim}
+items = ["Jerry", "Elaine", "Kramer"]
+
+it = iter(items)
+
+first = list(it)
+second = list(it)
+
+print(f"first: {first}")
+print(f"second: {second}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first: ['Jerry', 'Elaine', 'Kramer']
+second: []
+\end{verbatim}
+
+The first \texttt{list(it)} consumes the iterator. The second \texttt{list(it)} receives no remaining values.
+
+The type of the materialized result is separate from the iterator:
+
+\begin{verbatim}
+items = ["Jerry", "Elaine", "Kramer"]
+it = iter(items)
+first = list(it)
+
+print(f"type(items): {type(items)}")
+print(f"type(it): {type(it)}")
+print(f"type(first): {type(first)}")
+
+print(f"first: {first}")
+print(f"has append on first: {'append' in dir(first)}")
+print(f"has __next__ on first: {'__next__' in dir(first)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(items): <class 'list'>
+type(it): <class 'list_iterator'>
+type(first): <class 'list'>
+first: ['Jerry', 'Elaine', 'Kramer']
+has append on first: True
+has __next__ on first: False
+\end{verbatim}
+
+The materialized list is a normal list. It is not an iterator, and it does not continue the original traversal state.
+
+The practical distinction is:
+
+\begin{itemize}
+    \item Store an iterable when you need a reusable traversal source.
+    \item Store an iterator when you intentionally need one moving traversal state.
+    \item Convert an iterator to a list or tuple when you need to preserve all remaining values.
+\end{itemize}
+
+A final example shows the difference clearly:
+
+\begin{verbatim}
+source = range(1, 4)
+moving = iter(source)
+
+print("using the source twice")
+print(list(source))
+print(list(source))
+
+print("using the iterator twice")
+print(list(moving))
+print(list(moving))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+using the source twice
+[1, 2, 3]
+[1, 2, 3]
+using the iterator twice
+[1, 2, 3]
+[]
+\end{verbatim}
+
+The \texttt{range} object is reusable. The iterator is consumable.
+
+\begin{quote}
+An iterable is a source of traversal. An iterator is a traversal in progress. Once that traversal reaches the end, it is exhausted.
+\end{quote}

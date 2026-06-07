@@ -1,0 +1,85 @@
+\subsection{Structural Syntax and Function Object Creation}
+
+A Python function is a runtime object. The \texttt{def} statement creates it, attaches a \texttt{PyCodeObject}, stores metadata, and binds a name. Calling the function later creates a new execution frame; the body does not run merely because the function was defined.
+
+\subsubsection{The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\texttt{\_\_code\_\_}, \texttt{co\_code}, \texttt{co\_varnames}, \texttt{co\_consts}, \texttt{co\_names})}
+
+A function object references a code object. The function is the callable wrapper; the code object holds compiled execution data: local names, constants, external names, and raw bytecode.
+
+\begin{codebox}[]{python}{The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\textbackslash{}\_\textbackslash{}\_cod...}{str02}
+def make_message(name, number=42):
+    text = f"{name} says {number}"
+    return text.upper()
+
+code_obj = make_message.__code__
+
+print(f"co_argcount:    {code_obj.co_argcount}")
+print(f"co_varnames:    {code_obj.co_varnames}")
+print(f"co_consts:      {code_obj.co_consts}")
+print(f"co_names:       {code_obj.co_names}")
+print(f"co_code length: {len(code_obj.co_code)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{co\_argcount:    2} \\
+\texttt{co\_varnames:    ('name', 'number', 'text')} \\
+\texttt{co\_consts:      (None, ' says ')} \\
+\texttt{co\_names:       ('upper',)} \\
+\texttt{co\_code length: 58} \\
+\end{iobox}
+
+
+
+
+The stable separation is: function object (callable metadata) $\rightarrow$ code object (compiled description) $\rightarrow$ \texttt{co\_code} bytes (VM instruction stream). Exact byte sequences vary by CPython version; the object chain does not.
+
+\begin{verbatim}
+import dis
+
+def make_message(name, number=42):
+    text = f"{name} says {number}"
+    return text.upper()
+
+dis.dis(make_message)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+  4           2 LOAD_FAST                0 (name)
+              ...
+             14 STORE_FAST               2 (text)
+  5          16 LOAD_FAST                2 (text)
+             18 LOAD_METHOD              0 (upper)
+             40 CALL                     0
+             50 RETURN_VALUE
+\end{verbatim}
+
+When the function is called, a frame executes these instructions. A function is not a label on source text; it is a runtime object connected to compiled execution data.
+
+\subsubsection{Anonymous Expressions: The Structural Equivalence of \texttt{lambda} Functions}
+
+A \texttt{lambda} expression creates the same kind of function object as \texttt{def}. The compiler emits a \texttt{PyCodeObject} with identical structural fields: \texttt{co\_varnames}, \texttt{co\_consts}, \texttt{co\_code}, and call behavior via \texttt{\_\_call\_\_}. Lambdas are syntactic sugar restricted to a single expression; they carry the same allocation and execution profile as named functions.
+
+\begin{codebox}[]{python}{Anonymous Expressions: The Structural Equivalence of lambda Functions}{str01}
+def add_def(x):
+    return x + 42
+
+add_lambda = lambda x: x + 42
+
+for label, fn in [("add_def", add_def), ("add_lambda", add_lambda)]:
+    print(f"{label}: type={type(fn)}, vars={fn.__code__.co_varnames}, "
+          f"consts={fn.__code__.co_consts}, result={fn(8)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{add\_def: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50} \\
+\texttt{add\_lambda: type=<class 'function'>, vars=('x',), consts=(None, 42), result=50} \\
+\end{iobox}
+
+
+
+
+The only runtime differences are cosmetic: \texttt{\_\_name\_\_} is \texttt{'<lambda>'} and there is no docstring slot. Performance, frame allocation, and bytecode structure are equivalent. Use \texttt{lambda} only when an expression-level function is clearer; use \texttt{def} for multi-statement bodies.

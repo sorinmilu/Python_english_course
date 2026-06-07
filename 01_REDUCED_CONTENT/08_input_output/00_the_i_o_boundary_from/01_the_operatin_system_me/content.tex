@@ -21,20 +21,7 @@ sys.stdout.flush()
 
 POSIX descriptors \texttt{0}/\texttt{1}/\texttt{2} are process-local integer handles, not data. \texttt{sys.stdout} is a full Python object with encoding and buffering semantics. \texttt{fileno()} bridges the models.
 
-\begin{verbatim}
-import os
-import sys
-
-stdout_obj = sys.stdout
-stdout_fd = stdout_obj.fileno()
-print(stdout_obj, stdout_fd, type(stdout_fd))
-
-text = "Chuck Norris counted to infinity. Twice.\n"
-data = text.encode("utf-8")
-os.write(stdout_fd, data)
-sys.stdout.flush()
-\end{verbatim}
-
+%<<<PROGRAM:programs/the01>>>
 Low-level \texttt{os.write} accepts \texttt{bytes}; text must be encoded explicitly.
 
 \subsubsection{The Layered \texttt{io} Module Architecture: Understanding Text, Buffered, and Raw Subsystems}

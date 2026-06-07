@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...",
+  "label": "the03",
+  "linenos": true,
+  "input": null,
+  "output": "small_range: range(0, 10)\nlarge_range: range(0, 1000000)\nhuge_range:  range(0, 1000000000)\nsize of small_range: 48 bytes\nsize of large_range: 48 bytes\nsize of huge_range:  48 bytes",
+  "file": "main.py"
+}

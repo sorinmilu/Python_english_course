@@ -37,13 +37,4 @@ Use text mode when human-readable interchange is the contract; use binary mode w
 
 Mismatched encodings surface as \texttt{UnicodeDecodeError} or \texttt{UnicodeEncodeError}. Default \texttt{errors="strict"} is appropriate for data pipelines; \texttt{replace}/\texttt{ignore} mutate bytes silently and should be explicit policy choices.
 
-\begin{verbatim}
-text = "Stiinta"
-try:
-    text.encode("ascii")
-except UnicodeEncodeError as err:
-    print(err)
-
-data = text.encode("utf-8")
-print(data.decode("utf-8"))
-\end{verbatim}
+%<<<PROGRAM:programs/enc01>>>

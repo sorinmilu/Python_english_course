@@ -49,50 +49,10 @@ Possible output:
 
 This does not mean that all these objects are booleans. It means they can be tested as booleans.
 
-\begin{verbatim}
-items = []
-
-print(f"items: {items}")
-print(f"type(items): {type(items)}")
-print(f"bool(items): {bool(items)}")
-print(f"len(items): {len(items)}")
-print(f"has __len__: {'__len__' in dir(items)}")
-print(f"has __bool__: {'__bool__' in dir(items)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-items: []
-type(items): <class 'list'>
-bool(items): False
-len(items): 0
-has __len__: True
-has __bool__: False
-\end{verbatim}
-
+%<<<PROGRAM:programs/log07>>>
 A list does not normally define its own \texttt{\_\_bool\_\_()} method. Instead, Python can use its length. An empty list is false. A non-empty list is true.
 
-\begin{verbatim}
-items = ["soup"]
-
-print(f"items: {items}")
-print(f"type(items): {type(items)}")
-print(f"bool(items): {bool(items)}")
-print(f"len(items): {len(items)}")
-print(f"items.__len__(): {items.__len__()}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-items: ['soup']
-type(items): <class 'list'>
-bool(items): True
-len(items): 1
-items.__len__(): 1
-\end{verbatim}
-
+%<<<PROGRAM:programs/log06>>>
 The practical rule is:
 
 \begin{quote}
@@ -101,56 +61,10 @@ If an object has \texttt{\_\_bool\_\_()}, Python uses it for truth-value testing
 
 Numbers usually have direct boolean behavior:
 
-\begin{verbatim}
-num1 = 42
-num2 = 0
-
-print(f"type(num1): {type(num1)}")
-print(f"bool(num1): {bool(num1)}")
-print(f"num1.__bool__(): {num1.__bool__()}")
-print(f"has __bool__: {'__bool__' in dir(num1)}")
-print(f"has __len__: {'__len__' in dir(num1)}")
-
-print(f"bool(num2): {bool(num2)}")
-print(f"num2.__bool__(): {num2.__bool__()}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(num1): <class 'int'>
-bool(num1): True
-num1.__bool__(): True
-has __bool__: True
-has __len__: False
-bool(num2): False
-num2.__bool__(): False
-\end{verbatim}
-
+%<<<PROGRAM:programs/log05>>>
 Strings are length-based:
 
-\begin{verbatim}
-quote = "Ni!"
-
-print(f"quote: {quote!r}")
-print(f"type(quote): {type(quote)}")
-print(f"bool(quote): {bool(quote)}")
-print(f"len(quote): {len(quote)}")
-print(f"quote.__len__(): {quote.__len__()}")
-print(f"has __len__: {'__len__' in dir(quote)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-quote: 'Ni!'
-type(quote): <class 'str'>
-bool(quote): True
-len(quote): 3
-quote.__len__(): 3
-has __len__: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/log04>>>
 An empty string is false because its length is zero:
 
 \begin{verbatim}
@@ -186,49 +100,10 @@ The shorter version does not mean that \texttt{quote} is a boolean. It means the
 
 The object \texttt{None} is always false:
 
-\begin{verbatim}
-result = None
-
-print(f"result: {result}")
-print(f"type(result): {type(result)}")
-print(f"bool(result): {bool(result)}")
-print(f"dir(result) sample: {dir(result)[:8]}")
-print(f"result is None: {result is None}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-result: None
-type(result): <class 'NoneType'>
-bool(result): False
-dir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__']
-result is None: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/log03>>>
 The \texttt{is None} test checks identity with the single \texttt{None} object. It is not the same as a general false test.
 
-\begin{verbatim}
-value = 0
-
-if value:
-    print("truthy")
-else:
-    print("false by truth-value testing")
-
-if value is None:
-    print("missing value")
-else:
-    print("actual object present")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-false by truth-value testing
-actual object present
-\end{verbatim}
-
+%<<<PROGRAM:programs/log02>>>
 The integer \texttt{0} is false in a truth-value test, but it is not \texttt{None}. This distinction matters in real programs. A missing value and a present-but-zero value are not the same fact.
 
 \subsubsection{Short-Circuit Evaluation Mechanics and Object Return Behaviors}
@@ -285,32 +160,7 @@ but with one important structural detail: the middle expression is evaluated onl
 
 A simple example:
 
-\begin{verbatim}
-a = 10
-b = 20
-c = 30
-
-check = a < b < c
-
-print(f"a: {a}")
-print(f"b: {b}")
-print(f"c: {c}")
-print(f"check: {check}")
-print(f"type(check): {type(check)}")
-print(f"dir(check) sample: {dir(check)[:4]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-a: 10
-b: 20
-c: 30
-check: True
-type(check): <class 'bool'>
-dir(check) sample: ['__abs__', '__add__', '__and__', '__bool__']
-\end{verbatim}
-
+%<<<PROGRAM:programs/log01>>>
 The result of the whole comparison chain is a \texttt{bool} object. The comparison itself still follows short-circuit logic. If the first comparison fails, Python does not need the later comparisons.
 
 \begin{verbatim}

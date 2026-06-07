@@ -1,0 +1,285 @@
+\subsection{Transforming External Data}
+
+Many useful I/O programs do not merely read data or write data. They read external data, convert it into runtime objects, modify or filter those objects, and then write a new external representation. This is a data pipeline.
+
+The pipeline shape is simple:
+
+\begin{verbatim}
+external input -> Python objects -> transformed Python objects -> external output
+\end{verbatim}
+
+The important point is that each stage has a different responsibility. Reading crosses into the runtime. Processing changes runtime objects. Writing crosses back out to external storage.
+
+\subsubsection{Read-Transform-Write Pipelines}
+
+A read-transform-write pipeline reads data from one file, changes it, and writes the result to another file. The simplest form is a text filter.
+
+\begin{verbatim}
+from pathlib import Path
+
+src_path = Path("pipeline_input.txt")
+dst_path = Path("pipeline_output.txt")
+
+with open(src_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("homer | d'oh! | 42\n")
+    file_obj.write("jerry | serenity now! | 17\n")
+    file_obj.write("arthur | don't panic | 23\n")
+
+print("Input and output paths:")
+print(f"src_path       = {src_path}")
+print(f"dst_path       = {dst_path}")
+print(f"type(src_path) = {type(src_path)}")
+
+print()
+print("Selected names from dir(src_path):")
+for name in ["exists", "is_file", "name", "parent", "suffix", "replace"]:
+    print(f"{name:10} -> {name in dir(src_path)}")
+
+with open(src_path, "r", encoding="utf-8") as src_obj:
+    with open(dst_path, "w", encoding="utf-8") as dst_obj:
+        for line in src_obj:
+            clean_line = line.strip()
+            upper_line = clean_line.upper()
+
+            dst_obj.write(upper_line)
+            dst_obj.write("\n")
+
+            print(f"read:  {clean_line}")
+            print(f"wrote: {upper_line}")
+
+print()
+print("Output file content:")
+
+with open(dst_path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print(content)
+print(f"type(content) = {type(content)}")
+\end{verbatim}
+
+This pipeline never loads the whole input file as one string. It processes one line at a time. Each input line becomes a \texttt{str}, the string is transformed, and the transformed string is written to the output file.
+
+A slightly more structured pipeline can parse fields from each line.
+
+\begin{verbatim}
+from pathlib import Path
+
+src_path = Path("scores_input.txt")
+dst_path = Path("scores_output.txt")
+
+with open(src_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Homer,38\n")
+    file_obj.write("Elaine,42\n")
+    file_obj.write("Kramer,29\n")
+
+with open(src_path, "r", encoding="utf-8") as src_obj:
+    with open(dst_path, "w", encoding="utf-8") as dst_obj:
+        dst_obj.write("name,score,status\n")
+
+        for line in src_obj:
+            clean_line = line.strip()
+            parts = clean_line.split(",")
+
+            name = parts[0]
+            score = int(parts[1])
+
+            if score >= 40:
+                status = "high"
+            else:
+                status = "normal"
+
+            out_line = f"{name},{score},{status}\n"
+            dst_obj.write(out_line)
+
+            print(f"{name:8} score={score:02d} status={status}")
+
+print()
+print("Transformed file content:")
+
+with open(dst_path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+print(content)
+\end{verbatim}
+
+Here the program crosses several internal boundaries. The line is first a \texttt{str}. The call to \texttt{split()} creates a \texttt{list}. The score field is converted from \texttt{str} to \texttt{int}. Then the final output line is formatted back into a \texttt{str} and written to the destination file.
+
+The pipeline is not only copying. It is interpreting, transforming, and serializing data.
+
+\subsubsection{Temporary Files and Safe Output Replacement}
+
+A direct output file can be risky when replacing an existing file. If the program opens the final output path with \texttt{"w"}, the old contents are erased immediately. If an error occurs halfway through writing, the program may leave behind a broken partial file.
+
+A safer pattern writes the new content to a temporary file first. Only after the temporary file is complete does the program replace the real output file.
+
+\begin{verbatim}
+from pathlib import Path
+import tempfile
+
+target_path = Path("safe_replace_output.txt")
+
+with open(target_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("old line 1\n")
+    file_obj.write("old line 2\n")
+
+print("Original target content:")
+
+with open(target_path, "r", encoding="utf-8") as file_obj:
+    print(file_obj.read())
+
+tmp_obj = tempfile.NamedTemporaryFile(
+    "w",
+    encoding="utf-8",
+    delete=False,
+    dir=target_path.parent,
+    prefix="safe_replace_",
+    suffix=".tmp"
+)
+
+tmp_path = Path(tmp_obj.name)
+
+print("Temporary file object:")
+print(f"tmp_obj       = {tmp_obj}")
+print(f"type(tmp_obj) = {type(tmp_obj)}")
+
+print()
+print("Temporary path:")
+print(f"tmp_path       = {tmp_path}")
+print(f"type(tmp_path) = {type(tmp_path)}")
+
+print()
+print("Selected names from dir(tmp_path):")
+for name in ["exists", "is_file", "replace", "unlink", "name", "parent"]:
+    print(f"{name:10} -> {name in dir(tmp_path)}")
+
+try:
+    with tmp_obj:
+        tmp_obj.write("new line 1: Nobody expects the Spanish Inquisition.\n")
+        tmp_obj.write("new line 2: The answer is 42.\n")
+
+    tmp_path.replace(target_path)
+    print()
+    print("Replacement completed.")
+
+except OSError as err:
+    print()
+    print("Replacement failed.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    if tmp_path.exists():
+        tmp_path.unlink()
+        print("Temporary file removed.")
+
+print()
+print("Final target content:")
+
+with open(target_path, "r", encoding="utf-8") as file_obj:
+    print(file_obj.read())
+\end{verbatim}
+
+The temporary file is created in the same parent directory as the target. That is a useful habit because replacement is usually safest when both paths belong to the same filesystem location.
+
+The call \texttt{tmp\_path.replace(target\_path)} asks the operating system to replace the target path with the temporary file. This is safer than destroying the original file before the new content has been completely written.
+
+This pattern does not make every failure impossible. The disk may become full, permissions may change, or the replacement itself may fail. But it reduces one common danger: leaving the final output file half-written after a transformation error.
+
+\subsubsection{Separating Parsing, Processing, and Serialization Functions}
+
+In larger pipelines, it is useful to separate three ideas:
+
+\begin{itemize}
+    \item parsing: convert external text into Python objects;
+    \item processing: transform Python objects;
+    \item serialization: convert Python objects back into external text.
+\end{itemize}
+
+This separation prevents one loop from becoming an unreadable mixture of file access, string splitting, numeric conversion, business rules, and output formatting.
+
+\begin{verbatim}
+from pathlib import Path
+
+src_path = Path("separated_pipeline_input.txt")
+dst_path = Path("separated_pipeline_output.txt")
+
+with open(src_path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Homer|38|D'oh!\n")
+    file_obj.write("Elaine|42|Yada yada yada.\n")
+    file_obj.write("Arthur|23|Don't panic.\n")
+
+def parse_line(line):
+    clean_line = line.strip()
+    parts = clean_line.split("|")
+
+    record = {
+        "name": parts[0],
+        "score": int(parts[1]),
+        "quote": parts[2]
+    }
+
+    return record
+
+def process_record(record):
+    new_record = record.copy()
+
+    if new_record["score"] >= 40:
+        new_record["status"] = "high"
+    else:
+        new_record["status"] = "normal"
+
+    new_record["quote"] = new_record["quote"].upper()
+
+    return new_record
+
+def serialize_record(record):
+    out_line = (
+        f"{record['name']}|"
+        f"{record['score']}|"
+        f"{record['status']}|"
+        f"{record['quote']}\n"
+    )
+
+    return out_line
+
+with open(src_path, "r", encoding="utf-8") as src_obj:
+    with open(dst_path, "w", encoding="utf-8") as dst_obj:
+        for line in src_obj:
+            record = parse_line(line)
+            new_record = process_record(record)
+            out_line = serialize_record(new_record)
+
+            dst_obj.write(out_line)
+
+            print("Pipeline step:")
+            print(f"record       = {record}")
+            print(f"type(record) = {type(record)}")
+            print(f"new_record   = {new_record}")
+            print(f"out_line     = {out_line!r}")
+
+print()
+print("Selected names from dir(record):")
+for name in ["keys", "values", "items", "get", "copy", "update"]:
+    print(f"{name:10} -> {name in dir(record)}")
+
+print()
+print("Final output file:")
+
+with open(dst_path, "r", encoding="utf-8") as file_obj:
+    print(file_obj.read())
+\end{verbatim}
+
+The functions are short because each one owns only one part of the pipeline. \texttt{parse\_line()} knows how to read one external line into a dictionary. \texttt{process\_record()} knows how to modify one dictionary. \texttt{serialize\_record()} knows how to format one dictionary back into one output line.
+
+This shape is especially useful when the input format changes. If the separator changes, the parsing function changes. If the output format changes, the serialization function changes. If the rule for \texttt{status} changes, the processing function changes.
+
+The file loop stays simple:
+
+\begin{verbatim}
+for line in src_obj:
+    record = parse_line(line)
+    new_record = process_record(record)
+    out_line = serialize_record(new_record)
+    dst_obj.write(out_line)
+\end{verbatim}
+
+That loop describes the pipeline without hiding the boundary crossings. External text enters the program, becomes Python objects, is transformed, and becomes external text again.

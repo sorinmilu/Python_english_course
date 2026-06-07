@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked INDENT...",
+  "label": "the04",
+  "linenos": true,
+  "input": null,
+  "output": "NAME     'score'\nOP       '='\nNUMBER   '42'\nNAME     'if'\nNAME     'score'\nOP       '=='\nNUMBER   '42'\nOP       ':'\nINDENT   '    '\nNAME     'print'\nOP       '('\nSTRING   '\"the answer\"'\nOP       ')'\nNAME     'print'\nOP       '('\nSTRING   '\"do not panic\"'\nOP       ')'\nDEDENT   ''\nNAME     'print'\nOP       '('\nSTRING   '\"done\"'\nOP       ')'",
+  "file": "main.py"
+}

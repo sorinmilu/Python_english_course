@@ -1,0 +1,788 @@
+\subsection{Operating System Resource Management}
+
+
+\subsubsection{The Evolution of Multitasking Subsystems: Time-Slicing Hardware Resources}
+
+Early computers did not begin with the process model that modern programmers now assume. In the simplest execution model, one program occupied the machine, used the processor until it finished, and then another program could be loaded. The machine was expensive, the processor was scarce, and program execution was treated as a mostly exclusive activity. If the running program waited for input, output, tape, disk, printer access, or a human response, the processor could remain unused even though other work was available.
+
+This was inefficient because processors are fast compared with many external resources. A program that waits for disk input or terminal input is not doing useful CPU computation during that waiting period. If the operating system can suspend that waiting program and let another ready program use the processor, total machine utilization improves. This is the basic reason multitasking systems evolved.
+
+\textbf{Multitasking} means that the operating system allows multiple execution activities to exist during the same time interval. This does not necessarily mean that all of them execute machine instructions at the exact same instant. On a single processor core, only one instruction stream can execute at a given exact moment. Multitasking means that the operating system switches among runnable activities quickly enough that several programs can make progress over time.
+
+The central mechanism is \textbf{time-slicing}. The operating system divides CPU access into small intervals, often called time slices or scheduling quanta. A process or thread receives the processor for a short time. When that interval expires, or when the running activity blocks on input/output, the kernel may suspend it and choose another activity to run.
+
+A simplified timeline on a single core may look like this:
+
+\begin{verbatim}
+time -------------------------------------------------------->
+
+CPU:  Process A | Process B | Process C | Process A | Process B
+      slice 1     slice 2     slice 3     slice 4     slice 5
+\end{verbatim}
+
+At human time scales, this can look like simultaneous execution. A text editor remains responsive, a terminal command continues running, a network download progresses, and the graphical interface still reacts. Internally, the operating system is repeatedly choosing which execution context receives the processor.
+
+This is not the same as physical parallelism. On one hardware execution context, the CPU executes one instruction stream at a time. The apparent simultaneity comes from rapid switching. True parallel execution requires multiple hardware execution contexts, such as multiple CPU cores or simultaneous multithreading. Multitasking was important even before multicore machines because it allowed the operating system to hide waiting time and share one processor among many active programs.
+
+The need for multitasking becomes clear when considering input/output. Suppose a process reads data from a disk. The disk operation is slow compared with CPU instruction execution. If the operating system allowed the process to occupy the CPU while waiting, the CPU would waste time. Instead, the process can be moved into a waiting or blocked state. Another process that is ready to compute can run.
+
+A simplified state model is:
+
+\begin{verbatim}
+ready  ----scheduled---->  running
+running ----blocks------>  waiting
+waiting ----event ready->  ready
+running ----time slice-->  ready
+running ----exits------->  terminated
+\end{verbatim}
+
+A \textbf{ready} process can run but is not currently using the CPU. A \textbf{running} process is currently executing instructions. A \textbf{waiting} or \textbf{blocked} process cannot continue until some event occurs, such as disk completion, network input, a timer, or user input.
+
+This state management is one of the main responsibilities of the operating system kernel. The kernel must know which execution contexts exist, which are runnable, which are blocked, and which have terminated. It must also decide how to divide CPU time fairly or according to priority.
+
+The hardware timer is essential in many multitasking systems. The timer can periodically interrupt the currently running program and transfer control to the kernel. This prevents one program from keeping the CPU forever. When the timer interrupt occurs, the processor stops ordinary user-mode execution, enters kernel mode, and runs the kernel's interrupt-handling and scheduling code. The kernel may then decide to resume the same process or switch to another one.
+
+This hardware-supported interruption is what makes forced CPU sharing possible. Without it, a badly written or malicious program could run an infinite loop and never voluntarily give control back to the operating system. With timer interrupts, the kernel can regain control even if the program does not cooperate.
+
+For example, a program may contain:
+
+\begin{verbatim}
+while (1) {
+    /* never voluntarily stops */
+}
+\end{verbatim}
+
+In a system without preemptive control, this kind of loop could freeze the machine or the environment. In a modern operating system, the timer interrupt eventually transfers control back to the kernel, and the scheduler can allow other processes to run.
+
+Time-slicing also requires the operating system to preserve execution state. If Process A is suspended and Process B is run, Process A must later continue from the exact point where it stopped. This means the kernel must save enough state to resume it: instruction pointer, stack pointer, CPU registers, scheduling state, and memory mapping identity. When Process A is selected again, the kernel restores this saved context, and the process continues as if execution had merely been delayed.
+
+From the process's point of view, it usually does not know that it was suspended. It simply observes that time has passed. Its instruction pointer still identifies the next instruction to execute. Its stack still contains its call frames. Its heap and global data remain mapped. Its open files and other resources still exist unless another event changed them.
+
+This preservation of state is what allows multiple processes to share one processor safely. The processor itself does not contain the complete permanent state of every process. It contains the state of the currently running execution context. The operating system saves and restores this state as it switches between contexts.
+
+The evolution from single-program execution to multitasking also required memory isolation. If several programs exist in memory at the same time, one program must not freely overwrite another program's memory. Modern systems use virtual memory and the memory management unit to give each process its own address space. This allows the kernel to switch CPU time between processes while keeping their memory regions separated.
+
+Therefore, multitasking is not only a scheduling idea. It depends on several architectural components working together:
+
+\begin{itemize}
+    \item timer interrupts, so the kernel can regain control;
+    \item privileged kernel mode, so user programs cannot control scheduling directly;
+    \item saved execution contexts, so suspended processes can resume;
+    \item virtual memory, so processes can coexist without overwriting each other;
+    \item process tables and scheduler data structures, so the kernel can track runnable and blocked activities.
+\end{itemize}
+
+The operating system also time-shares other resources besides the processor. Disk access, network access, terminal access, memory pages, file descriptors, and device operations are all mediated by the kernel. However, CPU time-slicing is the central model because the CPU is the component that actually advances instruction execution. A process that does not receive CPU time cannot execute its next instruction.
+
+This model explains why the process is not merely a loaded executable file. A process is a schedulable execution entity. It can be running, ready, blocked, stopped, or terminated. The same program file may produce several processes, and each process may receive CPU time independently. The operating system controls when each one advances.
+
+For C programs, this means that the compiled native code does not own the machine. Even though C compiles to processor instructions, those instructions execute only when the scheduler gives the process CPU time. The process runs inside an operating-system-controlled environment. Its pointers are process-virtual addresses. Its files are kernel-managed handles or descriptors. Its execution can be interrupted between instructions by hardware and kernel activity.
+
+For Python programs, the same operating-system layer still exists. When a Python script runs, the schedulable process is the CPython interpreter process. The Python bytecode runs only because the interpreter process receives CPU time from the operating system. If the process is suspended by the scheduler, Python execution is suspended too. If the process blocks on file input, socket input, or sleep, the kernel may run another process during the wait.
+
+This operating-system time-slicing idea later reappears inside high-level runtimes in a different form. Generators, coroutines, event loops, and asynchronous programming systems do not usually control the hardware scheduler. Instead, they reproduce a scheduling-like pattern inside one process: one task runs for a while, reaches a suspension point, and another task is allowed to progress. The mechanism is different, but the conceptual influence is clear.
+
+Thus, the evolution of multitasking subsystems is the evolution from exclusive program execution to controlled sharing of hardware execution time. The operating system kernel divides CPU access into intervals, suspends and resumes execution contexts, hides waiting time, isolates processes, and creates the practical illusion that many programs are active at once. This resource-management model is one of the foundations on which both native compiled execution and high-level runtime execution are built.
+
+
+\subsubsection{Cooperative (Non-Preemptive) vs. Preemptive Multitasking Operating System Architectures}
+
+Multitasking systems need a rule for deciding when the currently running execution activity stops and another one receives the processor. Two major models exist: \textbf{cooperative multitasking} and \textbf{preemptive multitasking}. Both allow several programs or execution contexts to make progress over time, but they differ in who controls the moment of switching.
+
+In \textbf{cooperative multitasking}, the running process or task keeps the processor until it voluntarily gives control back to the operating system or runtime scheduler. The program must cooperate. It may yield control explicitly, wait for input/output, call a system function that blocks, or reach another defined suspension point. If it never does so, other tasks may not get a chance to run.
+
+A simplified cooperative timeline looks like this:
+
+\begin{verbatim}
+Process A runs
+    |
+    | voluntarily yields
+    v
+Process B runs
+    |
+    | voluntarily yields
+    v
+Process C runs
+    |
+    | voluntarily yields
+    v
+Process A resumes
+\end{verbatim}
+
+In this model, the scheduler depends on the behavior of the running program. The operating system or runtime may keep a list of ready tasks, but it normally switches only when the active task gives up control. This can be simple and efficient because switching happens at known points. It can also reduce some synchronization problems, because a task is not interrupted at arbitrary machine-instruction boundaries.
+
+However, cooperative multitasking has a serious weakness: one badly written task can block the whole system. If a task enters an infinite loop and never yields, it can prevent other tasks from running. For example:
+
+\begin{verbatim}
+while (1) {
+    /* never yields */
+}
+\end{verbatim}
+
+In a purely cooperative system, this loop can monopolize the processor. The scheduler may never regain control unless the program performs a blocking operation, explicitly yields, or is interrupted by some external mechanism not part of the cooperative model.
+
+This is why cooperative multitasking requires discipline from programs. Each task must be written so that it frequently reaches safe suspension points. This may be acceptable in controlled runtimes, embedded environments, event loops, or older graphical systems, but it is fragile as a general operating-system model.
+
+In \textbf{preemptive multitasking}, the operating system kernel can interrupt the running process without asking its permission. The running process does not have to call \texttt{yield()} or voluntarily block. A hardware timer periodically transfers control to the kernel. The kernel scheduler then decides whether the current process should continue or whether another process or thread should run.
+
+A simplified preemptive timeline looks like this:
+
+\begin{verbatim}
+Process A runs
+    |
+    | timer interrupt
+    v
+kernel scheduler runs
+    |
+    v
+Process B runs
+    |
+    | timer interrupt
+    v
+kernel scheduler runs
+    |
+    v
+Process C runs
+\end{verbatim}
+
+The important difference is that the currently running process does not control the switching point. The kernel does. This gives the operating system stronger authority over CPU sharing. A process may contain an infinite loop, but the timer interrupt still allows the kernel to regain control and schedule other processes.
+
+For example:
+
+\begin{verbatim}
+while (1) {
+    /* CPU-bound loop */
+}
+\end{verbatim}
+
+In a preemptive system, this loop may consume a lot of CPU time, but it should not prevent the kernel from running other processes. The scheduler can interrupt it after a time slice and allow other ready processes to execute.
+
+Preemption depends on hardware support. The processor must be able to receive interrupts. A timer device must generate periodic interrupts. The processor must be able to switch from user mode to kernel mode safely. The kernel must be able to save the current execution context, choose another one, and restore that other context.
+
+The saved context includes the information needed to resume execution later:
+
+\begin{itemize}
+    \item the instruction pointer;
+    \item the stack pointer;
+    \item general-purpose register values;
+    \item processor status flags;
+    \item memory mapping identity;
+    \item scheduling metadata.
+\end{itemize}
+
+When the interrupted process is scheduled again, the kernel restores this state. The process continues from the instruction where it was interrupted, or from the next valid instruction according to the architecture's interrupt-return rules. From the process's point of view, it usually appears as if execution simply became slower for a while.
+
+Preemptive multitasking is the dominant model in modern general-purpose operating systems because it provides stronger isolation and fairness. The kernel does not need to trust every user program to behave politely. It can enforce scheduling policy externally.
+
+However, preemption introduces complexity. A process or thread can be interrupted almost anywhere. If several threads share memory, one thread may be preempted while it is halfway through modifying shared data. Another thread may then run and observe inconsistent state unless synchronization mechanisms are used. This is why preemptive multithreaded programming requires locks, mutexes, semaphores, atomic operations, or other coordination tools.
+
+For example, suppose two threads update a shared counter:
+
+\begin{verbatim}
+counter = counter + 1;
+\end{verbatim}
+
+At source level, this looks like one operation. At machine level, it may involve several steps:
+
+\begin{verbatim}
+load counter
+add 1
+store counter
+\end{verbatim}
+
+If one thread is preempted between these steps and another thread modifies the same counter, the final result may be wrong. This is a race condition. Preemption makes such problems possible because execution can be interrupted between low-level operations.
+
+Cooperative systems have different risks. Since tasks yield only at known points, there is less danger of being interrupted in the middle of a critical sequence, as long as the sequence does not explicitly yield. But cooperative systems can freeze if one task fails to yield. Therefore, the two models exchange one kind of difficulty for another:
+
+\begin{itemize}
+    \item cooperative multitasking gives simpler switching points but depends on voluntary yielding;
+    \item preemptive multitasking gives stronger scheduling control but requires careful synchronization.
+\end{itemize}
+
+The distinction can be summarized as follows:
+
+\begin{center}
+\begin{tabular}{|p{0.28\textwidth}|p{0.32\textwidth}|p{0.32\textwidth}|}
+\hline
+\textbf{Property} & \textbf{Cooperative multitasking} & \textbf{Preemptive multitasking} \\
+\hline
+Switching control & Running task voluntarily yields & Kernel can interrupt running task \\
+\hline
+Main trigger & Yield, blocking call, explicit suspension point & Timer interrupt, priority decision, blocking event \\
+\hline
+Failure mode & One task can monopolize execution by not yielding & Shared data can be interrupted mid-update \\
+\hline
+Synchronization difficulty & Lower at non-yielding regions & Higher because interruption can happen almost anywhere \\
+\hline
+Typical use & Event loops, coroutines, older systems, controlled runtimes & Modern desktop/server operating systems \\
+\hline
+\end{tabular}
+\end{center}
+
+Modern operating systems usually use preemptive multitasking for native processes and threads. The kernel scheduler can interrupt a process after a time slice, handle interrupts, wake blocked processes, enforce priorities, and balance work across CPU cores. This gives the operating system central control over hardware resource sharing.
+
+However, cooperative multitasking has not disappeared. It reappears inside high-level programming runtimes. Generators, coroutines, event loops, and asynchronous programming systems often use cooperative scheduling. A coroutine runs until it reaches an explicit suspension point, such as \texttt{yield} or \texttt{await}. Then another coroutine may run. The runtime scheduler does not usually interrupt it at arbitrary machine instructions.
+
+For example, in Python asynchronous code, a coroutine gives up control when it awaits an awaitable operation:
+
+\begin{verbatim}
+await some_io_operation()
+\end{verbatim}
+
+This is conceptually cooperative. The coroutine voluntarily reaches a suspension point. The event loop can then run other tasks while the awaited operation is incomplete. If a coroutine performs a long CPU-bound loop without awaiting, it can block the event loop in the same way that a non-yielding task blocks a cooperative multitasking system.
+
+This is the important bridge from operating systems to language runtimes. At the operating-system level, modern systems use preemption to control native processes and threads. At the runtime level, languages often use cooperative scheduling to manage lightweight tasks inside one process.
+
+The same Python program can therefore be subject to both models at different layers:
+
+\begin{itemize}
+    \item the CPython process is scheduled preemptively by the operating system;
+    \item Python coroutines inside that process are scheduled cooperatively by the event loop.
+\end{itemize}
+
+This layered view prevents confusion. When a Python coroutine uses \texttt{await}, it is not asking the operating system scheduler to preempt the process. It is giving control back to the Python event loop. The operating system may still preempt the entire CPython process independently at any time, because the process remains a normal native process.
+
+Thus, cooperative and preemptive multitasking describe two different control policies for sharing execution time. Cooperative systems rely on voluntary suspension points. Preemptive systems allow the kernel to interrupt execution and enforce scheduling externally. Modern programming uses both: preemptive scheduling at the operating-system level and cooperative scheduling inside many high-level runtime systems.
+
+
+
+\subsubsection{The CPU Kernel Scheduler, Symmetrical Multiprocessing, and Context Switching Latency Overhead}
+
+The operating system scheduler is the kernel component that decides which execution context receives CPU time. A modern system may contain many runnable processes and threads, but the number of hardware execution units is limited. The scheduler must continuously choose which process or thread should run now, which ones must wait, which ones are blocked, and which ones should be resumed when an event completes.
+
+A \textbf{scheduler} is therefore not a vague background mechanism. It is a concrete kernel subsystem that manages the queue of runnable execution contexts and assigns them to available CPU cores. Each process or thread has scheduling metadata: state, priority, recent CPU usage, waiting time, affinity rules, and other implementation-specific information. The scheduler uses this information to make execution decisions.
+
+A simplified scheduling situation may look like this:
+
+\begin{verbatim}
+ready queue:
+    Thread A
+    Thread B
+    Thread C
+    Thread D
+
+available CPU core:
+    runs one selected thread
+\end{verbatim}
+
+If the machine has one CPU core, only one thread can execute at a given exact moment. The scheduler creates the appearance of concurrent execution by rapidly switching among runnable threads. If the machine has multiple cores, several threads can execute physically in parallel, but the scheduler still decides which runnable threads occupy which cores.
+
+This brings us to \textbf{symmetric multiprocessing}, usually abbreviated as \textbf{SMP}. In an SMP system, multiple CPU cores or processors are available under one operating system image, and each core can run kernel code and user code. The cores share access to the same physical memory system, although modern hardware may also contain private caches, shared caches, memory-controller topology, and non-uniform access costs.
+
+In a simplified SMP model:
+
+\begin{verbatim}
+               shared memory
+                    |
+    +---------------+---------------+
+    |               |               |
+ CPU core 0     CPU core 1     CPU core 2
+    |               |               |
+ Thread A       Thread B       Thread C
+\end{verbatim}
+
+Here, several threads can actually execute at the same time. This is real parallelism, not only time-sliced concurrency. If three CPU cores run three different threads simultaneously, three instruction streams are physically advancing at the same time.
+
+However, SMP does not remove the need for scheduling. It makes scheduling more complex. The scheduler must choose not only \emph{when} a thread runs, but also \emph{where} it runs. It may need to decide whether a thread should stay on the same core where its data may still be warm in cache, or move to another core that is idle. It may need to balance the system so that one core is not overloaded while another is idle.
+
+This creates a tension between \textbf{load balancing} and \textbf{cache locality}. Load balancing means spreading work across available cores. Cache locality means keeping a thread near the CPU cache state it has already built. Moving a thread from one core to another may make the system more balanced, but it can also hurt performance because the new core may not have the same data in its cache.
+
+The scheduler must also handle threads with different states. A thread that is waiting for disk input, network input, a timer, a lock, or a child process is not runnable. It should not receive a CPU core until the event it is waiting for becomes ready. A thread that has all required data and is ready to compute can be placed in a run queue.
+
+A simplified thread-state transition looks like:
+
+\begin{verbatim}
+ready  ----scheduler chooses----> running
+running ----time slice expires--> ready
+running ----waits for I/O-------> blocked
+blocked ----I/O completes-------> ready
+running ----finishes------------> terminated
+\end{verbatim}
+
+The scheduler is involved every time a runnable execution context must be chosen. It may run because a timer interrupt occurred, because a thread blocked, because a blocked thread became ready, because a higher-priority thread appeared, or because a process voluntarily yielded.
+
+When the scheduler stops one thread and starts another, the operating system performs a \textbf{context switch}. A context switch is the act of saving the execution state of the current thread and restoring the execution state of another thread. The saved state must be sufficient for the old thread to continue later as if it had merely paused.
+
+The context of a thread includes information such as:
+
+\begin{itemize}
+    \item the instruction pointer;
+    \item the stack pointer;
+    \item general-purpose registers;
+    \item processor flags;
+    \item floating-point or vector register state when needed;
+    \item kernel scheduling metadata;
+    \item memory mapping identity, especially when switching between processes.
+\end{itemize}
+
+Switching between two threads in the same process may be cheaper than switching between two different processes because threads in the same process share the same virtual address space. Switching between processes may require changing the active address-space mapping, which can affect page-table-related processor state and memory translation caches.
+
+This is where the memory management unit matters again. The processor uses translation structures to convert virtual addresses into physical addresses. To make this fast, processors use caches for address translations, commonly called translation lookaside buffers, or TLBs. A process switch may require changing the active page-table root or address-space identifier. Depending on the architecture and operating-system strategy, this can invalidate or reduce the usefulness of cached translations.
+
+Therefore, a context switch is not free. It has \textbf{latency overhead}. During the switch itself, the CPU is executing kernel scheduling and bookkeeping code rather than advancing the user program's useful work. The kernel must save registers, update scheduler structures, choose the next thread, restore state, and return to user mode. Cache and TLB effects may also slow down the newly scheduled thread after the switch.
+
+A simplified view is:
+
+\begin{verbatim}
+Thread A useful work
+        |
+        v
+kernel saves Thread A context
+kernel chooses Thread B
+kernel restores Thread B context
+        |
+        v
+Thread B useful work
+\end{verbatim}
+
+The time spent in the middle is scheduling overhead. It is necessary overhead, because without it the operating system could not share the CPU safely. But it is still overhead. A system that switches too often may spend too much time managing execution and not enough time doing useful computation.
+
+This is why scheduler design must balance responsiveness and throughput. Small time slices can make a system feel responsive because interactive programs get frequent chances to run. But very small time slices can increase context-switch overhead. Larger time slices reduce switching overhead but may make interactive tasks wait longer.
+
+For example:
+
+\begin{verbatim}
+very small slices:
+    responsive, but many switches
+
+very large slices:
+    fewer switches, but worse responsiveness
+\end{verbatim}
+
+Schedulers also use priorities. A system may prefer interactive tasks, real-time tasks, I/O-bound tasks, or CPU-bound tasks depending on policy. A process waiting for keyboard input should often respond quickly when input arrives. A long numerical computation may be allowed to run in larger chunks. A real-time audio thread may need stricter scheduling guarantees to prevent audible glitches.
+
+The scheduler must also interact with blocking operations. If a thread performs a blocking read from disk or network, it should not sit on a CPU core doing nothing. The kernel marks it as blocked and schedules another runnable thread. When the disk or network operation completes, an interrupt or kernel event marks the blocked thread as ready again. It can then compete for CPU time.
+
+This is one of the major reasons multitasking improves system efficiency. The scheduler can run CPU-ready work while other tasks wait for slow external resources.
+
+In SMP systems, context switching can occur independently on several cores. Each core may run its own current thread. The scheduler may maintain per-core run queues, global balancing mechanisms, or hybrid structures. The exact implementation is complex and operating-system-specific, but the conceptual goal is stable: keep available cores doing useful work while respecting priorities, fairness, locality, and synchronization constraints.
+
+Parallel execution also introduces synchronization costs. If two threads on different cores access shared memory, they may need locks or atomic operations. These mechanisms can force coordination between cores. A lock can cause one thread to block while another holds the protected resource. Atomic operations can require cache coherence traffic. Therefore, using many cores does not automatically make a program faster. The program must have work that can truly proceed in parallel without excessive coordination.
+
+This distinction is important for C and Python programmers alike. In C, native threads can often run on multiple cores at the same time, provided the program uses operating-system threading APIs or libraries and manages synchronization correctly. The operating system scheduler maps those threads to CPU cores.
+
+In CPython, the situation has another layer. The CPython interpreter process is scheduled by the operating system like any other process. Its native threads are also visible to the operating system. However, in the traditional CPython execution model, the Global Interpreter Lock, or GIL, prevents multiple threads from executing Python bytecode at the same time inside one interpreter process. A thread may still run native code, wait for I/O, or release the GIL in certain extension modules, but ordinary CPU-bound Python bytecode execution is constrained by the interpreter's locking model.
+
+This means two scheduling systems can be involved:
+
+\begin{itemize}
+    \item the operating system scheduler assigns native threads to CPU cores;
+    \item the CPython runtime controls which thread may execute Python bytecode through interpreter-level locking.
+\end{itemize}
+
+A Python program using threads is therefore not automatically parallel in the same way as a C program using native threads for CPU-bound work. The operating system may schedule several CPython threads, but the interpreter may allow only one of them to execute Python bytecode at a time. For I/O-bound work, Python threads can still be useful because one thread may wait while another progresses. For CPU-bound parallelism, Python often uses multiprocessing, native extensions, vectorized libraries, or implementations without the same locking behavior.
+
+This layered model is the key point. The operating system scheduler manages hardware execution contexts. It knows processes, native threads, CPU cores, priorities, and blocking states. A language runtime may add additional scheduling or locking rules on top of that. The two layers are related, but they are not the same.
+
+Thus, the CPU kernel scheduler is the authority that distributes processor time across runnable native execution contexts. Symmetric multiprocessing allows several of those contexts to execute physically in parallel on different cores. Context switching makes sharing possible, but it costs time through saved state, restored state, cache disruption, and memory-translation effects. Understanding this cost is essential before discussing higher-level runtime scheduling, because generators, coroutines, async tasks, and interpreter locks all exist above the lower operating-system layer that ultimately decides when the process itself receives CPU time.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Structural Differentiation: Heavyweight OS Processes (MMU Isolation) vs. Lightweight Native Threads (Shared Memory Spaces)}
+
+Operating systems do not schedule only whole programs. Modern systems usually schedule smaller execution units called \textbf{threads}. A process may contain one thread or many threads. This distinction is essential because processes and threads share some similarities, but they have very different memory and resource boundaries.
+
+A \textbf{process} is a heavyweight operating-system execution container. It has its own virtual address space, its own memory mappings, its own process identifier, its own resource table, and its own protection boundary. The memory management unit, or MMU, helps enforce this boundary by translating virtual addresses differently for different processes. This is why one process cannot normally read or write another process's memory just by using a pointer.
+
+A \textbf{thread}, by contrast, is a lighter execution path inside a process. Threads inside the same process share the process address space. They can execute different instruction streams, have separate stacks, and maintain separate register states, but they see the same heap, global variables, loaded libraries, and open resources belonging to the process.
+
+The difference can be represented simply:
+
+\begin{verbatim}
+Process A
+    virtual address space A
+    heap A
+    globals A
+    open files A
+    thread A1 -> stack A1, registers A1
+    thread A2 -> stack A2, registers A2
+
+Process B
+    virtual address space B
+    heap B
+    globals B
+    open files B
+    thread B1 -> stack B1, registers B1
+\end{verbatim}
+
+Threads \texttt{A1} and \texttt{A2} share memory because they belong to the same process. Thread \texttt{B1} does not share memory with them in the ordinary direct-addressing sense, because it belongs to a different process.
+
+This means that processes provide stronger isolation. If Process A has a pointer value such as:
+
+\begin{verbatim}
+0x100000
+\end{verbatim}
+
+and Process B has the same pointer value, those two values do not necessarily refer to the same physical memory. Each process has its own virtual address space, and the MMU translates those virtual addresses according to the active process page tables.
+
+Inside one process, however, two threads share the same virtual address space. If Thread A1 and Thread A2 both use the address \texttt{0x100000}, they are referring to the same virtual memory location inside Process A. If that address belongs to a heap object, both threads can access the same heap object. This is powerful, but dangerous.
+
+A process contains at least one thread. That first thread begins executing when the process starts. Additional threads can be created later by the program or runtime. Each thread has its own execution state:
+
+\begin{itemize}
+    \item its own instruction pointer;
+    \item its own stack pointer;
+    \item its own CPU register values;
+    \item its own stack;
+    \item its own scheduling state.
+\end{itemize}
+
+But threads in the same process share:
+
+\begin{itemize}
+    \item the same virtual address space;
+    \item the same heap;
+    \item the same global and static storage;
+    \item the same loaded executable and shared library code;
+    \item the same open file descriptors or handles;
+    \item many of the same process-level permissions and resources.
+\end{itemize}
+
+This shared-memory structure makes threads lighter than processes. Creating a new process requires creating or duplicating a process address space, setting up memory mappings, process tables, handles, and isolation structures. Creating a new thread inside an existing process requires less work because the address space and many resources already exist. The new thread mainly needs its own stack, register context, and scheduler metadata.
+
+This is why processes are often called heavyweight and threads lightweight. The terms are relative. A thread is still an operating-system object and still has real scheduling cost. But compared with a full process, a thread usually has lower creation cost, lower memory overhead, and faster communication with other threads in the same process.
+
+Communication between separate processes usually requires explicit inter-process communication mechanisms. Examples include:
+
+\begin{itemize}
+    \item pipes;
+    \item sockets;
+    \item shared memory segments;
+    \item files;
+    \item message queues;
+    \item signals;
+    \item operating-system-specific IPC mechanisms.
+\end{itemize}
+
+The reason is simple: normal process memory is isolated. Process A cannot simply dereference a pointer to Process B's heap. If two processes need to exchange information, the kernel must mediate the communication or explicitly create a shared region.
+
+Threads do not need such mechanisms to access shared data. If two threads belong to the same process, they can both access the same global variable or heap object directly:
+
+\begin{verbatim}
+int counter = 0;
+
+void *worker(void *arg) {
+    counter++;
+    return NULL;
+}
+\end{verbatim}
+
+If two native threads execute \texttt{worker()}, both can modify the same \texttt{counter}. No serialization or message passing is required just to reach the variable. But this direct access introduces race conditions.
+
+The source statement
+
+\begin{verbatim}
+counter++;
+\end{verbatim}
+
+looks like one operation, but at machine level it may require several steps:
+
+\begin{verbatim}
+load counter
+add 1
+store counter
+\end{verbatim}
+
+If two threads interleave these steps, one increment may be lost. For example:
+
+\begin{verbatim}
+Thread 1 reads counter = 0
+Thread 2 reads counter = 0
+Thread 1 stores counter = 1
+Thread 2 stores counter = 1
+\end{verbatim}
+
+The intended result after two increments was \texttt{2}, but the actual result is \texttt{1}. This is a race condition caused by shared mutable state.
+
+Therefore, threads are lightweight partly because they share memory, but this same sharing makes them harder to reason about. Programs using threads must protect shared mutable data with synchronization mechanisms such as:
+
+\begin{itemize}
+    \item mutexes;
+    \item locks;
+    \item semaphores;
+    \item condition variables;
+    \item atomic operations;
+    \item barriers;
+    \item thread-safe queues.
+\end{itemize}
+
+Processes avoid many of these accidental sharing problems by default because their memory is isolated. One process cannot corrupt another process's heap through an ordinary pointer bug. If a process crashes, the operating system can usually destroy that process and reclaim its resources without destroying unrelated processes. This makes process isolation valuable for reliability and security.
+
+However, process isolation also makes communication more expensive. If two processes need to exchange large amounts of data, the data may need to be copied through kernel buffers, serialized, sent through a socket, written to a pipe, or placed in an explicitly shared memory region. Threads can share data cheaply because it is already in the same address space.
+
+The contrast is therefore not simply ``processes are better'' or ``threads are better.'' They solve different problems:
+
+\begin{itemize}
+    \item processes provide isolation, protection, and failure containment;
+    \item threads provide cheaper concurrent execution paths inside one shared memory space.
+\end{itemize}
+
+A browser is a useful example. Modern browsers often use multiple processes for isolation between tabs, extensions, renderers, and privileged components. If one tab crashes, the whole browser does not necessarily die. At the same time, each process may use multiple threads internally for rendering, networking, JavaScript execution, disk cache work, and user-interface responsiveness.
+
+In a native C or C++ program, threads are often used when multiple execution paths need fast shared access to the same in-memory data structures. For example, a server may create multiple worker threads that share a cache. A numerical program may divide a large computation across several worker threads that operate on different parts of a shared array. In these cases, threads avoid the heavier boundary of process isolation.
+
+But the programmer must then handle synchronization correctly. A pointer bug, buffer overflow, or data race in one thread can corrupt the entire process, because all threads share the same address space. There is no MMU boundary between threads of the same process. The MMU isolates processes from one another, not threads from one another inside the same process.
+
+The scheduling model also differs slightly. The operating system scheduler may schedule threads rather than whole processes. If a process contains several runnable threads, those threads may run on different CPU cores at the same time. This means one process can have real parallel execution internally, if the operating system and hardware allow it.
+
+A simplified SMP situation may look like this:
+
+\begin{verbatim}
+Process A
+    Thread A1 running on CPU core 0
+    Thread A2 running on CPU core 1
+    Thread A3 waiting for disk I/O
+\end{verbatim}
+
+Here, Process A is not merely receiving one time slice. Two of its threads are physically executing in parallel. They share the same heap and globals, so synchronization is required if they touch the same mutable objects.
+
+Context switching between threads of the same process may be cheaper than switching between processes because the virtual address space does not need to change. The page tables may remain the same. Translation caches may be less disturbed. However, the kernel still must save and restore register state, stack pointer, instruction pointer, and scheduler metadata. A thread switch is cheaper than a process switch in many cases, but it is not free.
+
+The difference between processes and threads also clarifies Python's execution model. When a Python script is launched, the operating system creates a process for the CPython interpreter. Inside that process, CPython may create or manage native threads if the Python program uses the \texttt{threading} module or if libraries create threads internally.
+
+Those Python-level threads are backed by native operating-system threads in standard CPython. They share the same process address space. They also share the same CPython heap, where Python objects live. Therefore, two Python threads can refer to the same list, dictionary, file object, or user-defined object.
+
+For example:
+
+\begin{verbatim}
+shared_list = []
+
+def worker():
+    shared_list.append(1)
+\end{verbatim}
+
+If multiple Python threads call \texttt{worker()}, they are all operating on the same Python list object. That list exists inside the CPython process heap. The operating system does not isolate it per thread.
+
+However, CPython adds another rule above the operating-system thread model: the Global Interpreter Lock, or GIL, in the traditional CPython architecture. The GIL prevents multiple native threads from executing Python bytecode simultaneously inside one interpreter process. This means Python threads are native threads, but ordinary Python bytecode execution is still constrained by interpreter-level locking.
+
+This produces a layered model:
+
+\begin{itemize}
+    \item the operating system sees a CPython process and its native threads;
+    \item those threads share the same process memory space;
+    \item CPython uses internal locking to protect interpreter state;
+    \item Python objects are shared by reference inside the interpreter heap;
+    \item CPU-bound Python bytecode does not automatically scale across cores in traditional CPython.
+\end{itemize}
+
+This is different from using multiple Python processes through the \texttt{multiprocessing} module. Multiple processes do not share the same ordinary Python object heap. Each process has its own interpreter instance and its own address space. Communication must happen through pipes, queues, shared memory, sockets, files, or other mechanisms. The benefit is stronger isolation and the ability to use multiple CPU cores for Python execution without the same single-interpreter GIL bottleneck.
+
+Thus, the distinction between heavyweight processes and lightweight threads is a structural memory distinction, not just a naming convention. A process is a protected address-space container enforced by the operating system and MMU. A thread is an execution path inside that container, with its own stack and registers but shared process memory. Processes are safer and more isolated. Threads are cheaper and more direct, but shared-memory concurrency introduces race conditions, synchronization costs, and failure coupling.
+
+For students moving from C to Python, this distinction is essential. C exposes the raw power and danger of shared-memory threading directly. Python hides many low-level details behind runtime objects and libraries, but it does not remove the underlying operating-system model. Python threads still live inside a process. Python processes are still isolated by the operating system. Understanding the difference explains why threads, processes, coroutines, and async tasks are not interchangeable execution mechanisms.
+
+
+
+
+
+\subsubsection{From OS-Level Scheduling to Runtime-Level Scheduling}
+
+Operating-system scheduling and runtime-level scheduling solve similar coordination problems at different layers. The operating system scheduler decides which native process or native thread receives CPU time. A language runtime scheduler, when present, decides which language-level task, coroutine, fiber, generator, green thread, or event-loop callback should run inside an already existing process.
+
+The first layer belongs to the kernel. The kernel controls hardware resources. It can interrupt a running process, save its CPU state, restore another execution context, and assign work to CPU cores. This is operating-system-level scheduling. It manages native execution contexts that the processor can actually run.
+
+The second layer belongs to the runtime. A runtime such as CPython, a JavaScript host environment, the JVM, a green-thread system, or an async event loop may create smaller execution units inside one process. These units are not always known to the operating system as independently schedulable threads. They may exist only as runtime-managed objects: suspended frames, callbacks, coroutine objects, generator objects, promises, futures, or task descriptors.
+
+This gives us two different scheduling layers:
+
+\begin{verbatim}
+hardware CPU core
+    ^
+    |
+operating system scheduler
+    schedules native processes and native threads
+    ^
+    |
+language/runtime scheduler
+    schedules coroutines, generators, callbacks, tasks
+    ^
+    |
+user program logic
+\end{verbatim}
+
+The operating system scheduler answers the question:
+
+\begin{quote}
+Which native execution context should the CPU run now?
+\end{quote}
+
+The runtime scheduler answers a different question:
+
+\begin{quote}
+Inside this already running process, which runtime-level unit of work should continue now?
+\end{quote}
+
+This distinction is essential. A Python coroutine, for example, is not automatically a separate operating-system thread. It is a Python runtime object representing suspended execution. The operating system does not normally inspect Python coroutine objects and choose between them. The operating system schedules the CPython process or one of its native threads. When CPython receives CPU time, Python's own runtime mechanisms decide which coroutine or callback should advance.
+
+The reason runtime-level scheduling exists is similar to the reason operating-system scheduling exists: many programs spend time waiting. A program may wait for disk input, network data, user input, timers, database responses, or other slow external events. If one execution path waits, another execution path may be able to make progress. At the operating-system level, the kernel can run another process while one process is blocked. At the runtime level, an event loop can run another coroutine while one coroutine waits for I/O.
+
+A simplified operating-system-level waiting pattern looks like this:
+
+\begin{verbatim}
+Process A starts disk read
+Process A blocks
+kernel schedules Process B
+disk read completes
+kernel marks Process A ready
+Process A later resumes
+\end{verbatim}
+
+A simplified runtime-level waiting pattern looks like this:
+
+\begin{verbatim}
+Coroutine A starts async read
+Coroutine A awaits
+event loop schedules Coroutine B
+read operation completes
+event loop marks Coroutine A ready
+Coroutine A later resumes
+\end{verbatim}
+
+The similarity is real, but the mechanism is not the same. In the first case, the kernel changes which native process or thread runs on the CPU. In the second case, the runtime changes which coroutine or task continues inside the same process.
+
+This is why runtime-level scheduling is often called \textbf{cooperative}. A coroutine normally runs until it reaches an explicit suspension point, such as \texttt{await}, \texttt{yield}, or another runtime-defined pause operation. The runtime does not usually interrupt it at arbitrary bytecode instructions in the same way the operating system may preempt a native thread. The coroutine must reach a point where it gives control back.
+
+For example, in Python:
+
+\begin{verbatim}
+async def fetch_data():
+    data = await read_from_network()
+    return data
+\end{verbatim}
+
+The \texttt{await} expression is a suspension point. When execution reaches it, the coroutine can stop temporarily. The event loop can then run some other ready task. When the awaited operation completes, the coroutine can resume from the same logical point.
+
+This resembles operating-system multitasking, but it is not hardware preemption. The operating system does not know that \texttt{fetch\_data()} reached an \texttt{await}. The event loop knows. The Python runtime knows. The kernel only sees native threads and system calls.
+
+Generators show an even smaller form of runtime-controlled suspension:
+
+\begin{verbatim}
+def numbers():
+    yield 1
+    yield 2
+    yield 3
+\end{verbatim}
+
+Each \texttt{yield} suspends the function's execution state. The generator does not finish and destroy all local state after the first value. Instead, it keeps enough state to resume later. This is a language-runtime behavior, not an operating-system process switch.
+
+A generator object therefore stores a suspended execution position. It can be resumed by calling \texttt{next()}:
+
+\begin{verbatim}
+g = numbers()
+
+next(g)  # resumes until first yield
+next(g)  # resumes until second yield
+next(g)  # resumes until third yield
+\end{verbatim}
+
+At no point does the operating system create a separate process for each yielded value. The entire generator mechanism lives inside the Python runtime.
+
+Runtime-level scheduling is useful because it avoids some costs of operating-system scheduling. Creating thousands of native threads can be expensive. Each native thread needs a stack, kernel scheduling metadata, and synchronization with the operating-system scheduler. Switching between native threads has context-switch overhead. If a program has many tasks that spend most of their time waiting for I/O, representing each one as a full native thread may be wasteful.
+
+A runtime task can be much cheaper. A coroutine or generator may require only a runtime object containing its suspended state, local variables, instruction position, and links to awaited operations. The runtime can keep thousands or millions of such tasks more cheaply than the operating system can schedule the same number of native threads, depending on the implementation and workload.
+
+However, runtime-level scheduling has a major limitation: it does not automatically create CPU parallelism. If all tasks run inside one native thread, only one task executes at a time. The runtime may interleave them, but it does not make them physically execute on multiple CPU cores. It improves waiting behavior, not raw CPU execution throughput.
+
+This distinction can be summarized as:
+
+\begin{itemize}
+    \item \textbf{operating-system scheduling}: assigns native execution contexts to hardware CPU time;
+    \item \textbf{runtime scheduling}: assigns language-level tasks to execution opportunities inside a process;
+    \item \textbf{preemptive kernel scheduling}: can interrupt native threads without their cooperation;
+    \item \textbf{cooperative runtime scheduling}: usually requires explicit suspension points;
+    \item \textbf{parallelism}: requires multiple hardware execution contexts actually running at the same time;
+    \item \textbf{concurrency}: can exist through interleaving, even on one hardware thread.
+\end{itemize}
+
+This is why an async program can handle many network connections without using one native thread per connection, but it does not automatically make CPU-heavy computation faster. If a coroutine performs a long CPU-bound loop without reaching an \texttt{await}, it blocks the event loop:
+
+\begin{verbatim}
+async def bad_task():
+    while True:
+        pass
+\end{verbatim}
+
+This coroutine does not give control back to the runtime scheduler. Even though the program is written using \texttt{async}, this task can prevent other coroutines from advancing. This is the cooperative multitasking failure mode reappearing inside a high-level runtime.
+
+The operating system may still preempt the entire CPython process and run another process, but that does not help other coroutines inside the same blocked event loop. From the operating system's point of view, the CPython process is just executing CPU instructions. From the Python runtime's point of view, one coroutine is failing to cooperate.
+
+This layered scheduling model is especially important in Python because several execution mechanisms coexist:
+
+\begin{itemize}
+    \item \textbf{processes}, managed by the operating system and isolated by virtual memory;
+    \item \textbf{native threads}, managed by the operating system but sharing one process address space;
+    \item \textbf{Python threads}, backed by native threads in CPython, but constrained by interpreter-level rules such as the Global Interpreter Lock in traditional CPython;
+    \item \textbf{generators}, resumed manually through iteration;
+    \item \textbf{coroutines and async tasks}, scheduled cooperatively by an event loop;
+    \item \textbf{callbacks}, invoked by runtime or framework dispatch rules when events occur.
+\end{itemize}
+
+These mechanisms should not be treated as interchangeable. They live at different layers and have different memory, scheduling, and parallelism properties.
+
+For example, multiple processes provide operating-system isolation and can run on multiple cores, but they do not share ordinary memory directly. Multiple native threads share memory and may run on multiple cores, but they require synchronization. Multiple Python coroutines can be very lightweight and good for I/O interleaving, but they normally run cooperatively inside one event loop and do not by themselves provide CPU parallelism.
+
+A useful comparison is:
+
+\begin{center}
+\begin{tabular}{|p{0.24\textwidth}|p{0.24\textwidth}|p{0.24\textwidth}|p{0.20\textwidth}|}
+\hline
+\textbf{Mechanism} & \textbf{Scheduled by} & \textbf{Memory relation} & \textbf{Typical use} \\
+\hline
+Process & Operating system & Isolated address space & Isolation, CPU parallelism, independent programs \\
+\hline
+Native thread & Operating system & Shared process memory & Parallel or concurrent work inside one process \\
+\hline
+Coroutine / async task & Runtime event loop & Shared runtime memory & I/O concurrency with low overhead \\
+\hline
+Generator & Caller / iterator protocol & Suspended runtime frame & Lazy value production \\
+\hline
+Callback & Runtime / framework dispatcher & Shared runtime state & Event-driven execution hooks \\
+\hline
+\end{tabular}
+\end{center}
+
+The transition from OS-level scheduling to runtime-level scheduling is therefore not a replacement of one system by another. It is a layering. The runtime scheduler cannot run unless the operating system scheduler gives CPU time to the process. The event loop cannot advance coroutines unless the process is running. A generator cannot produce the next value unless the interpreter is executing. At the bottom, hardware execution is still controlled by the kernel scheduler.
+
+At the same time, runtime-level scheduling gives the programming language more control over how logical tasks are structured. The language can represent suspended computations as objects. It can store local state on the heap. It can resume a computation from a previous bytecode position. It can dispatch callbacks when events occur. It can let a single native thread manage many logical tasks.
+
+This is one of the reasons interpreted and runtime-managed languages can provide advanced control-flow abstractions more naturally than bare C. C can implement similar systems through libraries, state machines, callbacks, function pointers, operating-system threads, or manually managed stacks. But the language itself does not normally preserve and resume arbitrary function frames in the same way Python generators or coroutines do.
+
+Python's runtime is able to provide these abstractions because execution is mediated by bytecode, frame objects or frame-like internal structures, object references, and interpreter-managed state. A Python generator can suspend because the runtime knows how to preserve the generator's execution state. A Python coroutine can await because the runtime and event loop know how to register the suspended task and resume it later.
+
+Thus, operating-system scheduling explains how native execution contexts share hardware. Runtime-level scheduling explains how high-level language tasks share execution opportunities inside a process. The two mechanisms are connected but distinct. The operating system schedules the interpreter process and its native threads. The interpreter and its libraries may then schedule generators, coroutines, callbacks, and async tasks inside that process. Understanding this boundary is necessary before discussing Python's advanced procedural extensions, because those extensions are runtime scheduling mechanisms built above the lower operating-system scheduler.

@@ -1,0 +1,356 @@
+\subsection{Immutable Set Variants}
+
+Python also provides an immutable set-like object: \texttt{frozenset}. A normal \texttt{set} is mutable. Elements can be added and removed after construction. A \texttt{frozenset} has the same basic membership-domain meaning, but its contents cannot be changed after creation.
+
+This matters because hash-based containers require stable hash behavior. A mutable \texttt{set} cannot be used as a dictionary key or as an element inside another set. A \texttt{frozenset}, however, can be hashable if all of its elements are hashable.
+
+\begin{quote}
+A \texttt{set} is a mutable uniqueness domain. A \texttt{frozenset} is a fixed uniqueness domain.
+\end{quote}
+
+\subsubsection{\texttt{frozenset} as an Immutable Hashable Set-Like Object}
+
+A \texttt{frozenset} can be created by passing an iterable to the \texttt{frozenset()} constructor.
+
+\begin{verbatim}
+names = frozenset(["Arthur", "Brian", "Arthur", "Lancelot"])
+
+print(f"names: {names!r}")
+print(f"type(names): {type(names)}")
+print(f"len(names): {len(names)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: frozenset({'Arthur', 'Brian', 'Lancelot'})
+type(names): <class 'frozenset'>
+len(names): 3
+\end{verbatim}
+
+The duplicate value \texttt{"Arthur"} appears only once. A \texttt{frozenset} still obeys the uniqueness rule of sets.
+
+The main difference is mutation. A normal \texttt{set} has methods such as \texttt{add()}, \texttt{remove()}, \texttt{discard()}, \texttt{pop()}, and \texttt{clear()}. A \texttt{frozenset} does not have these mutating methods.
+
+\begin{verbatim}
+normal_set = {"spam", "eggs"}
+fixed_set = frozenset(["spam", "eggs"])
+
+print("normal_set")
+print(f"  type: {type(normal_set)}")
+print(f"  add in dir: {'add' in dir(normal_set)}")
+print(f"  remove in dir: {'remove' in dir(normal_set)}")
+print(f"  union in dir: {'union' in dir(normal_set)}")
+print()
+
+print("fixed_set")
+print(f"  type: {type(fixed_set)}")
+print(f"  add in dir: {'add' in dir(fixed_set)}")
+print(f"  remove in dir: {'remove' in dir(fixed_set)}")
+print(f"  union in dir: {'union' in dir(fixed_set)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal_set
+  type: <class 'set'>
+  add in dir: True
+  remove in dir: True
+  union in dir: True
+
+fixed_set
+  type: <class 'frozenset'>
+  add in dir: False
+  remove in dir: False
+  union in dir: True
+\end{verbatim}
+
+The \texttt{frozenset} keeps non-mutating set operations such as membership testing, union, intersection, difference, and symmetric difference. It rejects operations that would change its contents in place.
+
+\begin{verbatim}
+fixed_set = frozenset(["spam", "eggs", 42])
+
+print(f"fixed_set: {fixed_set!r}")
+print(f"{'spam' in fixed_set = }")
+print(f"{'larch' in fixed_set = }")
+print(f"{42 in fixed_set = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fixed_set: frozenset({'eggs', 42, 'spam'})
+'spam' in fixed_set = True
+'larch' in fixed_set = False
+42 in fixed_set = True
+\end{verbatim}
+
+Trying to mutate a \texttt{frozenset} fails because the method does not exist.
+
+\begin{verbatim}
+fixed_set = frozenset(["spam", "eggs"])
+
+try:
+    fixed_set.add("larch")
+except AttributeError as err:
+    print(f"mutation failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+mutation failed: 'frozenset' object has no attribute 'add'
+\end{verbatim}
+
+This is not a temporary restriction. It is the defining property of the object. Once created, the membership domain is fixed.
+
+A \texttt{frozenset} is also hashable when all its elements are hashable.
+
+\begin{verbatim}
+fixed_set = frozenset(["spam", "eggs", 42])
+
+print(f"fixed_set: {fixed_set!r}")
+print(f"type(fixed_set): {type(fixed_set)}")
+print(f"hash(fixed_set): {hash(fixed_set)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fixed_set: frozenset({'eggs', 42, 'spam'})
+type(fixed_set): <class 'frozenset'>
+hash(fixed_set): -7694472856633011256
+\end{verbatim}
+
+The exact hash value may differ between Python runs. The important point is that the object can produce a hash value because its membership cannot change after construction.
+
+A mutable \texttt{set} cannot do this.
+
+\begin{verbatim}
+normal_set = {"spam", "eggs"}
+
+print(f"normal_set: {normal_set!r}")
+print(f"type(normal_set): {type(normal_set)}")
+print(f"normal_set.__hash__: {normal_set.__hash__}")
+
+try:
+    print(hash(normal_set))
+except TypeError as err:
+    print(f"hash failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+normal_set: {'eggs', 'spam'}
+type(normal_set): <class 'set'>
+normal_set.__hash__: None
+hash failed: unhashable type: 'set'
+\end{verbatim}
+
+The normal set is unhashable because its contents can change. If its hash depended on its current elements, adding or removing an element would change the hash-relevant state. That would be unsafe inside another hash table.
+
+A \texttt{frozenset} can still be iterated.
+
+\begin{verbatim}
+fixed_set = frozenset(["Homer", "Marge", "Lisa"])
+
+print(f"fixed_set: {fixed_set!r}")
+
+for name in fixed_set:
+    print(f"name: {name!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fixed_set: frozenset({'Lisa', 'Homer', 'Marge'})
+name: 'Lisa'
+name: 'Homer'
+name: 'Marge'
+\end{verbatim}
+
+The iteration order must not be treated as a meaningful stored order. A \texttt{frozenset}, like a \texttt{set}, is still unordered.
+
+\subsubsection{Using \texttt{frozenset} as a Dictionary Key or Set Element}
+
+The practical reason \texttt{frozenset} exists is that sometimes the program needs a set-like value to behave as one stable hashable object.
+
+A dictionary key must be hashable. A normal set cannot be used as a key.
+
+\begin{verbatim}
+bad_key = {"spam", "eggs"}
+
+try:
+    data = {bad_key: "breakfast"}
+except TypeError as err:
+    print(f"dictionary construction failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+dictionary construction failed: unhashable type: 'set'
+\end{verbatim}
+
+A \texttt{frozenset} can be used instead.
+
+\begin{verbatim}
+good_key = frozenset(["spam", "eggs"])
+
+data = {
+    good_key: "breakfast"
+}
+
+print(f"good_key: {good_key!r}")
+print(f"type(good_key): {type(good_key)}")
+print(f"data: {data!r}")
+print(f"data[good_key]: {data[good_key]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+good_key: frozenset({'eggs', 'spam'})
+type(good_key): <class 'frozenset'>
+data: {frozenset({'eggs', 'spam'}): 'breakfast'}
+data[good_key]: 'breakfast'
+\end{verbatim}
+
+This is useful when the key represents an unordered group rather than a sequence. For example, a pair of people can be treated as the same group regardless of order.
+
+\begin{verbatim}
+pair1 = frozenset(["Jerry", "George"])
+pair2 = frozenset(["George", "Jerry"])
+
+print(f"pair1: {pair1!r}")
+print(f"pair2: {pair2!r}")
+print(f"pair1 == pair2: {pair1 == pair2}")
+print(f"hash(pair1) == hash(pair2): {hash(pair1) == hash(pair2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pair1: frozenset({'George', 'Jerry'})
+pair2: frozenset({'George', 'Jerry'})
+pair1 == pair2: True
+hash(pair1) == hash(pair2): True
+\end{verbatim}
+
+Because the two \texttt{frozenset} objects contain the same members, they compare equal. Since they compare equal, they must also have equal hash values.
+
+This makes them safe dictionary keys.
+
+\begin{verbatim}
+dialogue = {}
+
+pair1 = frozenset(["Jerry", "George"])
+pair2 = frozenset(["George", "Jerry"])
+
+dialogue[pair1] = "coffee shop argument"
+dialogue[pair2] = "updated coffee shop argument"
+
+print(f"dialogue: {dialogue!r}")
+print(f"len(dialogue): {len(dialogue)}")
+print(f"dialogue[pair1]: {dialogue[pair1]!r}")
+print(f"dialogue[pair2]: {dialogue[pair2]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+dialogue: {frozenset({'George', 'Jerry'}): 'updated coffee shop argument'}
+len(dialogue): 1
+dialogue[pair1]: 'updated coffee shop argument'
+dialogue[pair2]: 'updated coffee shop argument'
+\end{verbatim}
+
+The second assignment did not create a second dictionary entry. It used an equal key and replaced the associated value.
+
+A \texttt{frozenset} can also be stored as an element inside a normal set.
+
+\begin{verbatim}
+groups = set()
+
+group1 = frozenset(["Arthur", "Brian"])
+group2 = frozenset(["Brian", "Arthur"])
+group3 = frozenset(["Homer", "Marge"])
+
+groups.add(group1)
+groups.add(group2)
+groups.add(group3)
+
+print(f"groups: {groups!r}")
+print(f"type(groups): {type(groups)}")
+print(f"len(groups): {len(groups)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+groups: {frozenset({'Arthur', 'Brian'}), frozenset({'Homer', 'Marge'})}
+type(groups): <class 'set'>
+len(groups): 2
+\end{verbatim}
+
+The first two groups collapse into one set element because they are equal \texttt{frozenset} objects.
+
+A normal set cannot be placed inside another set.
+
+\begin{verbatim}
+outer = set()
+inner = {"Arthur", "Brian"}
+
+try:
+    outer.add(inner)
+except TypeError as err:
+    print(f"nested set failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+nested set failed: unhashable type: 'set'
+\end{verbatim}
+
+The fix is to freeze the inner set-like group.
+
+\begin{verbatim}
+outer = set()
+inner = frozenset(["Arthur", "Brian"])
+
+outer.add(inner)
+
+print(f"outer: {outer!r}")
+print(f"type(outer): {type(outer)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+outer: {frozenset({'Arthur', 'Brian'})}
+type(outer): <class 'set'>
+\end{verbatim}
+
+The practical distinction is:
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Object} & \textbf{Mutable?} & \textbf{Hashable?} \\
+\hline
+\texttt{set} & Yes & No \\
+\texttt{frozenset} & No & Yes, if all elements are hashable \\
+\end{tabular}
+\end{center}
+
+A \texttt{frozenset} should be used when the program needs an unordered unique group that must itself be stored inside a hash-based structure.
+
+In ordinary words:
+
+\begin{itemize}
+    \item use \texttt{set} for a membership domain that must change;
+    \item use \texttt{frozenset} for a membership domain that must remain fixed;
+    \item use \texttt{frozenset} when a set-like group must become a dictionary key or another set's element.
+\end{itemize}

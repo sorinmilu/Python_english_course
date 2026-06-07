@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq06",
+  "linenos": true,
+  "input": null,
+  "output": "nums: range(0, 5)\ntype(nums): <class 'range'>\nnums.start: 0\nnums.stop: 5\nnums.step: 1",
+  "file": "main.py"
+}

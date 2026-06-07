@@ -1,0 +1,391 @@
+\subsection{CPython Allocation Optimizations}
+
+A tuple is structurally simpler than a list. It has a fixed length, so CPython does not need to maintain spare capacity for future appends. Once the tuple exists, its slot count is fixed.
+
+This gives tuples two practical implementation advantages:
+
+\begin{itemize}
+    \item the tuple object can be allocated with exactly the needed number of reference slots;
+    \item CPython can apply allocation shortcuts for some tuple cases.
+\end{itemize}
+
+These are CPython implementation details, not general Python-language promises. Other Python implementations may use different internal layouts.
+
+\begin{verbatim}
+import platform
+import sys
+
+data = ("spam", "eggs", 42)
+
+print(f"implementation: {platform.python_implementation()}")
+print(f"python version:  {sys.version.split()[0]}")
+
+print()
+print(f"data: {data!r}")
+print(f"type(data): {type(data)}")
+print(f"len(data): {len(data)}")
+print(f"size: {sys.getsizeof(data)} bytes")
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+implementation: CPython
+python version:  3.12.3
+
+data: ('spam', 'eggs', 42)
+type(data): <class 'tuple'>
+len(data): 3
+size: 64 bytes
+\end{verbatim}
+
+The exact byte count can differ between Python versions, builds, and platforms. The important structural point is that a tuple does not carry list-style spare capacity for later growth.
+
+\subsubsection{CPython Allocation Caching: Version-Dependent Recycling Optimizations for Small Tuple Objects}
+
+CPython has historically used special allocation behavior for tuples. One simple case is the empty tuple. CPython reuses the empty tuple object.
+
+\begin{verbatim}
+a = ()
+b = ()
+c = tuple()
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+print(f"c: {c!r}")
+
+print()
+print(f"a is b: {a is b}")
+print(f"a is c: {a is c}")
+
+print()
+print(f"id(a): {id(a)}")
+print(f"id(b): {id(b)}")
+print(f"id(c): {id(c)}")
+\end{verbatim}
+
+Possible output on CPython:
+
+\begin{verbatim}
+a: ()
+b: ()
+c: ()
+
+a is b: True
+a is c: True
+
+id(a): 140619796135544
+id(b): 140619796135544
+id(c): 140619796135544
+\end{verbatim}
+
+This is safe because the empty tuple cannot be changed. There is no internal slot that could later be reassigned.
+
+CPython also performs recycling optimizations for some non-empty tuple allocations. The exact rules are implementation details and may change between versions. Therefore, tuple identity reuse must never be used as program logic.
+
+The following demonstration may show object-id reuse on CPython, but it is intentionally presented as an observation experiment, not as a guarantee.
+
+\begin{verbatim}
+import gc
+
+ids = []
+
+for nr in range(10):
+    data = (nr, nr + 1)
+    ids.append(id(data))
+    del data
+    gc.collect()
+
+print("observed ids")
+for value in ids:
+    print(value)
+
+print()
+print(f"unique id count: {len(set(ids))}")
+print(f"total creations: {len(ids)}")
+\end{verbatim}
+
+Possible output on one CPython run:
+
+\begin{verbatim}
+observed ids
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+140619786871232
+
+unique id count: 1
+total creations: 10
+\end{verbatim}
+
+Another run, another Python version, or another implementation may show different results. The only valid lesson is that CPython may recycle tuple memory after a tuple is destroyed.
+
+The same warning applies to identity comparisons.
+
+\begin{verbatim}
+a = (10, 20)
+b = (10, 20)
+
+print(f"a == b: {a == b}")
+print(f"a is b: {a is b}")
+
+print()
+print(f"id(a): {id(a)}")
+print(f"id(b): {id(b)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a == b: True
+a is b: False
+
+id(a): 140619786871232
+id(b): 140619786871488
+\end{verbatim}
+
+The tuples have equal contents. They should be compared with \texttt{==}, not \texttt{is}.
+
+Some constant tuples may appear to be shared because the compiler can store constants and reuse them inside code objects. This is another implementation detail.
+
+\begin{verbatim}
+a = (1, 2, 3)
+b = (1, 2, 3)
+
+print(f"a == b: {a == b}")
+print(f"a is b: {a is b}")
+
+print()
+print(f"id(a): {id(a)}")
+print(f"id(b): {id(b)}")
+\end{verbatim}
+
+Possible output on one CPython run:
+
+\begin{verbatim}
+a == b: True
+a is b: True
+
+id(a): 140619786873024
+id(b): 140619786873024
+\end{verbatim}
+
+This result is not the tuple equality rule. It is a storage optimization effect. The semantic rule is still:
+
+\begin{quote}
+Use \texttt{==} to compare tuple contents. Do not use \texttt{is} to test whether two tuples contain the same values.
+\end{quote}
+
+Tuple construction from an existing exact tuple may also return the same object, because there is no reason to copy an immutable tuple.
+
+\begin{verbatim}
+a = ("Homer", "Marge")
+b = tuple(a)
+
+print(f"a: {a!r}")
+print(f"b: {b!r}")
+
+print()
+print(f"a == b: {a == b}")
+print(f"a is b: {a is b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ('Homer', 'Marge')
+b: ('Homer', 'Marge')
+
+a == b: True
+a is b: True
+\end{verbatim}
+
+This is safe because neither \texttt{a} nor \texttt{b} can mutate the tuple structure.
+
+The practical rule is:
+
+\begin{quote}
+Tuple allocation optimizations are allowed because tuples are structurally immutable. They are useful for CPython performance, but they must not be treated as part of normal program meaning.
+\end{quote}
+
+\subsubsection{Memory Footprint Metrics: Comparing Fixed \texttt{tuple} Layouts Against the Dynamic Tracking Buffers of \texttt{list}}
+
+A list must support growth. For that reason, CPython lists maintain dynamic internal storage and may reserve extra pointer slots beyond the visible length.
+
+A tuple does not support growth. Its fixed slot count can be allocated directly.
+
+The difference can be measured with \texttt{sys.getsizeof()}.
+
+\begin{verbatim}
+import sys
+
+values = [10, 20, 30, 42]
+
+items_list = [10, 20, 30, 42]
+items_tuple = (10, 20, 30, 42)
+
+print(f"items_list:  {items_list!r}")
+print(f"items_tuple: {items_tuple!r}")
+
+print()
+print(f"len(items_list):  {len(items_list)}")
+print(f"len(items_tuple): {len(items_tuple)}")
+
+print()
+print(f"sys.getsizeof(items_list):  {sys.getsizeof(items_list)}")
+print(f"sys.getsizeof(items_tuple): {sys.getsizeof(items_tuple)}")
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+items_list:  [10, 20, 30, 42]
+items_tuple: (10, 20, 30, 42)
+
+len(items_list):  4
+len(items_tuple): 4
+
+sys.getsizeof(items_list):  88
+sys.getsizeof(items_tuple): 72
+\end{verbatim}
+
+The exact numbers are not universal. The usual pattern is that a tuple with the same number of elements is smaller than a list because the tuple does not need dynamic spare capacity.
+
+A size table makes the pattern clearer.
+
+\begin{verbatim}
+import sys
+
+print(f"{'n':>2} {'list':>8} {'tuple':>8}")
+
+for n in range(0, 11):
+    items_list = list(range(n))
+    items_tuple = tuple(range(n))
+
+    list_size = sys.getsizeof(items_list)
+    tuple_size = sys.getsizeof(items_tuple)
+
+    print(f"{n:>2} {list_size:>8} {tuple_size:>8}")
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+ n     list    tuple
+ 0       56       40
+ 1       72       48
+ 2       72       56
+ 3       88       64
+ 4       88       72
+ 5      104       80
+ 6      104       88
+ 7      120       96
+ 8      120      104
+ 9      136      112
+10      136      120
+\end{verbatim}
+
+The tuple size usually grows in a direct slot-count pattern. The list size often grows in jumps because of allocation rounding and spare capacity.
+
+This difference becomes more visible when a list is grown gradually with \texttt{append()}.
+
+\begin{verbatim}
+import sys
+
+items = []
+
+print(f"{'len':>3} {'list size':>10}")
+
+last_size = sys.getsizeof(items)
+print(f"{len(items):>3} {last_size:>10}")
+
+for nr in range(1, 13):
+    items.append(nr)
+    size = sys.getsizeof(items)
+
+    if size != last_size:
+        print(f"{len(items):>3} {size:>10}")
+        last_size = size
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+len  list size
+  0         56
+  1         88
+  5        120
+  9        184
+\end{verbatim}
+
+The list size does not increase at every length. It increases when the internal storage is resized.
+
+A tuple of the same visible lengths does not need this spare-capacity behavior.
+
+\begin{verbatim}
+import sys
+
+print(f"{'len':>3} {'tuple size':>10}")
+
+for n in [0, 1, 5, 9]:
+    data = tuple(range(n))
+    print(f"{n:>3} {sys.getsizeof(data):>10}")
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+len tuple size
+  0         40
+  1         48
+  5         80
+  9        112
+\end{verbatim}
+
+This does not mean tuples are always the correct replacement for lists. The choice depends on the required behavior.
+
+\begin{itemize}
+    \item Use a list when the sequence must be edited in place.
+    \item Use a tuple when the sequence represents a fixed structure.
+\end{itemize}
+
+The memory comparison is only one consequence of the deeper structural difference.
+
+The following example shows the behavioral reason first.
+
+\begin{verbatim}
+items_list = ["Jerry", "Elaine"]
+items_tuple = ("Jerry", "Elaine")
+
+items_list.append("George")
+
+print(f"items_list: {items_list!r}")
+
+try:
+    items_tuple.append("George")
+except AttributeError as err:
+    print("tuple append failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items_list: ['Jerry', 'Elaine', 'George']
+tuple append failed
+message: 'tuple' object has no attribute 'append'
+\end{verbatim}
+
+The list pays for editability with dynamic storage machinery. The tuple avoids that machinery because its structure is fixed.
+
+The practical rule is:
+
+\begin{quote}
+A tuple is usually smaller because it stores a fixed number of reference slots. A list is more flexible because it owns a dynamically resized slot buffer. Choose between them by meaning first: editable sequence or fixed record-like sequence.
+\end{quote}

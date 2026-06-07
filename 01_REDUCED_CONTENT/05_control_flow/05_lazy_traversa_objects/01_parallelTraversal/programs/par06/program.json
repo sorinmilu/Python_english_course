@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "zip() as a Lazy Synchronization Mechanism Across Multiple Iterables",
+  "label": "par06",
+  "linenos": true,
+  "input": null,
+  "output": "Jerry    |  72\nElaine   |  91\nKramer   |  42",
+  "file": "main.py"
+}

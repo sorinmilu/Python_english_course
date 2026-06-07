@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked INDENT...",
+  "label": "the02",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'IndentationError'>\nmessage: expected an indented block after 'if' statement on line 1 (<bad_indent>, line 2)\nargs: (\"expected an indented block after 'if' statement on line 1\", ('<bad_indent>', 2, 1, 'print(\"Ni!\")\\n', 2, -1))\nhas lineno: True\nline number: 2",
+  "file": "main.py"
+}

@@ -31,63 +31,12 @@ Python provides \texttt{enumerate()} for the more direct case: traverse the valu
 
 The \texttt{enumerate()} function receives an iterable and returns an \texttt{enumerate} object. That object is itself an iterator. Each call to \texttt{next()} produces a pair containing the current index and the current value.
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-pairs = enumerate(names)
-
-print(f"type(names): {type(names)}")
-print(f"type(pairs): {type(pairs)}")
-print(f"dir(pairs) sample: {dir(pairs)[:12]}")
-
-print(f"has __iter__: {'__iter__' in dir(pairs)}")
-print(f"has __next__: {'__next__' in dir(pairs)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(names): <class 'list'>
-type(pairs): <class 'enumerate'>
-dir(pairs) sample: ['__class__', '__class_getitem__', '__delattr__',
-'__dir__', '__doc__', '__eq__', '__format__', '__ge__',
-'__getattribute__', '__getstate__', '__gt__', '__hash__']
-has __iter__: True
-has __next__: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/enu05>>>
 Because the object has \texttt{\_\_iter\_\_()} and \texttt{\_\_next\_\_()}, it is an iterator. It is consumed as it advances.
 
 Manual inspection with \texttt{next()} shows what it produces:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-pairs = enumerate(names)
-
-pair1 = next(pairs)
-pair2 = next(pairs)
-pair3 = next(pairs)
-
-print(f"pair1: {pair1}")
-print(f"pair2: {pair2}")
-print(f"pair3: {pair3}")
-
-print(f"type(pair1): {type(pair1)}")
-print(f"dir(pair1) sample: {dir(pair1)[:10]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-pair1: (0, 'Jerry')
-pair2: (1, 'Elaine')
-pair3: (2, 'Kramer')
-type(pair1): <class 'tuple'>
-dir(pair1) sample: ['__add__', '__class__', '__class_getitem__',
-'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',
-'__format__', '__ge__']
-\end{verbatim}
-
+%<<<PROGRAM:programs/enu04>>>
 Each produced object is a tuple. The first component is the index. The second component is the original value.
 
 The tuple can be unpacked directly in the \texttt{for} loop header:
@@ -157,27 +106,7 @@ This is useful when displaying human-facing numbering. Python list indexes norma
 
 The \texttt{enumerate()} object is lazy. It does not immediately create all pairs.
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-pairs = enumerate(names, start=1)
-
-print(f"pairs: {pairs}")
-print("nothing has been printed from the names yet")
-
-print(f"next(pairs): {next(pairs)}")
-print(f"next(pairs): {next(pairs)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-pairs: <enumerate object at 0x...>
-nothing has been printed from the names yet
-next(pairs): (1, 'Jerry')
-next(pairs): (2, 'Elaine')
-\end{verbatim}
-
+%<<<PROGRAM:programs/enu03>>>
 The exact memory address will differ. The important fact is that \texttt{pairs} is a traversal object. It yields pairs only when asked.
 
 If all pairs are needed as stored data, the object can be materialized:
@@ -203,25 +132,7 @@ The call to \texttt{list(pairs)} consumes the \texttt{enumerate} iterator and st
 
 After consumption, the same \texttt{enumerate} object has no remaining values:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-pairs = enumerate(names)
-
-first = list(pairs)
-second = list(pairs)
-
-print(f"first: {first}")
-print(f"second: {second}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-first: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
-second: []
-\end{verbatim}
-
+%<<<PROGRAM:programs/enu02>>>
 This follows the iterator exhaustion rule from the previous section. The \texttt{enumerate} object is not the same kind of reusable source as the original list. It is a traversal in progress.
 
 To traverse again, create a new \texttt{enumerate} object from the original iterable:
@@ -270,25 +181,7 @@ The second program changes the traversal source while it is being traversed. Tha
 
 A compact practical example:
 
-\begin{verbatim}
-quotes = [
-    "No soup for you!",
-    "Nobody expects the Spanish Inquisition!",
-    "D'oh!",
-]
-
-for line_no, quote in enumerate(quotes, start=1):
-    print(f"{line_no:>2} | {quote}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
- 1 | No soup for you!
- 2 | Nobody expects the Spanish Inquisition!
- 3 | D'oh!
-\end{verbatim}
-
+%<<<PROGRAM:programs/enu01>>>
 The \texttt{enumerate()} call supplies the line number. The list supplies the quote. The loop receives both together.
 
 The practical rule is:

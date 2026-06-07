@@ -1,9 +1,10 @@
-def is_even(num):
-    return num % 2 == 0
+text = "42"
+num = int(text)
 
-texts = ["10", "15", "20", "42"]
-
-nums = map(int, texts)
-even_nums = filter(is_even, nums)
-
-print(list(even_nums))
+print(f"text: {text!r}")
+print(f"type(text): {type(text)}")
+print(f"num: {num}")
+print(f"type(num): {type(num)}")
+print(f"dir(num) sample: {dir(num)[:10]}")
+print(f"num.__bool__(): {num.__bool__()}")
+print(f"num.__add__(8): {num.__add__(8)}")

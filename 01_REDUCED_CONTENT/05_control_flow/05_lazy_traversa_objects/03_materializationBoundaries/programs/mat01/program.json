@@ -4,6 +4,6 @@
   "label": "mat01",
   "linenos": true,
   "input": null,
-  "output": "even_nums: [10, 20, 42]\nfirst even number: 10\ntotal: 72\nagain total: 72",
+  "output": "type(nums_range): <class 'range'>\ntype(nums_map): <class 'map'>\nsize of range: 48 bytes\nsize of map:   48 bytes",
   "file": "main.py"
 }

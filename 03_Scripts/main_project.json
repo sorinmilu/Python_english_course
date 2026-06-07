@@ -213,5 +213,7 @@
   "main_placeholder": "%<<<INSERT_CONTENT>>>",
   "bibliography_file": "references.bib",
   "final_bibliography_file": "full_references.bib",
+  "document_author": "Milutinovici Sorin",
+  "document_title": "Programming in Python",
   "copy_to_build": "layers"
 }

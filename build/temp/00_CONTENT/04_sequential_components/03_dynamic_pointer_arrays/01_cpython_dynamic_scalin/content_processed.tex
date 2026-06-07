@@ -1,0 +1,410 @@
+\subsection{CPython Dynamic Scaling Mechanics}
+
+A Python list can grow and shrink. This does not mean that CPython asks the memory allocator for a new block every time one element is appended. That would make repeated appending unnecessarily expensive.
+
+Instead, CPython keeps two related quantities:
+
+\begin{itemize}
+    \item the current logical length of the list;
+    \item the allocated internal slot capacity.
+\end{itemize}
+
+The logical length is what \texttt{len()} returns. The allocated capacity is an implementation detail: it is the number of pointer slots currently reserved internally.
+
+\begin{verbatim}
+items = []
+
+print(f"items: {items!r}")
+print(f"len(items): {len(items)}")
+
+items.append("spam")
+items.append("eggs")
+items.append(42)
+
+print()
+print(f"items: {items!r}")
+print(f"len(items): {len(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: []
+len(items): 0
+
+items: ['spam', 'eggs', 42]
+len(items): 3
+\end{verbatim}
+
+The program sees length. CPython also manages capacity behind that visible length.
+
+\subsubsection{Dynamic Over-Allocation Invariants: How CPython Pre-Allocates Extra Slots During List Resizing to Support Amortized O(1) Appends}
+
+When a list grows beyond its current internal capacity, CPython resizes the internal pointer array. During that resize, it usually allocates more slots than are immediately needed. Those extra slots are empty capacity for future appends.
+
+The effect can be observed indirectly with \texttt{sys.getsizeof()}.
+
+\begin{verbatim}
+import sys
+
+items = []
+last_size = sys.getsizeof(items)
+
+print(f"len={len(items):>2} size={last_size}")
+
+for nr in range(1, 35):
+    items.append(nr)
+    size = sys.getsizeof(items)
+
+    if size != last_size:
+        print(f"len={len(items):>2} size={size} growth={size - last_size}")
+        last_size = size
+\end{verbatim}
+
+Possible output on one 64-bit CPython build:
+
+\begin{verbatim}
+len= 0 size=56
+len= 1 size=88 growth=32
+len= 5 size=120 growth=32
+len= 9 size=184 growth=64
+len=17 size=248 growth=64
+len=25 size=312 growth=64
+len=33 size=376 growth=64
+\end{verbatim}
+
+The exact byte values depend on Python version, build, and platform. The important pattern is that the object size does not increase after every single append. It increases in jumps.
+
+This means that several appends can reuse already allocated pointer slots.
+
+\begin{verbatim}
+import sys
+
+items = []
+
+for nr in range(12):
+    before_size = sys.getsizeof(items)
+    items.append(nr)
+    after_size = sys.getsizeof(items)
+
+    changed = before_size != after_size
+
+    print(f"append {nr:>2}: len={len(items):>2} "
+          f"before={before_size:<4} after={after_size:<4} "
+          f"resized={changed}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+append  0: len= 1 before=56   after=88   resized=True
+append  1: len= 2 before=88   after=88   resized=False
+append  2: len= 3 before=88   after=88   resized=False
+append  3: len= 4 before=88   after=88   resized=False
+append  4: len= 5 before=88   after=120  resized=True
+append  5: len= 6 before=120  after=120  resized=False
+append  6: len= 7 before=120  after=120  resized=False
+append  7: len= 8 before=120  after=120  resized=False
+append  8: len= 9 before=120  after=184  resized=True
+append  9: len=10 before=184  after=184  resized=False
+append 10: len=11 before=184  after=184  resized=False
+append 11: len=12 before=184  after=184  resized=False
+\end{verbatim}
+
+The visible operation is always \texttt{append}. Internally, some appends only place a pointer into an already available slot. Other appends force a resize.
+
+This is why list appending is described as amortized \texttt{O(1)}. One particular append may trigger allocation and copying of pointer slots. But across a long sequence of appends, the extra allocated space prevents resizing on every operation.
+
+A simplified mental model is:
+
+\begin{verbatim}
+visible list:
++----+----+----+
+| 10 | 20 | 42 |
++----+----+----+
+ length = 3
+
+internal slot capacity:
++------+------+------+------+------+
+| used | used | used | free | free |
++------+------+------+------+------+
+ capacity = 5
+\end{verbatim}
+
+The free slots are not visible as list elements. They are only reserved internal space.
+
+Appending into free capacity is cheap.
+
+\begin{verbatim}
+items = [10, 20, 30]
+
+items.append(42)
+
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+[10, 20, 30, 42]
+\end{verbatim}
+
+But if there is no free internal slot, CPython must create or resize the internal slot array, copy existing references as needed, and then store the new reference.
+
+The practical programmer rule is:
+
+\begin{quote}
+Appending to the end of a list is normally efficient because CPython grows the internal pointer array in spare-capacity jumps, not one exact slot at a time.
+\end{quote}
+
+This does not mean that a list has infinite free space. It means that CPython uses extra reserved slots to make repeated appending efficient over time.
+
+\subsubsection{Memory Shifting Costs: The O(N) Penalty of Arbitrary Index Insertions and Deletions (\texttt{.insert()}, \texttt{.pop()})}
+
+Appending at the end is special because no existing element has to move to another logical position. Inserting near the front is different. To insert a new element at index \texttt{0}, every existing pointer slot must shift one position to the right.
+
+\begin{verbatim}
+items = ["B", "C", "D"]
+
+print("before insert")
+print(items)
+
+items.insert(0, "A")
+
+print()
+print("after insert")
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before insert
+['B', 'C', 'D']
+
+after insert
+['A', 'B', 'C', 'D']
+\end{verbatim}
+
+The result looks simple, but the internal slot movement is conceptually:
+
+\begin{verbatim}
+before:
+index:  0    1    2
+        B    C    D
+
+make room at index 0:
+index:  0    1    2    3
+        ?    B    C    D
+
+place new reference:
+index:  0    1    2    3
+        A    B    C    D
+\end{verbatim}
+
+The list does not copy the full Python objects. It shifts references. But shifting many references still costs time proportional to the number of shifted slots.
+
+Inserting in the middle shifts only the elements after the insertion point.
+
+\begin{verbatim}
+items = ["Jerry", "Elaine", "Kramer"]
+
+items.insert(2, "George")
+
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+['Jerry', 'Elaine', 'George', 'Kramer']
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+before:
+0: Jerry
+1: Elaine
+2: Kramer
+
+after inserting at index 2:
+0: Jerry
+1: Elaine
+2: George
+3: Kramer
+\end{verbatim}
+
+Only the old element at index \texttt{2} and everything after it must move.
+
+The worst case is insertion near the beginning of a large list.
+
+\begin{verbatim}
+import time
+
+count = 50000
+
+items = []
+
+start = time.perf_counter()
+
+for nr in range(count):
+    items.append(nr)
+
+end = time.perf_counter()
+append_time = end - start
+
+items = []
+
+start = time.perf_counter()
+
+for nr in range(count):
+    items.insert(0, nr)
+
+end = time.perf_counter()
+insert_front_time = end - start
+
+print(f"append loop:       {append_time:.6f} seconds")
+print(f"insert front loop: {insert_front_time:.6f} seconds")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+append loop:       0.002800 seconds
+insert front loop: 0.410000 seconds
+\end{verbatim}
+
+The exact times depend on the machine and Python build. The important point is the growth pattern: repeated front insertion is much more expensive than repeated appending because existing slots are shifted again and again.
+
+Deletion has the same structural issue. Removing from the end is cheap because no later elements exist.
+
+\begin{verbatim}
+items = ["A", "B", "C", "D"]
+
+last = items.pop()
+
+print(f"last:  {last!r}")
+print(f"items: {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+last:  'D'
+items: ['A', 'B', 'C']
+\end{verbatim}
+
+Popping from the middle or beginning requires shifting the later elements left.
+
+\begin{verbatim}
+items = ["A", "B", "C", "D"]
+
+removed = items.pop(0)
+
+print(f"removed: {removed!r}")
+print(f"items:   {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+removed: 'A'
+items:   ['B', 'C', 'D']
+\end{verbatim}
+
+Conceptually:
+
+\begin{verbatim}
+before:
+index:  0    1    2    3
+        A    B    C    D
+
+remove index 0:
+index:  0    1    2
+        B    C    D
+\end{verbatim}
+
+The references to \texttt{B}, \texttt{C}, and \texttt{D} must move left by one slot.
+
+The timing difference can be observed.
+
+\begin{verbatim}
+import time
+
+count = 50000
+
+items = list(range(count))
+
+start = time.perf_counter()
+
+while items:
+    items.pop()
+
+end = time.perf_counter()
+pop_end_time = end - start
+
+items = list(range(count))
+
+start = time.perf_counter()
+
+while items:
+    items.pop(0)
+
+end = time.perf_counter()
+pop_front_time = end - start
+
+print(f"pop end loop:   {pop_end_time:.6f} seconds")
+print(f"pop front loop: {pop_front_time:.6f} seconds")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pop end loop:   0.002500 seconds
+pop front loop: 0.180000 seconds
+\end{verbatim}
+
+Again, the exact numbers are not the lesson. The structural cost is the lesson.
+
+\begin{itemize}
+    \item \texttt{append(x)} adds at the end and is amortized \texttt{O(1)};
+    \item \texttt{pop()} removes from the end and is \texttt{O(1)};
+    \item \texttt{insert(i, x)} may shift many elements and is \texttt{O(N)};
+    \item \texttt{pop(i)} away from the end may shift many elements and is \texttt{O(N)}.
+\end{itemize}
+
+If a program repeatedly adds or removes values at the front, a list is usually the wrong structure. The standard library provides \texttt{collections.deque} for efficient append and pop operations at both ends.
+
+\begin{verbatim}
+from collections import deque
+
+items = deque()
+
+items.append("right")
+items.appendleft("left")
+
+print(items)
+
+left = items.popleft()
+right = items.pop()
+
+print(f"left:  {left!r}")
+print(f"right: {right!r}")
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+deque(['left', 'right'])
+left:  'left'
+right: 'right'
+deque([])
+\end{verbatim}
+
+The practical rule is:
+
+\begin{quote}
+Use lists when the main growth pattern is appending at the end and indexing by position. Be cautious with repeated insertion or deletion near the beginning, because the internal pointer slots must be shifted.
+\end{quote}

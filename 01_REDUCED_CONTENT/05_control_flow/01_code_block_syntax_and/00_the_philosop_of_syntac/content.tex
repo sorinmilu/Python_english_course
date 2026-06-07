@@ -47,13 +47,7 @@ The colon announces that a nested block is expected. The increased indentation d
 
 This means that Python code cannot lie about its structure in the same way badly formatted C code can. In C, this is legal but misleading:
 
-\begin{verbatim}
-/* C example, not Python */
-if (ready)
-    printf("ready\n");
-    printf("still printed even when ready is false\n");
-\end{verbatim}
-
+%<<<PROGRAM:programs/the06>>>
 The second \texttt{printf()} visually looks connected to the \texttt{if}, but it is not controlled by the \texttt{if}. In Python, that ambiguity is removed because indentation itself defines the block.
 
 \begin{verbatim}
@@ -95,15 +89,7 @@ Python does not use curly braces to define ordinary code blocks. It also does no
 
 A C-style structure uses explicit delimiters:
 
-\begin{verbatim}
-/* C example, not Python */
-if (score == 42) {
-    printf("the answer\n");
-    printf("do not panic\n");
-}
-printf("done\n");
-\end{verbatim}
-
+%<<<PROGRAM:programs/the05>>>
 A Python structure uses colon plus indentation:
 
 \begin{verbatim}
@@ -194,55 +180,7 @@ At the start of a file, Python is at indentation level zero. When a new block be
 
 The following script shows these tokens using the standard \texttt{tokenize} module:
 
-\begin{verbatim}
-import io
-import tokenize
-
-src = """\
-score = 42
-
-if score == 42:
-    print("the answer")
-    print("do not panic")
-
-print("done")
-"""
-
-tokens = tokenize.generate_tokens(io.StringIO(src).readline)
-
-for tok in tokens:
-    tok_name = tokenize.tok_name[tok.type]
-    if tok_name in ("INDENT", "DEDENT", "NAME", "OP", "STRING", "NUMBER"):
-        print(f"{tok_name:<8} {tok.string!r}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-NAME     'score'
-OP       '='
-NUMBER   '42'
-NAME     'if'
-NAME     'score'
-OP       '=='
-NUMBER   '42'
-OP       ':'
-INDENT   '    '
-NAME     'print'
-OP       '('
-STRING   '"the answer"'
-OP       ')'
-NAME     'print'
-OP       '('
-STRING   '"do not panic"'
-OP       ')'
-DEDENT   ''
-NAME     'print'
-OP       '('
-STRING   '"done"'
-OP       ')'
-\end{verbatim}
-
+%<<<PROGRAM:programs/the04>>>
 The important lines are:
 
 \begin{verbatim}
@@ -254,66 +192,12 @@ They show that indentation is turned into formal structure before the program ex
 
 The token objects produced by \texttt{tokenize} are runtime objects too:
 
-\begin{verbatim}
-import io
-import tokenize
-
-src = "x = 42\n"
-tokens = tokenize.generate_tokens(io.StringIO(src).readline)
-
-first_tok = next(tokens)
-
-print(f"type(first_tok): {type(first_tok)}")
-print(f"first_tok: {first_tok}")
-print(f"first_tok.type: {first_tok.type}")
-print(f"first_tok.string: {first_tok.string!r}")
-print(f"has start: {'start' in dir(first_tok)}")
-print(f"has end: {'end' in dir(first_tok)}")
-print(f"has line: {'line' in dir(first_tok)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(first_tok): <class 'tokenize.TokenInfo'>
-first_tok: TokenInfo(type=1 (NAME), string='x', start=(1, 0), end=(1, 1), line='x = 42\n')
-first_tok.type: 1
-first_tok.string: 'x'
-has start: True
-has end: True
-has line: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/the03>>>
 The \texttt{type} field identifies the token category. The \texttt{string} field stores the exact source text for that token. The \texttt{start} and \texttt{end} fields store source positions. The \texttt{line} field stores the physical line from which the token came.
 
 If Python expects indentation and the indentation does not form a valid block, it raises \texttt{IndentationError}.
 
-\begin{verbatim}
-bad_src = """\
-if True:
-print("Ni!")
-"""
-
-try:
-    compile(bad_src, "<bad_indent>", "exec")
-except IndentationError as err:
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-    print(f"args: {err.args}")
-    print(f"has lineno: {'lineno' in dir(err)}")
-    print(f"line number: {err.lineno}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'IndentationError'>
-message: expected an indented block after 'if' statement on line 1 (<bad_indent>, line 2)
-args: ("expected an indented block after 'if' statement on line 1", ('<bad_indent>', 2, 1, 'print("Ni!")\n', 2, -1))
-has lineno: True
-line number: 2
-\end{verbatim}
-
+%<<<PROGRAM:programs/the02>>>
 This example uses \texttt{compile()} so the error can be caught and inspected instead of stopping the whole demonstration script. The bad source is never executed. It fails during compilation, while Python is building the executable structure.
 
 \subsubsection{Mixed Tabs and Spaces: How \texttt{TabError} Emerges from Ambiguous Indentation}
@@ -324,27 +208,7 @@ Python must decide block structure mechanically, not visually. When tabs and spa
 
 The following script builds problematic source text as a string. The \texttt{\textbackslash t} sequence represents a tab character.
 
-\begin{verbatim}
-bad_src = "if True:\n        print('spaces')\n\tprint('tab')\n"
-
-try:
-    compile(bad_src, "<mixed_tabs_spaces>", "exec")
-except TabError as err:
-    print(f"type(err): {type(err)}")
-    print(f"is IndentationError: {isinstance(err, IndentationError)}")
-    print(f"message: {err}")
-    print(f"args: {err.args}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'TabError'>
-is IndentationError: True
-message: inconsistent use of tabs and spaces in indentation (<mixed_tabs_spaces>, line 3)
-args: ('inconsistent use of tabs and spaces in indentation', ('<mixed_tabs_spaces>', 3, 1, "\tprint('tab')\n", 3, 0))
-\end{verbatim}
-
+%<<<PROGRAM:programs/the01>>>
 The line with spaces and the line with a tab may look similarly indented in some editors, but Python rejects the structure because the indentation is not reliably defined.
 
 The inheritance relationship is visible directly:

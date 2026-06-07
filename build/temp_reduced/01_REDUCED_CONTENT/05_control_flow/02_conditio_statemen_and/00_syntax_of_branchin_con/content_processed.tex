@@ -1,0 +1,402 @@
+\subsection{Syntax of Branching Control Graphs}
+
+A conditional statement is the first major structure where the written order of source code visibly separates from the possible execution routes. The source still appears as text written from top to bottom, but the runtime does not necessarily execute every line. It tests a condition, selects a branch, executes the selected block, and skips the others.
+
+The basic syntax is:
+
+\begin{codebox}[]{python}{Syntax of Branching Control Graphs}{syn10}
+if condition:
+    statements_for_true_condition
+elif another_condition:
+    statements_for_second_condition
+else:
+    statements_for_all_previous_conditions_false
+\end{codebox}
+
+
+The colon announces that a block must follow. The indentation defines the block body. The \texttt{if}, \texttt{elif}, and \texttt{else} headers are decision nodes. Their indented bodies are the possible route bodies attached to those nodes.
+
+\begin{quote}
+A conditional statement is not only a textual structure. It is a control-flow structure that creates several possible forward edges and then rejoins after the selected branch.
+\end{quote}
+
+This subsection focuses on nested decision trees and inline conditional expressions. Sequential \texttt{if}/\texttt{elif} evaluation order is assumed; the deeper routing machinery is studied under logic evaluation architecture.
+
+\subsubsection{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}
+
+A conditional body may contain another conditional statement. This creates a nested decision tree. The outer decision must be entered before the inner decision can even be reached.
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn09}
+name = "Bart"
+age = 10
+
+if name == "Bart":
+    print("character found")
+
+    if age < 18:
+        print("minor character")
+    else:
+        print("adult character")
+
+else:
+    print("different character")
+
+print("analysis complete")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{character found} \\
+\texttt{minor character} \\
+\texttt{analysis complete} \\
+\end{iobox}
+
+
+The inner \texttt{if age < 18:} statement exists inside the body of the outer \texttt{if name == "Bart":} statement. Python reaches the age test only if the name test succeeds.
+
+The route shape is:
+
+\begin{verbatim}
+test name == "Bart"
+    true:
+        print "character found"
+        test age < 18
+            true:
+                print "minor character"
+            false:
+                print "adult character"
+    false:
+        print "different character"
+
+after whole nested structure:
+    print "analysis complete"
+\end{verbatim}
+
+The indentation levels describe the containment relation:
+
+\begin{verbatim}
+level 0: outside all conditionals
+level 1: inside the outer name decision
+level 2: inside the inner age decision
+\end{verbatim}
+
+A nested decision tree is useful when one question depends on the answer to an earlier question.
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn08}
+has_ticket = True
+has_secret_word = False
+
+if has_ticket:
+    print("ticket accepted")
+
+    if has_secret_word:
+        print("Nobody expects the Spanish Inquisition!")
+    else:
+        print("ordinary entrance")
+
+else:
+    print("no ticket, no entrance")
+
+print("gate check finished")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{ticket accepted} \\
+\texttt{ordinary entrance} \\
+\texttt{gate check finished} \\
+\end{iobox}
+
+
+The secret-word test is not a peer of the ticket test. It is subordinate to it. If \texttt{has\_ticket} is false, Python never evaluates the inner \texttt{if has\_secret\_word:} statement.
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn07}
+has_ticket = False
+has_secret_word = True
+
+if has_ticket:
+    print("ticket accepted")
+
+    if has_secret_word:
+        print("Nobody expects the Spanish Inquisition!")
+    else:
+        print("ordinary entrance")
+
+else:
+    print("no ticket, no entrance")
+
+print("gate check finished")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{no ticket, no entrance} \\
+\texttt{gate check finished} \\
+\end{iobox}
+
+
+Even though \texttt{has\_secret\_word} is true, that fact is irrelevant because the program never enters the outer true branch.
+
+Nested conditionals should be read from the outside inward:
+
+\begin{quote}
+The outer condition decides whether the inner decision point is reachable. The inner condition decides only after execution has already entered the outer branch.
+\end{quote}
+
+This is where indentation becomes more than neat formatting. Moving one line changes the tree.
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn06}
+has_ticket = True
+has_secret_word = False
+
+if has_ticket:
+    print("ticket accepted")
+
+if has_secret_word:
+    print("secret entrance")
+else:
+    print("not a secret entrance")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{ticket accepted} \\
+\texttt{not a secret entrance} \\
+\end{iobox}
+
+
+Here the second \texttt{if} is not nested. It is aligned with the first \texttt{if}, so it is a separate decision node. The secret-word decision happens regardless of the ticket decision.
+
+By contrast:
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn05}
+has_ticket = True
+has_secret_word = False
+
+if has_ticket:
+    print("ticket accepted")
+
+    if has_secret_word:
+        print("secret entrance")
+    else:
+        print("not a secret entrance")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{ticket accepted} \\
+\texttt{not a secret entrance} \\
+\end{iobox}
+
+
+The output happens to be the same for this input, but the graph is not the same. If \texttt{has\_ticket} becomes false, the difference appears.
+
+\begin{codebox}[]{python}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{syn04}
+has_ticket = False
+has_secret_word = False
+
+if has_ticket:
+    print("ticket accepted")
+
+    if has_secret_word:
+        print("secret entrance")
+    else:
+        print("not a secret entrance")
+
+print("finished")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{finished} \\
+\end{iobox}
+
+
+The whole inner decision is unreachable because it is inside the false outer branch.
+
+This is the reason nested conditional code must be read structurally, not only line by line. Each indentation level modifies reachability.
+
+\subsubsection{Conditional Expressions: Inline Branch Selection with \texttt{x if condition else y}}
+
+Python also has an expression form for selecting between two values:
+
+\begin{verbatim}
+value_if_true if condition else value_if_false
+\end{verbatim}
+
+This is called a conditional expression. It is sometimes informally called a ternary expression because it has three parts: the true-side value, the condition, and the false-side value.
+
+The order is important. Python does not write it as \texttt{condition ? x : y}, as in C-like languages. Python writes the selected true value first, then the condition, then the false value.
+
+\begin{codebox}[]{python}{Conditional Expressions: Inline Branch Selection with x if condition else y}{syn03}
+score = 42
+
+status = "passing" if score >= 50 else "failing"
+
+print(f"score: {score}")
+print(f"status: {status}")
+print(f"type(status): {type(status)}")
+print(f"dir(status) sample: {dir(status)[:8]}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{score: 42} \\
+\texttt{status: failing} \\
+\texttt{type(status): <class 'str'>} \\
+\texttt{dir(status) sample: ['\_\_add\_\_', '\_\_class\_\_', '\_\_contains\_\_', '\_\_delattr\_\_', '\_\_dir\_\_', '\_\_doc\_\_', '\_\_eq\_\_', '\_\_format\_\_']} \\
+\end{iobox}
+
+
+The selected result is an ordinary object. There is no special ``conditional expression object'' left behind. In this example, the selected object is a string. The string method \texttt{\_\_contains\_\_()} supports membership tests such as \texttt{"fail" in status}. The method \texttt{\_\_add\_\_()} supports string concatenation with \texttt{+}. The method \texttt{\_\_format\_\_()} is used by formatting operations such as f-strings.
+
+\begin{verbatim}
+status = "failing"
+
+print(f"'fail' in status: {'fail' in status}")
+print(f"status + '!': {status + '!'}")
+print(f"formatted status: {status:>10}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'fail' in status: True
+status + '!': failing!
+formatted status:    failing
+\end{verbatim}
+
+A conditional expression is useful when the branch selects a value, not when the branch contains several actions.
+
+Good use:
+
+\begin{verbatim}
+name = "Chuck"
+power = 42
+
+label = "legend" if name == "Chuck" and power >= 40 else "ordinary"
+
+print(f"name: {name}")
+print(f"label: {label}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name: Chuck
+label: legend
+\end{verbatim}
+
+Less readable use:
+
+\begin{verbatim}
+name = "Chuck"
+power = 42
+
+message = "Chuck Norris counted to infinity twice." if name == "Chuck" and power >= 40 else "ordinary case"
+
+print(message)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Chuck Norris counted to infinity twice.
+\end{verbatim}
+
+This still works, but long expressions can become hard to read. If the logic needs several steps, ordinary \texttt{if}/\texttt{else} blocks are clearer.
+
+The block form:
+
+\begin{codebox}[]{python}{Conditional Expressions: Inline Branch Selection with x if condition else y}{syn02}
+score = 72
+
+if score >= 50:
+    status = "passing"
+else:
+    status = "failing"
+
+print(f"status: {status}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{status: passing} \\
+\end{iobox}
+
+
+The expression form:
+
+\begin{verbatim}
+score = 72
+
+status = "passing" if score >= 50 else "failing"
+
+print(f"status: {status}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+status: passing
+\end{verbatim}
+
+Both versions select between two values. The difference is structural.
+
+\begin{itemize}
+    \item The \texttt{if}/\texttt{else} statement selects a block of statements to execute.
+    \item The conditional expression selects one value inside a larger expression.
+\end{itemize}
+
+Because a conditional expression is an expression, it can appear where a value is needed.
+
+\begin{verbatim}
+temperature = 18
+
+print(f"weather: {'warm' if temperature >= 20 else 'cold'}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+weather: cold
+\end{verbatim}
+
+It can also be used inside a list:
+
+\begin{codebox}[]{python}{Conditional Expressions: Inline Branch Selection with x if condition else y}{syn01}
+scores = [42, 88, 15]
+
+labels = [
+    "pass" if score >= 50 else "fail"
+    for score in scores
+]
+
+print(f"scores: {scores}")
+print(f"labels: {labels}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{scores: [42, 88, 15]} \\
+\texttt{labels: ['fail', 'pass', 'fail']} \\
+\end{iobox}
+
+
+This example also contains a list comprehension, which will be studied elsewhere. At this point, the important observation is simpler: the conditional expression contributes one selected value for each score.
+
+The conditional expression must include an \texttt{else} part. This is invalid:
+
+\begin{verbatim}
+status = "passing" if score >= 50
+\end{verbatim}
+
+Python rejects it because an expression must produce a value in every possible route. Without the \texttt{else} part, the false route has no value to return.
+
+The practical rule is:
+
+\begin{quote}
+Use a conditional statement when you need to choose between execution blocks. Use a conditional expression when you need to choose between two values.
+\end{quote}
+
+The control-flow graph still exists in the expression form, but it is compressed into a value-producing expression. One route produces the true-side value. The other route produces the false-side value. Execution then continues with that selected object.

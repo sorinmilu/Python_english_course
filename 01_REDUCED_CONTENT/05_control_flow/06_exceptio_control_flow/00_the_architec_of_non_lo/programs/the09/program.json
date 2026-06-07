@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer C...",
+  "label": "the09",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'ValueError'>\ndir(err) sample: ['__cause__', '__class__', '__context__', '__delattr__',\n'__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__']\nerr.args: (\"invalid literal for int() with base 10: 'forty-two'\",)\nhas __traceback__: True",
+  "file": "main.py"
+}

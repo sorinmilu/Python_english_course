@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq05",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'TypeError'>\nmessage: 'range' object does not support item assignment",
+  "file": "main.py"
+}

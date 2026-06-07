@@ -4,6 +4,6 @@
   "label": "mat02",
   "linenos": true,
   "input": null,
-  "output": "pipeline is still lazy\nstored: [10, 20, 42]",
+  "output": "nums: [10, 20, 42]\ntype(nums): <class 'list'>\nnums[0]: 10\nsum(nums): 72",
   "file": "main.py"
 }

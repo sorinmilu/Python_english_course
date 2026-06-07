@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...",
+  "label": "the01",
+  "linenos": true,
+  "input": null,
+  "output": "range object created\nnums: range(0, 10)\nnow asking for one value\nnums[4]: 4\nnow materializing all values\nlist(nums): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]",
+  "file": "main.py"
+}

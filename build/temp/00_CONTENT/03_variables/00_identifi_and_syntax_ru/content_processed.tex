@@ -1,0 +1,17 @@
+\section{Identifiers and Syntax Rules for Variables}
+
+Before a Python program can bind a name to an object, the name must first be accepted as valid source-code text. This section therefore begins before runtime execution. It looks at the lexical rules that decide whether a written name is a possible Python identifier at all.
+
+This distinction is important. Python variables are flexible runtime bindings, but their written form is not arbitrary. A programmer may rebind the same name to an integer, a string, a floating-point value, or another object, but the name itself must still obey the syntactic rules of the language.
+
+A variable name must be readable both by Python and by humans. The interpreter needs a form that can be separated cleanly from numbers, keywords, operators, and other tokens. The programmer needs a form that explains the role of the value without creating unnecessary visual noise.
+
+This section therefore separates two questions:
+
+\begin{quote}
+What names does Python legally accept, and what names should a programmer actually choose?
+\end{quote}
+
+The first question belongs to syntax: digits, letters, underscores, Unicode characters, reserved keywords, and case sensitivity. The second question belongs to style: readable \texttt{snake\_case}, careful use of underscores, and names that make program state easier to inspect.
+
+Only after these rules are clear does assignment make full sense. A name must first be valid text before it can become a binding to a runtime object.

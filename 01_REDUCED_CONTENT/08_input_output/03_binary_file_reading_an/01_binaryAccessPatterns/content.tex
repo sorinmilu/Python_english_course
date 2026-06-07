@@ -6,16 +6,7 @@ Binary workloads emphasize byte counts, fixed chunk sizes, and seek positions ra
 
 \texttt{read(n)} in binary mode returns at most \texttt{n} bytes; empty \texttt{b""} signals EOF. Only one chunk resides in memory at a time.
 
-\begin{verbatim}
-path = "chunk_read_demo.bin"
-data = b"Chunk1\nChunk2\nChunk3\n"
-with open(path, "wb") as f:
-    f.write(data)
-with open(path, "rb") as f:
-    while chunk := f.read(8):
-        print(repr(chunk))
-\end{verbatim}
-
+%<<<PROGRAM:programs/bin01>>>
 \subsubsection{Writing Byte Buffers to External Storage}
 
 \texttt{write()} accepts \texttt{bytes} and \texttt{bytearray}; return value is bytes written.

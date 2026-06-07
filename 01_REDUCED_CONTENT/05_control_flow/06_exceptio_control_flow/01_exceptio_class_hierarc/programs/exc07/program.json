@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Capturing Exception Objects with except SomeError as e",
+  "label": "exc07",
+  "linenos": true,
+  "input": null,
+  "output": "number: 42\nafter try",
+  "file": "main.py"
+}

@@ -1,0 +1,928 @@
+\subsection{Lexical Closures}
+
+A lexical closure exists when an inner function keeps access to names from an enclosing function after the enclosing function has finished running.
+
+This sounds strange only if a function frame is imagined as disappearing completely with all of its local state. In normal cases, a function frame does terminate after return. But when an inner function needs some of the outer function's local bindings, CPython preserves those specific bindings inside cell objects. The whole outer frame is not kept alive as an ordinary active call frame. The necessary referenced state is moved into closure storage.
+
+The result is a function object that carries executable code plus references to preserved lexical state.
+
+\subsubsection{The Lifespan Shift: Preserving Enclosing Environments for Out-of-Scope Execution}
+
+Start with a nested function that is called while the outer function is still running.
+
+\begin{verbatim}
+def outer():
+    message = "D'oh!"
+
+    def inner():
+        return message
+
+    return inner()
+
+result = outer()
+
+print(f"result: {result}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: D'oh!
+\end{verbatim}
+
+This example does not yet require a long-lived closure. The inner function runs before \texttt{outer()} returns. The enclosing frame still exists when \texttt{inner()} reads \texttt{message}.
+
+Now return the inner function object itself.
+
+\begin{verbatim}
+def outer():
+    message = "D'oh!"
+
+    def inner():
+        return message
+
+    return inner
+
+fn = outer()
+
+print(f"fn:       {fn}")
+print(f"type(fn): {type(fn)}")
+print(f"fn():     {fn()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn:       <function outer.<locals>.inner at 0x...>
+type(fn): <class 'function'>
+fn():     D'oh!
+\end{verbatim}
+
+The function \texttt{outer()} has already returned. Its ordinary execution frame is no longer active. But \texttt{fn()} can still read \texttt{message}. That is the lifespan shift.
+
+The local name \texttt{message} did not simply vanish, because the returned inner function still needs it.
+
+The preserved state is not global.
+
+\begin{verbatim}
+def outer():
+    message = "D'oh!"
+
+    def inner():
+        return message
+
+    return inner
+
+fn = outer()
+
+try:
+    print(message)
+except NameError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+
+print(f"fn(): {fn()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'NameError'>
+message:    name 'message' is not defined
+fn(): D'oh!
+\end{verbatim}
+
+The name \texttt{message} is not available as a global name. It is available only through the closure carried by the returned function object.
+
+A closure can preserve different values for different function objects.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+say_doh = make_speaker("D'oh!")
+say_ni = make_speaker("Ni!")
+say_answer = make_speaker("The answer is 42.")
+
+print(say_doh())
+print(say_ni())
+print(say_answer())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+D'oh!
+Ni!
+The answer is 42.
+\end{verbatim}
+
+Each call to \texttt{make\_speaker()} creates a new function call frame. Each returned \texttt{speak} function preserves the \texttt{message} value from its own call.
+
+The function objects are separate.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+say_doh = make_speaker("D'oh!")
+say_ni = make_speaker("Ni!")
+
+print(f"say_doh:       {say_doh}")
+print(f"say_ni:        {say_ni}")
+print(f"same object:   {say_doh is say_ni}")
+print()
+print(f"say_doh():     {say_doh()}")
+print(f"say_ni():      {say_ni()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+say_doh:       <function make_speaker.<locals>.speak at 0x...>
+say_ni:        <function make_speaker.<locals>.speak at 0x...>
+same object:   False
+
+say_doh():     D'oh!
+say_ni():      Ni!
+\end{verbatim}
+
+They were created from the same source code, but they are different function objects with different preserved environments.
+
+The returned function object is still an ordinary function object.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+fn = make_speaker("No soup for you!")
+
+print(f"type(fn): {type(fn)}")
+print()
+
+selected_names = [
+    "__call__",
+    "__name__",
+    "__doc__",
+    "__defaults__",
+    "__code__",
+    "__closure__",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(fn)}")
+
+print()
+print(f"fn.__name__: {fn.__name__!r}")
+print(f"fn():        {fn()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(fn): <class 'function'>
+
+__call__        True
+__name__        True
+__doc__         True
+__defaults__    True
+__code__        True
+__closure__     True
+
+fn.__name__: 'speak'
+fn():        No soup for you!
+\end{verbatim}
+
+The closure does not make it a different kind of callable. It is still a function object. It just has additional stored lexical state.
+
+Closures are useful when a function must be configured once and executed later.
+
+\begin{verbatim}
+def make_prefixer(prefix):
+    def add_prefix(text):
+        return f"{prefix}: {text}"
+
+    return add_prefix
+
+warn = make_prefixer("WARNING")
+info = make_prefixer("INFO")
+
+print(warn("Nobody expects the Spanish Inquisition!"))
+print(info("It is only a model."))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+WARNING: Nobody expects the Spanish Inquisition!
+INFO: It is only a model.
+\end{verbatim}
+
+The function \texttt{make\_prefixer()} builds a specialized function. The returned function remembers the selected \texttt{prefix}.
+
+This is not class-based storage. It is not a global variable. It is a function object carrying references to preserved enclosing bindings.
+
+\subsubsection{How CPython Uses \texttt{\_\_closure\_\_} and Cell Objects to Store Lexical State After the Parent Frame Unwinds}
+
+The closure state of a function object is visible through \texttt{\_\_closure\_\_}.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+fn = make_speaker("D'oh!")
+
+print(f"fn.__closure__: {fn.__closure__}")
+print(f"type:           {type(fn.__closure__)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+fn.__closure__: (<cell at 0x...: str object at 0x...>,)
+type:           <class 'tuple'>
+\end{verbatim}
+
+The \texttt{\_\_closure\_\_} attribute is either \texttt{None} or a tuple of cell objects.
+
+Here it is a tuple containing one cell. That cell contains the preserved object referenced by the outer name \texttt{message}.
+
+The tuple can be inspected.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+fn = make_speaker("D'oh!")
+closure_tuple = fn.__closure__
+
+print(f"type(closure_tuple): {type(closure_tuple)}")
+print()
+
+selected_names = [
+    "count",
+    "index",
+    "__len__",
+    "__getitem__",
+    "__contains__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(closure_tuple)}")
+
+print()
+print(f"len(closure_tuple): {len(closure_tuple)}")
+print(f"closure_tuple[0]:   {closure_tuple[0]}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(closure_tuple): <class 'tuple'>
+
+count          True
+index          True
+__len__        True
+__getitem__    True
+__contains__   True
+
+len(closure_tuple): 1
+closure_tuple[0]:   <cell at 0x...: str object at 0x...>
+\end{verbatim}
+
+The cell object exposes its stored object through \texttt{cell\_contents}.
+
+\begin{verbatim}
+def make_speaker(message):
+    def speak():
+        return message
+
+    return speak
+
+fn = make_speaker("D'oh!")
+cell = fn.__closure__[0]
+
+print(f"cell:       {cell}")
+print(f"type(cell): {type(cell)}")
+print()
+
+selected_names = [
+    "cell_contents",
+    "__class__",
+    "__eq__",
+    "__repr__",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(cell)}")
+
+print()
+print(f"cell.cell_contents: {cell.cell_contents!r}")
+print(f"type(contents):     {type(cell.cell_contents)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+cell:       <cell at 0x...: str object at 0x...>
+type(cell): <class 'cell'>
+
+cell_contents    True
+__class__        True
+__eq__           True
+__repr__         True
+
+cell.cell_contents: "D'oh!"
+type(contents):     <class 'str'>
+\end{verbatim}
+
+The closure cell stores a reference to the object. It does not store the source-code text \texttt{"message"}. It stores runtime state needed by the inner function.
+
+A function without preserved enclosing names has no closure.
+
+\begin{verbatim}
+def plain():
+    return "D'oh!"
+
+print(f"plain.__closure__: {plain.__closure__}")
+print(f"plain():           {plain()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+plain.__closure__: None
+plain():           D'oh!
+\end{verbatim}
+
+There is no enclosing function state to preserve.
+
+A closure can contain several cells.
+
+\begin{verbatim}
+def make_card(name, score):
+    mood = "calm"
+
+    def card():
+        return f"{name:<10} score={score:04d} mood={mood}"
+
+    return card
+
+fn = make_card("Homer", 42)
+
+print(fn())
+print()
+print(f"fn.__closure__: {fn.__closure__}")
+
+for index, cell in enumerate(fn.__closure__):
+    print(f"{index}: {cell.cell_contents!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+
+fn.__closure__: (<cell at 0x...: str object at 0x...>, <cell at 0x...: str object at 0x...>, <cell at 0x...: int object at 0x...>)
+0: 'calm'
+1: 'Homer'
+2: 42
+\end{verbatim}
+
+The cell order corresponds to the function code object's free-variable order, which will be inspected in the next subsubsection.
+
+If the preserved object is mutable, the closure can mutate that object without rebinding the outer name.
+
+\begin{verbatim}
+def make_collector():
+    items = []
+
+    def add_item(text):
+        items.append(text)
+        return items
+
+    return add_item
+
+collector = make_collector()
+
+print(collector("D'oh!"))
+print(collector("No soup for you!"))
+print(collector("The answer is 42."))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+["D'oh!"]
+["D'oh!", 'No soup for you!']
+["D'oh!", 'No soup for you!', 'The answer is 42.']
+\end{verbatim}
+
+The list object is preserved in the closure. Each call mutates the same list object.
+
+Inspect the preserved list.
+
+\begin{verbatim}
+def make_collector():
+    items = []
+
+    def add_item(text):
+        items.append(text)
+        return items
+
+    return add_item
+
+collector = make_collector()
+
+cell = collector.__closure__[0]
+items = cell.cell_contents
+
+print(f"items before: {items}")
+print(f"id(items):    {id(items)}")
+print()
+
+collector("D'oh!")
+collector("Ni!")
+
+print(f"items after:  {items}")
+print(f"id(items):    {id(items)}")
+print(f"cell value:   {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items before: []
+id(items):    2298078960768
+
+items after:  ["D'oh!", 'Ni!']
+id(items):    2298078960768
+cell value:   ["D'oh!", 'Ni!']
+\end{verbatim}
+
+The same list object remains inside the cell. The list contents change.
+
+The list object can be inspected.
+
+\begin{verbatim}
+def make_collector():
+    items = []
+
+    def add_item(text):
+        items.append(text)
+        return items
+
+    return add_item
+
+collector = make_collector()
+items = collector.__closure__[0].cell_contents
+
+print(f"type(items): {type(items)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "pop",
+    "clear",
+    "__len__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(items)}")
+
+print()
+items.append("It is only a model.")
+print(f"items: {items}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(items): <class 'list'>
+
+append         True
+extend         True
+pop            True
+clear          True
+__len__        True
+__getitem__    True
+__setitem__    True
+
+items: ['It is only a model.']
+\end{verbatim}
+
+If the inner function must rebind an outer name, it needs \texttt{nonlocal}.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+
+print(counter())
+print(counter())
+print(counter())
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+1
+2
+3
+\end{verbatim}
+
+The integer object is immutable. The statement:
+
+\begin{verbatim}
+count = count + 1
+\end{verbatim}
+
+does not mutate the integer object. It creates or obtains a new integer object and updates the closure cell so that \texttt{count} refers to the new object.
+
+Inspect the cell before and after calls.
+
+\begin{verbatim}
+def make_counter():
+    count = 0
+
+    def next_count():
+        nonlocal count
+
+        count = count + 1
+        return count
+
+    return next_count
+
+counter = make_counter()
+cell = counter.__closure__[0]
+
+print(f"before: {cell.cell_contents}")
+
+counter()
+counter()
+
+print(f"after:  {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: 0
+after:  2
+\end{verbatim}
+
+The closure cell, not a normal local frame slot, is where the preserved binding now lives.
+
+A compact closure structure is:
+
+\begin{verbatim}
+outer function call:
+    creates local variable message
+    creates inner function object
+    inner function refers to message
+    message is stored in a cell
+    inner function receives reference to that cell
+    outer function returns inner function
+
+later:
+    inner function reads message through the cell
+\end{verbatim}
+
+\subsubsection{Inspecting Free Variables via \texttt{co\_freevars}, \texttt{co\_cellvars}, and Closure Cells}
+
+Code objects record closure-related names.
+
+From the outer function's point of view, a local variable that must be preserved for an inner function is a cell variable.
+
+From the inner function's point of view, a variable coming from an enclosing scope is a free variable.
+
+\begin{verbatim}
+def outer():
+    message = "D'oh!"
+
+    def inner():
+        return message
+
+    return inner
+
+fn = outer()
+
+print(f"outer co_cellvars: {outer.__code__.co_cellvars}")
+print(f"inner co_freevars: {fn.__code__.co_freevars}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+outer co_cellvars: ('message',)
+inner co_freevars: ('message',)
+\end{verbatim}
+
+The same lexical name appears from two perspectives:
+
+\begin{verbatim}
+outer:
+    message is a cell variable
+
+inner:
+    message is a free variable
+\end{verbatim}
+
+The inner function's closure tuple stores the cells for its free variables.
+
+\begin{verbatim}
+def outer():
+    message = "D'oh!"
+
+    def inner():
+        return message
+
+    return inner
+
+fn = outer()
+
+free_names = fn.__code__.co_freevars
+closure_cells = fn.__closure__
+
+for name, cell in zip(free_names, closure_cells):
+    print(f"{name:<10} -> {cell.cell_contents!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+message    -> "D'oh!"
+\end{verbatim}
+
+The \texttt{zip()} call pairs each free-variable name with its corresponding closure cell.
+
+For several free variables:
+
+\begin{verbatim}
+def make_card(name, score):
+    mood = "calm"
+
+    def card():
+        return f"{name:<10} score={score:04d} mood={mood}"
+
+    return card
+
+fn = make_card("Homer", 42)
+
+print(f"freevars: {fn.__code__.co_freevars}")
+print()
+
+for name, cell in zip(fn.__code__.co_freevars, fn.__closure__):
+    print(f"{name:<8} -> {cell.cell_contents!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+freevars: ('mood', 'name', 'score')
+
+mood     -> 'calm'
+name     -> 'Homer'
+score    -> 42
+\end{verbatim}
+
+The exact ordering is the ordering recorded by the code object. Code should not guess it manually. When inspecting, pair \texttt{co\_freevars} with \texttt{\_\_closure\_\_}.
+
+The code object itself can be inspected.
+
+\begin{verbatim}
+def make_card(name, score):
+    mood = "calm"
+
+    def card():
+        return f"{name:<10} score={score:04d} mood={mood}"
+
+    return card
+
+fn = make_card("Homer", 42)
+code_obj = fn.__code__
+
+print(f"type(code_obj): {type(code_obj)}")
+print()
+
+selected_names = [
+    "co_freevars",
+    "co_cellvars",
+    "co_varnames",
+    "co_names",
+    "co_consts",
+    "co_code",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(code_obj)}")
+
+print()
+print(f"co_freevars: {code_obj.co_freevars}")
+print(f"co_cellvars: {code_obj.co_cellvars}")
+print(f"co_varnames: {code_obj.co_varnames}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(code_obj): <class 'code'>
+
+co_freevars    True
+co_cellvars    True
+co_varnames    True
+co_names       True
+co_consts      True
+co_code        True
+
+co_freevars: ('mood', 'name', 'score')
+co_cellvars: ()
+co_varnames: ()
+\end{verbatim}
+
+The inner function has no ordinary local variables in this example. Its useful names come from closure cells.
+
+The outer function's code object has cell variables.
+
+\begin{verbatim}
+def make_card(name, score):
+    mood = "calm"
+
+    def card():
+        return f"{name:<10} score={score:04d} mood={mood}"
+
+    return card
+
+outer_code = make_card.__code__
+
+print(f"outer co_varnames: {outer_code.co_varnames}")
+print(f"outer co_cellvars: {outer_code.co_cellvars}")
+print(f"outer co_freevars: {outer_code.co_freevars}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+outer co_varnames: ('name', 'score', 'card')
+outer co_cellvars: ('name', 'score', 'mood')
+outer co_freevars: ()
+\end{verbatim}
+
+The outer function has ordinary local names, but some of them also become cell variables because an inner function needs them.
+
+A nested function can have ordinary local variables and free variables at the same time.
+
+\begin{verbatim}
+def make_builder(prefix):
+    def build(text):
+        result = f"{prefix}: {text}"
+        return result
+
+    return build
+
+fn = make_builder("INFO")
+
+print(fn("It is only a model."))
+print()
+print(f"co_varnames: {fn.__code__.co_varnames}")
+print(f"co_freevars: {fn.__code__.co_freevars}")
+print(f"closure:     {fn.__closure__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+INFO: It is only a model.
+
+co_varnames: ('text', 'result')
+co_freevars: ('prefix',)
+closure:     (<cell at 0x...: str object at 0x...>,)
+\end{verbatim}
+
+Here:
+
+\begin{itemize}
+    \item \texttt{text} is a parameter local to \texttt{build()};
+    \item \texttt{result} is a local variable inside \texttt{build()};
+    \item \texttt{prefix} is a free variable coming from the enclosing function;
+    \item the actual \texttt{prefix} object is stored in a closure cell.
+\end{itemize}
+
+The bytecode can show closure reads.
+
+\begin{verbatim}
+import dis
+
+def make_builder(prefix):
+    def build(text):
+        result = f"{prefix}: {text}"
+        return result
+
+    return build
+
+fn = make_builder("INFO")
+
+dis.dis(fn)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+... LOAD_DEREF               2 (prefix)
+... LOAD_FAST                0 (text)
+... STORE_FAST               1 (result)
+... LOAD_FAST                1 (result)
+... RETURN_VALUE
+\end{verbatim}
+
+The exact bytecode display varies by Python version. The important distinction is that closure variables are accessed differently from ordinary local variables. A local variable may use a fast-local access path. A closure variable is loaded through a cell.
+
+A closure can be summarized as three connected objects:
+
+\begin{verbatim}
+function object
+    -> code object
+        -> co_freevars names
+    -> __closure__ tuple
+        -> cell objects
+            -> preserved runtime objects
+\end{verbatim}
+
+A final inspection example prints the complete mapping.
+
+\begin{verbatim}
+def make_counter(start):
+    count = start
+
+    def next_count(step=1):
+        nonlocal count
+
+        count = count + step
+        return count
+
+    return next_count
+
+counter = make_counter(40)
+
+print(counter())
+print(counter())
+print()
+
+print(f"function object: {counter}")
+print(f"code object:     {counter.__code__}")
+print(f"freevars:        {counter.__code__.co_freevars}")
+print(f"defaults:        {counter.__defaults__}")
+print()
+
+for name, cell in zip(counter.__code__.co_freevars, counter.__closure__):
+    print(f"{name:<8} -> {cell.cell_contents!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+41
+42
+
+function object: <function make_counter.<locals>.next_count at 0x...>
+code object:     <code object next_count at 0x..., file "...", line ...>
+freevars:        ('count',)
+defaults:        (1,)
+
+count    -> 42
+\end{verbatim}
+
+The default value \texttt{step=1} is stored in the function object's defaults. The preserved state \texttt{count} is stored through the closure cell. These are different storage mechanisms.
+
+The final rule is:
+
+\begin{quote}
+A closure is not a copy of an outer function call. It is a function object whose code refers to preserved cell variables from its lexical enclosing scope.
+\end{quote}

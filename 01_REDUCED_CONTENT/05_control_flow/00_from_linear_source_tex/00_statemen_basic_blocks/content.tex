@@ -45,24 +45,7 @@ Sequential flow is the default case. If nothing interrupts execution, Python exe
 
 This ordinary movement from one statement to the next is often called fall-through. The name is useful because it describes the simplest edge in the control flow graph: execution falls from the current statement into the next statement below it.
 
-\begin{verbatim}
-quote = "Nobody expects the Spanish Inquisition!"
-count = 3
-result = count + 39
-
-print(f"quote: {quote}")
-print(f"count: {count}")
-print(f"result: {result}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-quote: Nobody expects the Spanish Inquisition!
-count: 3
-result: 42
-\end{verbatim}
-
+%<<<PROGRAM:programs/sta05>>>
 The route is direct:
 
 \begin{verbatim}
@@ -102,26 +85,7 @@ A conditional statement creates multiple possible outgoing edges from a decision
 
 In ordinary written form, the code is still vertical:
 
-\begin{verbatim}
-score = 42
-
-if score > 90:
-    print("excellent")
-elif score >= 50:
-    print("acceptable")
-else:
-    print("needs work")
-
-print("grading finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-needs work
-grading finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/sta04>>>
 The written order is not the same thing as the execution route. Python does not execute every branch body. It tests the first condition. If that condition is false, it tests the next condition. If all previous tested conditions fail, it enters the \texttt{else} body when one exists.
 
 The control shape is closer to this:
@@ -171,25 +135,7 @@ Here, there are three separate decision points. All three tests are evaluated, b
 
 By contrast:
 
-\begin{verbatim}
-value = 42
-
-if value < 0:
-    print("negative")
-elif value % 2 == 0:
-    print("even")
-elif value == 42:
-    print("the answer")
-else:
-    print("something else")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-even
-\end{verbatim}
-
+%<<<PROGRAM:programs/sta03>>>
 The third condition is not reached, even though \texttt{value == 42} is true. The earlier \texttt{elif} branch already captured the route.
 
 This distinction is easier to understand with the graph model. Separate \texttt{if} statements create separate decision nodes. An \texttt{if}/\texttt{elif}/\texttt{else} chain creates one connected decision structure where the first successful branch consumes the path.
@@ -310,32 +256,7 @@ The assignment to \texttt{number} does not complete. The following two \texttt{p
 
 With a handler, the exceptional route is caught:
 
-\begin{verbatim}
-text = "forty-two"
-
-print("before conversion")
-
-try:
-    number = int(text)
-    print(f"number: {number}")
-except ValueError as err:
-    print("conversion failed")
-    print(f"error type: {type(err)}")
-    print(f"error message: {err}")
-
-print("after try statement")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-before conversion
-conversion failed
-error type: <class 'ValueError'>
-error message: invalid literal for int() with base 10: 'forty-two'
-after try statement
-\end{verbatim}
-
+%<<<PROGRAM:programs/sta02>>>
 The important fact is not only that an error occurred. The important control-flow fact is that execution jumped from inside the \texttt{try} block to the matching \texttt{except} block. The rest of the ordinary \texttt{try} block was skipped.
 
 The graph shape is approximately:
@@ -367,27 +288,7 @@ Python can also use explicit checks, but its exception mechanism gives operation
 
 The object captured by \texttt{except ValueError as err} is itself a runtime object. It has a type, a textual representation, and methods inherited from the exception hierarchy.
 
-\begin{verbatim}
-text = "forty-two"
-
-try:
-    number = int(text)
-except ValueError as err:
-    print(f"type(err): {type(err)}")
-    print(f"str(err): {str(err)}")
-    print(f"args: {err.args}")
-    print(f"has __traceback__: {'__traceback__' in dir(err)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'ValueError'>
-str(err): invalid literal for int() with base 10: 'forty-two'
-args: ("invalid literal for int() with base 10: 'forty-two'",)
-has __traceback__: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/sta01>>>
 The \texttt{args} attribute contains the construction arguments stored by the exception object. The \texttt{\_\_traceback\_\_} attribute connects the exception object to traceback information, which records where the failure passed through the active execution frames. Later sections will study this mechanism more carefully.
 
 For now, the essential rule is:

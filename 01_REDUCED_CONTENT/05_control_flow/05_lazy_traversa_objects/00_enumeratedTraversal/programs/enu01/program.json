@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "enumerate() as a Lazy Pair Generator for Index-Value Iteration",
+  "label": "enu01",
+  "linenos": true,
+  "input": null,
+  "output": " 1 | No soup for you!\n 2 | Nobody expects the Spanish Inquisition!\n 3 | D'oh!",
+  "file": "main.py"
+}

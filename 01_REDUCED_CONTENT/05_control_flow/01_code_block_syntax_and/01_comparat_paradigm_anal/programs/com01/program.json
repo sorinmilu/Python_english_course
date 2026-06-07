@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Log...",
+  "label": "com01",
+  "linenos": true,
+  "input": null,
+  "output": "checking item: soup\nfinished one item\nchecking item: pretzels\nThese pretzels are making me thirsty.\nfinished one item\nchecking item: muffin\nfinished one item\nfinished all items",
+  "file": "main.py"
+}

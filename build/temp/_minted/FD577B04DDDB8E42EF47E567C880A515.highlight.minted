@@ -1,0 +1,14 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{caller} \PYG{n}{asks} \PYG{k}{for} \PYG{n+nb}{next} \PYG{n}{value}
+    \PYG{n}{generator} \PYG{n}{frame} \PYG{n}{resumes}
+        \PYG{n}{runs} \PYG{n}{until} \PYG{k}{yield}
+        \PYG{n}{produces} \PYG{n}{value}
+        \PYG{n}{suspends}
+\PYG{n}{caller} \PYG{n}{receives} \PYG{n}{value}
+
+\PYG{n}{caller} \PYG{n}{asks} \PYG{n}{again}
+    \PYG{n}{same} \PYG{n}{generator} \PYG{n}{frame} \PYG{n}{resumes} \PYG{n}{after} \PYG{n}{previous} \PYG{k}{yield}
+        \PYG{n}{runs} \PYG{n}{until} \PYG{n+nb}{next} \PYG{k}{yield}
+        \PYG{n}{produces} \PYG{n}{value}
+        \PYG{n}{suspends} \PYG{n}{again}
+\end{MintedVerbatim}

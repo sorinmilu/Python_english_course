@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked INDENT...",
+  "label": "the03",
+  "linenos": true,
+  "input": null,
+  "output": "type(first_tok): <class 'tokenize.TokenInfo'>\nfirst_tok: TokenInfo(type=1 (NAME), string='x', start=(1, 0), end=(1, 1), line='x = 42\\n')\nfirst_tok.type: 1\nfirst_tok.string: 'x'\nhas start: True\nhas end: True\nhas line: True",
+  "file": "main.py"
+}

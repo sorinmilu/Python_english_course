@@ -4,6 +4,6 @@
   "label": "mat03",
   "linenos": true,
   "input": null,
-  "output": "type(err): <class 'TypeError'>\nmessage: 'filter' object is not subscriptable",
+  "output": "type(err): <class 'AttributeError'>\nmessage: 'tuple' object has no attribute 'append'",
   "file": "main.py"
 }

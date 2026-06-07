@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat07",
+  "linenos": true,
+  "input": null,
+  "output": "first traversal\n(0, 'Jerry')\n(1, 'Elaine')\n(2, 'Kramer')\nsecond traversal\n(0, 'Jerry')\n(1, 'Elaine')\n(2, 'Kramer')",
+  "file": "main.py"
+}

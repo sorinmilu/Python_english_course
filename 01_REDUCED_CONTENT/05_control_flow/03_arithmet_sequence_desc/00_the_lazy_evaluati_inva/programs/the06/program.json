@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object...",
+  "label": "the06",
+  "linenos": true,
+  "input": null,
+  "output": "nums: range(0, 5)\ntype(nums): <class 'range'>\ndir(nums) sample: ['__bool__', '__class__', '__contains__', '__delattr__', '__dir__',\n'__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__',\n'__gt__']\nnums.start: 0\nnums.stop: 5\nnums.step: 1",
+  "file": "main.py"
+}

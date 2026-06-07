@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{try}\PYG{p}{:}
+    \PYG{n}{score} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{D}\PYG{l+s+s2}{\PYGZsq{}}\PYG{l+s+s2}{oh!}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{ValueError} \PYG{k}{as} \PYG{n}{err}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{type(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{dir(err) sample: }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{dir}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{p}{[}\PYG{p}{:}\PYG{l+m+mi}{12}\PYG{p}{]}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{err.args: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{o}{.}\PYG{n}{args}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{str(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{str}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{repr(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{repr}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

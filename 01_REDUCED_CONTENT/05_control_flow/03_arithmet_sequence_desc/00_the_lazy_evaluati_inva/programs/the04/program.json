@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object...",
+  "label": "the04",
+  "linenos": true,
+  "input": null,
+  "output": "nums_range: range(10, 20, 2)\nnums_list: [10, 12, 14, 16, 18]\ntype(nums_range): <class 'range'>\ntype(nums_list): <class 'list'>",
+  "file": "main.py"
+}

@@ -1,0 +1,889 @@
+\subsection{Anatomy of Scope Failures}
+
+Scope failures are not random lookup accidents. They follow directly from Python's binding rules. The most important failure pattern appears when a name is classified as local because the function body assigns to it somewhere, but execution tries to read that local name before any value has been bound to it.
+
+This is the source of \texttt{UnboundLocalError}.
+
+The error is often misunderstood as ``Python failed to find the global variable.'' That is not the real mechanism. In many cases, Python does not even try the global namespace, because the compiler has already classified the name as local for that function.
+
+\subsubsection{Runtime Execution Traces and Bytecode Analysis of \texttt{UnboundLocalError}}
+
+Start with a global name that can be read normally.
+
+\begin{verbatim}
+answer = 42
+
+def show_answer():
+    print(answer)
+
+show_answer()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+\end{verbatim}
+
+Inside \texttt{show\_answer()}, there is no assignment to \texttt{answer}. Python treats \texttt{answer} as a nonlocal lookup, finds it in the global namespace, and prints it.
+
+Now add an assignment inside the function.
+
+\begin{verbatim}
+answer = 42
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+try:
+    broken_answer()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'answer' where it is not associated with a value
+\end{verbatim}
+
+The assignment:
+
+\begin{verbatim}
+answer = 100
+\end{verbatim}
+
+makes \texttt{answer} a local name for the entire function body. This classification is not limited to the lines after the assignment. It applies to the function as compiled.
+
+So the earlier read:
+
+\begin{verbatim}
+print(answer)
+\end{verbatim}
+
+tries to read the local \texttt{answer}. At that moment, the local frame has no value bound to \texttt{answer}. Python raises \texttt{UnboundLocalError}.
+
+The error object can be inspected.
+
+\begin{verbatim}
+answer = 42
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+try:
+    broken_answer()
+except UnboundLocalError as err:
+    print(f"err:       {err}")
+    print(f"type(err): {type(err)}")
+    print()
+
+    selected_names = [
+        "args",
+        "__class__",
+        "__str__",
+        "__repr__",
+        "with_traceback",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<18} {name in dir(err)}")
+
+    print()
+    print(f"err.args: {err.args}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+err:       cannot access local variable 'answer' where it is not associated with a value
+type(err): <class 'UnboundLocalError'>
+
+args               True
+__class__          True
+__str__            True
+__repr__           True
+with_traceback     True
+
+err.args: ("cannot access local variable 'answer' where it is not associated with a value",)
+\end{verbatim}
+
+The exception object is a normal runtime object. It has a type, attributes, and a message stored in \texttt{args}.
+
+The traceback shows where execution failed.
+
+\begin{verbatim}
+import traceback
+
+answer = 42
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+try:
+    broken_answer()
+except UnboundLocalError:
+    traceback.print_exc()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Traceback (most recent call last):
+  File "scope_demo.py", line 8, in <module>
+    broken_answer()
+  File "scope_demo.py", line 5, in broken_answer
+    print(answer)
+          ^^^^^^
+UnboundLocalError: cannot access local variable 'answer' where it is not associated with a value
+\end{verbatim}
+
+The traceback points to the read, not the later assignment. The assignment is still the reason the name was classified as local, but the runtime failure happens when Python tries to load the unbound local value.
+
+The traceback object can also be inspected.
+
+\begin{verbatim}
+import sys
+
+answer = 42
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+try:
+    broken_answer()
+except UnboundLocalError as err:
+    err_type, err_obj, tb_obj = sys.exc_info()
+
+    print(f"err_type:     {err_type}")
+    print(f"err_obj:      {err_obj}")
+    print(f"tb_obj:       {tb_obj}")
+    print(f"type(tb_obj): {type(tb_obj)}")
+    print()
+
+    selected_names = [
+        "tb_frame",
+        "tb_lineno",
+        "tb_next",
+        "tb_lasti",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<12} {name in dir(tb_obj)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+err_type:     <class 'UnboundLocalError'>
+err_obj:      cannot access local variable 'answer' where it is not associated with a value
+tb_obj:       <traceback object at 0x...>
+type(tb_obj): <class 'traceback'>
+
+tb_frame      True
+tb_lineno     True
+tb_next       True
+tb_lasti      True
+\end{verbatim}
+
+The traceback chain contains frame information. That frame information can point to the active code object and local namespace display.
+
+\begin{verbatim}
+import sys
+
+answer = 42
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+try:
+    broken_answer()
+except UnboundLocalError:
+    tb_obj = sys.exc_info()[2]
+
+    while tb_obj is not None:
+        frame = tb_obj.tb_frame
+        code_obj = frame.f_code
+
+        print(f"function: {code_obj.co_name}")
+        print(f"line:     {tb_obj.tb_lineno}")
+        print(f"locals:   {frame.f_locals}")
+        print()
+
+        tb_obj = tb_obj.tb_next
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+function: <module>
+line:     8
+locals:   {...}
+
+function: broken_answer
+line:     5
+locals:   {}
+\end{verbatim}
+
+Inside the failing \texttt{broken\_answer()} frame, the local namespace display has no bound value for \texttt{answer}. The name was reserved as a local slot, but no runtime assignment has executed yet.
+
+Bytecode inspection makes the distinction visible.
+
+\begin{verbatim}
+import dis
+
+answer = 42
+
+def show_answer():
+    print(answer)
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+print("show_answer bytecode:")
+dis.dis(show_answer)
+
+print()
+print("broken_answer bytecode:")
+dis.dis(broken_answer)
+\end{verbatim}
+
+Possible output on a modern CPython version:
+
+\begin{verbatim}
+show_answer bytecode:
+  5           0 RESUME                   0
+
+  6           2 LOAD_GLOBAL              1 (NULL + print)
+             14 LOAD_GLOBAL              2 (answer)
+             26 CALL                     1
+             36 POP_TOP
+             38 RETURN_CONST             0 (None)
+
+broken_answer bytecode:
+  8           0 RESUME                   0
+
+  9           2 LOAD_GLOBAL              1 (NULL + print)
+             14 LOAD_FAST                0 (answer)
+             16 CALL                     1
+             26 POP_TOP
+
+ 10          28 LOAD_CONST               1 (100)
+             30 STORE_FAST               0 (answer)
+             32 RETURN_CONST             0 (None)
+\end{verbatim}
+
+The exact instruction names vary across Python versions, but the critical difference is stable:
+
+\begin{itemize}
+    \item \texttt{show\_answer()} uses a global lookup for \texttt{answer};
+    \item \texttt{broken\_answer()} uses a fast-local lookup for \texttt{answer}.
+\end{itemize}
+
+The assignment caused \texttt{answer} to become a local variable in \texttt{broken\_answer()}. Therefore, the read uses the local-variable access path. Since no local value exists yet, the read fails.
+
+The code object also records local variable names.
+
+\begin{verbatim}
+answer = 42
+
+def show_answer():
+    print(answer)
+
+def broken_answer():
+    print(answer)
+    answer = 100
+
+print(f"show_answer co_varnames:   {show_answer.__code__.co_varnames}")
+print(f"show_answer co_names:      {show_answer.__code__.co_names}")
+print()
+
+print(f"broken_answer co_varnames: {broken_answer.__code__.co_varnames}")
+print(f"broken_answer co_names:    {broken_answer.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+show_answer co_varnames:   ()
+show_answer co_names:      ('print', 'answer')
+
+broken_answer co_varnames: ('answer',)
+broken_answer co_names:    ('print',)
+\end{verbatim}
+
+In \texttt{show\_answer()}, \texttt{answer} appears in \texttt{co\_names}, which is used for nonlocal/global-style name lookup.
+
+In \texttt{broken\_answer()}, \texttt{answer} appears in \texttt{co\_varnames}, which means it is a local variable of the function.
+
+So the failure is not:
+
+\begin{quote}
+Python looked for the global \texttt{answer} and failed.
+\end{quote}
+
+The correct description is:
+
+\begin{quote}
+Python classified \texttt{answer} as local in this function, tried to read the local slot before assignment, and raised \texttt{UnboundLocalError}.
+\end{quote}
+
+\subsubsection{Analyzing the Mechanics of Conflicting Local and Global Names}
+
+A conflict appears when the same name exists globally and is also assigned inside a function.
+
+\begin{verbatim}
+score = 42
+
+def update_score():
+    score = 100
+    print(f"inside: {score}")
+
+update_score()
+
+print(f"outside: {score}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+inside: 100
+outside: 42
+\end{verbatim}
+
+There is no error here because the function does not read the local name before assigning it. It creates a local \texttt{score}, prints that local value, and exits. The global \texttt{score} remains unchanged.
+
+The conflict becomes an error when the function tries to read the name before the local assignment executes.
+
+\begin{verbatim}
+score = 42
+
+def update_score():
+    print(f"before: {score}")
+    score = 100
+    print(f"after:  {score}")
+
+try:
+    update_score()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+
+print(f"outside: {score}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'score' where it is not associated with a value
+outside: 42
+\end{verbatim}
+
+The global \texttt{score} exists. That does not help, because the function's own assignment makes \texttt{score} local inside \texttt{update\_score()}.
+
+The compiled function confirms this.
+
+\begin{verbatim}
+import dis
+
+score = 42
+
+def update_score():
+    print(f"before: {score}")
+    score = 100
+    print(f"after:  {score}")
+
+print(f"co_varnames: {update_score.__code__.co_varnames}")
+print(f"co_names:    {update_score.__code__.co_names}")
+print()
+
+dis.dis(update_score)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+co_varnames: ('score',)
+co_names:    ('print',)
+
+... LOAD_FAST                0 (score)
+... STORE_FAST               0 (score)
+\end{verbatim}
+
+The name \texttt{score} is a local variable in the function. It is not loaded from the module namespace.
+
+The solution depends on the intended design.
+
+If the function should only compute a new value, return it.
+
+\begin{verbatim}
+score = 42
+
+def make_updated_score(old_score):
+    new_score = old_score + 58
+    return new_score
+
+score = make_updated_score(score)
+
+print(f"score: {score}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+score: 100
+\end{verbatim}
+
+This is usually the clearest data flow:
+
+\begin{verbatim}
+caller gives old object
+function returns new object
+caller rebinds its own name
+\end{verbatim}
+
+If the function is deliberately supposed to rebind the module-level name, use \texttt{global}.
+
+\begin{verbatim}
+score = 42
+
+def update_global_score():
+    global score
+
+    print(f"before: {score}")
+    score = 100
+    print(f"after:  {score}")
+
+update_global_score()
+
+print(f"outside: {score}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: 42
+after:  100
+outside: 100
+\end{verbatim}
+
+Now \texttt{score} is no longer local inside the function.
+
+\begin{verbatim}
+score = 42
+
+def update_global_score():
+    global score
+
+    print(f"before: {score}")
+    score = 100
+    print(f"after:  {score}")
+
+print(f"co_varnames: {update_global_score.__code__.co_varnames}")
+print(f"co_names:    {update_global_score.__code__.co_names}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+co_varnames: ()
+co_names:    ('print', 'score')
+\end{verbatim}
+
+The name \texttt{score} is no longer in \texttt{co\_varnames}. It is resolved through the global name mechanism.
+
+A frequent confusion appears with augmented assignment.
+
+\begin{verbatim}
+score = 42
+
+def add_points():
+    score += 1
+    print(score)
+
+try:
+    add_points()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'score' where it is not associated with a value
+\end{verbatim}
+
+The statement:
+
+\begin{verbatim}
+score += 1
+\end{verbatim}
+
+is still an assignment to \texttt{score}. It requires reading the current local \texttt{score}, adding \texttt{1}, and storing the result back into the local \texttt{score}. But the local value does not exist yet.
+
+A simplified expansion is:
+
+\begin{verbatim}
+score = score + 1
+\end{verbatim}
+
+This explains the failure.
+
+The same idea applies to lists, but mutation and rebinding must be separated carefully.
+
+This works without \texttt{global} because it mutates the global list object:
+
+\begin{verbatim}
+items = ["D'oh!"]
+
+def add_item():
+    items.append("No soup for you!")
+
+add_item()
+
+print(items)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+["D'oh!", 'No soup for you!']
+\end{verbatim}
+
+This fails because augmented assignment to the name counts as rebinding that name inside the function:
+
+\begin{verbatim}
+items = ["D'oh!"]
+
+def add_items_bad():
+    items += ["No soup for you!"]
+
+try:
+    add_items_bad()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'items' where it is not associated with a value
+\end{verbatim}
+
+The method call:
+
+\begin{verbatim}
+items.append(...)
+\end{verbatim}
+
+reads the outer name and mutates the reached list object.
+
+The augmented assignment:
+
+\begin{verbatim}
+items += [...]
+\end{verbatim}
+
+is treated as assignment to the name \texttt{items}. That makes \texttt{items} local unless declared \texttt{global} or \texttt{nonlocal}.
+
+The list object itself can be inspected.
+
+\begin{verbatim}
+items = ["D'oh!"]
+
+print(f"type(items): {type(items)}")
+print()
+
+selected_names = [
+    "append",
+    "extend",
+    "__iadd__",
+    "__add__",
+    "__len__",
+    "__getitem__",
+    "__setitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(items): <class 'list'>
+
+append         True
+extend         True
+__iadd__       True
+__add__        True
+__len__        True
+__getitem__    True
+__setitem__    True
+\end{verbatim}
+
+Even though lists support in-place addition, the statement syntax still assigns to the target name. That target assignment is enough for Python to classify the name as local.
+
+The safest rule is:
+
+\begin{quote}
+If a function assigns to a name anywhere in its body, that name is local by default throughout that function body.
+\end{quote}
+
+The exceptions are explicit:
+
+\begin{itemize}
+    \item \texttt{global name} means assignment targets the module namespace;
+    \item \texttt{nonlocal name} means assignment targets an enclosing function scope.
+\end{itemize}
+
+\subsubsection{Name Resolution Failure: \texttt{NameError} vs. \texttt{UnboundLocalError}}
+
+\texttt{NameError} and \texttt{UnboundLocalError} are related, but they are not the same situation.
+
+A plain \texttt{NameError} happens when Python cannot find a name in the lookup chain.
+
+\begin{verbatim}
+try:
+    print(missing_name)
+except NameError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'NameError'>
+message:    name 'missing_name' is not defined
+\end{verbatim}
+
+Python searched the available namespaces and did not find a binding for \texttt{missing\_name}.
+
+An \texttt{UnboundLocalError} happens when Python has already decided that the name is local, but the local slot has no value at the moment of reading.
+
+\begin{verbatim}
+x = 42
+
+def bad_local():
+    print(x)
+    x = 100
+
+try:
+    bad_local()
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'x' where it is not associated with a value
+\end{verbatim}
+
+The difference is:
+
+\begin{center}
+\begin{tabular}{|p{0.28\linewidth}|p{0.32\linewidth}|p{0.30\linewidth}|}
+\hline
+\textbf{Error} & \textbf{Meaning} & \textbf{Typical cause} \\
+\hline
+\texttt{NameError} & no binding found in the lookup chain & name was never defined in accessible scope \\
+\hline
+\texttt{UnboundLocalError} & local name exists as a compiled local slot, but no value is bound yet & function assigns to the name later or conditionally \\
+\hline
+\end{tabular}
+\end{center}
+
+The relationship can be inspected directly.
+
+\begin{verbatim}
+print(f"issubclass(UnboundLocalError, NameError): {issubclass(UnboundLocalError, NameError)}")
+print(f"issubclass(NameError, Exception):         {issubclass(NameError, Exception)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+issubclass(UnboundLocalError, NameError): True
+issubclass(NameError, Exception):         True
+\end{verbatim}
+
+\texttt{UnboundLocalError} is a specialized kind of \texttt{NameError}. All unbound local failures are name-resolution failures, but not all name-resolution failures are unbound-local failures.
+
+The exception classes are objects too.
+
+\begin{verbatim}
+print(f"NameError:             {NameError}")
+print(f"type(NameError):       {type(NameError)}")
+print()
+print(f"UnboundLocalError:     {UnboundLocalError}")
+print(f"type(UnboundLocalError): {type(UnboundLocalError)}")
+print()
+
+selected_names = [
+    "__name__",
+    "__mro__",
+    "__bases__",
+    "__subclasses__",
+]
+
+for name in selected_names:
+    print(f"{name:<18} {name in dir(UnboundLocalError)}")
+
+print()
+print(f"UnboundLocalError.__mro__: {UnboundLocalError.__mro__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+NameError:             <class 'NameError'>
+type(NameError):       <class 'type'>
+
+UnboundLocalError:     <class 'UnboundLocalError'>
+type(UnboundLocalError): <class 'type'>
+
+__name__           True
+__mro__            True
+__bases__          True
+__subclasses__     True
+
+UnboundLocalError.__mro__: (<class 'UnboundLocalError'>, <class 'NameError'>, <class 'Exception'>, <class 'BaseException'>, <class 'object'>)
+\end{verbatim}
+
+The method resolution order shows the inheritance chain. \texttt{UnboundLocalError} is under \texttt{NameError}.
+
+A conditional assignment can also cause \texttt{UnboundLocalError}.
+
+\begin{verbatim}
+def choose_value(flag):
+    if flag:
+        value = 42
+
+    return value
+
+print(choose_value(True))
+
+try:
+    print(choose_value(False))
+except UnboundLocalError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+error type: <class 'UnboundLocalError'>
+message:    cannot access local variable 'value' where it is not associated with a value
+\end{verbatim}
+
+The assignment target \texttt{value} exists syntactically inside the function, so \texttt{value} is a local variable. But when \texttt{flag} is \texttt{False}, the assignment line does not execute. The function later tries to return an unbound local name.
+
+A safer version binds a default first.
+
+\begin{verbatim}
+def choose_value(flag):
+    value = None
+
+    if flag:
+        value = 42
+
+    return value
+
+print(choose_value(True))
+print(choose_value(False))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+None
+\end{verbatim}
+
+Now the local name \texttt{value} is always bound before it is returned.
+
+Another safe version returns directly from each branch.
+
+\begin{verbatim}
+def choose_value(flag):
+    if flag:
+        return 42
+
+    return None
+
+print(choose_value(True))
+print(choose_value(False))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+None
+\end{verbatim}
+
+A missing global and an unbound local can be contrasted with bytecode.
+
+\begin{verbatim}
+import dis
+
+def missing_global():
+    return unknown_name
+
+def unbound_local():
+    print(value)
+    value = 42
+
+print("missing_global:")
+print(f"co_varnames: {missing_global.__code__.co_varnames}")
+print(f"co_names:    {missing_global.__code__.co_names}")
+dis.dis(missing_global)
+
+print()
+print("unbound_local:")
+print(f"co_varnames: {unbound_local.__code__.co_varnames}")
+print(f"co_names:    {unbound_local.__code__.co_names}")
+dis.dis(unbound_local)
+\end{verbatim}
+
+Possible output excerpt:
+
+\begin{verbatim}
+missing_global:
+co_varnames: ()
+co_names:    ('unknown_name',)
+... LOAD_GLOBAL              0 (unknown_name)
+
+unbound_local:
+co_varnames: ('value',)
+co_names:    ('print',)
+... LOAD_FAST                0 (value)
+... STORE_FAST               0 (value)
+\end{verbatim}
+
+The first function performs a global-style name lookup and fails with \texttt{NameError} if no accessible binding exists. The second function performs a local-slot load and fails with \texttt{UnboundLocalError} if the local slot has not yet been assigned.
+
+The compact rule is:
+
+\begin{quote}
+\texttt{NameError} means no accessible binding was found. \texttt{UnboundLocalError} means the binding was classified as local, but no local value existed at the read point.
+\end{quote}

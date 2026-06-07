@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq01",
+  "linenos": true,
+  "input": null,
+  "output": "plain traversal\nn: 1\nn: 2\nn: 3\nn: 4\nn: 5\nsquared values\n1 squared is 1\n2 squared is 4\n3 squared is 9\n4 squared is 16\n5 squared is 25\nformatted table\n 1 |  42\n 2 |  84\n 3 | 126\n 4 | 168\n 5 | 210",
+  "file": "main.py"
+}

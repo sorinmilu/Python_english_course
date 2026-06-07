@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "zip() as a Lazy Synchronization Mechanism Across Multiple Iterables",
+  "label": "par04",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'ValueError'>\nmessage: zip() argument 2 is shorter than argument 1",
+  "file": "main.py"
+}

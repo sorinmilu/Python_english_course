@@ -1,13 +1,9 @@
-def is_even(num):
-    return num % 2 == 0
+texts = ["10", "20", "42"]
 
-texts = ["10", "15", "20", "42", "99"]
+nums_iter = map(int, texts)
+nums = list(nums_iter)
 
-nums = map(int, texts)
-even_nums = filter(is_even, nums)
-
-print("pipeline is still lazy")
-
-stored = list(even_nums)
-
-print(f"stored: {stored}")
+print(f"nums: {nums}")
+print(f"type(nums): {type(nums)}")
+print(f"nums[0]: {nums[0]}")
+print(f"sum(nums): {sum(nums)}")

@@ -1,0 +1,175 @@
+\subsection{The \texttt{open()} Function and File Object Construction}
+
+The \texttt{open()} function is the ordinary entry point through which Python code obtains access to a file. It does not return the file contents directly. It returns a runtime object that represents an open communication channel between the Python process and an external filesystem resource.
+
+That object is usually called a file object or stream object. It is a Python-level wrapper around lower-level operating-system access. The file object has methods such as \texttt{read()}, \texttt{write()}, \texttt{close()}, \texttt{flush()}, \texttt{seek()}, and \texttt{tell()}. Through these methods, Python code can move data across the boundary between runtime memory and persistent storage.
+
+\subsubsection{Path Argument, Mode Argument, Encoding Argument, and Runtime File Object Creation}
+
+The most common call shape is:
+
+\begin{verbatim}
+open(path, mode, encoding=...)
+\end{verbatim}
+
+The \texttt{path} argument identifies the external file. The \texttt{mode} argument tells Python what kind of access is requested. The \texttt{encoding} argument matters in text mode because stored bytes must be decoded into \texttt{str} objects when reading, or encoded from \texttt{str} objects when writing.
+
+\begin{verbatim}
+path = "io_demo_1.txt"
+text = "It's just a flesh wound.\n"
+
+file_obj = open(path, "w", encoding="utf-8")
+
+print("The file object was created by open().")
+print(f"path     = {path}")
+print(f"text     = {text.strip()}")
+print(f"file_obj = {file_obj}")
+
+print()
+print("Object types:")
+print(f"type(path)     = {type(path)}")
+print(f"type(text)     = {type(text)}")
+print(f"type(file_obj) = {type(file_obj)}")
+
+print()
+print("Selected names from dir(file_obj):")
+for name in ["write", "read", "close", "flush", "seek", "tell", "encoding", "mode"]:
+    print(f"{name:10} -> {name in dir(file_obj)}")
+
+print()
+written_count = file_obj.write(text)
+file_obj.close()
+
+print(f"write() returned: {written_count}")
+print("The returned number is the number of text characters written.")
+print("The file now exists outside the Python runtime.")
+\end{verbatim}
+
+The name \texttt{file\_obj} does not contain the file itself. It refers to a Python object that manages access to the external file. The file object knows its mode, its encoding in text mode, and the operations allowed by that mode.
+
+The call to \texttt{write()} receives a \texttt{str} object. Because the file was opened in text mode with \texttt{encoding="utf-8"}, Python encodes that string into bytes before they are stored externally. The call to \texttt{close()} releases the open file resource. Resource lifetime will be examined more carefully in the next subsection.
+
+\subsubsection{Read Modes, Write Modes, Append Modes, and Exclusive Creation Modes}
+
+The mode string controls the intended access pattern. The basic modes are:
+
+\begin{itemize}
+    \item \texttt{"r"}: read an existing file;
+    \item \texttt{"w"}: write a file, replacing existing contents;
+    \item \texttt{"a"}: append to the end of a file;
+    \item \texttt{"x"}: create a new file, failing if it already exists.
+\end{itemize}
+
+These modes are not cosmetic. They change what the file object is allowed to do and what happens to existing stored data.
+
+\begin{verbatim}
+path = "io_modes_demo.txt"
+
+file_obj = open(path, "w", encoding="utf-8")
+file_obj.write("First line: D'oh!\n")
+file_obj.close()
+
+print("After write mode:")
+file_obj = open(path, "r", encoding="utf-8")
+content = file_obj.read()
+file_obj.close()
+print(content)
+
+file_obj = open(path, "a", encoding="utf-8")
+file_obj.write("Second line: Serenity now!\n")
+file_obj.close()
+
+print("After append mode:")
+file_obj = open(path, "r", encoding="utf-8")
+content = file_obj.read()
+file_obj.close()
+print(content)
+
+print("Type inspection:")
+print(f"type(content) = {type(content)}")
+
+print()
+print("Selected names from dir(content):")
+for name in ["splitlines", "upper", "replace", "strip", "count"]:
+    print(f"{name:12} -> {name in dir(content)}")
+
+print()
+print("Trying exclusive creation on an existing file:")
+try:
+    file_obj = open(path, "x", encoding="utf-8")
+    file_obj.write("This should not replace the old file.\n")
+    file_obj.close()
+except FileExistsError as err:
+    print(f"FileExistsError: {err}")
+\end{verbatim}
+
+The first \texttt{"w"} opening creates or replaces the file. The later \texttt{"a"} opening preserves the existing data and adds new text at the end. The later \texttt{"r"} openings read the stored data back into Python as a \texttt{str} object.
+
+The \texttt{"x"} mode is useful when overwriting would be a bug. It asks Python to create the file only if the path does not already exist. If the file already exists, Python raises \texttt{FileExistsError} instead of silently destroying previous contents.
+
+\subsubsection{Text Mode vs. Binary Mode: \texttt{str} Streams vs. \texttt{bytes} Streams}
+
+A file can be opened in text mode or binary mode.
+
+Text mode works with \texttt{str} objects. Python performs encoding and decoding at the boundary. This is appropriate for ordinary textual data: source code, logs, CSV files, JSON files, configuration files, and plain text documents.
+
+Binary mode works with \texttt{bytes} objects. Python does not interpret the bytes as text. This is appropriate for images, archives, compiled files, serialized binary formats, and any file where raw byte values matter.
+
+The mode string controls this distinction. Modes such as \texttt{"r"}, \texttt{"w"}, and \texttt{"a"} are text modes by default. Modes such as \texttt{"rb"} and \texttt{"wb"} are binary modes.
+
+\begin{verbatim}
+text_path = "io_text_demo.txt"
+bin_path = "io_binary_demo.bin"
+
+text_msg = "The answer is 42, but the question is unstable.\n"
+
+file_obj = open(text_path, "w", encoding="utf-8")
+file_obj.write(text_msg)
+file_obj.close()
+
+file_obj = open(text_path, "r", encoding="utf-8")
+text_data = file_obj.read()
+file_obj.close()
+
+print("Text mode result:")
+print(f"text_data       = {text_data.strip()}")
+print(f"type(text_data) = {type(text_data)}")
+
+print()
+byte_data = text_msg.encode("utf-8")
+
+print("Manual encoding creates bytes:")
+print(f"byte_data       = {byte_data}")
+print(f"type(byte_data) = {type(byte_data)}")
+
+print()
+print("Selected names from dir(byte_data):")
+for name in ["decode", "hex", "split", "replace", "startswith"]:
+    print(f"{name:12} -> {name in dir(byte_data)}")
+
+file_obj = open(bin_path, "wb")
+file_obj.write(byte_data)
+file_obj.close()
+
+file_obj = open(bin_path, "rb")
+raw_data = file_obj.read()
+file_obj.close()
+
+print()
+print("Binary mode result:")
+print(f"raw_data       = {raw_data}")
+print(f"type(raw_data) = {type(raw_data)}")
+
+print()
+decoded_again = raw_data.decode("utf-8")
+print("Decoded back into text:")
+print(f"decoded_again       = {decoded_again.strip()}")
+print(f"type(decoded_again) = {type(decoded_again)}")
+\end{verbatim}
+
+In text mode, \texttt{read()} returns a \texttt{str}. In binary mode, \texttt{read()} returns a \texttt{bytes} object. This is the central difference.
+
+The text file example lets Python handle the conversion between \texttt{str} and stored bytes through the declared encoding. The binary file example performs the conversion manually with \texttt{encode()} and \texttt{decode()}. This makes the boundary visible: external storage ultimately contains bytes, while Python text is represented as \texttt{str} objects inside the runtime.
+
+The practical rule is direct: use text mode when the file represents text, and always specify an encoding such as \texttt{"utf-8"}. Use binary mode when the file represents raw bytes and must not be decoded as text.
+

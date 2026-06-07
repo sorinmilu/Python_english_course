@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat08",
+  "linenos": true,
+  "input": null,
+  "output": "stored_list: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]\ntype(stored_list): <class 'list'>\ndir(stored_list) sample: ['__add__', '__class__', '__class_getitem__',\n'__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__',\n'__eq__', '__format__']",
+  "file": "main.py"
+}

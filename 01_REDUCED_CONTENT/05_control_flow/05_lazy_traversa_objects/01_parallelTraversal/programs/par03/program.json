@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "zip() as a Lazy Synchronization Mechanism Across Multiple Iterables",
+  "label": "par03",
+  "linenos": true,
+  "input": null,
+  "output": "pairs: <zip object at 0x...>\nno pairs have been printed yet\nnext(pairs): ('Jerry', 72)\nnext(pairs): ('Elaine', 91)",
+  "file": "main.py"
+}

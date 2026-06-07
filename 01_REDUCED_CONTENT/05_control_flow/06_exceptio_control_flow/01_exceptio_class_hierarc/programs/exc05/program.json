@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Risk of Bare except and Over-Broad Exception Traps",
+  "label": "exc05",
+  "linenos": true,
+  "input": null,
+  "output": "'10' -> 10\n'20' -> 20\nignored an error\n'42' -> 42",
+  "file": "main.py"
+}

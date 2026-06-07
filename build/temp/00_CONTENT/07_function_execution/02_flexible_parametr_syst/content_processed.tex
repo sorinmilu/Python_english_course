@@ -1,0 +1,7 @@
+\section{Flexible Parametrization Systems}
+
+Not every function call has a fixed number of inputs. Some functions must accept an open-ended sequence of positional values, an open-ended set of named options, or a mixture of both. Python handles this through variadic parameters and argument unpacking: \texttt{*args}, \texttt{**kwargs}, \texttt{*iterable}, and \texttt{**mapping}.
+
+These mechanisms do not change the basic call model. Arguments are still evaluated into object references, a new frame is still created, and parameter names are still bound inside that frame. What changes is the shape of the binding operation. Positional overflow can be packed into a tuple. Keyword overflow can be packed into a dictionary. Existing sequences and mappings can also be expanded across the call boundary.
+
+This section also covers one of the most important traps in Python function design: default argument expressions are evaluated when the function object is created, not each time the function is called. That single rule explains both the power and the danger of flexible signatures, especially when mutable default objects are involved.

@@ -1,0 +1,1064 @@
+\subsection{Comparative Runtime Case Studies}
+
+
+
+\subsubsection{The Java Virtual Machine (JVM): Compiled Bytecode, Type Verification, Managed Memory, and the WORA Paradigm}
+
+The Java Virtual Machine, usually abbreviated as JVM, is one of the clearest examples of a process virtual machine. It is a runtime environment that executes programs represented as JVM bytecode, not as direct native machine code produced from the original Java source file.
+
+In the usual Java workflow, the source file is not executed directly by the JVM. First, Java source code is compiled by the Java compiler:
+
+\begin{verbatim}
+javac Main.java
+\end{verbatim}
+
+This produces one or more \texttt{.class} files:
+
+\begin{verbatim}
+Main.java
+    |
+    | javac
+    v
+Main.class
+\end{verbatim}
+
+The \texttt{.class} file contains JVM bytecode. This bytecode is not x86-64 machine code, ARM64 machine code, or any other physical processor instruction set. It is an instruction stream for the Java Virtual Machine.
+
+At runtime, the operating system loads a native executable such as the Java launcher and JVM runtime. The JVM then loads the class file, verifies it, prepares runtime structures, and executes the bytecode:
+
+\begin{verbatim}
+Main.class
+    |
+    | loaded by JVM
+    v
+verified JVM bytecode
+    |
+    | interpreted or JIT-compiled by JVM
+    v
+program behavior
+\end{verbatim}
+
+This produces a layered model:
+
+\begin{verbatim}
+physical CPU
+    executes native JVM machine code
+        |
+        v
+JVM runtime process
+    loads and executes JVM bytecode
+        |
+        v
+Java program behavior
+\end{verbatim}
+
+The JVM is therefore similar to CPython in one broad sense: the operating system runs the runtime process, and the runtime executes the user's program representation. But the JVM differs from CPython in several important ways.
+
+The first major difference is that Java normally exposes source-to-bytecode compilation as a separate build step. In CPython, source-to-bytecode compilation usually happens automatically when a file is run or imported. In Java, the programmer usually compiles source files with \texttt{javac} before running the program with \texttt{java}.
+
+A simplified comparison is:
+
+\begin{verbatim}
+CPython:
+    script.py
+        |
+        | CPython compiles internally
+        v
+    CPython bytecode
+        |
+        | CPython interpreter
+        v
+    execution
+
+
+Java:
+    Main.java
+        |
+        | javac
+        v
+    Main.class
+        |
+        | JVM
+        v
+    execution
+\end{verbatim}
+
+The second major difference is bytecode verification. Before JVM bytecode is allowed to run, the JVM checks that it obeys structural safety rules. This process is called \textbf{bytecode verification}. The verifier checks properties such as:
+
+\begin{itemize}
+    \item whether bytecode instructions have valid structure;
+    \item whether stack operations are type-consistent;
+    \item whether local variables are used correctly;
+    \item whether method calls match declared method signatures;
+    \item whether control flow jumps to valid instruction locations;
+    \item whether object initialization rules are respected.
+\end{itemize}
+
+This verification step is important because JVM bytecode may come from files, libraries, downloaded archives, build tools, or other compilers targeting the JVM. The JVM cannot blindly trust every bytecode file. It must check that the bytecode does not violate the rules of the virtual machine before executing it.
+
+The JVM is a stack-based virtual machine. Each method call creates a JVM frame. A JVM frame contains local variable slots and an operand stack. Instructions load values from local variables onto the operand stack, operate on those values, and store results back.
+
+A simplified JVM method frame looks like this:
+
+\begin{verbatim}
+JVM method frame
++----------------------+
+| local variable slots |
++----------------------+
+| operand stack        |
++----------------------+
+| runtime metadata     |
++----------------------+
+\end{verbatim}
+
+For example, an expression such as:
+
+\begin{verbatim}
+x = a + b;
+\end{verbatim}
+
+can be represented conceptually as:
+
+\begin{verbatim}
+load a onto operand stack
+load b onto operand stack
+add top two stack values
+store result into x
+\end{verbatim}
+
+The operand stack is not the native process stack. It is part of the JVM's method-frame model. The physical CPU does not directly execute these stack operations as Java operations. The JVM interpreter or JIT-compiled code implements them.
+
+The JVM also owns Java memory management. Java objects are allocated on a managed heap. The programmer normally creates objects with \texttt{new}, but does not manually release them with something like C's \texttt{free()}.
+
+For example:
+
+\begin{verbatim}
+Person p = new Person();
+\end{verbatim}
+
+This creates a Java object managed by the JVM. When the object is no longer reachable, the JVM's garbage collector may reclaim its memory. The programmer does not explicitly destroy the object.
+
+The managed-memory model can be sketched as:
+
+\begin{verbatim}
+Java reference variable
+        |
+        v
+object on JVM-managed heap
+        |
+        v
+reclaimed later by garbage collector when unreachable
+\end{verbatim}
+
+This is one of the strongest contrasts with C. In C, the programmer may allocate with \texttt{malloc()} and release with \texttt{free()}. In Java, ordinary object memory is managed by the virtual machine. This reduces many manual memory errors, such as double free and use-after-free, but it does not eliminate all memory problems. A Java program can still keep references to objects it no longer needs, preventing them from being collected.
+
+The JVM also provides a structured exception model. Exceptions are objects. When an exception is thrown, the JVM searches through active method frames for a matching handler. If no handler is found, the exception propagates upward and may terminate the thread. This is runtime-managed control flow, similar in broad structure to Python exceptions, but governed by Java's type system and JVM execution rules.
+
+A simplified exception path is:
+
+\begin{verbatim}
+method C throws exception
+        |
+        v
+JVM checks handler in method C
+        |
+        v
+if not handled, unwind to method B
+        |
+        v
+if not handled, unwind to method A
+\end{verbatim}
+
+The JVM is also closely associated with the phrase \textbf{WORA}: \emph{Write Once, Run Anywhere}. The idea is that Java source code can be compiled into JVM bytecode once, and that bytecode can run on any platform that has a compatible JVM.
+
+The intended portability model is:
+
+\begin{verbatim}
+Java source
+    |
+    | javac
+    v
+JVM bytecode
+    |
+    +--> JVM on Linux x86-64
+    |
+    +--> JVM on Windows x86-64
+    |
+    +--> JVM on macOS ARM64
+    |
+    +--> JVM on other supported platforms
+\end{verbatim}
+
+The same bytecode does not run directly on all processors. Instead, each platform provides its own native JVM implementation. The bytecode targets the JVM specification, and the JVM implementation targets the local operating system and processor.
+
+This is different from C portability. C source code can often be recompiled for different platforms, but the compiled binary is normally platform-specific. A Linux x86-64 executable is not the same as a Windows x86-64 executable or a macOS ARM64 executable. Java moves the portability boundary from source code to bytecode.
+
+A C-style model is:
+
+\begin{verbatim}
+C source
+    |
+    +--> compile for Linux x86-64  -> Linux binary
+    |
+    +--> compile for Windows x86-64 -> Windows binary
+    |
+    +--> compile for macOS ARM64    -> macOS binary
+\end{verbatim}
+
+A Java-style model is:
+
+\begin{verbatim}
+Java source
+    |
+    | javac
+    v
+JVM bytecode
+    |
+    +--> run on JVM for Linux
+    |
+    +--> run on JVM for Windows
+    |
+    +--> run on JVM for macOS
+\end{verbatim}
+
+This does not mean that all Java programs are perfectly platform-independent. Programs can still depend on platform-specific file paths, native libraries, environment variables, GUI behavior, operating-system services, or external resources. But the bytecode execution model is designed to make the compiled program representation independent of one physical CPU instruction set.
+
+The JVM also commonly uses just-in-time compilation. The JVM may begin by interpreting bytecode, but frequently executed methods or code paths can be compiled into native machine code while the program is running. This allows the JVM to combine portability with high performance.
+
+A simplified JVM execution path is:
+
+\begin{verbatim}
+JVM bytecode
+    |
+    +--> interpreted execution
+    |
+    +--> profiling detects hot code
+            |
+            v
+        JIT compiler emits native machine code
+            |
+            v
+        CPU executes optimized native code
+\end{verbatim}
+
+This makes the JVM more aggressive than the traditional CPython execution model. CPython normally interprets bytecode through its evaluation loop. The JVM often transforms selected bytecode into native machine code at runtime. The JVM can use runtime information to optimize code paths that are actually important during execution.
+
+The JVM runtime therefore combines several responsibilities:
+
+\begin{itemize}
+    \item loading classes;
+    \item verifying bytecode;
+    \item creating method frames;
+    \item executing bytecode;
+    \item managing the heap;
+    \item collecting unreachable objects;
+    \item routing exceptions;
+    \item resolving symbolic references;
+    \item compiling hot paths to native code through JIT compilation.
+\end{itemize}
+
+This makes the JVM a rich managed runtime, not just a simple bytecode interpreter.
+
+For the purposes of this course, the JVM is useful mainly as a contrast point. It shows a runtime-hosted model where bytecode is explicit, verification is central, memory is managed, and JIT compilation is a normal performance strategy. CPython shares the idea of bytecode executed inside a native runtime process, but it has a different object model, different type timing, different bytecode stability guarantees, and a much less aggressive default JIT story.
+
+The JVM therefore represents one major process-VM architecture: a portable bytecode target with verification, managed memory, runtime class loading, and adaptive native compilation. It demonstrates that a virtual machine is not merely an interpreter. It can be a complete execution environment that defines its own instruction set, memory model, safety checks, object lifecycle rules, and performance strategy.
+
+
+\subsubsection{The JavaScript V8 Engine: High-Performance Runtime Optimization, JIT Compilation, and Host-Provided Event Loops}
+
+The JavaScript V8 engine is a process-VM-style execution engine designed for running JavaScript with high runtime performance. It is best known as the engine used by Chromium-based browsers and by Node.js. It also appears indirectly inside Electron-style desktop applications, where a native application embeds a browser/runtime stack. Applications such as Visual Studio Code use this general architecture: the operating system runs the application process, while JavaScript or TypeScript-derived code executes inside an embedded JavaScript runtime environment.
+
+V8 is not usually the entire application. It is an engine embedded inside a host. The host provides the surrounding environment: browser APIs, DOM access, timers, networking interfaces, file-system APIs in Node.js, event-loop integration, and application-specific services. V8 itself is responsible for parsing JavaScript, representing code internally, executing it, optimizing it, managing JavaScript objects, and collecting unused memory.
+
+A simplified browser-side model is:
+
+\begin{verbatim}
+browser executable
+    |
+    v
+browser process / renderer process
+    |
+    v
+embedded V8 engine
+    |
+    v
+JavaScript source from page or application
+    |
+    v
+JavaScript execution inside browser-provided environment
+\end{verbatim}
+
+A simplified Node.js model is:
+
+\begin{verbatim}
+node executable
+    |
+    v
+Node.js runtime process
+    |
+    v
+embedded V8 engine
+    |
+    v
+JavaScript source / module graph
+    |
+    v
+JavaScript execution with Node-provided APIs
+\end{verbatim}
+
+In both cases, the operating system does not directly execute a \texttt{.js} file as a native binary. The operating system runs the host executable: a browser, the Node.js executable, or an Electron application. That host embeds V8. V8 then executes JavaScript code inside the host process.
+
+This makes V8 different from CPython in an important way. CPython is normally used directly as the interpreter executable:
+
+\begin{verbatim}
+python script.py
+\end{verbatim}
+
+Here, the Python interpreter is the visible runtime process. With V8, the engine is commonly hidden inside another program:
+
+\begin{verbatim}
+chrome / chromium / node / electron application
+        |
+        v
+embedded V8 engine
+        |
+        v
+JavaScript execution
+\end{verbatim}
+
+The user may experience this as a web page, a server process, a command-line JavaScript program, or a desktop application. In all cases, V8 is the engine that gives JavaScript its execution machinery.
+
+V8 does not simply interpret JavaScript source line by line. Modern JavaScript execution is too dynamic and too performance-sensitive for such a simple model. V8 parses source code, builds internal representations, executes code through interpreter tiers, observes runtime behavior, and compiles frequently executed paths into native machine code. This is called \textbf{just-in-time compilation}, or \textbf{JIT compilation}.
+
+A simplified V8 execution pipeline can be sketched as:
+
+\begin{verbatim}
+JavaScript source
+    |
+    v
+parser
+    |
+    v
+internal representation / bytecode
+    |
+    v
+interpreter or baseline execution
+    |
+    v
+runtime profiling feedback
+    |
+    v
+optimized native code for hot paths
+    |
+    v
+deoptimization if assumptions fail
+\end{verbatim}
+
+The important idea is that V8 does not need to know everything before execution begins. It can start running code, observe what actually happens, and then optimize based on that observed behavior. If a function is called many times with the same kinds of values, V8 may specialize the machine code for that pattern. If later calls violate the assumptions used by the optimizer, V8 can abandon the optimized code and fall back to a safer representation. This fallback is called \textbf{deoptimization}.
+
+For example, consider JavaScript code such as:
+
+\begin{verbatim}
+function add(a, b) {
+    return a + b;
+}
+\end{verbatim}
+
+At the source level, the operator \texttt{+} is not fixed to one machine operation. It may mean numeric addition, string concatenation, or another behavior depending on runtime values. If V8 observes that \texttt{add} is repeatedly called with numbers, it may optimize for numeric addition. If the function is later called with strings, the optimized assumptions may no longer be valid.
+
+This is different from C. In C, if the parameters are declared as integers, the compiler already knows the operation category before execution:
+
+\begin{verbatim}
+int add(int a, int b) {
+    return a + b;
+}
+\end{verbatim}
+
+The C compiler can generate native integer-addition code ahead of time. JavaScript's dynamic value model requires more runtime observation. V8 recovers performance by using feedback from real execution.
+
+This is also different from traditional CPython. CPython usually executes bytecode through its evaluation loop and performs dynamic dispatch for object operations. V8, by contrast, aggressively tries to turn frequently used JavaScript paths into native machine code. This makes V8 a much more optimization-heavy runtime than the standard CPython execution model.
+
+The reason this works is that many dynamic programs behave regularly in practice. A function may be legally able to receive many types of values, but in a real program it often receives the same shapes of objects and the same primitive categories repeatedly. V8 exploits that regularity.
+
+A central optimization concept in JavaScript engines is the internal representation of object structure. JavaScript objects are dynamic: properties can be added, removed, or changed at runtime. A naive implementation would treat every property access as a dictionary-like lookup. That would be slow. V8 instead tracks object layout patterns internally. If many objects have the same property structure, the engine can optimize property access based on that stable shape.
+
+For example:
+
+\begin{verbatim}
+function Point(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+let p = new Point(10, 20);
+\end{verbatim}
+
+If many \texttt{Point} objects are created with the same property layout, V8 can treat property access such as:
+
+\begin{verbatim}
+p.x
+\end{verbatim}
+
+as a predictable offset-like operation internally, rather than as a fully general dictionary lookup every time. The source language remains dynamic, but the engine tries to discover stable structure during execution.
+
+This is the general pattern of high-performance JavaScript engines:
+
+\begin{itemize}
+    \item accept a highly dynamic language at the source level;
+    \item start execution with a general representation;
+    \item collect runtime type and shape feedback;
+    \item generate optimized native code when behavior becomes predictable;
+    \item discard optimized code if later behavior breaks the assumptions.
+\end{itemize}
+
+V8 also owns JavaScript memory management. JavaScript objects live on a managed heap controlled by the engine. The programmer creates objects, arrays, functions, closures, promises, and other values, but does not manually free them. V8 uses garbage collection to reclaim objects that are no longer reachable.
+
+A simplified JavaScript object-lifetime model is:
+
+\begin{verbatim}
+JavaScript variable / property / closure reference
+        |
+        v
+object on V8-managed heap
+        |
+        v
+garbage collector reclaims it when unreachable
+\end{verbatim}
+
+This resembles Java and Python at the broad runtime level: objects are managed by the runtime, not by explicit user calls to \texttt{free()}. The details differ. CPython primarily uses reference counting plus a cyclic garbage collector. The JVM uses garbage collectors designed for Java heap management. V8 uses garbage collection strategies adapted to JavaScript's allocation patterns and object model.
+
+One of the most important architectural points about V8 is that the event loop is not V8 alone. JavaScript programmers often associate JavaScript with asynchronous execution, timers, callbacks, promises, and event loops. However, the event loop is provided by the host environment around the engine.
+
+In a browser, the browser host provides:
+
+\begin{itemize}
+    \item timers such as \texttt{setTimeout};
+    \item event dispatch for user input;
+    \item network operations;
+    \item DOM events;
+    \item rendering integration;
+    \item task and microtask scheduling behavior.
+\end{itemize}
+
+In Node.js, the Node runtime provides:
+
+\begin{itemize}
+    \item file-system operations;
+    \item networking;
+    \item timers;
+    \item process APIs;
+    \item event-loop integration;
+    \item module loading;
+    \item native bindings.
+\end{itemize}
+
+V8 executes JavaScript code. The host provides the surrounding world in which JavaScript code receives events and performs I/O.
+
+This distinction matters. A JavaScript expression such as:
+
+\begin{verbatim}
+let x = 1 + 2;
+\end{verbatim}
+
+is pure JavaScript execution handled by the engine. But a call such as:
+
+\begin{verbatim}
+setTimeout(callback, 1000);
+\end{verbatim}
+
+depends on host-provided timer functionality. The callback is a JavaScript function object, but the timer mechanism itself belongs to the host environment.
+
+A simplified event model is:
+
+\begin{verbatim}
+host environment
+    receives external event or timer completion
+        |
+        v
+queues callback / task
+        |
+        v
+event loop selects runnable task
+        |
+        v
+V8 executes JavaScript callback
+\end{verbatim}
+
+This is why the same V8 engine can be used in different environments. In a browser, JavaScript code interacts with the DOM and web APIs. In Node.js, JavaScript code interacts with files, sockets, processes, and server-side APIs. In Electron, JavaScript code may interact with both browser-like and Node-like capabilities depending on configuration.
+
+The host/engine split can be drawn as:
+
+\begin{verbatim}
+native host application
++--------------------------------------------------+
+| browser / node / electron                        |
+|                                                  |
+|  host APIs: timers, I/O, DOM, filesystem, etc.   |
+|                                                  |
+|  +--------------------------------------------+  |
+|  | V8 engine                                  |  |
+|  | parser, bytecode, JIT, GC, JS heap          |  |
+|  +--------------------------------------------+  |
+|                                                  |
++--------------------------------------------------+
+\end{verbatim}
+
+This architecture explains why JavaScript is not only a language but also an embedded runtime component. The same language engine can appear inside different native programs, each providing different external capabilities.
+
+Compared with the JVM, V8 is usually more tightly tied to a dynamic source language and to host-driven evented execution. Java normally compiles source into class files before execution, verifies bytecode, and runs inside a JVM with a strongly specified bytecode model. V8 accepts JavaScript source from a host, compiles and optimizes dynamically, and interacts heavily with event loops supplied by that host.
+
+Compared with CPython, V8 is much more JIT-centered. CPython traditionally prioritizes predictable bytecode interpretation and a rich object model. V8 prioritizes aggressive adaptive optimization because JavaScript performance in browsers and server environments is critical. V8 therefore spends significant runtime effort observing code, generating optimized native paths, and invalidating those paths when assumptions fail.
+
+The trade-off is complexity. A simple bytecode interpreter is easier to reason about: fetch instruction, dispatch operation, update runtime state. A JIT engine has many more moving parts: profiling, inline caches, object-shape tracking, optimized code generation, deoptimization, garbage collection coordination, and host event integration. This complexity exists to make a highly dynamic language run fast in demanding environments.
+
+For this course, V8 is useful mainly as a contrast to CPython. Both are native runtimes that execute high-level source programs inside a process. Both manage objects and memory. Both can expose dynamic language behavior. But V8 is architected around adaptive runtime optimization and host embedding, while CPython is best understood first as a bytecode interpreter with runtime-managed frames and objects.
+
+A concise comparison is:
+
+\begin{center}
+\begin{tabular}{|p{0.25\textwidth}|p{0.30\textwidth}|p{0.30\textwidth}|}
+\hline
+\textbf{Runtime} & \textbf{Main execution style} & \textbf{Important surrounding structure} \\
+\hline
+CPython & Bytecode interpretation & Python frames, object model, reference counting, import system \\
+\hline
+JVM & Bytecode execution plus JIT & Class loading, verification, managed heap, garbage collection \\
+\hline
+V8 & Adaptive interpretation and JIT optimization & Host APIs, event loop, JavaScript heap, object-shape feedback \\
+\hline
+\end{tabular}
+\end{center}
+
+Thus, the V8 engine demonstrates a different process virtual machine philosophy. The user program is still not a native executable loaded directly by the operating system. It is source input to an engine embedded inside a native host. But unlike a simple interpreter, V8 aggressively transforms runtime observations into optimized machine code. Its design shows how a virtual machine can act not only as an interpreter, but as a dynamic optimizer that continuously adapts the program representation while execution is already in progress.
+
+
+
+\subsubsection{The CPython Virtual Machine: Bytecode Interpretation, Runtime Frames, Dynamic Inspection, and Managed Object Allocation}
+
+CPython is the reference implementation through which Python is most commonly understood. It is a native program, written mostly in C, that implements the Python language by compiling Python source code into bytecode and then executing that bytecode inside a runtime-managed environment.
+
+The name \emph{CPython virtual machine} refers to this internal execution environment. It is not a virtual machine in the sense of a full hardware emulator. It does not boot an operating system and it does not create a separate virtual computer. It is a process virtual machine: a software execution engine running inside the native CPython process.
+
+A simplified CPython execution path is:
+
+\begin{verbatim}
+Python source file
+    |
+    v
+tokenizer and parser
+    |
+    v
+abstract syntax tree
+    |
+    v
+compiler
+    |
+    v
+code object containing bytecode
+    |
+    v
+CPython bytecode evaluation loop
+    |
+    v
+Python runtime behavior
+\end{verbatim}
+
+The bytecode is the instruction stream of the CPython virtual machine. It is not hardware machine code. A physical CPU cannot directly execute Python bytecode. Instead, the CPU executes the native machine code of the CPython interpreter. That native interpreter code reads bytecode instructions and performs the corresponding Python-level operations.
+
+This gives CPython a layered structure:
+
+\begin{verbatim}
+physical CPU
+    executes native CPython instructions
+        |
+        v
+CPython interpreter loop
+    reads Python bytecode
+        |
+        v
+Python bytecode instructions
+    manipulate Python frames and objects
+        |
+        v
+Python program behavior
+\end{verbatim}
+
+For example, a Python statement such as:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+is not normally translated into a fixed native addition instruction in the way a C compiler might translate integer addition. CPython compiles the statement into bytecode operations that load the objects bound to \texttt{a} and \texttt{b}, perform Python's addition protocol, and bind the result to the name \texttt{x}. The addition operation is dynamic: the runtime must consider the actual objects involved.
+
+If \texttt{a} and \texttt{b} are integers, the operation follows integer addition behavior. If they are strings, the same source-level \texttt{+} operator may mean concatenation. If they are user-defined objects, the operation may dispatch through special methods such as \texttt{\_\_add\_\_}. The bytecode instruction is therefore not equivalent to a single hardware instruction. It is an entry point into Python's object protocol.
+
+This is one of the main differences between CPython and the C execution model. In C, much operation meaning is fixed by declared types before execution. In CPython, many operation meanings are resolved while the program runs, based on the objects that are actually present.
+
+A simplified comparison is:
+
+\begin{verbatim}
+C:
+    declared types
+        -> compiler chooses native operation
+        -> CPU executes operation directly
+
+CPython:
+    runtime objects
+        -> interpreter checks object types/protocols
+        -> runtime performs appropriate operation
+\end{verbatim}
+
+CPython bytecode is organized around code objects. A code object stores compiled executable content and metadata. It may contain bytecode, constants, variable names, names used for global lookup, information about local variables, and other details needed by the interpreter.
+
+For example, a function definition such as:
+
+\begin{verbatim}
+def add(a, b):
+    return a + b
+\end{verbatim}
+
+creates a function object. That function object refers to a code object representing the body of the function. The function object is callable. The code object contains the compiled instructions that run when the function is called.
+
+A simplified structure is:
+
+\begin{verbatim}
+function object
+    |
+    v
+code object
+    |
+    v
+bytecode instructions and metadata
+\end{verbatim}
+
+When a Python function is called, CPython creates or activates a runtime frame for that call. A frame represents an active execution of code. It contains the state needed to continue execution: local bindings or local slots, links to global and built-in namespaces, the current bytecode position, and the evaluation stack used by bytecode instructions.
+
+A simplified Python frame can be represented as:
+
+\begin{verbatim}
+Python execution frame
++----------------------------------+
+| code object                      |
+| current bytecode position        |
+| local variable storage           |
+| global namespace reference       |
+| builtins namespace reference     |
+| evaluation stack                 |
+| previous frame link              |
++----------------------------------+
+\end{verbatim}
+
+This frame is not the same thing as a native C stack frame. CPython itself uses native C stack frames internally because it is a C program. But Python-level function calls are represented by interpreter-managed frame state. A Python local name is not simply a raw C stack variable. It is part of the Python runtime's frame and namespace machinery.
+
+For example:
+
+\begin{verbatim}
+def f():
+    x = 10
+    y = x + 5
+    return y
+\end{verbatim}
+
+When \texttt{f()} runs, CPython manages the names \texttt{x} and \texttt{y} as Python-level local bindings. The value \texttt{10} is a Python integer object. The result of \texttt{x + 5} is also a Python object. The frame records the execution state that connects the bytecode, the local names, and the objects.
+
+The evaluation stack is especially important. CPython is usually understood as a stack-based bytecode interpreter. Bytecode instructions push object references onto the evaluation stack, pop them as operands, and push results back.
+
+A simplified bytecode-style evaluation of:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+can be imagined as:
+
+\begin{verbatim}
+LOAD a      -> push object bound to a
+LOAD b      -> push object bound to b
+ADD         -> pop two objects, compute result, push result
+STORE x     -> pop result and bind it to x
+\end{verbatim}
+
+The actual bytecode instruction names vary between Python versions, but the structural idea is stable: bytecode manipulates Python object references inside a runtime frame.
+
+CPython's object model is also runtime-owned. Python values are represented as objects. Integers, floats, strings, lists, dictionaries, functions, modules, classes, exceptions, and types are all runtime objects. These objects live in memory managed by CPython.
+
+At the C implementation level, Python objects share a common object-header idea. A Python object carries information such as a reference count and a pointer to its type object. The exact structure depends on the object kind and CPython version, but the conceptual model is:
+
+\begin{verbatim}
+Python object
++------------------------------+
+| reference count              |
+| pointer to type object       |
+| object-specific data         |
++------------------------------+
+\end{verbatim}
+
+The type object tells CPython how that object behaves. It defines or points toward operations such as representation, arithmetic behavior, attribute lookup, calling behavior, item access, iteration, comparison, and memory deallocation.
+
+This is the runtime basis of the phrase ``everything is an object.'' The statement does not mean that all objects have the same internal layout. It means that values participating in Python execution are represented through a uniform object model. Even primitive-looking values such as integers are Python objects.
+
+For example:
+
+\begin{verbatim}
+x = 100
+\end{verbatim}
+
+does not create a C-style local integer box named \texttt{x}. It binds the name \texttt{x} to a Python integer object. The name is part of a namespace or local frame. The integer object is managed by CPython.
+
+This is why assignment in Python is binding, not copying into a typed variable slot:
+
+\begin{verbatim}
+a = [1, 2, 3]
+b = a
+\end{verbatim}
+
+After this code, \texttt{a} and \texttt{b} refer to the same list object. CPython has not duplicated the list merely because a second name was assigned. It has created another reference to the same runtime object.
+
+A simplified binding diagram is:
+
+\begin{verbatim}
+a ----\
+      v
+    list object [1, 2, 3]
+      ^
+b ----/
+\end{verbatim}
+
+This object-reference model is central to Python's memory behavior, argument passing, mutation semantics, and container behavior.
+
+CPython also owns ordinary memory reclamation for Python objects. In C, a programmer may allocate memory with \texttt{malloc()} and release it with \texttt{free()}. In Python, normal user code does not manually free every object. CPython tracks references to objects and reclaims memory when objects are no longer reachable according to its memory-management rules.
+
+The primary mechanism in CPython is reference counting. Each object tracks how many active references point to it. When the reference count drops to zero, the object can be destroyed immediately. CPython also includes garbage collection machinery for certain cyclic structures, because reference counting alone cannot reclaim objects that refer to each other in cycles.
+
+A simple acyclic case is:
+
+\begin{verbatim}
+x = [1, 2, 3]
+x = None
+\end{verbatim}
+
+The first line binds \texttt{x} to a list object. The second line rebinds \texttt{x} to \texttt{None}. If no other references to the list exist, the list becomes reclaimable.
+
+A cyclic case is more difficult:
+
+\begin{verbatim}
+a = []
+a.append(a)
+\end{verbatim}
+
+The list refers to itself. Even if the external name \texttt{a} is removed, the object participates in a reference cycle. CPython's cyclic garbage collector exists to handle such cases.
+
+This managed allocation model is one of the major differences between CPython and C. The Python programmer still needs to understand object lifetimes, aliases, references, and resources, but not ordinary manual deallocation of every heap object.
+
+CPython also exposes dynamic inspection facilities. Because code, functions, types, modules, frames, and objects are runtime structures, they can be inspected while the program is running.
+
+For example:
+
+\begin{verbatim}
+type(x)
+id(x)
+dir(x)
+\end{verbatim}
+
+These are not merely debugging conveniences. They reveal the fact that Python execution is represented in runtime metadata. The object has a type. The object has an identity. The runtime can enumerate available attributes. A function has a \texttt{\_\_code\_\_} object. A module has a namespace. A class has a dictionary-like attribute structure.
+
+Python can also expose bytecode. The \texttt{dis} module can display the bytecode generated for a function. This allows the programmer to see that source code has been compiled into virtual instructions before execution.
+
+For example:
+
+\begin{verbatim}
+import dis
+
+def add(a, b):
+    return a + b
+
+dis.dis(add)
+\end{verbatim}
+
+The exact output depends on the Python version, but the purpose is stable: the tool shows the virtual instruction stream used by CPython to execute the function.
+
+Dynamic inspection is not free. It exists because CPython maintains rich runtime structures. Those structures make the language flexible, debuggable, introspective, and interactive, but they also add overhead compared with direct native execution.
+
+This helps explain Python's performance profile. CPython is usually slower than optimized C for CPU-bound numerical loops because each Python-level operation involves runtime object handling, bytecode dispatch, dynamic type behavior, reference management, and possible exception checks. A C loop over raw integers can often become a compact sequence of native instructions operating on registers and memory. A Python loop over Python integers involves repeated interpreter-level work.
+
+A simplified contrast is:
+
+\begin{verbatim}
+C integer addition:
+    load raw integer values
+    execute native add instruction
+    store raw result
+
+Python integer addition in CPython:
+    load object references
+    check runtime types / dispatch operation
+    allocate or retrieve result object
+    update references
+    continue bytecode evaluation
+\end{verbatim}
+
+This overhead is the cost of CPython's runtime flexibility. The benefit is that Python values are uniform objects, types can be inspected dynamically, names can be rebound, functions and classes can be created at runtime, modules can be imported dynamically, exceptions carry traceback objects, and interactive execution is natural.
+
+Compared with the JVM, CPython is less centered on bytecode verification and aggressive JIT compilation. The JVM usually executes statically typed bytecode, verifies it, manages a heap, and often compiles hot code paths into native machine code. CPython bytecode is more closely tied to the CPython implementation and is usually interpreted by the evaluation loop.
+
+Compared with V8, CPython is also less optimization-tier-driven in the traditional model. V8 aggressively profiles JavaScript execution and generates optimized native code for hot paths. CPython's first conceptual model is simpler: source becomes bytecode, bytecode is executed by a predictable interpreter loop, and Python operations are resolved through the runtime object system.
+
+Compared with PHP's Zend Engine, CPython shares the idea of compiling source into runtime instructions and executing them inside an engine. PHP uses opcodes and request/runtime symbol tables. CPython uses code objects, bytecode, frames, namespaces, and Python objects. The broad architecture is similar, but the object model, lifecycle model, and execution environment differ.
+
+Compared with Bash, CPython is much more bytecode-VM-like. Bash interprets command syntax and frequently dispatches external native programs as child processes. CPython executes Python statements mostly inside one interpreter process by evaluating bytecode and manipulating Python objects.
+
+The CPython virtual machine can therefore be summarized as:
+
+\begin{verbatim}
+source code
+    -> AST
+    -> code object with bytecode
+    -> interpreter-managed frame
+    -> evaluation stack of object references
+    -> operations through Python object model
+    -> managed memory and exception routing
+\end{verbatim}
+
+For students coming from C, the main transition is this: Python execution does not expose raw machine-level storage as the primary programming model. CPython owns the execution state. Variables are bindings to objects. Function calls create runtime frames. Operations dispatch through object types and protocols. Memory is managed by the interpreter. Bytecode, frames, namespaces, and objects are the real machinery behind ordinary Python source code.
+
+
+\subsubsection{The Pure Interpretation vs. JIT Compilation Boundary: Why CPython Prioritizes a Predictable, Linear Dispatch Loop over High-Overhead Runtime JIT Machine Code Emission}
+
+CPython is usually described as a bytecode interpreter. This means that Python source code is compiled into CPython bytecode, and that bytecode is executed by an interpreter loop inside the CPython process. The interpreter repeatedly reads the next bytecode instruction, dispatches to the native C implementation of that instruction, updates the current frame state, and continues.
+
+A simplified view is:
+
+\begin{verbatim}
+Python source
+    |
+    v
+CPython bytecode
+    |
+    v
+interpreter dispatch loop
+    |
+    v
+C implementation of each bytecode operation
+    |
+    v
+Python runtime state changes
+\end{verbatim}
+
+This is different from a just-in-time compiler. A JIT compiler observes or receives runtime code and emits native machine code while the program is already running. Instead of interpreting each virtual instruction one by one, the runtime may generate native instruction sequences for selected functions, loops, or hot paths. The CPU can then execute that generated machine code directly.
+
+A simplified JIT model is:
+
+\begin{verbatim}
+source or bytecode
+    |
+    v
+runtime profiling / analysis
+    |
+    v
+JIT compiler emits native machine code
+    |
+    v
+CPU executes generated native code
+\end{verbatim}
+
+The difference is not that one model uses the CPU and the other does not. Both use the CPU. The difference is what the CPU is executing. In CPython's traditional model, the CPU executes the interpreter's native code, and the interpreter executes Python bytecode. In a JIT model, the runtime may generate new native code representing parts of the user's program, and the CPU can execute that generated code more directly.
+
+This distinction can be summarized as:
+
+\begin{center}
+\begin{tabular}{|p{0.42\textwidth}|p{0.42\textwidth}|}
+\hline
+\textbf{Interpreter-centered execution} & \textbf{JIT-centered execution} \\
+\hline
+Bytecode remains the main executed representation & Hot bytecode paths may become native machine code \\
+\hline
+Each virtual instruction is dispatched by the interpreter & Repeated dispatch can be reduced or removed for compiled paths \\
+\hline
+Runtime behavior stays close to the bytecode/frame/object model & Runtime may build optimized native traces or functions \\
+\hline
+Simpler to debug, inspect, port, and maintain & More complex optimizer, guards, invalidation, and deoptimization machinery \\
+\hline
+Predictable startup behavior & Extra compilation cost during execution \\
+\hline
+\end{tabular}
+\end{center}
+
+Historically, CPython has prioritized the interpreter-centered model. The central execution idea is a dispatch loop over bytecode instructions. This loop is sometimes introduced pedagogically as a large \texttt{switch}-style structure: inspect the current opcode, jump to the implementation of that opcode, execute it, then continue to the next instruction. Actual CPython implementations may use more efficient dispatch techniques, generated interpreter code, computed gotos, inline caches, and specialized instructions depending on version and build configuration. The teaching point is not the literal C syntax of the loop. The teaching point is that CPython traditionally advances Python execution by dispatching bytecode operations through interpreter-controlled machinery.
+
+A simplified interpreter loop can be imagined as:
+
+\begin{verbatim}
+while running:
+    opcode = next_instruction()
+    dispatch opcode:
+        LOAD_FAST:
+            ...
+        STORE_FAST:
+            ...
+        CALL:
+            ...
+        RETURN_VALUE:
+            ...
+\end{verbatim}
+
+This model is linear and explicit. The runtime keeps a current frame, a current bytecode offset, an evaluation stack, local bindings, global and built-in namespace links, and references to Python objects. Each bytecode instruction modifies this interpreter-managed state.
+
+For example, a Python expression such as:
+
+\begin{verbatim}
+x = a + b
+\end{verbatim}
+
+does not normally become one native arithmetic instruction. It becomes bytecode-level work:
+
+\begin{verbatim}
+load object bound to a
+load object bound to b
+perform Python addition protocol
+bind result to x
+\end{verbatim}
+
+The addition operation is dynamic. The runtime must know what objects \texttt{a} and \texttt{b} refer to at that exact moment. They might be integers, floats, strings, lists, user-defined objects, or objects implementing special methods. The source operator \texttt{+} is therefore not enough to select one fixed hardware instruction ahead of time.
+
+This dynamic object model makes aggressive JIT compilation harder. A JIT compiler must generate native code that is correct for the runtime objects actually observed. If it assumes that \texttt{a} and \texttt{b} are integers, it must include guards or checks to make sure that assumption remains true. If a later call uses different object types, the optimized machine code may no longer be valid and the runtime must fall back to a more general path.
+
+A JIT path therefore often needs:
+
+\begin{itemize}
+    \item profiling information about actual runtime values;
+    \item guards that test whether optimization assumptions still hold;
+    \item fallback paths for unexpected object types;
+    \item deoptimization machinery to return from optimized native code to interpreter state;
+    \item memory-management integration with the runtime heap;
+    \item exception integration with the runtime frame model;
+    \item debugging and tracing compatibility.
+\end{itemize}
+
+This is not impossible. Engines such as V8 and the JVM do it aggressively. But it is complex. The runtime must not only generate fast code; it must also preserve the exact language behavior when assumptions fail.
+
+CPython's object model creates additional pressure against simple native compilation. Python code can inspect objects dynamically, modify classes, replace methods, monkey-patch modules, intercept attribute access, override operators, use tracing hooks, inspect frames, catch exceptions with tracebacks, and call into C extension modules. These features mean that the runtime must preserve a very rich execution model.
+
+For example, the meaning of:
+
+\begin{verbatim}
+obj.x
+\end{verbatim}
+
+may involve ordinary attribute lookup, descriptors, properties, \texttt{\_\_getattribute\_\_}, \texttt{\_\_getattr\_\_}, class dictionaries, instance dictionaries, slots, or extension-level behavior. A native optimizer can accelerate common cases, but it must still respect all these dynamic mechanisms.
+
+The C extension ecosystem is another major constraint. A large part of Python's practical power comes from native extensions: numerical libraries, database bindings, image libraries, cryptography libraries, machine-learning frameworks, and many system-level modules. These extensions interact with CPython's object model and C API. A radically different execution strategy must still cooperate with the expectations of this ecosystem.
+
+This is one reason CPython's default strategy has historically favored compatibility, debuggability, portability, and predictable semantics over aggressive runtime native-code generation. The interpreter loop is not the fastest possible execution architecture, but it is a stable center around which the rest of the runtime is built.
+
+This does not mean CPython performs no optimization. Modern CPython has added adaptive specialization mechanisms that improve common bytecode paths while staying close to the interpreter model. Instead of replacing the whole execution model with a full aggressive JIT, CPython can specialize bytecode operations based on observed runtime behavior. For example, a generic operation may be specialized when the interpreter repeatedly sees the same common object types or access patterns.
+
+Conceptually:
+
+\begin{verbatim}
+generic bytecode operation
+    |
+    | runtime observes common pattern
+    v
+specialized interpreter operation
+    |
+    v
+faster path inside interpreter architecture
+\end{verbatim}
+
+This is different from full JIT compilation. The runtime may optimize dispatch and operation handling, but the program is still primarily executing through interpreter-managed bytecode machinery rather than through large generated native code regions.
+
+The contrast with V8 is useful. JavaScript is also dynamic, but V8 was designed around aggressive adaptive optimization because browser and server-side JavaScript performance became critical. V8 invests heavily in profiling, hidden classes or shape-like structures, inline caches, optimized native code, and deoptimization. The result can be very fast execution for hot JavaScript paths, but at the cost of a much more complex engine.
+
+A simplified V8-style model is:
+
+\begin{verbatim}
+JavaScript source
+    |
+    v
+bytecode / baseline execution
+    |
+    v
+profiling feedback
+    |
+    v
+optimized native code for hot paths
+    |
+    v
+deoptimization if assumptions fail
+\end{verbatim}
+
+The JVM is another contrast. Java bytecode is usually more statically structured than Python bytecode. Java's type system, bytecode verifier, class metadata, and method signatures give the runtime more stable information before execution. The JVM can use this structure, plus runtime profiling, to compile hot methods into native code.
+
+A simplified JVM model is:
+
+\begin{verbatim}
+JVM bytecode
+    |
+    v
+verification and interpretation
+    |
+    v
+profiling
+    |
+    v
+JIT compilation of hot methods
+    |
+    v
+native execution with managed-runtime support
+\end{verbatim}
+
+CPython starts from a different set of priorities. Python's runtime behavior is highly dynamic, its C extension ecosystem is large, and its introspection features are central to how programmers use the language. A simple statement can require many runtime decisions. Therefore, the interpreter remains the natural baseline.
+
+This baseline has practical advantages:
+
+\begin{itemize}
+    \item startup can be simpler because there is no need to compile large native regions before running;
+    \item debugging and tracing can remain close to the bytecode/frame model;
+    \item bytecode inspection remains meaningful;
+    \item portability is easier because the runtime does not need a production-grade native code generator for every target architecture;
+    \item C extension compatibility remains central;
+    \item memory management and exception routing stay concentrated in the interpreter runtime.
+\end{itemize}
+
+The cost is CPU-bound performance. A tight Python loop performing arithmetic on ordinary Python objects usually cannot compete with optimized C, JVM JIT-compiled code, or V8-optimized JavaScript in hot paths. Each Python-level operation involves bytecode dispatch, object handling, dynamic type behavior, reference management, and error checking.
+
+For example:
+
+\begin{verbatim}
+total = 0
+for i in range(1000000):
+    total += i
+\end{verbatim}
+
+At the Python level, this loop looks simple. At the CPython runtime level, it involves repeated iteration protocol operations, integer object operations, name or local-slot access, bytecode dispatch, and reference management. A C compiler can often reduce a similar loop over machine integers to a compact native instruction sequence. CPython preserves Python's dynamic semantics, and that preservation has runtime cost.
+
+This is why Python performance practice often moves CPU-heavy inner loops into native libraries. A Python program may call NumPy, PyTorch, OpenCV, database engines, compression libraries, or other native components. The Python layer coordinates work, while optimized native code performs heavy computation.
+
+The architecture then becomes:
+
+\begin{verbatim}
+Python code
+    |
+    | CPython interpreter
+    v
+library call
+    |
+    v
+native extension / optimized C, C++, Fortran, CUDA, etc.
+    |
+    v
+fast computation outside ordinary Python bytecode loop
+\end{verbatim}
+
+This is not an accident. It is one of the practical ways Python combines high-level flexibility with native performance where needed.
+
+The phrase \emph{pure interpretation} should therefore be used carefully. CPython is not merely reading source text line by line. It compiles source to bytecode. It uses specialized interpreter mechanisms. Recent and experimental builds may include JIT-related work. But the default conceptual model remains interpreter-centered: bytecode is executed through CPython's runtime machinery, and Python operations are resolved through the object system.
+
+A precise teaching statement is:
+
+\begin{quote}
+Traditional CPython is not a source-line interpreter and not primarily a production JIT compiler. It is a bytecode interpreter with a rich runtime object model, adaptive interpreter optimizations, and an implementation strategy that favors compatibility and predictable runtime semantics over aggressive default machine-code generation.
+\end{quote}
+
+This boundary is important for students moving from C to Python. In C, the compiler tries to remove as much runtime uncertainty as possible before execution. In V8 or the JVM, the runtime may recover speed by compiling hot paths into native code while execution proceeds. In CPython, the main execution path remains close to bytecode, frames, objects, and interpreter dispatch. Understanding this explains both Python's flexibility and its performance limits.

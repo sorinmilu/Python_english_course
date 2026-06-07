@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Capturing Exception Objects with except SomeError as e",
+  "label": "exc06",
+  "linenos": true,
+  "input": null,
+  "output": "index 0: soup\nindex 42: lookup failed\nerror type: <class 'IndexError'>\nmessage: list index out of range\nindex 'bad': lookup failed\nerror type: <class 'TypeError'>\nmessage: list indices must be integers or slices, not str",
+  "file": "main.py"
+}

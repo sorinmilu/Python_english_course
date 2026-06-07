@@ -1,0 +1,501 @@
+\subsection{String Sequence Operations}
+
+A string is a sequence, but it is also a text object with many specialized methods. These methods do not change the original string. Since \texttt{str} is immutable, operations such as searching, splitting, replacing, and case conversion return results while leaving the original object unchanged.
+
+\begin{verbatim}
+text = "These pretzels are making me thirsty"
+
+selected_names = [
+    "find",
+    "index",
+    "startswith",
+    "endswith",
+    "split",
+    "join",
+    "replace",
+    "lower",
+    "upper",
+    "casefold",
+]
+
+print(f"text: {text!r}")
+print(f"type(text): {type(text)}")
+print()
+
+for name in selected_names:
+    print(f"{name:<12} {name in dir(text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'These pretzels are making me thirsty'
+type(text): <class 'str'>
+
+find         True
+index        True
+startswith   True
+endswith     True
+split        True
+join         True
+replace      True
+lower        True
+upper        True
+casefold     True
+\end{verbatim}
+
+The methods in this section are ordinary string methods. They are called on a string object using dot notation.
+
+\subsubsection{Searching and Membership: \texttt{in}, \texttt{.find()}, \texttt{.index()}, \texttt{.startswith()}, and \texttt{.endswith()}}
+
+The simplest search operation is \texttt{in}. It returns a Boolean result.
+
+\begin{verbatim}
+text = "Nobody expects the Spanish Inquisition"
+
+print(f"{'Spanish' in text = }")
+print(f"{'French' in text = }")
+print(f"{'Nobody' in text = }")
+print(f"{'nobody' in text = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'Spanish' in text = True
+'French' in text = False
+'Nobody' in text = True
+'nobody' in text = False
+\end{verbatim}
+
+String search is case-sensitive. \texttt{"Nobody"} and \texttt{"nobody"} are different strings.
+
+The method \texttt{.find()} searches for a substring and returns the index where it first appears. If the substring is not found, it returns \texttt{-1}.
+
+\begin{verbatim}
+text = "Nobody expects the Spanish Inquisition"
+
+pos1 = text.find("Nobody")
+pos2 = text.find("expects")
+pos3 = text.find("Spanish")
+pos4 = text.find("French")
+
+print(f"Nobody:  {pos1}")
+print(f"expects: {pos2}")
+print(f"Spanish: {pos3}")
+print(f"French:  {pos4}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Nobody:  0
+expects: 7
+Spanish: 19
+French:  -1
+\end{verbatim}
+
+The return value is a position. It can be used for slicing.
+
+\begin{verbatim}
+text = "Nobody expects the Spanish Inquisition"
+
+pos = text.find("Spanish")
+
+print(f"pos: {pos}")
+print(f"text[pos:]: {text[pos:]!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pos: 19
+text[pos:]: 'Spanish Inquisition'
+\end{verbatim}
+
+The method \texttt{.index()} is similar to \texttt{.find()}, but it raises an error when the substring is absent.
+
+\begin{verbatim}
+text = "No soup for you!"
+
+print(f"text.index('soup'): {text.index('soup')}")
+
+try:
+    print(text.index("coffee"))
+except ValueError as err:
+    print("index search failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text.index('soup'): 3
+index search failed
+message: substring not found
+\end{verbatim}
+
+The choice is practical:
+
+\begin{itemize}
+    \item use \texttt{.find()} when absence is an expected result;
+    \item use \texttt{.index()} when absence should be treated as an error.
+\end{itemize}
+
+The methods \texttt{.startswith()} and \texttt{.endswith()} test boundaries.
+
+\begin{verbatim}
+text = "Hello, Newman!"
+
+print(f"{text.startswith('Hello') = }")
+print(f"{text.startswith('Newman') = }")
+print(f"{text.endswith('Newman!') = }")
+print(f"{text.endswith('Jerry') = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text.startswith('Hello') = True
+text.startswith('Newman') = False
+text.endswith('Newman!') = True
+text.endswith('Jerry') = False
+\end{verbatim}
+
+These methods are clearer than manual slicing when the intention is boundary testing.
+
+\begin{verbatim}
+filename = "report_final.txt"
+
+print(f"manual suffix test: {filename[-4:] == '.txt'}")
+print(f"endswith test:      {filename.endswith('.txt')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+manual suffix test: True
+endswith test:      True
+\end{verbatim}
+
+The second line communicates the intention directly: check whether the string ends with \texttt{".txt"}.
+
+\subsubsection{Splitting and Joining: \texttt{.split()} and \texttt{.join()} as Core Text-Sequence Transformations}
+
+The method \texttt{.split()} breaks a string into a list of smaller strings.
+
+\begin{verbatim}
+line = "spam eggs bacon"
+
+parts = line.split()
+
+print(f"line:  {line!r}")
+print(f"parts: {parts!r}")
+print(f"type(parts): {type(parts)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line:  'spam eggs bacon'
+parts: ['spam', 'eggs', 'bacon']
+type(parts): <class 'list'>
+\end{verbatim}
+
+With no argument, \texttt{.split()} splits on runs of whitespace.
+
+\begin{verbatim}
+line = "spam   eggs\tbacon\nbeans"
+
+parts = line.split()
+
+print(f"line:  {line!r}")
+print(f"parts: {parts!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line:  'spam   eggs\tbacon\nbeans'
+parts: ['spam', 'eggs', 'bacon', 'beans']
+\end{verbatim}
+
+A separator can be supplied explicitly.
+
+\begin{verbatim}
+csv_line = "Homer,Marge,Bart,Lisa,Maggie"
+
+parts = csv_line.split(",")
+
+print(f"csv_line: {csv_line!r}")
+print(f"parts:    {parts!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+csv_line: 'Homer,Marge,Bart,Lisa,Maggie'
+parts:    ['Homer', 'Marge', 'Bart', 'Lisa', 'Maggie']
+\end{verbatim}
+
+The separator is removed from the result.
+
+The method \texttt{.join()} performs the reverse kind of transformation. It takes an iterable of strings and joins them with a separator string.
+
+\begin{verbatim}
+parts = ["Homer", "Marge", "Bart", "Lisa", "Maggie"]
+
+line1 = ",".join(parts)
+line2 = " | ".join(parts)
+line3 = " ".join(parts)
+
+print(f"line1: {line1!r}")
+print(f"line2: {line2!r}")
+print(f"line3: {line3!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line1: 'Homer,Marge,Bart,Lisa,Maggie'
+line2: 'Homer | Marge | Bart | Lisa | Maggie'
+line3: 'Homer Marge Bart Lisa Maggie'
+\end{verbatim}
+
+The separator is the string before \texttt{.join()}.
+
+\begin{verbatim}
+parts = ["Ni", "Ni", "Ni"]
+
+text1 = " ".join(parts)
+text2 = "-".join(parts)
+text3 = "".join(parts)
+
+print(f"text1: {text1!r}")
+print(f"text2: {text2!r}")
+print(f"text3: {text3!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text1: 'Ni Ni Ni'
+text2: 'Ni-Ni-Ni'
+text3: 'NiNiNi'
+\end{verbatim}
+
+A common mistake is to try to join non-string elements directly.
+
+\begin{verbatim}
+numbers = [10, 20, 12]
+
+try:
+    text = ", ".join(numbers)
+    print(text)
+except TypeError as err:
+    print("join failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+join failed
+message: sequence item 0: expected str instance, int found
+\end{verbatim}
+
+The elements must be converted to strings first.
+
+\begin{verbatim}
+numbers = [10, 20, 12]
+
+text_parts = []
+
+for nr in numbers:
+    text_parts.append(str(nr))
+
+text = " + ".join(text_parts)
+
+print(f"text_parts: {text_parts!r}")
+print(f"text:       {text}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text_parts: ['10', '20', '12']
+text:       10 + 20 + 12
+\end{verbatim}
+
+Splitting and joining are central because they move between:
+
+\begin{itemize}
+    \item one text sequence;
+    \item a list of text components;
+    \item another text sequence built from those components.
+\end{itemize}
+
+\begin{verbatim}
+line = "jerry;elaine;george;kramer"
+
+parts = line.split(";")
+pretty = " / ".join(parts)
+
+print(f"line:   {line!r}")
+print(f"parts:  {parts!r}")
+print(f"pretty: {pretty!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line:   'jerry;elaine;george;kramer'
+parts:  ['jerry', 'elaine', 'george', 'kramer']
+pretty: 'jerry / elaine / george / kramer'
+\end{verbatim}
+
+\subsubsection{Replacement and Case Transformation: \texttt{.replace()}, \texttt{.lower()}, \texttt{.upper()}, and \texttt{.casefold()}}
+
+The method \texttt{.replace()} creates a new string where occurrences of one substring are replaced with another substring.
+
+\begin{verbatim}
+text = "yada yada yada"
+
+new_text = text.replace("yada", "blah")
+
+print(f"text:     {text!r}")
+print(f"new_text: {new_text!r}")
+
+print()
+print(f"text id:     {id(text)}")
+print(f"new_text id: {id(new_text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:     'yada yada yada'
+new_text: 'blah blah blah'
+
+text id:     140225874656944
+new_text id: 140225874657392
+\end{verbatim}
+
+The original string is unchanged.
+
+\begin{verbatim}
+text = "D'oh! D'oh! D'oh!"
+
+once = text.replace("D'oh", "Woohoo", 1)
+twice = text.replace("D'oh", "Woohoo", 2)
+all_items = text.replace("D'oh", "Woohoo")
+
+print(f"once:      {once!r}")
+print(f"twice:     {twice!r}")
+print(f"all_items: {all_items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+once:      "Woohoo! D'oh! D'oh!"
+twice:     "Woohoo! Woohoo! D'oh!"
+all_items: "Woohoo! Woohoo! Woohoo!"
+\end{verbatim}
+
+The optional third argument limits the number of replacements.
+
+Case transformation methods also return new strings.
+
+\begin{verbatim}
+text = "No Soup For You!"
+
+lower_text = text.lower()
+upper_text = text.upper()
+
+print(f"text:       {text!r}")
+print(f"lower_text: {lower_text!r}")
+print(f"upper_text: {upper_text!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:       'No Soup For You!'
+lower_text: 'no soup for you!'
+upper_text: 'NO SOUP FOR YOU!'
+\end{verbatim}
+
+These are useful for normalization before comparison.
+
+\begin{verbatim}
+answer = "YES"
+
+print(f"answer == 'yes':         {answer == 'yes'}")
+print(f"answer.lower() == 'yes': {answer.lower() == 'yes'}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer == 'yes':         False
+answer.lower() == 'yes': True
+\end{verbatim}
+
+The method \texttt{.casefold()} is a stronger case-normalization method intended for caseless text comparison.
+
+\begin{verbatim}
+word1 = "straße"
+word2 = "STRASSE"
+
+print(f"word1.lower():    {word1.lower()!r}")
+print(f"word2.lower():    {word2.lower()!r}")
+print(f"lower same:       {word1.lower() == word2.lower()}")
+
+print()
+print(f"word1.casefold(): {word1.casefold()!r}")
+print(f"word2.casefold(): {word2.casefold()!r}")
+print(f"casefold same:    {word1.casefold() == word2.casefold()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+word1.lower():    'straße'
+word2.lower():    'strasse'
+lower same:       False
+
+word1.casefold(): 'strasse'
+word2.casefold(): 'strasse'
+casefold same:    True
+\end{verbatim}
+
+For simple English text, \texttt{.lower()} is often enough. For broader Unicode text comparison, \texttt{.casefold()} is usually the better tool.
+
+A final example combines several operations in a normal cleaning pipeline.
+
+\begin{verbatim}
+line = "  These Pretzels Are Making Me Thirsty!  "
+
+clean = line.strip()
+clean = clean.lower()
+clean = clean.replace("pretzels", "bagels")
+
+print(f"line:  {line!r}")
+print(f"clean: {clean!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+line:  '  These Pretzels Are Making Me Thirsty!  '
+clean: 'these bagels are making me thirsty!'
+\end{verbatim}
+
+The method \texttt{.strip()} removes leading and trailing whitespace. It is included here only because it commonly appears next to replacement and case normalization in real text-processing code.
+
+The practical rule is:
+
+\begin{quote}
+String methods return new string values. Searching reads the string, splitting converts text into pieces, joining builds text from pieces, replacement creates modified text, and case conversion creates normalized text.
+\end{quote}

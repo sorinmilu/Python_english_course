@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Capturing Exception Objects with except SomeError as e",
+  "label": "exc08",
+  "linenos": true,
+  "input": null,
+  "output": "    '10' ->  10\n'twenty' -> conversion failed\nerror type: <class 'ValueError'>\nerror args: (\"invalid literal for int() with base 10: 'twenty'\",)\n    '42' ->  42",
+  "file": "main.py"
+}

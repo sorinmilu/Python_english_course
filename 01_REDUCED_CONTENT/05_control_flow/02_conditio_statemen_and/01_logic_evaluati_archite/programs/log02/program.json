@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \\_\\_boo...",
+  "label": "log02",
+  "linenos": true,
+  "input": null,
+  "output": "false by truth-value testing\nactual object present",
+  "file": "main.py"
+}

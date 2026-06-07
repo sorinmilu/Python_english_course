@@ -1,0 +1,1055 @@
+\subsection{Variadic Keyword Parameters}
+
+A variadic keyword parameter collects keyword arguments that were not bound to ordinary named parameters. The syntax uses two stars in the function definition:
+
+\begin{verbatim}
+def func(**kwargs):
+    ...
+\end{verbatim}
+
+The name \texttt{kwargs} is only a convention. The two stars are the important syntax. Python programmers usually use \texttt{kwargs} because it means ``keyword arguments collected here.''
+
+The collected object is a normal dictionary.
+
+\subsubsection{Argument Packing Mechanics: Collecting Keyword Overflow into \texttt{**kwargs}}
+
+A function can collect arbitrary keyword arguments using \texttt{**kwargs}.
+
+\begin{verbatim}
+def show_kwargs(**kwargs):
+    print(f"kwargs:       {kwargs}")
+    print(f"type(kwargs): {type(kwargs)}")
+
+show_kwargs(name="Homer", score=42, mood="hungry")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+kwargs:       {'name': 'Homer', 'score': 42, 'mood': 'hungry'}
+type(kwargs): <class 'dict'>
+\end{verbatim}
+
+The call supplied three keyword arguments. The function definition had one variadic keyword parameter. Python packed the keyword names and their argument objects into one dictionary.
+
+The binding shape is:
+
+\begin{verbatim}
+show_kwargs(name="Homer", score=42, mood="hungry")
+
+inside function frame:
+    kwargs -> {
+        "name": "Homer",
+        "score": 42,
+        "mood": "hungry"
+    }
+\end{verbatim}
+
+The dictionary is a normal dictionary object.
+
+\begin{verbatim}
+def show_kwargs(**kwargs):
+    print(f"type(kwargs): {type(kwargs)}")
+    print()
+
+    selected_names = [
+        "keys",
+        "values",
+        "items",
+        "get",
+        "update",
+        "__getitem__",
+        "__setitem__",
+    ]
+
+    for name in selected_names:
+        print(f"{name:<14} {name in dir(kwargs)}")
+
+    print()
+    print(f"keys:              {list(kwargs.keys())}")
+    print(f"items:             {list(kwargs.items())}")
+    print(f"kwargs.get('score'): {kwargs.get('score')}")
+
+show_kwargs(name="Homer", score=42, mood="hungry")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(kwargs): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+update         True
+__getitem__    True
+__setitem__    True
+
+keys:              ['name', 'score', 'mood']
+items:             [('name', 'Homer'), ('score', 42), ('mood', 'hungry')]
+kwargs.get('score'): 42
+\end{verbatim}
+
+Unlike \texttt{*args}, which creates a tuple, \texttt{**kwargs} creates a dictionary. The keys are the keyword names. The values are the objects supplied by the caller.
+
+A function can combine ordinary parameters with \texttt{**kwargs}.
+
+\begin{verbatim}
+def show_report(title, **options):
+    print(f"title:   {title!r}")
+    print(f"options: {options}")
+    print(f"type(options): {type(options)}")
+
+show_report(
+    "Springfield report",
+    score=42,
+    mood="calm",
+    quote="D'oh!",
+)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+title:   'Springfield report'
+options: {'score': 42, 'mood': 'calm', 'quote': "D'oh!"}
+type(options): <class 'dict'>
+\end{verbatim}
+
+The keyword \texttt{title} is bound to the ordinary parameter \texttt{title}. The other keyword arguments are collected into \texttt{options}.
+
+The binding shape is:
+
+\begin{verbatim}
+title   -> "Springfield report"
+options -> {
+    "score": 42,
+    "mood": "calm",
+    "quote": "D'oh!"
+}
+\end{verbatim}
+
+If there is no keyword overflow, Python creates an empty dictionary.
+
+\begin{verbatim}
+def show_report(title, **options):
+    print(f"title:        {title!r}")
+    print(f"options:      {options}")
+    print(f"type(options): {type(options)}")
+    print(f"len(options):  {len(options)}")
+
+show_report("Empty report")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+title:        'Empty report'
+options:      {}
+type(options): <class 'dict'>
+len(options):  0
+\end{verbatim}
+
+An empty \texttt{**kwargs} value is not \texttt{None}. It is an empty dictionary.
+
+The parameter name does not have to be \texttt{kwargs}.
+
+\begin{verbatim}
+def show_settings(**settings):
+    print(f"settings:       {settings}")
+    print(f"type(settings): {type(settings)}")
+
+show_settings(theme="light", font_size=14, answer=42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+settings:       {'theme': 'light', 'font_size': 14, 'answer': 42}
+type(settings): <class 'dict'>
+\end{verbatim}
+
+The two stars make the parameter variadic. The name only chooses the local name inside the function frame.
+
+The standard \texttt{inspect} module shows this parameter kind explicitly.
+
+\begin{verbatim}
+import inspect
+
+def show_report(title, **options):
+    print(title, options)
+
+sig = inspect.signature(show_report)
+
+print(f"signature: {sig}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<8} kind={param.kind}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (title, **options)
+
+title    kind=POSITIONAL_OR_KEYWORD
+options  kind=VAR_KEYWORD
+\end{verbatim}
+
+The \texttt{VAR\_KEYWORD} kind means that the parameter collects keyword overflow.
+
+A function can have both \texttt{*args} and \texttt{**kwargs}.
+
+\begin{verbatim}
+def show_call(*args, **kwargs):
+    print(f"args:       {args}")
+    print(f"type(args): {type(args)}")
+    print()
+    print(f"kwargs:       {kwargs}")
+    print(f"type(kwargs): {type(kwargs)}")
+
+show_call("Homer", "Bart", score=42, mood="restless")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+args:       ('Homer', 'Bart')
+type(args): <class 'tuple'>
+
+kwargs:       {'score': 42, 'mood': 'restless'}
+type(kwargs): <class 'dict'>
+\end{verbatim}
+
+The positional overflow goes into the tuple. The keyword overflow goes into the dictionary.
+
+The binding shape is:
+
+\begin{verbatim}
+args   -> ("Homer", "Bart")
+kwargs -> {
+    "score": 42,
+    "mood": "restless"
+}
+\end{verbatim}
+
+The order in the function definition matters. A typical flexible function has this shape:
+
+\begin{verbatim}
+def func(required, *args, named=default, **kwargs):
+    ...
+\end{verbatim}
+
+The meaning is:
+
+\begin{itemize}
+    \item ordinary parameters receive explicitly declared arguments;
+    \item \texttt{*args} receives extra positional arguments;
+    \item keyword-only parameters receive explicitly named arguments after \texttt{*args};
+    \item \texttt{**kwargs} receives extra keyword arguments.
+\end{itemize}
+
+Here is a small inspection example.
+
+\begin{verbatim}
+import inspect
+
+def demo(a, b=42, *args, mode="calm", **kwargs):
+    print(a, b, args, mode, kwargs)
+
+sig = inspect.signature(demo)
+
+print(f"signature: {sig}")
+print()
+
+for name, param in sig.parameters.items():
+    print(f"{name:<8} kind={param.kind} default={param.default}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+signature: (a, b=42, *args, mode='calm', **kwargs)
+
+a        kind=POSITIONAL_OR_KEYWORD default=<class 'inspect._empty'>
+b        kind=POSITIONAL_OR_KEYWORD default=42
+args     kind=VAR_POSITIONAL default=<class 'inspect._empty'>
+mode     kind=KEYWORD_ONLY default=calm
+kwargs   kind=VAR_KEYWORD default=<class 'inspect._empty'>
+\end{verbatim}
+
+This signature says exactly how the entrance into the function frame is constructed.
+
+\subsubsection{Argument Unpacking Operations: Expanding Mappings Across Function Call Boundaries with \texttt{**}}
+
+The double star has a second use at the call site. In a function definition, \texttt{**kwargs} packs keyword overflow into a dictionary. In a function call, \texttt{**some\_mapping} unpacks a mapping into separate keyword arguments.
+
+These are opposite directions:
+
+\begin{verbatim}
+definition side:
+    def func(**kwargs):
+        pack keyword overflow into one dictionary
+
+call side:
+    func(**mapping)
+        unpack one mapping into many keyword arguments
+\end{verbatim}
+
+Start with a normal function.
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+    print(f"mood={mood!r}")
+
+data = {
+    "name": "Homer",
+    "score": 42,
+    "mood": "hungry",
+}
+
+show_line(**data)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+mood='hungry'
+\end{verbatim}
+
+The call:
+
+\begin{verbatim}
+show_line(**data)
+\end{verbatim}
+
+means:
+
+\begin{verbatim}
+take key-value pairs from data
+send them as separate keyword arguments
+\end{verbatim}
+
+So this:
+
+\begin{verbatim}
+show_line(**data)
+\end{verbatim}
+
+is equivalent to:
+
+\begin{verbatim}
+show_line(name=data["name"], score=data["score"], mood=data["mood"])
+\end{verbatim}
+
+for this specific dictionary.
+
+The dictionary object can be inspected before unpacking.
+
+\begin{verbatim}
+data = {
+    "name": "Homer",
+    "score": 42,
+    "mood": "hungry",
+}
+
+print(f"type(data): {type(data)}")
+print()
+
+selected_names = [
+    "keys",
+    "values",
+    "items",
+    "get",
+    "__iter__",
+    "__getitem__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(data)}")
+
+print()
+print(f"keys:      {list(data.keys())}")
+print(f"items:     {list(data.items())}")
+print(f"name:      {data['name']!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(data): <class 'dict'>
+
+keys           True
+values         True
+items          True
+get            True
+__iter__       True
+__getitem__    True
+
+keys:      ['name', 'score', 'mood']
+items:     [('name', 'Homer'), ('score', 42), ('mood', 'hungry')]
+name:      'Homer'
+\end{verbatim}
+
+The unpacking operation uses the mapping keys as keyword names.
+
+If a required key is missing, normal argument binding fails.
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+    print(f"mood={mood!r}")
+
+data = {
+    "name": "Homer",
+    "score": 42,
+}
+
+try:
+    show_line(**data)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() missing 1 required positional argument: 'mood'
+\end{verbatim}
+
+The mapping did not provide a value for \texttt{mood}.
+
+If the mapping contains an unknown keyword and the function has no \texttt{**kwargs} receiver, binding also fails.
+
+\begin{verbatim}
+def show_line(name, score):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+data = {
+    "name": "Homer",
+    "score": 42,
+    "mood": "hungry",
+}
+
+try:
+    show_line(**data)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    show_line() got an unexpected keyword argument 'mood'
+\end{verbatim}
+
+If the function has a \texttt{**kwargs} receiver, the unknown keyword can be collected.
+
+\begin{verbatim}
+def show_line(name, score, **extra):
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+    print(f"extra={extra}")
+
+data = {
+    "name": "Homer",
+    "score": 42,
+    "mood": "hungry",
+}
+
+show_line(**data)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+extra={'mood': 'hungry'}
+\end{verbatim}
+
+The keyword names from the mapping first try to bind to declared parameters. The leftover keyword names are packed into the variadic keyword dictionary.
+
+The keys used by \texttt{**} must be strings.
+
+\begin{verbatim}
+def show_all(**kwargs):
+    print(kwargs)
+
+data = {
+    "name": "Homer",
+    42: "answer",
+}
+
+try:
+    show_all(**data)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    keywords must be strings
+\end{verbatim}
+
+The double-star call syntax creates keyword arguments, and keyword names must be strings.
+
+Several mappings can be unpacked in one call, but duplicate keyword names are not allowed in a function call.
+
+\begin{verbatim}
+def show_all(**kwargs):
+    print(kwargs)
+
+first = {"name": "Homer", "score": 42}
+second = {"mood": "hungry"}
+
+show_all(**first, **second)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+{'name': 'Homer', 'score': 42, 'mood': 'hungry'}
+\end{verbatim}
+
+This works because the keys are distinct.
+
+Duplicate keys fail at call binding time.
+
+\begin{verbatim}
+def show_all(**kwargs):
+    print(kwargs)
+
+first = {"name": "Homer", "score": 42}
+second = {"score": 100, "mood": "focused"}
+
+try:
+    show_all(**first, **second)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    __main__.show_all() got multiple values for keyword argument 'score'
+\end{verbatim}
+
+The exact module name may differ. The rule is stable: a function call cannot receive the same keyword name twice.
+
+This is different from dictionary merging, where later values can overwrite earlier values.
+
+\begin{verbatim}
+first = {"name": "Homer", "score": 42}
+second = {"score": 100, "mood": "focused"}
+
+merged = {**first, **second}
+
+print(f"merged: {merged}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+merged: {'name': 'Homer', 'score': 100, 'mood': 'focused'}
+\end{verbatim}
+
+Inside a dictionary display, duplicate keys are resolved by the resulting dictionary construction. In a function call, duplicate keyword arguments are rejected because a parameter cannot receive two values.
+
+The double-star unpacking operation does not copy the contained objects. It passes references to the same objects.
+
+\begin{verbatim}
+def mutate_option(**kwargs):
+    items = kwargs["items"]
+    items.append("No soup for you!")
+
+quotes = ["D'oh!"]
+
+data = {
+    "items": quotes,
+}
+
+print("before")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+print()
+
+mutate_option(**data)
+
+print("after")
+print(f"quotes:     {quotes}")
+print(f"id(quotes): {id(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+quotes:     ["D'oh!"]
+id(quotes): 2292527068032
+
+after
+quotes:     ["D'oh!", 'No soup for you!']
+id(quotes): 2292527068032
+\end{verbatim}
+
+The dictionary \texttt{kwargs} inside the function is newly created for the call, but the value stored under \texttt{"items"} is a reference to the same list object. Mutating that list is visible outside the function.
+
+\subsubsection{Key-Value Parameter Extraction, Mapping Lookups, and Safe Override Patterns}
+
+A \texttt{**kwargs} dictionary is often used for optional named settings. The function can look up keys, provide defaults, reject unknown options, or forward options to another function.
+
+The simplest lookup uses square brackets.
+
+\begin{verbatim}
+def show_required(**kwargs):
+    name = kwargs["name"]
+    score = kwargs["score"]
+
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+show_required(name="Homer", score=42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name='Homer'
+score=42
+\end{verbatim}
+
+Square-bracket lookup requires the key to exist. If it does not exist, Python raises \texttt{KeyError}.
+
+\begin{verbatim}
+def show_required(**kwargs):
+    name = kwargs["name"]
+    score = kwargs["score"]
+
+    print(f"name={name!r}")
+    print(f"score={score!r}")
+
+try:
+    show_required(name="Homer")
+except KeyError as err:
+    print(f"error type: {type(err)}")
+    print(f"missing key: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'KeyError'>
+missing key: 'score'
+\end{verbatim}
+
+The safer lookup method for optional keys is \texttt{get()}.
+
+\begin{verbatim}
+def show_optional(**kwargs):
+    name = kwargs.get("name", "unknown")
+    score = kwargs.get("score", 42)
+    mood = kwargs.get("mood", "calm")
+
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+show_optional(name="Homer")
+show_optional(name="Lisa", score=100, mood="focused")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+Lisa       score=0100 mood=focused
+\end{verbatim}
+
+The method call:
+
+\begin{verbatim}
+kwargs.get("score", 42)
+\end{verbatim}
+
+means:
+
+\begin{verbatim}
+if "score" exists:
+    return kwargs["score"]
+else:
+    return 42
+\end{verbatim}
+
+For required-but-manual validation, check membership explicitly.
+
+\begin{verbatim}
+def show_checked(**kwargs):
+    if "name" not in kwargs:
+        raise ValueError("missing required option: name")
+
+    name = kwargs["name"]
+    score = kwargs.get("score", 42)
+
+    print(f"{name:<10} score={score:04d}")
+
+show_checked(name="Homer")
+
+try:
+    show_checked(score=100)
+except ValueError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042
+error type: <class 'ValueError'>
+message:    missing required option: name
+\end{verbatim}
+
+This kind of check is clearer than allowing a low-level \texttt{KeyError} when the missing key is part of the function's public call contract.
+
+A function can also reject unknown keys.
+
+\begin{verbatim}
+def show_limited(**kwargs):
+    allowed = {"name", "score", "mood"}
+
+    for key in kwargs:
+        if key not in allowed:
+            raise ValueError(f"unknown option: {key}")
+
+    name = kwargs.get("name", "unknown")
+    score = kwargs.get("score", 42)
+    mood = kwargs.get("mood", "calm")
+
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+show_limited(name="Homer", score=42)
+
+try:
+    show_limited(name="Bart", snack="donut")
+except ValueError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+error type: <class 'ValueError'>
+message:    unknown option: snack
+\end{verbatim}
+
+The set object used for allowed keys is also an ordinary object.
+
+\begin{verbatim}
+allowed = {"name", "score", "mood"}
+
+print(f"type(allowed): {type(allowed)}")
+print()
+
+selected_names = [
+    "add",
+    "remove",
+    "discard",
+    "union",
+    "__contains__",
+    "__iter__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(allowed)}")
+
+print()
+print(f"'score' in allowed: { 'score' in allowed }")
+print(f"'snack' in allowed: { 'snack' in allowed }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(allowed): <class 'set'>
+
+add            True
+remove         True
+discard        True
+union          True
+__contains__   True
+__iter__       True
+
+'score' in allowed: True
+'snack' in allowed: False
+\end{verbatim}
+
+A set is useful here because membership checks are direct and readable.
+
+When extracting options from \texttt{kwargs}, \texttt{pop()} is useful if the function wants to consume recognized options and then check whether anything unknown remains.
+
+\begin{verbatim}
+def show_consumed(**kwargs):
+    name = kwargs.pop("name", "unknown")
+    score = kwargs.pop("score", 42)
+    mood = kwargs.pop("mood", "calm")
+
+    if kwargs:
+        raise ValueError(f"unknown options: {list(kwargs.keys())}")
+
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+show_consumed(name="Homer", score=42)
+
+try:
+    show_consumed(name="Bart", snack="donut", town="Springfield")
+except ValueError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Homer      score=0042 mood=calm
+error type: <class 'ValueError'>
+message:    unknown options: ['snack', 'town']
+\end{verbatim}
+
+This mutates the local \texttt{kwargs} dictionary. That is usually safe because \texttt{kwargs} is a fresh dictionary created for the current function call.
+
+However, if the function receives an ordinary dictionary as a normal parameter, mutating it directly would mutate the caller's dictionary. In that case, make a shallow copy first if the caller's mapping should be preserved.
+
+\begin{verbatim}
+def consume_mapping(options):
+    local_options = dict(options)
+
+    name = local_options.pop("name", "unknown")
+    score = local_options.pop("score", 42)
+
+    print(f"name={name!r}, score={score}")
+    print(f"remaining local_options: {local_options}")
+
+settings = {
+    "name": "Homer",
+    "score": 42,
+    "mood": "hungry",
+}
+
+print("before")
+print(f"settings: {settings}")
+print()
+
+consume_mapping(settings)
+
+print()
+print("after")
+print(f"settings: {settings}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+settings: {'name': 'Homer', 'score': 42, 'mood': 'hungry'}
+
+name='Homer', score=42
+remaining local_options: {'mood': 'hungry'}
+
+after
+settings: {'name': 'Homer', 'score': 42, 'mood': 'hungry'}
+\end{verbatim}
+
+The expression:
+
+\begin{verbatim}
+local_options = dict(options)
+\end{verbatim}
+
+creates a new dictionary containing the same key-value references. The dictionary container is new. The contained objects are not deeply copied.
+
+A common safe override pattern is to build a new options dictionary before calling another function.
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+defaults = {
+    "name": "unknown",
+    "score": 42,
+    "mood": "calm",
+}
+
+user_options = {
+    "name": "Lisa",
+    "score": 100,
+}
+
+final_options = {
+    **defaults,
+    **user_options,
+}
+
+print(f"final_options: {final_options}")
+show_line(**final_options)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+final_options: {'name': 'Lisa', 'score': 100, 'mood': 'calm'}
+Lisa       score=0100 mood=calm
+\end{verbatim}
+
+The dictionary construction:
+
+\begin{verbatim}
+final_options = {
+    **defaults,
+    **user_options,
+}
+\end{verbatim}
+
+means:
+
+\begin{verbatim}
+start with defaults
+then apply user_options on top
+if the same key appears twice, the later value wins
+\end{verbatim}
+
+This avoids duplicate keyword errors in the function call because the merging happened before the call. The function receives each keyword only once.
+
+This is unsafe:
+
+\begin{verbatim}
+def show_line(name, score, mood):
+    print(f"{name:<10} score={score:04d} mood={mood}")
+
+defaults = {
+    "name": "unknown",
+    "score": 42,
+    "mood": "calm",
+}
+
+user_options = {
+    "name": "Lisa",
+    "score": 100,
+}
+
+try:
+    show_line(**defaults, **user_options)
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+error type: <class 'TypeError'>
+message:    __main__.show_line() got multiple values for keyword argument 'name'
+\end{verbatim}
+
+The call attempts to pass \texttt{name} twice and \texttt{score} twice. Python rejects that.
+
+This is safe:
+
+\begin{verbatim}
+final_options = {**defaults, **user_options}
+show_line(**final_options)
+\end{verbatim}
+
+Now the duplicate keys have already been resolved by dictionary construction.
+
+For forwarding options, a function can separate what it consumes from what it forwards.
+
+\begin{verbatim}
+def render_text(text, *, uppercase=False, **style):
+    if uppercase:
+        text = text.upper()
+
+    print(f"text:  {text}")
+    print(f"style: {style}")
+
+render_text(
+    "No soup for you!",
+    uppercase=True,
+    font="serif",
+    size=14,
+    answer=42,
+)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:  NO SOUP FOR YOU!
+style: {'font': 'serif', 'size': 14, 'answer': 42}
+\end{verbatim}
+
+The keyword-only parameter \texttt{uppercase} is consumed by the function directly. The remaining keyword arguments are collected into \texttt{style}.
+
+A more explicit forwarding example:
+
+\begin{verbatim}
+def final_display(text, **style):
+    print(f"text:  {text}")
+    print(f"style: {style}")
+
+def display_quote(text, **options):
+    uppercase = options.pop("uppercase", False)
+
+    if uppercase:
+        text = text.upper()
+
+    final_display(text, **options)
+
+display_quote(
+    "It is only a model.",
+    uppercase=True,
+    font="mono",
+    size=12,
+)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:  IT IS ONLY A MODEL.
+style: {'font': 'mono', 'size': 12}
+\end{verbatim}
+
+Here, \texttt{display\_quote()} consumes \texttt{uppercase} and forwards the remaining options to \texttt{final\_display()}.
+
+The safe structure is:
+
+\begin{verbatim}
+1. receive **options
+2. extract options that belong to the current function
+3. validate or reject unknown options if necessary
+4. forward only the remaining dictionary with **options
+\end{verbatim}
+
+The important rule is:
+
+\begin{quote}
+\texttt{**kwargs} packs keyword overflow into a dictionary. \texttt{**mapping} at the call site unpacks a mapping into keyword arguments. Dictionary merging can resolve overrides before a call; function-call binding itself rejects duplicate keyword names.
+\end{quote}

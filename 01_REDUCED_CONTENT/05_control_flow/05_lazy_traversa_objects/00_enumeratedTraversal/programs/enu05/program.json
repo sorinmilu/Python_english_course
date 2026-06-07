@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "enumerate() as a Lazy Pair Generator for Index-Value Iteration",
+  "label": "enu05",
+  "linenos": true,
+  "input": null,
+  "output": "type(names): <class 'list'>\ntype(pairs): <class 'enumerate'>\ndir(pairs) sample: ['__class__', '__class_getitem__', '__delattr__',\n'__dir__', '__doc__', '__eq__', '__format__', '__ge__',\n'__getattribute__', '__getstate__', '__gt__', '__hash__']\nhas __iter__: True\nhas __next__: True",
+  "file": "main.py"
+}

@@ -1,0 +1,611 @@
+\subsection{The Integer Representation Architecture (\texttt{int})}
+
+Python's \texttt{int} type represents whole numbers: negative integers, zero, and positive integers. Unlike a typical C \texttt{int}, Python's \texttt{int} is not a fixed-width storage cell such as 32 bits or 64 bits. It is a runtime object that can grow as needed.
+
+A first inspection:
+
+\begin{verbatim}
+answer = 42
+
+print(f"value: {answer}")
+print(f"type:  {type(answer)}")
+print(f"id:    {id(answer)}")
+
+print()
+print("selected int methods:")
+print(f"{'bit_length':<18} {'bit_length' in dir(answer)}")
+print(f"{'bit_count':<18} {'bit_count' in dir(answer)}")
+print(f"{'to_bytes':<18} {'to_bytes' in dir(answer)}")
+print(f"{'__add__':<18} {'__add__' in dir(answer)}")
+print(f"{'__mul__':<18} {'__mul__' in dir(answer)}")
+
+print()
+print(f"bit_length(): {answer.bit_length()}")
+print(f"bit_count():  {answer.bit_count()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: 42
+type:  <class 'int'>
+id:    140734432946520
+
+selected int methods:
+bit_length         True
+bit_count          True
+to_bytes           True
+__add__            True
+__mul__            True
+
+bit_length(): 6
+bit_count():  3
+\end{verbatim}
+
+The method \texttt{bit\_length()} reports how many binary digits are needed to represent the magnitude of the integer. The method \texttt{bit\_count()} reports how many binary \texttt{1} bits appear in the integer's absolute value.
+
+For example, \texttt{42} is \texttt{101010} in base two. That takes six bits and contains three \texttt{1} bits.
+
+\begin{verbatim}
+number = 42
+
+print(f"decimal: {number}")
+print(f"binary:  {bin(number)}")
+print(f"bits needed: {number.bit_length()}")
+print(f"one bits:    {number.bit_count()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+decimal: 42
+binary:  0b101010
+bits needed: 6
+one bits:    3
+\end{verbatim}
+
+This is already different from C thinking. In C, asking how many bits are needed for the value is not the same as asking how many bits the variable has. A C \texttt{int} may occupy 32 bits even when it stores the small value \texttt{42}. In Python, the integer object has a representation that scales with the value.
+
+\subsubsection{Arbitrary-Precision Math Engine: Eliminating Fixed-Width Integer Overflow Boundaries}
+
+In many C programs, integer arithmetic is constrained by the width of the selected integer type. A signed 32-bit integer has a maximum positive value of \texttt{2147483647}. Adding past that boundary does not produce a larger mathematical integer inside the same type.
+
+Python's \texttt{int} does not behave like that. It grows to represent larger whole numbers.
+
+\begin{verbatim}
+small_limit = 2_147_483_647
+bigger_value = small_limit + 1
+
+print(f"small_limit:  {small_limit}")
+print(f"bigger_value: {bigger_value}")
+
+print()
+print(f"type(small_limit):  {type(small_limit)}")
+print(f"type(bigger_value): {type(bigger_value)}")
+
+print()
+print(f"small_limit bits:  {small_limit.bit_length()}")
+print(f"bigger_value bits: {bigger_value.bit_length()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+small_limit:  2147483647
+bigger_value: 2147483648
+
+type(small_limit):  <class 'int'>
+type(bigger_value): <class 'int'>
+
+small_limit bits:  31
+bigger_value bits: 32
+\end{verbatim}
+
+The value passes the usual signed 32-bit positive boundary, but the type remains \texttt{int}. Python does not silently wrap the value back into a negative number.
+
+A much larger example:
+
+\begin{verbatim}
+huge_number = 2 ** 200
+
+print(f"huge_number: {huge_number}")
+print(f"type:        {type(huge_number)}")
+print(f"bit length:  {huge_number.bit_length()}")
+print(f"decimal digits: {len(str(huge_number))}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+huge_number: 1606938044258990275541962092341162602522202993782792835301376
+type:        <class 'int'>
+bit length:  201
+decimal digits: 61
+\end{verbatim}
+
+The expression \texttt{2 ** 200} produces a normal Python integer object. It is not a separate ``big integer'' type at the Python level. In Python 3, small integers and enormous integers both have type \texttt{int}.
+
+\begin{verbatim}
+small = 42
+large = 10 ** 100
+
+print(f"small type: {type(small)}")
+print(f"large type: {type(large)}")
+
+print()
+print(f"small bit length: {small.bit_length()}")
+print(f"large bit length: {large.bit_length()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+small type: <class 'int'>
+large type: <class 'int'>
+
+small bit length: 6
+large bit length: 333
+\end{verbatim}
+
+This does not mean that large integers are free. It means that the boundary is not the fixed width of a C integer type. The practical boundaries become memory, time, and interpreter implementation limits.
+
+A simple multiplication test:
+
+\begin{verbatim}
+left = 10 ** 50
+right = 10 ** 50
+product = left * right
+
+print(f"left:    {left}")
+print(f"right:   {right}")
+print(f"product: {product}")
+
+print()
+print(f"type(product): {type(product)}")
+print(f"product bit length: {product.bit_length()}")
+print(f"product decimal digits: {len(str(product))}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+left:    100000000000000000000000000000000000000000000000000
+right:   100000000000000000000000000000000000000000000000000
+product: 10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+type(product): <class 'int'>
+product bit length: 333
+product decimal digits: 101
+\end{verbatim}
+
+The result is still exact. This is one of the major practical advantages of Python integers: whole-number arithmetic does not accidentally lose precision merely because the value crosses 32-bit or 64-bit range.
+
+However, exact does not mean physically unlimited. This program asks for a very large integer object:
+
+\begin{verbatim}
+big = 2 ** 10_000
+
+print(f"type(big): {type(big)}")
+print(f"bit length: {big.bit_length()}")
+print(f"decimal digits: {len(str(big))}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(big): <class 'int'>
+bit length: 10001
+decimal digits: 3011
+\end{verbatim}
+
+The interpreter can represent this value, but it must allocate memory for it and spend time operating on it. Python removes the ordinary fixed-width overflow boundary; it does not remove the cost of large arithmetic.
+
+\subsubsection{Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation for High-Magnitude Values}
+
+At the Python-language level, the rule is simple: \texttt{int} supports arbitrary precision. At the CPython implementation level, a Python integer is represented internally using a variable-size structure.
+
+CPython does not store a huge integer as one impossible machine word. It stores the integer's magnitude across several internal chunks. These chunks are often called digits in the CPython source code, but they are not decimal digits. They are base-\(2^n\) chunks used by the implementation.
+
+Python exposes some of this implementation information through \texttt{sys.int\_info}.
+
+\begin{verbatim}
+import sys
+
+print(sys.int_info)
+print()
+print(f"type(sys.int_info): {type(sys.int_info)}")
+
+print()
+print(f"bits per internal digit: {sys.int_info.bits_per_digit}")
+print(f"size of internal digit:  {sys.int_info.sizeof_digit} bytes")
+\end{verbatim}
+
+Possible output on a common 64-bit CPython build:
+
+\begin{verbatim}
+sys.int_info(bits_per_digit=30, sizeof_digit=4, default_max_str_digits=4300, str_digits_check_threshold=640)
+
+type(sys.int_info): <class 'sys.int_info'>
+
+bits per internal digit: 30
+size of internal digit:  4 bytes
+\end{verbatim}
+
+The exact values are implementation details, but the idea is stable for CPython: larger integers require more internal integer digits.
+
+A useful analogy is not a C scalar variable but an expandable sequence of number chunks:
+
+\begin{verbatim}
+small integer:
+    one or very few internal chunks
+
+large integer:
+    many internal chunks
+\end{verbatim}
+
+We can observe the growth indirectly with \texttt{bit\_length()} and \texttt{sys.getsizeof()}.
+
+\begin{verbatim}
+import sys
+
+numbers = [
+    0,
+    42,
+    2 ** 30 - 1,
+    2 ** 30,
+    2 ** 60,
+    2 ** 120,
+    2 ** 240,
+]
+
+print(f"{'value expression':<16} {'bits':>6} {'bytes':>6}")
+print("-" * 32)
+
+for number in numbers:
+    if number == 0:
+        label = "0"
+    else:
+        label = f"2**{number.bit_length() - 1}"
+
+    print(f"{label:<16} {number.bit_length():>6} {sys.getsizeof(number):>6}")
+\end{verbatim}
+
+Possible output on one CPython build:
+
+\begin{verbatim}
+value expression    bits  bytes
+--------------------------------
+0                      0     28
+2**5                   6     28
+2**29                 30     28
+2**30                 31     32
+2**60                 61     36
+2**120               121     44
+2**240               241     60
+\end{verbatim}
+
+The exact byte counts may differ between builds and Python versions. The pattern is the important part: as the integer needs more bits, the object can require more memory.
+
+This is not the C model:
+
+\begin{verbatim}
+C-like fixed-width intuition:
+    int x;
+    x always has the same storage width
+
+Python int intuition:
+    x is a name
+    x refers to an int object
+    the int object representation can scale with the value
+\end{verbatim}
+
+The name itself is still only a binding. When arithmetic creates a larger result, Python binds the name to a result object capable of representing that value.
+
+\begin{verbatim}
+import sys
+
+value = 42
+
+print("start")
+print(f"value: {value}")
+print(f"bits:  {value.bit_length()}")
+print(f"bytes: {sys.getsizeof(value)}")
+print(f"id:    {id(value)}")
+
+old_id = id(value)
+
+value = value ** 20
+
+print()
+print("after value = value ** 20")
+print(f"value: {value}")
+print(f"bits:  {value.bit_length()}")
+print(f"bytes: {sys.getsizeof(value)}")
+print(f"id:    {id(value)}")
+print(f"same object as before: {id(value) == old_id}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start
+value: 42
+bits:  6
+bytes: 28
+id:    140734432946520
+
+after value = value ** 20
+value: 278218429446951548637196401
+bits:  88
+bytes: 36
+id:    2168389813520
+same object as before: False
+\end{verbatim}
+
+The integer object \texttt{42} was not expanded in place. The expression produced a new integer object. The name \texttt{value} was rebound to that object.
+
+This connects the integer architecture back to assignment:
+
+\begin{quote}
+Python's integer arithmetic creates exact integer result objects. Assignment then binds names to those objects.
+\end{quote}
+
+For teaching purposes, the most useful CPython facts are:
+
+\begin{itemize}
+    \item a Python \texttt{int} is an object, not a raw C \texttt{int};
+    \item its magnitude can require one or more internal digits;
+    \item the number of required internal digits grows with the number's bit length;
+    \item arithmetic results are exact whole-number objects unless another numeric type is introduced;
+    \item the precise internal layout is an implementation detail, not source-level Python syntax.
+\end{itemize}
+
+\subsubsection{Integer Literals: Decimal, Binary, Octal, and Hexadecimal Notation}
+
+An integer literal is a way of writing an integer value directly in source code.
+
+The normal form is decimal:
+
+\begin{verbatim}
+count = 42
+year = 2026
+temperature = -5
+
+print(count)
+print(year)
+print(temperature)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42
+2026
+-5
+\end{verbatim}
+
+The minus sign in \texttt{-5} is not part of the integer literal in the deepest lexical sense. It is a unary operator applied to the integer literal \texttt{5}. This will matter more when operator precedence is discussed later.
+
+Python also supports base-specific integer literal notation:
+
+\begin{itemize}
+    \item decimal: ordinary digits, such as \texttt{42};
+    \item binary: prefix \texttt{0b}, such as \texttt{0b101010};
+    \item octal: prefix \texttt{0o}, such as \texttt{0o52};
+    \item hexadecimal: prefix \texttt{0x}, such as \texttt{0x2a}.
+\end{itemize}
+
+All four examples below create the same integer value:
+
+\begin{verbatim}
+decimal_value = 42
+binary_value = 0b101010
+octal_value = 0o52
+hex_value = 0x2a
+
+print(f"decimal:     {decimal_value}")
+print(f"binary src:  {binary_value}")
+print(f"octal src:   {octal_value}")
+print(f"hex src:     {hex_value}")
+
+print()
+print(f"all equal: {decimal_value == binary_value == octal_value == hex_value}")
+
+print()
+print(f"type(decimal_value): {type(decimal_value)}")
+print(f"type(binary_value):  {type(binary_value)}")
+print(f"type(octal_value):   {type(octal_value)}")
+print(f"type(hex_value):     {type(hex_value)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+decimal:     42
+binary src:  42
+octal src:   42
+hex src:     42
+
+all equal: True
+
+type(decimal_value): <class 'int'>
+type(binary_value):  <class 'int'>
+type(octal_value):   <class 'int'>
+type(hex_value):     <class 'int'>
+\end{verbatim}
+
+The base notation changes how the value is written in source code. It does not create different integer types.
+
+Conceptually:
+
+\begin{verbatim}
+42         -> int object with value 42
+0b101010   -> int object with value 42
+0o52       -> int object with value 42
+0x2a       -> int object with value 42
+\end{verbatim}
+
+Python can also convert an existing integer into string representations in these bases:
+
+\begin{verbatim}
+number = 42
+
+print(f"decimal string:     {str(number)}")
+print(f"binary string:      {bin(number)}")
+print(f"octal string:       {oct(number)}")
+print(f"hexadecimal string: {hex(number)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+decimal string:     42
+binary string:      0b101010
+octal string:       0o52
+hexadecimal string: 0x2a
+\end{verbatim}
+
+The functions \texttt{bin()}, \texttt{oct()}, and \texttt{hex()} return strings, not integers.
+
+\begin{verbatim}
+number = 42
+
+binary_text = bin(number)
+octal_text = oct(number)
+hex_text = hex(number)
+
+print(f"binary_text: {binary_text}")
+print(f"octal_text:  {octal_text}")
+print(f"hex_text:    {hex_text}")
+
+print()
+print(f"type(binary_text): {type(binary_text)}")
+print(f"type(octal_text):  {type(octal_text)}")
+print(f"type(hex_text):    {type(hex_text)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+binary_text: 0b101010
+octal_text:  0o52
+hex_text:    0x2a
+
+type(binary_text): <class 'str'>
+type(octal_text):  <class 'str'>
+type(hex_text):    <class 'str'>
+\end{verbatim}
+
+To parse text as an integer, use \texttt{int()} with a base argument:
+
+\begin{verbatim}
+binary_text = "101010"
+octal_text = "52"
+hex_text = "2a"
+
+from_binary = int(binary_text, 2)
+from_octal = int(octal_text, 8)
+from_hex = int(hex_text, 16)
+
+print(f"from binary: {from_binary}")
+print(f"from octal:  {from_octal}")
+print(f"from hex:    {from_hex}")
+
+print()
+print(f"type(from_binary): {type(from_binary)}")
+print(f"type(from_octal):  {type(from_octal)}")
+print(f"type(from_hex):    {type(from_hex)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+from binary: 42
+from octal:  42
+from hex:    42
+
+type(from_binary): <class 'int'>
+type(from_octal):  <class 'int'>
+type(from_hex):    <class 'int'>
+\end{verbatim}
+
+The prefix may also be included if base \texttt{0} is used. In that mode, Python detects the base from the prefix:
+
+\begin{verbatim}
+texts = ["42", "0b101010", "0o52", "0x2a"]
+
+for text in texts:
+    number = int(text, 0)
+    print(f"{text:<10} -> {number:<3} type={type(number)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42         -> 42  type=<class 'int'>
+0b101010   -> 42  type=<class 'int'>
+0o52       -> 42  type=<class 'int'>
+0x2a       -> 42  type=<class 'int'>
+\end{verbatim}
+
+Integer literals may also use underscores for readability:
+
+\begin{verbatim}
+population = 1_000_000
+mask = 0b1111_0000
+hex_color = 0xff_aa_00
+
+print(f"population: {population}")
+print(f"mask:       {mask}")
+print(f"hex_color:  {hex_color}")
+
+print()
+print(f"type(population): {type(population)}")
+print(f"type(mask):       {type(mask)}")
+print(f"type(hex_color):  {type(hex_color)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+population: 1000000
+mask:       240
+hex_color:  16755200
+
+type(population): <class 'int'>
+type(mask):       <class 'int'>
+type(hex_color):  <class 'int'>
+\end{verbatim}
+
+The underscores are not part of the value. They only make the source code easier to read.
+
+A final compact table:
+
+\begin{verbatim}
+number = 42
+
+print(f"{'form':<14} {'text':<12} {'value':<8} {'type'}")
+print("-" * 50)
+
+print(f"{'decimal':<14} {'42':<12} {42:<8} {type(42)}")
+print(f"{'binary':<14} {'0b101010':<12} {0b101010:<8} {type(0b101010)}")
+print(f"{'octal':<14} {'0o52':<12} {0o52:<8} {type(0o52)}")
+print(f"{'hexadecimal':<14} {'0x2a':<12} {0x2a:<8} {type(0x2a)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+form           text         value    type
+--------------------------------------------------
+decimal        42           42       <class 'int'>
+binary         0b101010     42       <class 'int'>
+octal          0o52         42       <class 'int'>
+hexadecimal    0x2a         42       <class 'int'>
+\end{verbatim}
+
+The practical summary is:
+
+\begin{quote}
+Python's \texttt{int} is an exact whole-number object with arbitrary precision. The source code may write that value in decimal, binary, octal, or hexadecimal notation, but the resulting runtime object is still an \texttt{int}.
+\end{quote}

@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Conditional Expressions: Inline Branch Selection with x if condition else y",
+  "label": "syn02",
+  "linenos": true,
+  "input": null,
+  "output": "status: passing",
+  "file": "main.py"
+}

@@ -1,0 +1,535 @@
+\subsection{Character Interoperability Standards}
+
+Text is not stored by magic. A visible character must be represented by some numeric convention before software can store it, transmit it, compare it, or write it into a file. Python hides much of this complexity during ordinary string use, but it does not remove the boundary. It separates \emph{text} from \emph{bytes}.
+
+This section introduces the external standards that make text exchange possible. We are not yet studying the full CPython string memory layout. That comes later. Here the goal is simpler: understand the difference between characters, character numbers, and byte encodings.
+
+\begin{verbatim}
+text = "Ni!"
+raw = b"Ni!"
+
+print(f"text: {text!r}")
+print(f"raw:  {raw!r}")
+
+print()
+print(f"type(text): {type(text)}")
+print(f"type(raw):  {type(raw)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'Ni!'
+raw:  b'Ni!'
+
+type(text): <class 'str'>
+type(raw):  <class 'bytes'>
+\end{verbatim}
+
+A \texttt{str} object stores text. A \texttt{bytes} object stores integer byte values from \texttt{0} to \texttt{255}. These two objects may look similar when they contain plain English letters, but they do not represent the same conceptual layer.
+
+\begin{verbatim}
+text = "Ni!"
+raw = b"Ni!"
+
+names = ["encode", "decode", "__len__", "__getitem__", "__contains__"]
+
+print("selected attributes")
+print()
+
+for obj_name, obj in [("text", text), ("raw", raw)]:
+    print(f"{obj_name}: {type(obj)}")
+    for name in names:
+        print(f"  {name:<12} {name in dir(obj)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+selected attributes
+
+text: <class 'str'>
+  encode       True
+  decode       False
+  __len__      True
+  __getitem__  True
+  __contains__ True
+
+raw: <class 'bytes'>
+  encode       False
+  decode       True
+  __len__      True
+  __getitem__  True
+  __contains__ True
+\end{verbatim}
+
+The direction is important:
+
+\begin{itemize}
+    \item \texttt{str.encode()} converts text into bytes;
+    \item \texttt{bytes.decode()} converts bytes back into text.
+\end{itemize}
+
+\subsubsection{The Classical Domain: 7-Bit ASCII Codepoints (\texttt{0--127}) and the Later Confusion with 8-Bit Extended Encodings}
+
+ASCII is the old small map that assigns numbers to basic English letters, digits, punctuation marks, and control characters. Classical ASCII uses only seven bits, so it contains values from \texttt{0} to \texttt{127}.
+
+The function \texttt{ord()} returns the numeric codepoint of a one-character string. The function \texttt{chr()} performs the reverse operation.
+
+\begin{verbatim}
+chars = ["A", "B", "a", "0", "!", " "]
+
+for ch in chars:
+    nr = ord(ch)
+    back = chr(nr)
+    print(f"ch={ch!r:<4} ord={nr:<3} chr(ord)={back!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ch='A'  ord=65  chr(ord)='A'
+ch='B'  ord=66  chr(ord)='B'
+ch='a'  ord=97  chr(ord)='a'
+ch='0'  ord=48  chr(ord)='0'
+ch='!'  ord=33  chr(ord)='!'
+ch=' '  ord=32  chr(ord)=' '
+\end{verbatim}
+
+These values are ASCII values. They are also Unicode codepoints, because Unicode deliberately keeps the first \texttt{128} codepoints compatible with ASCII.
+
+\begin{verbatim}
+text = "Chuck Norris counted to 42 twice."
+
+for ch in text[:15]:
+    print(f"{ch!r:<4} {ord(ch):>3}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'C'   67
+'h'  104
+'u'  117
+'c'   99
+'k'  107
+' '   32
+'N'   78
+'o'  111
+'r'  114
+'r'  114
+'i'  105
+'s'  115
+' '   32
+'c'   99
+'o'  111
+\end{verbatim}
+
+ASCII is small. It cannot directly represent Romanian letters, Greek letters, mathematical symbols, Chinese characters, Arabic script, emoji, and many other writing systems.
+
+\begin{verbatim}
+chars = ["A", "z", "ă", "ș", "π"]
+
+for ch in chars:
+    nr = ord(ch)
+    print(f"{ch!r:<4} codepoint={nr:<6} inside_ascii={nr <= 127}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'A'  codepoint=65     inside_ascii=True
+'z'  codepoint=122    inside_ascii=True
+'ă'  codepoint=259    inside_ascii=False
+'ș'  codepoint=537    inside_ascii=False
+'π'  codepoint=960    inside_ascii=False
+\end{verbatim}
+
+The later confusion came from the unused eighth bit. A byte has eight bits, so one byte can store values from \texttt{0} to \texttt{255}. Classical ASCII used only \texttt{0} to \texttt{127}. Many systems used the remaining range, \texttt{128} to \texttt{255}, for different local extensions.
+
+That produced many incompatible ``extended ASCII'' encodings. The phrase is dangerous because it sounds like one standard, but historically it often referred to different byte-to-character maps.
+
+The same byte value can mean different characters in different 8-bit encodings.
+
+\begin{verbatim}
+raw = bytes([0xE9])
+
+print(f"raw: {raw!r}")
+print(f"raw[0]: {raw[0]}")
+
+print()
+print(f"latin-1: {raw.decode('latin-1')!r}")
+print(f"cp1252:  {raw.decode('cp1252')!r}")
+print(f"cp437:   {raw.decode('cp437')!r}")
+
+print()
+try:
+    print(raw.decode("ascii"))
+except UnicodeDecodeError as err:
+    print("ascii decoding failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+raw: b'\xe9'
+raw[0]: 233
+
+latin-1: 'é'
+cp1252:  'é'
+cp437:   'Θ'
+
+ascii decoding failed
+message: 'ascii' codec can't decode byte 0xe9 in position 0:
+ordinal not in range(128)
+\end{verbatim}
+
+The byte \texttt{0xE9} is not classical ASCII. Different encodings may interpret it differently. Therefore, a byte value alone is not enough to identify text once we leave the ASCII range.
+
+The practical rule is:
+
+\begin{quote}
+ASCII is the stable \texttt{0--127} core. The range \texttt{128--255} is not one universal text system. It depends on the chosen encoding.
+\end{quote}
+
+\subsubsection{The Universal Map: Unicode Codepoints as Abstract Character Numbers, Separate from Byte Encodings}
+
+Unicode solves the local-map problem by defining a large universal character map. In that map, each character has an abstract number called a codepoint.
+
+A Unicode codepoint is usually written in the form \texttt{U+XXXX}. For example:
+
+\begin{itemize}
+    \item \texttt{A} has codepoint \texttt{U+0041};
+    \item \texttt{ă} has codepoint \texttt{U+0103};
+    \item \texttt{π} has codepoint \texttt{U+03C0}.
+\end{itemize}
+
+Python's \texttt{str} works at this text/codepoint level, not at the raw byte level.
+
+\begin{verbatim}
+chars = ["A", "ă", "ș", "π", "漢"]
+
+for ch in chars:
+    nr = ord(ch)
+    print(f"char={ch!r:<4} decimal={nr:<6} unicode=U+{nr:04X}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+char='A'  decimal=65     unicode=U+0041
+char='ă'  decimal=259    unicode=U+0103
+char='ș'  decimal=537    unicode=U+0219
+char='π'  decimal=960    unicode=U+03C0
+char='漢' decimal=28450  unicode=U+6F22
+\end{verbatim}
+
+The important point is that these are character numbers, not byte sequences. A codepoint says \emph{which character} is meant. It does not by itself say \emph{which bytes} will be written to a file or sent over a network.
+
+\begin{verbatim}
+text = "π"
+
+print(f"text:      {text!r}")
+print(f"ord(text): {ord(text)}")
+print(f"unicode:   U+{ord(text):04X}")
+
+print()
+print(f"utf-8 bytes:  {text.encode('utf-8')}")
+print(f"utf-16 bytes: {text.encode('utf-16')}")
+print(f"utf-32 bytes: {text.encode('utf-32')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:      'π'
+ord(text): 960
+unicode:   U+03C0
+
+utf-8 bytes:  b'\xcf\x80'
+utf-16 bytes: b'\xff\xfe\xc0\x03'
+utf-32 bytes: b'\xff\xfe\x00\x00\xc0\x03\x00\x00'
+\end{verbatim}
+
+The character is the same: \texttt{π}. The Unicode codepoint is the same: \texttt{U+03C0}. The byte representation changes depending on the encoding.
+
+This distinction is one of the most important text-processing boundaries in Python:
+
+\begin{quote}
+A Unicode codepoint is an abstract character number. An encoding is a rule for turning that character number into bytes.
+\end{quote}
+
+The following program makes the boundary visible by storing several characters in one Python string, then printing their codepoints.
+
+\begin{verbatim}
+text = "Aăπ"
+
+print(f"text: {text!r}")
+print(f"len(text): {len(text)}")
+
+print()
+for ch in text:
+    print(f"{ch!r:<4} U+{ord(ch):04X}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'Aăπ'
+len(text): 3
+
+'A'  U+0041
+'ă'  U+0103
+'π'  U+03C0
+\end{verbatim}
+
+The string has three text components. It does not have three bytes in every encoding.
+
+\begin{verbatim}
+text = "Aăπ"
+
+utf8 = text.encode("utf-8")
+utf16 = text.encode("utf-16")
+utf32 = text.encode("utf-32")
+
+print(f"text:       {text!r}")
+print(f"len(text):  {len(text)}")
+
+print()
+print(f"utf8:       {utf8!r}")
+print(f"len(utf8):  {len(utf8)}")
+
+print()
+print(f"utf16:      {utf16!r}")
+print(f"len(utf16): {len(utf16)}")
+
+print()
+print(f"utf32:      {utf32!r}")
+print(f"len(utf32): {len(utf32)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:       'Aăπ'
+len(text):  3
+
+utf8:       b'A\xc4\x83\xcf\x80'
+len(utf8):  5
+
+utf16:      b'\xff\xfeA\x00\x03\x01\xc0\x03'
+len(utf16): 8
+
+utf32:      b'\xff\xfe\x00\x00A\x00\x00\x00\x03\x01\x00\x00\xc0\x03\x00\x00'
+len(utf32): 16
+\end{verbatim}
+
+The same text gives different byte lengths. This is why text length and byte length must not be confused.
+
+\subsubsection{Encoding Boundaries: UTF-8, UTF-16, and UTF-32 as Byte Representations of Unicode Text}
+
+UTF-8, UTF-16, and UTF-32 are encodings. They are not three different character sets. They are three different ways of representing Unicode text as bytes.
+
+Python exposes this boundary directly:
+
+\begin{itemize}
+    \item \texttt{text.encode("utf-8")} turns a \texttt{str} into \texttt{bytes};
+    \item \texttt{raw.decode("utf-8")} turns \texttt{bytes} back into \texttt{str}.
+\end{itemize}
+
+\begin{verbatim}
+text = "No soup for you!"
+
+raw = text.encode("utf-8")
+again = raw.decode("utf-8")
+
+print(f"text:  {text!r}")
+print(f"raw:   {raw!r}")
+print(f"again: {again!r}")
+
+print()
+print(f"type(text):  {type(text)}")
+print(f"type(raw):   {type(raw)}")
+print(f"type(again): {type(again)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text:  'No soup for you!'
+raw:   b'No soup for you!'
+again: 'No soup for you!'
+
+type(text):  <class 'str'>
+type(raw):   <class 'bytes'>
+type(again): <class 'str'>
+\end{verbatim}
+
+For pure ASCII-range text, UTF-8 uses the same byte values as ASCII.
+
+\begin{verbatim}
+text = "ABC"
+
+ascii_raw = text.encode("ascii")
+utf8_raw = text.encode("utf-8")
+
+print(f"ascii_raw: {ascii_raw!r}")
+print(f"utf8_raw:  {utf8_raw!r}")
+print(f"same:      {ascii_raw == utf8_raw}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+ascii_raw: b'ABC'
+utf8_raw:  b'ABC'
+same:      True
+\end{verbatim}
+
+For non-ASCII text, UTF-8 uses more than one byte for some characters.
+
+\begin{verbatim}
+text = "Aăπ"
+
+raw = text.encode("utf-8")
+
+print(f"text: {text!r}")
+print(f"raw:  {raw!r}")
+
+print()
+for byte in raw:
+    print(f"byte decimal={byte:<3} hex=0x{byte:02X}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'Aăπ'
+raw:  b'A\xc4\x83\xcf\x80'
+
+byte decimal=65  hex=0x41
+byte decimal=196 hex=0xC4
+byte decimal=131 hex=0x83
+byte decimal=207 hex=0xCF
+byte decimal=128 hex=0x80
+\end{verbatim}
+
+The string has three characters. The UTF-8 byte sequence has five bytes.
+
+\begin{verbatim}
+text = "Aăπ"
+raw = text.encode("utf-8")
+
+print(f"len(text): {len(text)}")
+print(f"len(raw):  {len(raw)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+len(text): 3
+len(raw):  5
+\end{verbatim}
+
+UTF-16 and UTF-32 use different storage rules. Python can show their produced bytes directly.
+
+\begin{verbatim}
+text = "Aăπ"
+
+for enc in ["utf-8", "utf-16", "utf-32"]:
+    raw = text.encode(enc)
+    print(f"{enc:<7} bytes={raw!r}")
+    print(f"{'':<7} len={len(raw)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+utf-8   bytes=b'A\xc4\x83\xcf\x80'
+        len=5
+
+utf-16  bytes=b'\xff\xfeA\x00\x03\x01\xc0\x03'
+        len=8
+
+utf-32  bytes=b'\xff\xfe\x00\x00A\x00\x00\x00\x03\x01\x00\x00\xc0\x03\x00\x00'
+        len=16
+\end{verbatim}
+
+The leading bytes in the UTF-16 and UTF-32 examples are a byte-order mark. They help identify byte order. To inspect the raw little-endian forms without that marker, Python also provides explicit encoding names.
+
+\begin{verbatim}
+text = "Aăπ"
+
+for enc in ["utf-16-le", "utf-32-le"]:
+    raw = text.encode(enc)
+    print(f"{enc:<10} {raw!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+utf-16-le  b'A\x00\x03\x01\xc0\x03'
+utf-32-le  b'A\x00\x00\x00\x03\x01\x00\x00\xc0\x03\x00\x00'
+\end{verbatim}
+
+Decoding must use the correct encoding. If bytes were produced as UTF-8, they must be decoded as UTF-8.
+
+\begin{verbatim}
+text = "ă"
+raw = text.encode("utf-8")
+
+print(f"text: {text!r}")
+print(f"raw:  {raw!r}")
+
+print()
+print(f"correct decode: {raw.decode('utf-8')!r}")
+
+try:
+    wrong = raw.decode("ascii")
+    print(wrong)
+except UnicodeDecodeError as err:
+    print("wrong decode failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: 'ă'
+raw:  b'\xc4\x83'
+
+correct decode: 'ă'
+wrong decode failed
+message: 'ascii' codec can't decode byte 0xc4 in position 0:
+ordinal not in range(128)
+\end{verbatim}
+
+A different wrong decoding may not fail. It may produce incorrect text.
+
+\begin{verbatim}
+text = "ă"
+raw = text.encode("utf-8")
+
+print(f"raw: {raw!r}")
+print(f"utf-8:   {raw.decode('utf-8')!r}")
+print(f"latin-1: {raw.decode('latin-1')!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+raw: b'\xc4\x83'
+utf-8:   'ă'
+latin-1: 'Ä\x83'
+\end{verbatim}
+
+This is worse than an exception because the program continues with corrupted text. The bytes were valid according to Latin-1, but they were not meant to be read as Latin-1.
+
+The practical boundary is therefore:
+
+\begin{quote}
+Inside Python, ordinary text is \texttt{str}. At file, network, and binary protocol boundaries, text must become \texttt{bytes}. Encoding moves from \texttt{str} to \texttt{bytes}; decoding moves from \texttt{bytes} back to \texttt{str}.
+\end{quote}

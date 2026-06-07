@@ -4,6 +4,6 @@
   "label": "emp02",
   "linenos": true,
   "input": null,
-  "output": "type(convert_score): <class 'function'>\ntype(EmptyBox): <class 'type'>\ntype(EmptyBox()): <class '__main__.EmptyBox'>",
+  "output": "grading finished",
   "file": "main.py"
 }

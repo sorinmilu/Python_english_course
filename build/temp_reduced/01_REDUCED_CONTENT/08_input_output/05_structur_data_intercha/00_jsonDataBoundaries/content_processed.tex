@@ -1,0 +1,39 @@
+\subsection{JSON Data Boundaries}
+
+JSON is external text, not Python syntax. \texttt{json.loads}/\texttt{json.load} parse text into \texttt{dict}/\texttt{list}/scalars; \texttt{json.dumps}/\texttt{json.dump} serialize back.
+
+\subsubsection{JSON as Text-Based Tree Serialization: Objects, Arrays, Strings, Numbers, Booleans, and Null}
+
+JSON objects map to \texttt{dict}, arrays to \texttt{list}, \texttt{true}/\texttt{false} to \texttt{bool}, \texttt{null} to \texttt{None}. Until parsed, a JSON document is an ordinary \texttt{str}.
+
+\begin{verbatim}
+import json
+
+json_text = '{"name": "Chuck", "level": 42, "active": true, "tags": ["fact"]}'
+data = json.loads(json_text)
+print(type(data), data["name"], data["tags"][0])
+\end{verbatim}
+
+\subsubsection{Loading JSON into Python Dictionaries and Lists with \texttt{json.load()} and \texttt{json.loads()}}
+
+\texttt{json.loads} parses in-memory strings; \texttt{json.load} reads from a text file object. Both construct a new object graph on the heap.
+
+\begin{codebox}[]{python}{Loading JSON into Python Dictionaries and Lists with json.load() and json.loa...}{jso01}
+import json
+from pathlib import Path
+
+path = Path("demo.json")
+path.write_text('{"show": "Simpsons", "line": "D\'oh!"}', encoding="utf-8")
+with open(path, encoding="utf-8") as f:
+    data = json.load(f)
+print(data)
+\end{codebox}
+
+
+\subsubsection{Writing Python Structures Back to JSON with \texttt{json.dump()} and \texttt{json.dumps()}}
+
+Serialization walks Python objects and emits UTF-8 text with JSON lexical rules (double-quoted keys/strings).
+
+\subsubsection{JSON Type Mapping Boundaries: \texttt{None} vs. \texttt{null}, \texttt{dict} vs. Object, \texttt{list} vs. Array}
+
+Only JSON-native types round-trip cleanly. Python \texttt{set}, \texttt{datetime}, and arbitrary class instances require custom encoders or pre-conversion.

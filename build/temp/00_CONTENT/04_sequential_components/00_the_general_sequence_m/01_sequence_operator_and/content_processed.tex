@@ -1,0 +1,600 @@
+\subsection{Sequence Operators and Shared Behaviors}
+
+Python sequences share several operators. The same symbols can work on strings, lists, and tuples, but they do not always mean numeric arithmetic.
+
+For sequences, the most important shared operators are:
+
+\begin{itemize}
+    \item \texttt{+}: concatenation;
+    \item \texttt{*}: repetition;
+    \item \texttt{==}: equality comparison;
+    \item \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}: lexicographic ordering, when the compared components support ordering.
+\end{itemize}
+
+These operators are still type-checked at runtime. Python does not abandon the strong operation-checking rule introduced earlier. A sequence operation succeeds only when the involved objects define that operation for that kind of partner.
+
+\begin{verbatim}
+text = "spam"
+items = ["spam", "eggs"]
+point = (10, 20)
+
+names = ["__add__", "__mul__", "__eq__", "__lt__"]
+
+for obj_name, obj in [("text", text), ("items", items), ("point", point)]:
+    print(f"{obj_name}: {type(obj)}")
+    for name in names:
+        print(f"  {name:<10} {name in dir(obj)}")
+    print()
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text: <class 'str'>
+  __add__    True
+  __mul__    True
+  __eq__     True
+  __lt__     True
+
+items: <class 'list'>
+  __add__    True
+  __mul__    True
+  __eq__     True
+  __lt__     True
+
+point: <class 'tuple'>
+  __add__    True
+  __mul__    True
+  __eq__     True
+  __lt__     True
+\end{verbatim}
+
+The presence of these special methods does not mean that every possible operand combination is accepted. It means that the object has some defined behavior for these operators.
+
+\subsubsection{Concatenation and Repetition: \texttt{+} and \texttt{*} Across Compatible Sequence Types}
+
+For compatible sequences, \texttt{+} creates a new sequence containing the left sequence followed by the right sequence.
+
+\begin{verbatim}
+text1 = "Hello, "
+text2 = "Newman!"
+
+items1 = ["spam", "eggs"]
+items2 = ["bacon", 42]
+
+point1 = (10, 20)
+point2 = (30, 40)
+
+print(f"text1 + text2:   {text1 + text2!r}")
+print(f"items1 + items2: {items1 + items2!r}")
+print(f"point1 + point2: {point1 + point2!r}")
+
+print()
+print(f"type(text1 + text2):   {type(text1 + text2)}")
+print(f"type(items1 + items2): {type(items1 + items2)}")
+print(f"type(point1 + point2): {type(point1 + point2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text1 + text2:   'Hello, Newman!'
+items1 + items2: ['spam', 'eggs', 'bacon', 42]
+point1 + point2: (10, 20, 30, 40)
+
+type(text1 + text2):   <class 'str'>
+type(items1 + items2): <class 'list'>
+type(point1 + point2): <class 'tuple'>
+\end{verbatim}
+
+The result has the same type as the sequences being concatenated.
+
+Concatenation does not mean that lists and tuples can be freely mixed.
+
+\begin{verbatim}
+items = ["Homer", "Marge"]
+point = ("Bart", "Lisa")
+
+try:
+    result = items + point
+    print(result)
+except TypeError as err:
+    print("operation failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+operation failed
+message: can only concatenate list (not "tuple") to list
+\end{verbatim}
+
+The components may be heterogeneous inside a list, but the two outer sequence objects must still be compatible for concatenation.
+
+\begin{verbatim}
+items1 = ["Homer", 42]
+items2 = [3.14, True]
+
+result = items1 + items2
+
+print(f"result: {result!r}")
+print(f"type:   {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+result: ['Homer', 42, 3.14, True]
+type:   <class 'list'>
+\end{verbatim}
+
+The heterogeneous part is inside the list. The operation itself is still list concatenation.
+
+The operator \texttt{*} repeats a sequence a specified number of times.
+
+\begin{verbatim}
+text = "Ni! "
+items = ["spam", 42]
+point = ("D'oh!",)
+
+print(f"text * 3:  {text * 3!r}")
+print(f"items * 3: {items * 3!r}")
+print(f"point * 3: {point * 3!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text * 3:  'Ni! Ni! Ni! '
+items * 3: ['spam', 42, 'spam', 42, 'spam', 42]
+point * 3: ("D'oh!", "D'oh!", "D'oh!")
+\end{verbatim}
+
+The number on the right must be an integer.
+
+\begin{verbatim}
+text = "yada "
+
+print(f"text * 2: {text * 2!r}")
+
+try:
+    result = text * 2.5
+    print(result)
+except TypeError as err:
+    print("operation failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text * 2: 'yada yada '
+operation failed
+message: can't multiply sequence by non-int of type 'float'
+\end{verbatim}
+
+The integer can also appear on the left.
+
+\begin{verbatim}
+text = "ha"
+items = ["larch"]
+
+print(f"text * 4:  {text * 4!r}")
+print(f"4 * text:  {4 * text!r}")
+
+print()
+print(f"items * 3: {items * 3!r}")
+print(f"3 * items: {3 * items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text * 4:  'hahahaha'
+4 * text:  'hahahaha'
+
+items * 3: ['larch', 'larch', 'larch']
+3 * items: ['larch', 'larch', 'larch']
+\end{verbatim}
+
+A repetition count of zero creates an empty sequence of the same type. A negative repetition count also produces an empty sequence.
+
+\begin{verbatim}
+text = "abc"
+items = ["a", "b"]
+point = (1, 2)
+
+print(f"text * 0:  {text * 0!r}")
+print(f"items * 0: {items * 0!r}")
+print(f"point * 0: {point * 0!r}")
+
+print()
+print(f"text * -1:  {text * -1!r}")
+print(f"items * -1: {items * -1!r}")
+print(f"point * -1: {point * -1!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text * 0:  ''
+items * 0: []
+point * 0: ()
+
+text * -1:  ''
+items * -1: []
+point * -1: ()
+\end{verbatim}
+
+For immutable elements such as numbers and strings, repetition is usually harmless. With mutable elements inside a list, repetition deserves caution because repeated positions may refer to the same inner object. That issue will be handled more directly in the later section on shallow and deep copying.
+
+\subsubsection{Equality and Lexicographic Comparison Rules}
+
+Equality checks whether two sequences have equal contents according to the equality rules of their components.
+
+\begin{verbatim}
+text1 = "spam"
+text2 = "spam"
+text3 = "eggs"
+
+items1 = [10, 20, 42]
+items2 = [10, 20, 42]
+items3 = [10, 20, 99]
+
+point1 = (10, 20, 42)
+point2 = (10, 20, 42)
+point3 = (10, 20, 99)
+
+print(f"text1 == text2:   {text1 == text2}")
+print(f"text1 == text3:   {text1 == text3}")
+
+print()
+print(f"items1 == items2: {items1 == items2}")
+print(f"items1 == items3: {items1 == items3}")
+
+print()
+print(f"point1 == point2: {point1 == point2}")
+print(f"point1 == point3: {point1 == point3}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+text1 == text2:   True
+text1 == text3:   False
+
+items1 == items2: True
+items1 == items3: False
+
+point1 == point2: True
+point1 == point3: False
+\end{verbatim}
+
+For lists and tuples, equality is positional. The first component is compared with the first component, the second with the second, and so on.
+
+\begin{verbatim}
+a = ["Jerry", "Elaine"]
+b = ["Jerry", "Elaine"]
+c = ["Elaine", "Jerry"]
+
+print(f"a == b: {a == b}")
+print(f"a == c: {a == c}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a == b: True
+a == c: False
+\end{verbatim}
+
+The same elements in a different order do not make the same sequence.
+
+A list and a tuple may contain equal components, but the outer sequence types are different.
+
+\begin{verbatim}
+items = [10, 20]
+point = (10, 20)
+
+print(f"items: {items!r}")
+print(f"point: {point!r}")
+
+print()
+print(f"items == point: {items == point}")
+print(f"type(items):    {type(items)}")
+print(f"type(point):    {type(point)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: [10, 20]
+point: (10, 20)
+
+items == point: False
+type(items):    <class 'list'>
+type(point):    <class 'tuple'>
+\end{verbatim}
+
+Ordering comparisons are lexicographic. Python compares from left to right. The first unequal component decides the result.
+
+\begin{verbatim}
+a = [10, 20, 30]
+b = [10, 20, 40]
+
+print(f"a: {a}")
+print(f"b: {b}")
+
+print()
+print(f"a < b: {a < b}")
+print(f"a > b: {a > b}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: [10, 20, 30]
+b: [10, 20, 40]
+
+a < b: True
+a > b: False
+\end{verbatim}
+
+The first two components are equal: \texttt{10} equals \texttt{10}, and \texttt{20} equals \texttt{20}. The third comparison decides the result: \texttt{30} is smaller than \texttt{40}.
+
+If all compared components are equal, but one sequence ends earlier, the shorter sequence is smaller.
+
+\begin{verbatim}
+a = [10, 20]
+b = [10, 20, 30]
+
+print(f"a < b: {a < b}")
+print(f"b < a: {b < a}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a < b: True
+b < a: False
+\end{verbatim}
+
+This is similar to dictionary ordering of words, but it is not exactly human dictionary ordering. It is component-by-component comparison.
+
+Strings are also compared lexicographically.
+
+\begin{verbatim}
+word1 = "spam"
+word2 = "span"
+word3 = "spammy"
+
+print(f"word1 < word2: {word1 < word2}")
+print(f"word1 < word3: {word1 < word3}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+word1 < word2: True
+word1 < word3: True
+\end{verbatim}
+
+In the first comparison, the decisive position is the fourth character:
+
+\begin{verbatim}
+spam
+span
+   ^
+\end{verbatim}
+
+The character \texttt{'m'} is smaller than \texttt{'n'} in Python's text ordering.
+
+Case also matters.
+
+\begin{verbatim}
+print(f"{'A' < 'a' = }")
+print(f"{'Z' < 'a' = }")
+print(f"{'abc' < 'Abc' = }")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'A' < 'a' = True
+'Z' < 'a' = True
+'abc' < 'Abc' = False
+\end{verbatim}
+
+This is not because uppercase letters are morally earlier or later. Python compares text according to character codepoint ordering. The details of character encoding and Unicode are handled in the next section.
+
+Ordering comparison requires comparable components. Python will not silently invent an ordering between unrelated object types.
+
+\begin{verbatim}
+a = [10, "spam"]
+b = [10, 42]
+
+try:
+    print(a < b)
+except TypeError as err:
+    print("comparison failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+comparison failed
+message: '<' not supported between instances of 'str' and 'int'
+\end{verbatim}
+
+The first components are equal: \texttt{10} and \texttt{10}. Then Python must compare \texttt{"spam"} and \texttt{42}. That comparison is not defined, so the whole sequence comparison fails.
+
+\subsubsection{Immutability vs. Mutability as the Major Structural Split}
+
+The shared sequence model does not mean that all sequences can be changed in the same way.
+
+The major structural split is:
+
+\begin{itemize}
+    \item \texttt{str}: immutable;
+    \item \texttt{tuple}: immutable;
+    \item \texttt{list}: mutable.
+\end{itemize}
+
+Immutable means that the object cannot be changed in place after it is created. Mutable means that the object can be modified in place.
+
+The following program tries index assignment on all three sequence types.
+
+\begin{verbatim}
+text = "D'oh!"
+items = ["D", "'", "o", "h", "!"]
+point = (10, 20, 30)
+
+print("before")
+print(f"text:  {text!r}")
+print(f"items: {items!r}")
+print(f"point: {point!r}")
+
+print()
+print("changing the list")
+items[0] = "W"
+print(f"items: {items!r}")
+
+print()
+print("trying to change the string")
+try:
+    text[0] = "W"
+except TypeError as err:
+    print("string change failed")
+    print(f"message: {err}")
+
+print()
+print("trying to change the tuple")
+try:
+    point[0] = 99
+except TypeError as err:
+    print("tuple change failed")
+    print(f"message: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before
+text:  "D'oh!"
+items: ['D', "'", 'o', 'h', '!']
+point: (10, 20, 30)
+
+changing the list
+items: ['W', "'", 'o', 'h', '!']
+
+trying to change the string
+string change failed
+message: 'str' object does not support item assignment
+
+trying to change the tuple
+tuple change failed
+message: 'tuple' object does not support item assignment
+\end{verbatim}
+
+The list is changed in place. The string and tuple reject the assignment.
+
+This difference can be seen with \texttt{id()}, which shows the identity of the object during the current program run.
+
+\begin{verbatim}
+text = "spam"
+items = ["spam", "eggs"]
+
+print("initial objects")
+print(f"text:  {text!r:<20} id={id(text)}")
+print(f"items: {items!r:<20} id={id(items)}")
+
+print()
+text = text + " and eggs"
+items.append(42)
+
+print("after operations")
+print(f"text:  {text!r:<20} id={id(text)}")
+print(f"items: {items!r:<20} id={id(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+initial objects
+text:  'spam'               id=139935850269424
+items: ['spam', 'eggs']     id=139935850316032
+
+after operations
+text:  'spam and eggs'      id=139935850318384
+items: ['spam', 'eggs', 42] id=139935850316032
+\end{verbatim}
+
+The exact \texttt{id()} numbers will differ from one run to another. The important observation is the pattern:
+
+\begin{itemize}
+    \item the string operation creates a different string object;
+    \item the list operation modifies the same list object.
+\end{itemize}
+
+Concatenation does not mutate the original sequence, even for lists.
+
+\begin{verbatim}
+a = ["Homer"]
+b = ["Marge"]
+
+old_id = id(a)
+c = a + b
+
+print(f"a:      {a!r}")
+print(f"b:      {b!r}")
+print(f"c:      {c!r}")
+
+print()
+print(f"id(a) before saved: {old_id}")
+print(f"id(a) after:        {id(a)}")
+print(f"id(c):              {id(c)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a:      ['Homer']
+b:      ['Marge']
+c:      ['Homer', 'Marge']
+
+id(a) before saved: 139935850315776
+id(a) after:        139935850315776
+id(c):              139935850317184
+\end{verbatim}
+
+The expression \texttt{a + b} creates a new list. It does not extend \texttt{a}. To mutate \texttt{a}, use a list mutation operation such as \texttt{append()} or \texttt{extend()}.
+
+\begin{verbatim}
+a = ["Homer"]
+b = ["Marge"]
+
+old_id = id(a)
+a.extend(b)
+
+print(f"a: {a!r}")
+print(f"id(a) before saved: {old_id}")
+print(f"id(a) after:        {id(a)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+a: ['Homer', 'Marge']
+id(a) before saved: 139935850315776
+id(a) after:        139935850315776
+\end{verbatim}
+
+The practical distinction is simple:
+
+\begin{quote}
+Shared sequence operations describe how objects can be read and combined. Mutability describes whether the existing object can be changed in place.
+\end{quote}
+
+This split is the reason strings and tuples feel stable, while lists behave like editable containers.

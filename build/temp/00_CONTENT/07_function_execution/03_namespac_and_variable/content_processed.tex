@@ -1,0 +1,7 @@
+\section{Namespaces and Variable Scope Resolution}
+
+Names do not exist in one flat container. During execution, Python keeps different namespaces for different levels of the program: the active function frame, enclosing function frames, the current module, and the built-in namespace. When a name is read, Python searches these namespaces in a fixed order: Local, Enclosing, Global, Built-in.
+
+This section explains that lookup chain and then separates lookup from assignment. Reading a name from an outer namespace is usually automatic. Rebinding a name in an outer namespace is not automatic and requires explicit syntax: \texttt{global} for module-level bindings and \texttt{nonlocal} for enclosing function bindings.
+
+The central distinction is the same one used throughout the chapter: names are bindings, objects are separate runtime values. Scope rules decide where a name is searched or rebound. They do not change the identity of the objects themselves.

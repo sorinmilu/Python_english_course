@@ -1,0 +1,7 @@
+\section{CPython String Memory Realities (\texttt{str})}
+
+A Python string is used as a text sequence, but CPython must still store that sequence inside real memory. The language view is simple: a \texttt{str} contains ordered text components and cannot be changed in place. The implementation view is more concrete: CPython must choose a memory layout, preserve Unicode meaning, support fast indexing and hashing, and avoid wasting space for common ASCII text.
+
+This section connects those two views. We will keep the programmer-facing rule clear: \texttt{str} stores text, not raw bytes. Then we will look under that rule and see how CPython represents Unicode strings efficiently, why immutability matters, why repeated concatenation can be expensive, and why some string objects may be reused through interning.
+
+The goal is not to replace ordinary string programming with implementation trivia. The goal is to make string behavior unsurprising: indexing gives one-character strings, slicing creates new strings, formatting builds new strings, and every apparent modification produces another object rather than editing the old one.

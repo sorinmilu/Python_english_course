@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Arithmetic Membership Testing: Why Integer Containment in range Can Be Checke...",
+  "label": "seq07",
+  "linenos": true,
+  "input": null,
+  "output": "nums: range(10, 0, -2)\nlist(nums): [10, 8, 6, 4, 2]\n8 in nums: True\n7 in nums: False\n0 in nums: False",
+  "file": "main.py"
+}

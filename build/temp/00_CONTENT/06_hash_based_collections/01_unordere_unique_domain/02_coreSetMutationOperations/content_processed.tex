@@ -1,0 +1,484 @@
+\subsection{Core Set Mutation Operations}
+
+A \texttt{set} is a mutable hash-based collection. Its elements are unique, unordered, and hashable. Mutation means that the set object itself remains the same object, but its internal membership domain changes.
+
+This is different from creating a new set. When \texttt{.add()}, \texttt{.remove()}, \texttt{.discard()}, \texttt{.pop()}, or \texttt{.clear()} is used, Python modifies the existing set object in place.
+
+\begin{verbatim}
+names = {"Homer", "Marge"}
+
+print(f"before: {names!r}")
+print(f"type(names): {type(names)}")
+print(f"id(names): {id(names)}")
+
+names.add("Lisa")
+
+print()
+print(f"after:  {names!r}")
+print(f"type(names): {type(names)}")
+print(f"id(names): {id(names)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Homer', 'Marge'}
+type(names): <class 'set'>
+id(names): 2199772358016
+
+after:  {'Lisa', 'Homer', 'Marge'}
+type(names): <class 'set'>
+id(names): 2199772358016
+\end{verbatim}
+
+The memory identity printed by \texttt{id()} remains the same. The set object was not replaced. Its contents were changed.
+
+\subsubsection{Adding Elements with \texttt{.add()}}
+
+The method \texttt{.add()} inserts one element into a set. If an equal element is already present, the set remains unchanged.
+
+\begin{verbatim}
+quotes = set()
+
+print(f"start: {quotes!r}")
+print(f"type(quotes): {type(quotes)}")
+
+quotes.add("D'oh!")
+quotes.add("No soup for you!")
+quotes.add("D'oh!")
+quotes.add(42)
+
+print()
+print(f"after additions: {quotes!r}")
+print(f"len(quotes): {len(quotes)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start: set()
+type(quotes): <class 'set'>
+
+after additions: {"D'oh!", 42, 'No soup for you!'}
+len(quotes): 3
+\end{verbatim}
+
+The value \texttt{"D'oh!"} was added twice, but it appears only once. The uniqueness invariant is enforced during insertion.
+
+The method itself returns \texttt{None}. Its purpose is to mutate the set, not to produce a new set.
+
+\begin{verbatim}
+names = {"Arthur", "Brian"}
+
+result = names.add("Lancelot")
+
+print(f"names: {names!r}")
+print(f"result: {result!r}")
+print(f"type(result): {type(result)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: {'Lancelot', 'Arthur', 'Brian'}
+result: None
+type(result): <class 'NoneType'>
+\end{verbatim}
+
+This is common for in-place mutation methods in Python. The changed object is \texttt{names}; the method call itself does not return the changed set.
+
+The inserted element must be hashable.
+
+\begin{verbatim}
+items = set()
+
+items.add("spam")
+items.add(("eggs", 42))
+
+print(f"items: {items!r}")
+
+try:
+    items.add(["larch", 42])
+except TypeError as err:
+    print(f"add failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: {('eggs', 42), 'spam'}
+add failed: unhashable type: 'list'
+\end{verbatim}
+
+The tuple is accepted because its elements are hashable. The list is rejected because lists are mutable and unhashable.
+
+We can inspect the set methods relevant to this point.
+
+\begin{verbatim}
+items = {"spam"}
+
+print(f"type(items): {type(items)}")
+print(f"add in dir(items): {'add' in dir(items)}")
+print(f"__contains__ in dir(items): {'__contains__' in dir(items)}")
+print(f"__iter__ in dir(items): {'__iter__' in dir(items)}")
+print(f"__len__ in dir(items): {'__len__' in dir(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(items): <class 'set'>
+add in dir(items): True
+__contains__ in dir(items): True
+__iter__ in dir(items): True
+__len__ in dir(items): True
+\end{verbatim}
+
+The important methods are:
+
+\begin{itemize}
+    \item \texttt{add}: inserts one hashable element;
+    \item \texttt{\_\_contains\_\_}: supports membership testing with \texttt{in};
+    \item \texttt{\_\_iter\_\_}: allows iteration over the set's current elements;
+    \item \texttt{\_\_len\_\_}: supports \texttt{len()}.
+\end{itemize}
+
+\subsubsection{Removing Elements with \texttt{.remove()}, \texttt{.discard()}, \texttt{.pop()}, and \texttt{.clear()}}
+
+A set has several removal operations because different situations need different failure behavior.
+
+The method \texttt{.remove()} removes a specific element. If the element is not present, Python raises \texttt{KeyError}.
+
+\begin{verbatim}
+names = {"Homer", "Marge", "Lisa"}
+
+print(f"before: {names!r}")
+
+names.remove("Marge")
+
+print(f"after:  {names!r}")
+
+try:
+    names.remove("Bart")
+except KeyError as err:
+    print(f"remove failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Lisa', 'Homer', 'Marge'}
+after:  {'Lisa', 'Homer'}
+remove failed: 'Bart'
+\end{verbatim}
+
+Use \texttt{.remove()} when absence should be treated as an error. The method says: remove this element, and fail loudly if it is not there.
+
+The method \texttt{.discard()} also removes a specific element, but it does not raise an error if the element is absent.
+
+\begin{verbatim}
+names = {"Homer", "Marge", "Lisa"}
+
+print(f"before: {names!r}")
+
+names.discard("Marge")
+names.discard("Bart")
+
+print(f"after:  {names!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Lisa', 'Homer', 'Marge'}
+after:  {'Lisa', 'Homer'}
+\end{verbatim}
+
+Use \texttt{.discard()} when absence is acceptable. The method says: remove this element if it exists; otherwise do nothing.
+
+Both \texttt{.remove()} and \texttt{.discard()} return \texttt{None}.
+
+\begin{verbatim}
+items = {"spam", "eggs", "larch"}
+
+result1 = items.remove("spam")
+result2 = items.discard("beans")
+
+print(f"items: {items!r}")
+print(f"result1: {result1!r}")
+print(f"result2: {result2!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+items: {'eggs', 'larch'}
+result1: None
+result2: None
+\end{verbatim}
+
+The method \texttt{.pop()} removes and returns one arbitrary element from the set.
+
+\begin{verbatim}
+items = {"spam", "eggs", "larch"}
+
+print(f"before: {items!r}")
+
+removed = items.pop()
+
+print(f"removed: {removed!r}")
+print(f"type(removed): {type(removed)}")
+print(f"after:   {items!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'eggs', 'spam', 'larch'}
+removed: 'eggs'
+type(removed): <class 'str'>
+after:   {'spam', 'larch'}
+\end{verbatim}
+
+The word ``arbitrary'' matters. Since a set is not a positional sequence, \texttt{.pop()} does not mean ``remove the first element'' or ``remove the last element.'' Those ideas belong to ordered containers, not to sets.
+
+Calling \texttt{.pop()} on an empty set raises \texttt{KeyError}.
+
+\begin{verbatim}
+items = set()
+
+try:
+    removed = items.pop()
+except KeyError as err:
+    print(f"pop failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pop failed: 'pop from an empty set'
+\end{verbatim}
+
+The method \texttt{.clear()} removes all elements from the set.
+
+\begin{verbatim}
+items = {"Arthur", "Brian", "Lancelot", 42}
+
+print(f"before: {items!r}")
+print(f"len before: {len(items)}")
+
+items.clear()
+
+print()
+print(f"after: {items!r}")
+print(f"len after: {len(items)}")
+print(f"type(items): {type(items)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before: {'Lancelot', 42, 'Arthur', 'Brian'}
+len before: 4
+
+after: set()
+len after: 0
+type(items): <class 'set'>
+\end{verbatim}
+
+The set still exists after \texttt{.clear()}. It is simply empty.
+
+The removal methods can be summarized as follows:
+
+\begin{center}
+\begin{tabular}{lll}
+\textbf{Method} & \textbf{Meaning} & \textbf{Absent Element Behavior} \\
+\hline
+\texttt{.remove(x)} & Remove \texttt{x} & Raises \texttt{KeyError} \\
+\texttt{.discard(x)} & Remove \texttt{x} if present & Does nothing \\
+\texttt{.pop()} & Remove and return one arbitrary element & Raises \texttt{KeyError} if empty \\
+\texttt{.clear()} & Remove all elements & Always leaves an empty set \\
+\end{tabular}
+\end{center}
+
+A complete small script shows the operations together.
+
+\begin{verbatim}
+words = {"spam", "eggs", "larch", "ni"}
+
+print(f"start: {words!r}")
+
+words.remove("eggs")
+print(f"after remove('eggs'):   {words!r}")
+
+words.discard("beans")
+print(f"after discard('beans'): {words!r}")
+
+one_word = words.pop()
+print(f"popped: {one_word!r}")
+print(f"after pop():            {words!r}")
+
+words.clear()
+print(f"after clear():          {words!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+start: {'eggs', 'ni', 'spam', 'larch'}
+after remove('eggs'):   {'ni', 'spam', 'larch'}
+after discard('beans'): {'ni', 'spam', 'larch'}
+popped: 'ni'
+after pop():            {'spam', 'larch'}
+after clear():          set()
+\end{verbatim}
+
+\subsubsection{Membership Testing with \texttt{in}}
+
+Membership testing is the central read operation for sets. The expression \texttt{x in some\_set} asks whether \texttt{x} is currently a member of the set.
+
+\begin{verbatim}
+allowed = {"Homer", "Marge", "Lisa", "Bart"}
+
+candidate1 = "Lisa"
+candidate2 = "Burns"
+
+print(f"allowed: {allowed!r}")
+print()
+
+print(f"{candidate1!r} in allowed: {candidate1 in allowed}")
+print(f"{candidate2!r} in allowed: {candidate2 in allowed}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+allowed: {'Lisa', 'Homer', 'Bart', 'Marge'}
+
+'Lisa' in allowed: True
+'Burns' in allowed: False
+\end{verbatim}
+
+The operator \texttt{in} calls the set's membership machinery. Internally, this depends on hashing and equality, not positional scanning.
+
+The searched value must also be hashable.
+
+\begin{verbatim}
+items = {"spam", "eggs", 42}
+
+print(f"{'spam' in items = }")
+print(f"{42 in items = }")
+
+try:
+    print(["spam"] in items)
+except TypeError as err:
+    print(f"membership test failed: {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'spam' in items = True
+42 in items = True
+membership test failed: unhashable type: 'list'
+\end{verbatim}
+
+The list cannot be searched as a set member because checking membership would require computing its hash. Since the list is unhashable, the membership operation fails.
+
+The opposite operator, \texttt{not in}, checks absence.
+
+\begin{verbatim}
+blocked = {"Newman", "Burns", "Sideshow Bob"}
+
+name = "Jerry"
+
+print(f"blocked: {blocked!r}")
+print(f"name: {name!r}")
+print(f"name not in blocked: {name not in blocked}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+blocked: {'Sideshow Bob', 'Burns', 'Newman'}
+name: 'Jerry'
+name not in blocked: True
+\end{verbatim}
+
+Membership testing is often used before mutation when the program needs explicit control over what happens next.
+
+\begin{verbatim}
+names = {"Arthur", "Brian"}
+
+new_name = "Arthur"
+
+if new_name in names:
+    print(f"{new_name!r} is already present")
+else:
+    names.add(new_name)
+    print(f"{new_name!r} was added")
+
+print(f"names: {names!r}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+'Arthur' is already present
+names: {'Arthur', 'Brian'}
+\end{verbatim}
+
+However, this check is not needed merely to preserve uniqueness. The set already does that.
+
+\begin{verbatim}
+names = {"Arthur", "Brian"}
+
+names.add("Arthur")
+names.add("Lancelot")
+
+print(f"names: {names!r}")
+print(f"len(names): {len(names)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+names: {'Lancelot', 'Arthur', 'Brian'}
+len(names): 3
+\end{verbatim}
+
+The explicit membership check is useful when the program wants a different action depending on presence or absence. It is not required for safe insertion.
+
+A final example combines membership and mutation.
+
+\begin{verbatim}
+seen = set()
+
+line1 = "Nobody expects the Spanish Inquisition!"
+line2 = "D'oh!"
+line3 = "Nobody expects the Spanish Inquisition!"
+
+for line in [line1, line2, line3]:
+    if line in seen:
+        print(f"duplicate ignored: {line!r}")
+    else:
+        seen.add(line)
+        print(f"new line stored:   {line!r}")
+
+print()
+print(f"seen: {seen!r}")
+print(f"len(seen): {len(seen)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+new line stored:   'Nobody expects the Spanish Inquisition!'
+new line stored:   "D'oh!"
+duplicate ignored: 'Nobody expects the Spanish Inquisition!'
+
+seen: {'Nobody expects the Spanish Inquisition!', "D'oh!"}
+len(seen): 2
+\end{verbatim}
+
+The set acts as a memory of already-seen values. It does not remember where they appeared, and it does not remember how many times they appeared. It remembers membership.

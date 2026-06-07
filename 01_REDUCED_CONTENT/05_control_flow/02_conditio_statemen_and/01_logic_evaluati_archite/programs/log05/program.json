@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \\_\\_boo...",
+  "label": "log05",
+  "linenos": true,
+  "input": null,
+  "output": "type(num1): <class 'int'>\nbool(num1): True\nnum1.__bool__(): True\nhas __bool__: True\nhas __len__: False\nbool(num2): False\nnum2.__bool__(): False",
+  "file": "main.py"
+}

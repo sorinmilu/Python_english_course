@@ -1,0 +1,224 @@
+\subsection{Resource Management Invariants}
+
+Opening a file creates a runtime object connected to an external operating-system resource. That connection must not be treated like an ordinary temporary string or integer. A file object has a lifetime that matters outside normal Python object manipulation, because the operating system has allocated a handle for the process.
+
+The central invariant is simple: every successfully opened file should be closed when the program no longer needs it. Closing releases the external resource, flushes pending buffered output when appropriate, and marks the Python file object as no longer usable for ordinary read and write operations.
+
+\subsubsection{Manual Closing with \texttt{.close()} and the Risk of Leaked File Handles}
+
+The most direct way to close a file is to call its \texttt{close()} method manually. This makes the lifetime visible: first the program opens the file, then it uses the file, then it closes the file.
+
+\begin{verbatim}
+path = "manual_close_demo.txt"
+
+file_obj = open(path, "w", encoding="utf-8")
+
+print("File object after open():")
+print(f"file_obj        = {file_obj}")
+print(f"type(file_obj)  = {type(file_obj)}")
+print(f"file_obj.closed = {file_obj.closed}")
+
+print()
+print("Selected names from dir(file_obj):")
+for name in ["write", "flush", "close", "closed", "read", "seek", "tell"]:
+    print(f"{name:10} -> {name in dir(file_obj)}")
+
+print()
+file_obj.write("No soup for you!\n")
+file_obj.write("The answer is still 42.\n")
+
+print("Before close():")
+print(f"file_obj.closed = {file_obj.closed}")
+
+file_obj.close()
+
+print()
+print("After close():")
+print(f"file_obj.closed = {file_obj.closed}")
+\end{verbatim}
+
+The \texttt{closed} attribute reports whether the file object is already closed. Before \texttt{close()}, it is \texttt{False}. After \texttt{close()}, it is \texttt{True}. The object still exists as a Python object, but its connection to the external file resource has been shut down.
+
+Trying to use a closed file for ordinary writing is an error.
+
+\begin{verbatim}
+path = "closed_file_demo.txt"
+
+file_obj = open(path, "w", encoding="utf-8")
+file_obj.write("I'm not dead yet.\n")
+file_obj.close()
+
+print("Closed file state:")
+print(f"file_obj.closed = {file_obj.closed}")
+
+print()
+try:
+    file_obj.write("This write happens too late.\n")
+except ValueError as err:
+    print("Python rejected the write.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+    print()
+    print("Selected names from dir(err):")
+    for name in ["args", "with_traceback", "add_note"]:
+        print(f"{name:16} -> {name in dir(err)}")
+\end{verbatim}
+
+Manual closing works, but it is fragile. If an error occurs between \texttt{open()} and \texttt{close()}, the closing call may be skipped unless the programmer has written explicit cleanup logic. This is the leaked-handle risk: the program has acquired an external resource but does not reliably release it.
+
+Small scripts may terminate quickly enough that the operating system cleans up the process resources after exit. That is not a design rule. Long-running programs, servers, data pipelines, and repeated file operations must not rely on process termination as their cleanup mechanism.
+
+\subsubsection{Context Managers: The \texttt{with} Statement as Structured Resource Lifetime Control}
+
+The usual Python solution is the \texttt{with} statement. A \texttt{with} block gives the resource a visible lexical lifetime. The file is open inside the block. When execution leaves the block, Python closes the file automatically.
+
+\begin{verbatim}
+path = "with_demo.txt"
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    print("Inside the with block:")
+    print(f"file_obj        = {file_obj}")
+    print(f"type(file_obj)  = {type(file_obj)}")
+    print(f"file_obj.closed = {file_obj.closed}")
+
+    file_obj.write("Spam, spam, spam, eggs, and spam.\n")
+    file_obj.write("This file is managed by a with block.\n")
+
+print()
+print("After the with block:")
+print(f"file_obj.closed = {file_obj.closed}")
+\end{verbatim}
+
+The name \texttt{file\_obj} may still exist after the block, because Python block statements do not create a new local scope. But the file itself is closed. The object remains inspectable, while the external resource connection has ended.
+
+This is why \texttt{with open(...)} is usually preferred over manual \texttt{open()} followed by manual \texttt{close()}. The resource lifetime is attached to the structure of the code. The indentation shows exactly where the file is valid for normal operations.
+
+A read example shows the same invariant from the input side.
+
+\begin{verbatim}
+path = "with_read_demo.txt"
+
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Yada yada yada.\n")
+    file_obj.write("Runtime objects cross into persistent storage.\n")
+
+with open(path, "r", encoding="utf-8") as file_obj:
+    content = file_obj.read()
+
+    print("Inside read block:")
+    print(f"type(file_obj) = {type(file_obj)}")
+    print(f"type(content)  = {type(content)}")
+    print(f"content        = {content.strip()}")
+
+    print()
+    print("Selected names from dir(content):")
+    for name in ["splitlines", "upper", "replace", "strip", "count"]:
+        print(f"{name:12} -> {name in dir(content)}")
+
+print()
+print("After read block:")
+print(f"file_obj.closed = {file_obj.closed}")
+\end{verbatim}
+
+The file object is temporary access machinery. The \texttt{content} variable is different. It refers to a \texttt{str} object created by reading from the file. After the file closes, the string remains available because it is now an ordinary runtime object.
+
+\subsubsection{The \texttt{\_\_enter\_\_()} / \texttt{\_\_exit\_\_()} Protocol Behind \texttt{with}}
+
+The \texttt{with} statement is not special only for files. It is built on a general protocol. An object used in a \texttt{with} statement must provide methods named \texttt{\_\_enter\_\_()} and \texttt{\_\_exit\_\_()}.
+
+For file objects, \texttt{\_\_enter\_\_()} prepares the object for use and returns the object assigned after \texttt{as}. The \texttt{\_\_exit\_\_()} method performs cleanup when the block is left. For files, that cleanup includes closing the file.
+
+The protocol can be inspected directly on a file object.
+
+\begin{verbatim}
+path = "protocol_demo.txt"
+
+file_obj = open(path, "w", encoding="utf-8")
+
+print("Protocol methods on a file object:")
+print(f"__enter__ in dir(file_obj): {'__enter__' in dir(file_obj)}")
+print(f"__exit__  in dir(file_obj): {'__exit__' in dir(file_obj)}")
+
+print()
+print("Selected names from dir(file_obj):")
+for name in ["__enter__", "__exit__", "write", "close", "closed"]:
+    print(f"{name:12} -> {name in dir(file_obj)}")
+
+print()
+entered_obj = file_obj.__enter__()
+
+print("After explicit __enter__():")
+print(f"entered_obj is file_obj = {entered_obj is file_obj}")
+print(f"type(entered_obj)      = {type(entered_obj)}")
+print(f"file_obj.closed        = {file_obj.closed}")
+
+entered_obj.write("This line was written after __enter__().\n")
+entered_obj.write("The Ministry of Silly Walks approves this protocol.\n")
+
+file_obj.__exit__(None, None, None)
+
+print()
+print("After explicit __exit__():")
+print(f"file_obj.closed = {file_obj.closed}")
+\end{verbatim}
+
+This manual call style is shown only to reveal the mechanism. Normal code should use the \texttt{with} statement, not direct calls to \texttt{\_\_enter\_\_()} and \texttt{\_\_exit\_\_()}.
+
+Conceptually, this block:
+
+\begin{verbatim}
+with open(path, "w", encoding="utf-8") as file_obj:
+    file_obj.write("Hello.\n")
+\end{verbatim}
+
+means roughly this:
+
+\begin{verbatim}
+file_obj = open(path, "w", encoding="utf-8")
+managed_obj = file_obj.__enter__()
+
+try:
+    managed_obj.write("Hello.\n")
+finally:
+    file_obj.__exit__(None, None, None)
+\end{verbatim}
+
+The real interpreter behavior also passes exception information into \texttt{\_\_exit\_\_()} when an error occurs. That is what makes the protocol useful for reliable cleanup.
+
+\subsubsection{Exception-Safe Cleanup: Why File Handles Close Even When Errors Occur Inside the Block}
+
+The strongest reason to use \texttt{with} is exception-safe cleanup. If an error happens inside the block, Python still leaves the block through the context-manager protocol. The file object's \texttt{\_\_exit\_\_()} method is still called, so the file is closed.
+
+\begin{verbatim}
+path = "exception_cleanup_demo.txt"
+
+try:
+    with open(path, "w", encoding="utf-8") as file_obj:
+        print("Inside with block, before the error:")
+        print(f"file_obj.closed = {file_obj.closed}")
+
+        file_obj.write("Everything is fine so far.\n")
+        file_obj.write("Then the program hits a deliberate error.\n")
+
+        number = 42
+        result = number / 0
+
+        file_obj.write("This line is never reached.\n")
+
+except ZeroDivisionError as err:
+    print()
+    print("The exception was caught outside the with block.")
+    print(f"type(err) = {type(err)}")
+    print(f"err       = {err}")
+
+print()
+print("After the failed with block:")
+print(f"file_obj.closed = {file_obj.closed}")
+\end{verbatim}
+
+The division by zero interrupts the normal flow of the block. The last write is not reached. Even so, the file is closed before control reaches the \texttt{except} block outside.
+
+This is the resource-management invariant: cleanup must not depend on the happy path. A program that opens external resources must release them even when execution is interrupted by an exception. The \texttt{with} statement encodes that rule directly into the shape of the program.
+
+For files, the practical rule is strict: use \texttt{with open(...)} unless there is a specific reason not to. It keeps acquisition and release in the same visible structure, prevents many leaked-handle mistakes, and matches Python's general object protocol for managed external resources.

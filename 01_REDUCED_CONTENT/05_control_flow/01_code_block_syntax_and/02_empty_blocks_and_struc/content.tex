@@ -51,46 +51,10 @@ A simple way to read \texttt{pass} is:
 
 It is common in temporary control-flow scaffolding:
 
-\begin{verbatim}
-score = 42
-
-if score > 90:
-    print("excellent")
-elif score > 50:
-    pass
-else:
-    print("needs work")
-
-print("grading finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-grading finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/emp02>>>
 The \texttt{elif} branch is selected because \texttt{42 > 50} is false? No. In this exact program, the \texttt{elif} branch is not selected. The program reaches the \texttt{else} branch and would print \texttt{needs work}. If we want to demonstrate the selected empty branch, the value must satisfy the middle condition:
 
-\begin{verbatim}
-score = 72
-
-if score > 90:
-    print("excellent")
-elif score > 50:
-    pass
-else:
-    print("needs work")
-
-print("grading finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-grading finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/emp01>>>
 The \texttt{elif} branch was entered, but it had no visible effect because its only statement was \texttt{pass}. After that empty branch completes, execution continues after the whole conditional structure.
 
 The control-flow graph still has a real branch:

@@ -1,0 +1,887 @@
+\relax 
+\providecommand*\new@tpo@label[2]{}
+\providecommand \babel@aux [2]{\global \let \babel@toc \@gobbletwo }
+\@nameuse{bbl@beforestart}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\babel@aux{english}{}
+\pgfsyspdfmark {pgfid2}{5644739}{50865199}
+\@writefile{toc}{\contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.1}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {chapter}{\numberline {2}Execution Architecture: From C Processes to Python Runtime Semantics}{9}{chapter.2}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {2.1}Operating Systems, Programs, and Process Mechanics}{10}{section.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Foundations of Execution Architecture}{11}{subsection.2.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{What is a Program? The Static Binary Blueprint and Executable Formats (ELF on Linux, PE/COFF on Windows)}{11}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{What is a Process? A Running Program with Its Own Virtual Address Space}{12}{section*.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Role of the Operating System Kernel: Supervisor Mode, Hardware Traps, System Calls, and Resource Isolation}{14}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}The Traditional Compilation Pipeline (The C Blueprint)}{16}{subsection.2.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Core Definition, Intent, and Objectives of Compilation vs. Interpretation}{16}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Factory vs. The Traveling Theater}{16}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 1: Raw materials intake (source and preprocessing).}{16}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 2: Token stamping (lexical analysis).}{16}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 3: Structural framing (parsing and the AST).}{16}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 4: Safety inspection (semantic analysis).}{16}{section*.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 5: Industrial optimization and lowering (middle/back end).}{17}{section*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Stage 6: Permanent pour (assembly, linking, native executable).}{17}{section*.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Why this metaphor matters for Python.}{17}{section*.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Compilation objectives restated compactly.}{17}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Program Loading and Execution Mechanics}{17}{subsection.2.1.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Lifecycle of Transformation: From Storage Binary Block to Active Virtual Memory Process}{17}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The OS Loader Subsystem: VMA Memory Mapping, Page Table Initialization, and Stack Argument Injection}{18}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Relocation Invariants and Control Handover to the Hardware Thread Execution Context}{18}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Native Entry Points: Loader Handover, C Runtime Startup, and the Call to \texttt  {main()}}{18}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Memory Layout in Bare-Metal Compiled Processes}{18}{subsection.2.1.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Text Segment: Read-Only Machine Instructions and Instruction Pointer Tracking}{18}{section*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Data and BSS Segments: Initialized and Uninitialized Global/Static Variable Storage Boundaries}{18}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Process Heap: Dynamic Manual Memory Allocation and Deallocation Schemes (\texttt  {malloc()} and \texttt  {free()})}{18}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Process Stack: Automatic Variable Lifetime Tracking, Call Chains, and Push/Pop Stack Frames}{19}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{The Grid vs. The Luxury Hotel (preview).}{19}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}Operating System Resource Management}{19}{subsection.2.1.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Cooperative (Non-Preemptive) vs. Preemptive Multitasking Operating System Architectures}{19}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The CPU Kernel Scheduler, Symmetrical Multiprocessing, and Context Switching Latency Overhead}{19}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Structural Differentiation: Heavyweight OS Processes (MMU Isolation) vs. Lightweight Native Threads (Shared Memory Spaces)}{19}{section*.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{From OS-Level Scheduling to Runtime-Level Scheduling}{19}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hotel concierge on the grid (synthesis).}{20}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}Process Virtual Machines and Interpreted Runtimes}{20}{section.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}From Native Executables to Runtime-Hosted Programs}{20}{subsection.2.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{What Actually Runs When We Run a Python File?}{20}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Native Interpreter Process: CPython as the Executable Loaded by the Operating System}{23}{section*.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The User Script as Runtime Input: Source File, Module Body, and First Executable Statement}{27}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Runtime Ownership of Execution State: Frames, Objects, Bytecode, and Managed Memory}{31}{section*.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.2}Abstracting the Hardware Layer: The Process VM Blueprint}{35}{subsection.2.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Definition, Scope, and Intent of a Software-Driven Execution Runtime Environment}{35}{section*.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Bytecode Concept: Platform-Agnostic Virtual Instruction Set Architecture (ISA) Layouts}{38}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Structural Models of Execution Engines}{42}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Stack-Based Virtual Machines: Evaluation Stack Operations and Zero-Address Instruction Sets}{46}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Register-Based Virtual Machines: Virtual CPU Register Mapping and Explicit-Address Instructions}{51}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.3}Comparative Runtime Case Studies}{54}{subsection.2.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Java Virtual Machine (JVM): Compiled Bytecode, Type Verification, Managed Memory, and the WORA Paradigm}{54}{section*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{CPython: Reference-Rich Stack Bytecode Inside a Stable C Extension Host}{55}{section*.39}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{V8 and JavaScript: Multi-Tiered Adaptive Compilation for Browser Latency}{55}{section*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{LuaJIT and Register VMs: Density and Dispatch Cost}{55}{section*.41}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Bash and Shell Dispatch: Process Spawning as the Real Instruction}{55}{section*.42}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Architectural summary for engineers from C.}{55}{section*.43}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}Architectural Roadmaps of Modern Procedural Extensions}{55}{section.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Functions as Runtime Values and Saved Execution Context}{56}{subsection.2.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Callbacks: Inverting Program Flow Control via Code Execution References and Function Pointers}{57}{section*.44}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{C: function pointers, comparators, signal handlers, and C-style event hooks.}{58}{section*.45}\protected@file@percent }
+\newlabel{lst:fun01}{{2.3.1}{58}{C: function pointers, comparators, signal handlers, and C-style event hooks}{tcb@cnt@codebox.2.3.1}{}}
+\newlabel{lst:fun01@cref}{{[tcb@cnt@codebox][1][2,3]2.3.1}{[1][58][]58}{}{}{}}
+\newlabel{lst:fun24}{{2.3.2}{59}{C: function pointers, comparators, signal handlers, and C-style event hooks}{tcb@cnt@codebox.2.3.2}{}}
+\newlabel{lst:fun24@cref}{{[tcb@cnt@codebox][2][2,3]2.3.2}{[1][59][]59}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Python: sorting keys, GUI handlers, web callbacks, and data-processing hooks.}{60}{section*.46}\protected@file@percent }
+\newlabel{lst:fun23}{{2.3.3}{61}{Python: sorting keys, GUI handlers, web callbacks, and data-processing hooks}{tcb@cnt@codebox.2.3.3}{}}
+\newlabel{lst:fun23@cref}{{[tcb@cnt@codebox][3][2,3]2.3.3}{[1][60][]61}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Java: listeners, GUI events, stream operations, and functional interfaces.}{62}{section*.47}\protected@file@percent }
+\newlabel{lst:fun27}{{2.3.4}{62}{Java: listeners, GUI events, stream operations, and functional interfaces}{tcb@cnt@codebox.2.3.4}{}}
+\newlabel{lst:fun27@cref}{{[tcb@cnt@codebox][4][2,3]2.3.4}{[1][62][]62}{}{}{}}
+\newlabel{lst:fun07}{{2.3.5}{63}{Java: listeners, GUI events, stream operations, and functional interfaces}{tcb@cnt@codebox.2.3.5}{}}
+\newlabel{lst:fun07@cref}{{[tcb@cnt@codebox][5][2,3]2.3.5}{[1][63][]63}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks.}{64}{section*.48}\protected@file@percent }
+\newlabel{lst:fun09}{{2.3.6}{64}{JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks}{tcb@cnt@codebox.2.3.6}{}}
+\newlabel{lst:fun09@cref}{{[tcb@cnt@codebox][6][2,3]2.3.6}{[1][64][]64}{}{}{}}
+\newlabel{lst:fun08}{{2.3.7}{65}{JavaScript and V8: DOM events, AJAX, timers, promises, and Node.js callbacks}{tcb@cnt@codebox.2.3.7}{}}
+\newlabel{lst:fun08@cref}{{[tcb@cnt@codebox][7][2,3]2.3.7}{[1][65][]65}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{PHP: array callbacks, sorting callbacks, request hooks, and framework handlers.}{65}{section*.49}\protected@file@percent }
+\newlabel{lst:fun16}{{2.3.8}{65}{PHP: array callbacks, sorting callbacks, request hooks, and framework handlers}{tcb@cnt@codebox.2.3.8}{}}
+\newlabel{lst:fun16@cref}{{[tcb@cnt@codebox][8][2,3]2.3.8}{[1][65][]65}{}{}{}}
+\newlabel{lst:fun15}{{2.3.9}{66}{PHP: array callbacks, sorting callbacks, request hooks, and framework handlers}{tcb@cnt@codebox.2.3.9}{}}
+\newlabel{lst:fun15@cref}{{[tcb@cnt@codebox][9][2,3]2.3.9}{[1][66][]66}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Bash: traps, shell hooks, command-name callbacks, and pipeline orchestration.}{67}{section*.50}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Comparison and stack summary.}{68}{section*.51}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Anonymous Subroutines: Inline Block Definitions, Lambda Expressions, and Function Objects Without Stable Source-Level Names}{69}{section*.52}\protected@file@percent }
+\newlabel{lst:fun19}{{2.3.10}{69}{Anonymous Subroutines: Inline Block Definitions, Lambda Expressions, and Function Objects Without Stable Source-Level Names}{tcb@cnt@codebox.2.3.10}{}}
+\newlabel{lst:fun19@cref}{{[tcb@cnt@codebox][10][2,3]2.3.10}{[1][69][]69}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Python: lambda expressions and local function objects.}{69}{section*.53}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{JavaScript and V8: function expressions, arrow functions, AJAX, and DOM handlers.}{71}{section*.54}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Java: anonymous classes, lambdas, GUI listeners, and stream functions.}{72}{section*.55}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{PHP: anonymous functions, closures, array processing, and route handlers.}{73}{section*.56}\protected@file@percent }
+\newlabel{lst:fun14}{{2.3.11}{73}{PHP: anonymous functions, closures, array processing, and route handlers}{tcb@cnt@codebox.2.3.11}{}}
+\newlabel{lst:fun14@cref}{{[tcb@cnt@codebox][11][2,3]2.3.11}{[1][73][]73}{}{}{}}
+\newlabel{lst:fun13}{{2.3.12}{73}{PHP: anonymous functions, closures, array processing, and route handlers}{tcb@cnt@codebox.2.3.12}{}}
+\newlabel{lst:fun13@cref}{{[tcb@cnt@codebox][12][2,3]2.3.12}{[1][73][]73}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{C: no standard lambdas, but function pointers and nonstandard emulations.}{74}{section*.57}\protected@file@percent }
+\newlabel{lst:fun04}{{2.3.13}{75}{C: no standard lambdas, but function pointers and nonstandard emulations}{tcb@cnt@codebox.2.3.13}{}}
+\newlabel{lst:fun04@cref}{{[tcb@cnt@codebox][13][2,3]2.3.13}{[1][74][]75}{}{}{}}
+\newlabel{lst:fun03}{{2.3.14}{75}{C: no standard lambdas, but function pointers and nonstandard emulations}{tcb@cnt@codebox.2.3.14}{}}
+\newlabel{lst:fun03@cref}{{[tcb@cnt@codebox][14][2,3]2.3.14}{[1][75][]75}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Bash: no real anonymous functions, but inline commands and evaluated command bodies.}{76}{section*.58}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Implementation comparison.}{77}{section*.59}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Closures: Heap-Preserved Execution Environments, Non-Local Scope State Retention, and Lexical Binding}{78}{section*.60}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Python / CPython: closure cells and non-local lexical bindings.}{78}{section*.61}\protected@file@percent }
+\newlabel{lst:fun22}{{2.3.15}{78}{Python / CPython: closure cells and non-local lexical bindings}{tcb@cnt@codebox.2.3.15}{}}
+\newlabel{lst:fun22@cref}{{[tcb@cnt@codebox][15][2,3]2.3.15}{[1][78][]78}{}{}{}}
+\newlabel{lst:fun21}{{2.3.16}{80}{Python / CPython: closure cells and non-local lexical bindings}{tcb@cnt@codebox.2.3.16}{}}
+\newlabel{lst:fun21@cref}{{[tcb@cnt@codebox][16][2,3]2.3.16}{[1][79][]80}{}{}{}}
+\newlabel{lst:fun20}{{2.3.17}{80}{Python / CPython: closure cells and non-local lexical bindings}{tcb@cnt@codebox.2.3.17}{}}
+\newlabel{lst:fun20@cref}{{[tcb@cnt@codebox][17][2,3]2.3.17}{[1][80][]80}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factories.}{80}{section*.62}\protected@file@percent }
+\newlabel{lst:fun12}{{2.3.18}{81}{JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factories}{tcb@cnt@codebox.2.3.18}{}}
+\newlabel{lst:fun12@cref}{{[tcb@cnt@codebox][18][2,3]2.3.18}{[1][80][]81}{}{}{}}
+\newlabel{lst:fun11}{{2.3.19}{81}{JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factories}{tcb@cnt@codebox.2.3.19}{}}
+\newlabel{lst:fun11@cref}{{[tcb@cnt@codebox][19][2,3]2.3.19}{[1][81][]81}{}{}{}}
+\newlabel{lst:fun10}{{2.3.20}{82}{JavaScript / V8: lexical environments for callbacks, AJAX, timers, and factories}{tcb@cnt@codebox.2.3.20}{}}
+\newlabel{lst:fun10@cref}{{[tcb@cnt@codebox][20][2,3]2.3.20}{[1][82][]82}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Java: captured variables in lambdas and generated callable objects.}{82}{section*.63}\protected@file@percent }
+\newlabel{lst:fun06}{{2.3.21}{82}{Java: captured variables in lambdas and generated callable objects}{tcb@cnt@codebox.2.3.21}{}}
+\newlabel{lst:fun06@cref}{{[tcb@cnt@codebox][21][2,3]2.3.21}{[1][82][]82}{}{}{}}
+\newlabel{lst:fun05}{{2.3.22}{83}{Java: captured variables in lambdas and generated callable objects}{tcb@cnt@codebox.2.3.22}{}}
+\newlabel{lst:fun05@cref}{{[tcb@cnt@codebox][22][2,3]2.3.22}{[1][83][]83}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{PHP: closures with \texttt  {use}, captured values, and captured references.}{84}{section*.64}\protected@file@percent }
+\newlabel{lst:fun18}{{2.3.23}{84}{PHP: closures with \texttt {use}, captured values, and captured references}{tcb@cnt@codebox.2.3.23}{}}
+\newlabel{lst:fun18@cref}{{[tcb@cnt@codebox][23][2,3]2.3.23}{[1][84][]84}{}{}{}}
+\newlabel{lst:fun17}{{2.3.24}{85}{PHP: closures with \texttt {use}, captured values, and captured references}{tcb@cnt@codebox.2.3.24}{}}
+\newlabel{lst:fun17@cref}{{[tcb@cnt@codebox][24][2,3]2.3.24}{[1][85][]85}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{C: no standard closures, explicit environment structs, and lifetime hazards.}{85}{section*.65}\protected@file@percent }
+\newlabel{lst:fun02}{{2.3.25}{86}{C: no standard closures, explicit environment structs, and lifetime hazards}{tcb@cnt@codebox.2.3.25}{}}
+\newlabel{lst:fun02@cref}{{[tcb@cnt@codebox][25][2,3]2.3.25}{[1][85][]86}{}{}{}}
+\newlabel{lst:fun26}{{2.3.26}{87}{C: no standard closures, explicit environment structs, and lifetime hazards}{tcb@cnt@codebox.2.3.26}{}}
+\newlabel{lst:fun26@cref}{{[tcb@cnt@codebox][26][2,3]2.3.26}{[1][87][]87}{}{}{}}
+\newlabel{lst:fun28}{{2.3.27}{87}{C: no standard closures, explicit environment structs, and lifetime hazards}{tcb@cnt@codebox.2.3.27}{}}
+\newlabel{lst:fun28@cref}{{[tcb@cnt@codebox][27][2,3]2.3.27}{[1][87][]87}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Bash: no lexical closures, but state can be approximated with globals, subshells, and generated commands.}{88}{section*.66}\protected@file@percent }
+\newlabel{lst:fun25}{{2.3.28}{88}{Bash: no lexical closures, but state can be approximated with globals, subshells, and generated commands}{tcb@cnt@codebox.2.3.28}{}}
+\newlabel{lst:fun25@cref}{{[tcb@cnt@codebox][28][2,3]2.3.28}{[1][88][]88}{}{}{}}
+\@writefile{toc}{\contentsline {paragraph}{Closures and stack preservation: the crucial distinction.}{89}{section*.67}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.2}Suspended Execution and Runtime-Managed Control Flow}{90}{subsection.2.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-Preserving Suspended Subroutines}{90}{section*.68}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Coroutines and the Async Event Loop: Cooperative Scheduling Inside One OS Thread}{90}{section*.69}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Mechanical picture at an await boundary.}{91}{section*.70}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Introduction to the Python Language Architecture}{92}{chapter.3}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Historical Context and Design Evolution}{92}{section.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Chronological Timeline: The Genesis, Origins, and Formal Release of Python (Guido van Rossum, 1989--1991)}{92}{subsection.3.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Design Philosophy and Tensions: Reading “The Zen of Python” Critically}{93}{subsection.3.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Python Implementations and the Role of CPython}{94}{section.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Python as a Language vs. CPython as the Reference Implementation}{94}{subsection.3.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Language: Rules Visible to the Programmer}{94}{section*.71}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Implementation: The Machine That Realizes the Rules}{94}{section*.72}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why CPython Became the Reference Implementation}{94}{section*.73}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Boundary Between Guaranteed Behavior and CPython Behavior}{95}{section*.74}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why This Course Focuses on CPython}{95}{section*.75}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Practical Rule}{95}{section*.76}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}CPython, PyPy, Jython, IronPython, and Alternative Runtime Strategies}{95}{subsection.3.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{CPython: The Dominant Reference Runtime}{95}{section*.77}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{PyPy: Python with a JIT-Oriented Runtime Strategy}{95}{section*.78}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Jython: Python on the Java Virtual Machine}{95}{section*.79}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{IronPython: Python on the .NET Runtime}{95}{section*.80}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Alternative Strategies and Specialized Pythons}{96}{section*.81}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Compatibility Is Not Only Syntax}{96}{section*.82}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Different Runtime Strategies, Different Tradeoffs}{96}{section*.83}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Practical Consequence}{96}{section*.84}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Python Compilers, Accelerators, and Translators: Cython, Nuitka, Numba, MyPyC, and Related Tools}{96}{subsection.3.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why Python Compilation Is Not C Compilation}{96}{section*.85}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Cython: Python Near the C Boundary}{96}{section*.86}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Nuitka: Whole-Program Compilation with Runtime Preservation}{96}{section*.87}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Numba: Runtime Compilation of Numerical Kernels}{97}{section*.88}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{MyPyC: Type-Annotated Python Compiled to C Extensions}{97}{section*.89}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Packaging Tools Are Not Necessarily Compilers}{97}{section*.90}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Common Pattern: Move the Hot Path Downward}{97}{section*.91}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Conceptual Lesson}{97}{section*.92}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}The Practical Consequence: Python Code Can Have Different Execution Backends but One Dominant Reference Runtime}{97}{subsection.3.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Same Source Surface Can Hide Different Machines}{97}{section*.93}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why CPython Still Dominates Practice}{97}{section*.94}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Portability Is Real, but Not Automatic}{97}{section*.95}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The False Simplicity of “Compiled vs. Interpreted”}{98}{section*.96}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Teaching Consequence}{98}{section*.97}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Practical Rule for Programmers}{98}{section*.98}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Variables and Singular Data Types}{99}{chapter.4}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Identifiers and Syntax Rules for Variables}{99}{section.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1.1}Legal and Structural Lexer Constraints}{100}{subsection.4.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Digit Restrictions: Why Identifiers Cannot Start with a Numerical Character}{100}{section*.99}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Reserved Keywords: Why \texttt  {def}, \texttt  {class}, \texttt  {import}, and Similar Tokens Cannot Be Used as Names}{101}{section*.100}\protected@file@percent }
+\newlabel{lst:leg01}{{4.1.1}{101}{Reserved Keywords: Why \texttt {def}, \texttt {class}, \texttt {import}, and Similar Tokens Cannot Be Used as Names}{tcb@cnt@codebox.4.1.1}{}}
+\newlabel{lst:leg01@cref}{{[tcb@cnt@codebox][1][4,1]4.1.1}{[1][101][]101}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Case Sensitivity: \texttt  {name}, \texttt  {Name}, and \texttt  {NAME} as Distinct Bindings}{101}{section*.101}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Assignment and Name Binding}{102}{section.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.1}Simple Assignment: Creating or Rebinding a Name}{102}{subsection.4.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Assignment as Binding, Not Memory Copying}{102}{section*.102}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Reassignment: Moving a Name from One Object to Another}{102}{section*.103}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Object Sharing: Binding Multiple Names to the Same Runtime Object (\texttt  {a = b})}{103}{section*.104}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.2}Multiple Assignment and Unpacking}{103}{subsection.4.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parallel Assignment: Swapping Values with \texttt  {a, b = b, a}}{103}{section*.105}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Sequence Unpacking and Arity Requirements}{104}{section*.106}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Extended Unpacking with the Star Target (\texttt  {*rest})}{104}{section*.107}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.3}Augmented Assignment}{104}{subsection.4.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Numeric Augmented Assignment (\texttt  {+=}, \texttt  {-=}, \texttt  {*=}, \texttt  {/=}) as Read-Operate-Rebind for Immutable Singular Values}{105}{section*.108}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Mutation vs. Rebinding Preview for Later Mutable Containers}{105}{section*.109}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2.4}Deleting Names}{106}{subsection.4.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Removing a Binding with \texttt  {del}}{106}{section*.110}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Name Deletion, Object Reachability, and Possible Reference Count Changes}{106}{section*.111}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Singular Data Domains and Operator Precedence}{106}{section.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.1}The Integer Representation Architecture (\texttt  {int})}{107}{subsection.4.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Arbitrary-Precision Math Engine: Eliminating Fixed-Width Integer Overflow Boundaries}{107}{section*.112}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Dynamic Bit Scaling: CPython's Digit-Array Structural Allocation for High-Magnitude Values}{107}{section*.113}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Integer Literals: Decimal, Binary, Octal, and Hexadecimal Notation}{107}{section*.114}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.2}The Floating-Point Representation Architecture (\texttt  {float})}{108}{subsection.4.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Architectural Realities: Mapping Python Floats to C Doubles via the IEEE 754 Double-Precision Binary Standard}{108}{section*.115}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Machine Epsilon and Precision Loss: The Pitfalls of Representing Base-10 Fractions in Base-2 Memory Buffers}{108}{section*.116}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Special Floating-Point Values: Infinity, Negative Infinity, and NaN}{108}{section*.117}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.3}The Boolean Representation Architecture (\texttt  {bool})}{109}{subsection.4.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Boolean Values as Singleton Objects: \texttt  {True} and \texttt  {False}}{109}{section*.118}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Boolean as a Subclass of Integer: Numeric Compatibility and Practical Warnings}{109}{section*.119}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Logical Operators vs. Bitwise Operators: \texttt  {and} / \texttt  {or} / \texttt  {not} Compared with \texttt  {\&} / \texttt  {|} / \texttt  {\textasciitilde {}}}{109}{section*.120}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.4}The Null-Sentinel Object (\texttt  {None})}{110}{subsection.4.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {None} as a Singleton Object, Not a Null Pointer}{110}{section*.121}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Absence, Default Return Values, and Missing-Value Signaling}{110}{section*.122}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Identity Testing with \texttt  {is None} and \texttt  {is not None}}{110}{section*.123}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3.5}Numerical Operator Architecture and Precedence Graphs}{110}{subsection.4.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Standard Arithmetic: Operator Dispatch and Result Object Creation}{110}{section*.124}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Division Divergence: Floating-Point Division (\texttt  {/}) vs. Floor Division (\texttt  {//})}{111}{section*.125}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Modular Math (\texttt  {\%}) and Exponentiation (\texttt  {**}) Mechanics}{111}{section*.126}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Unary Operators and Precedence Traps: \texttt  {-x}, \texttt  {+x}, and \texttt  {-2 ** 2}}{111}{section*.127}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Parentheses as Explicit Precedence Control}{111}{section*.128}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Runtime Typing Consequences in Singular Operations}{112}{section.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.1}Dynamic Typing in Assignment}{112}{subsection.4.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Names Do Not Have Fixed Declared Types}{112}{section*.129}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Rebinding the Same Name to Objects of Different Types}{112}{section*.130}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Runtime Type Inspection with \texttt  {type()} and \texttt  {isinstance()}}{112}{section*.131}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.2}Strong Typing in Operations}{113}{subsection.4.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why Heterogeneous Operations Such as \texttt  {"3" + 4} Fail Instead of Silently Converting}{113}{section*.132}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Explicit Conversion with \texttt  {int()}, \texttt  {float()}, \texttt  {complex()}, \texttt  {bool()}, and \texttt  {str()}}{113}{section*.133}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Numeric Promotion Boundaries: Integer, Float, Complex, and Boolean Interactions}{114}{section*.134}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4.3}Structural Summary}{114}{subsection.4.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Categorizing Python as a Dynamically Bound, Strongly Verified Runtime Typing Environment}{114}{section*.135}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Practical Rule: Names Are Flexible, Objects Keep Their Runtime Type}{115}{section*.136}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Sequential Component Data Architectures (Strings, Lists, and Tuples)}{116}{chapter.5}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}The General Sequence Model in Python}{116}{section.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}Ordered Component Storage and Positional Access}{116}{subsection.5.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Slicing: Extracting Sub-Sequences with \texttt  {[start:stop:step]}}{116}{section*.137}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}Sequence Operators and Shared Behaviors}{117}{subsection.5.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Immutability vs. Mutability as the Major Structural Split}{117}{section*.138}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}Text Encoding Systems, Lexical Escape Maps, and Character Representation}{117}{section.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.1}Character Interoperability Standards}{117}{subsection.5.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Classical Domain: 7-Bit ASCII Codepoints (\texttt  {0--127}) and the Later Confusion with 8-Bit Extended Encodings}{118}{section*.139}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Universal Map: Unicode Codepoints as Abstract Character Numbers, Separate from Byte Encodings}{118}{section*.140}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Encoding Boundaries: UTF-8, UTF-16, and UTF-32 as Byte Representations of Unicode Text}{118}{section*.141}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.2}Native Conversion and Boundary Escape Sequences}{118}{subsection.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Hexadecimal Literal Parsing Boundaries (\texttt  {\textbackslash xhh} Values through Base-16 Conversions)}{118}{section*.142}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Raw String Literals: Suppressing Most Escape Processing with the \texttt  {r"..."} Prefix}{118}{section*.143}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2.3}Extended Universal Codepoint Escape Access}{118}{subsection.5.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}CPython String Memory Realities (\texttt  {str})}{119}{section.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Structural Abstraction of the Unicode Standard}{119}{subsection.5.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Distinction Between Abstract Codepoints, Visible Glyphs, and Transmitted Byte Serializations}{119}{section*.144}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Text vs. Bytes: Why \texttt  {str} Stores Text and \texttt  {bytes} Stores Raw Byte Values}{119}{section*.145}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.2}CPython Memory Optimization Architecture (PEP 393)}{119}{subsection.5.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Flexible String Representation Framework: Dynamic Character Data Width Selection Based on Maximum Codepoint Value}{119}{section*.146}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Core Immutability: Fixed Heap Allocations and Read-Only Character Storage}{120}{section*.147}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Computational and Allocation Overhead of Iterative String Concatenation}{120}{section*.148}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Interning Subsystem: Immutable String Optimization and Singly Allocated Literals inside CPython}{120}{section*.149}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.3}Structural Extraction and Evaluation}{120}{subsection.5.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Indexing and Slicing: Characters as One-Character String Objects}{120}{section*.150}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Substring Evaluation Mechanisms: Step-Based Slice Offsets (\texttt  {[start:stop:step]}) vs. Manual Pointer Offsets}{120}{section*.151}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{String Formatting Paradigms: Variable Injection via Modern f-Strings}{121}{section*.152}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.4}String Sequence Operations}{121}{subsection.5.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Splitting and Joining: \texttt  {.split()} and \texttt  {.join()} as Core Text-Sequence Transformations}{121}{section*.153}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.4}Dynamic Pointer Arrays: The Python List Architecture (\texttt  {list})}{121}{section.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.1}The Memory Layout Paradigm Contrast}{121}{subsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The C Array Blueprint: Fixed, Contiguous Structures Storing Homogeneous Raw Primitive Values Directly}{121}{section*.154}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Python List Blueprint: A Contiguous Array Storing Heterogeneous \texttt  {PyObject*} References on the Heap}{121}{section*.155}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.2}CPython Dynamic Scaling Mechanics}{122}{subsection.5.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Dynamic Over-Allocation Invariants: How CPython Pre-Allocates Extra Slots During List Resizing to Support Amortized O(1) Appends}{122}{section*.156}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Memory Shifting Costs: The O(N) Penalty of Arbitrary Index Insertions and Deletions (\texttt  {.insert()}, \texttt  {.pop()})}{122}{section*.157}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.3}List Mutation Operations}{122}{subsection.5.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Index Assignment and Slice Assignment}{122}{section*.158}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4.4}Deep vs. Shallow Structural Cloning}{122}{subsection.5.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Assignment Is Not Copying: Shared List References with \texttt  {b = a}}{123}{section*.159}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Deep vs. Shallow Structural Cloning}{123}{section*.160}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.5}Fixed Structural Contiguity: The Tuple Architecture (\texttt  {tuple})}{123}{section.5.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.1}Tuple Syntax and Structural Role}{123}{subsection.5.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Tuple Unpacking: Decomposing Fixed-Length Structures into Multiple Names}{123}{section*.161}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Single-Element Tuple Syntax: Why \texttt  {(x,)} Is a Tuple but \texttt  {(x)} Is Not}{123}{section*.162}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.2}Immutable Sequence Invariants}{124}{subsection.5.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Structural Definition: Fixed-Size, Read-Only Sequential Storage of \texttt  {PyObject*} Addresses}{124}{section*.163}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Concept of Transitive Mutability: Why a Tuple Is Structurally Unalterable, Yet May Reference Internally Mutable Objects}{124}{section*.164}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5.3}CPython Allocation Optimizations}{124}{subsection.5.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{CPython Allocation Caching: Version-Dependent Recycling Optimizations for Small Tuple Objects}{124}{section*.165}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Memory Footprint Metrics: Comparing Fixed \texttt  {tuple} Layouts Against the Dynamic Tracking Buffers of \texttt  {list}}{124}{section*.166}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {6}Control Flow Graphs, Lazy Traversal, and Exception Routing}{125}{chapter.6}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {6.1}From Linear Source Text to Control Flow Graphs}{125}{section.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1.1}Statements, Basic Blocks, and Execution Edges}{125}{subsection.6.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Sequential Flow: The Default Fall-Through Path from One Statement to the Next}{126}{section*.167}\protected@file@percent }
+\newlabel{lst:sta05}{{6.1.1}{126}{Sequential Flow: The Default Fall-Through Path from One Statement to the Next}{tcb@cnt@codebox.6.1.1}{}}
+\newlabel{lst:sta05@cref}{{[tcb@cnt@codebox][1][6,1]6.1.1}{[1][126][]126}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Conditional Edges: Branching Execution Paths Created by \texttt  {if}, \texttt  {elif}, and \texttt  {else}}{127}{section*.168}\protected@file@percent }
+\newlabel{lst:sta04}{{6.1.2}{127}{Conditional Edges: Branching Execution Paths Created by \texttt {if}, \texttt {elif}, and \texttt {else}}{tcb@cnt@codebox.6.1.2}{}}
+\newlabel{lst:sta04@cref}{{[tcb@cnt@codebox][2][6,1]6.1.2}{[1][127][]127}{}{}{}}
+\newlabel{lst:sta03}{{6.1.3}{128}{Conditional Edges: Branching Execution Paths Created by \texttt {if}, \texttt {elif}, and \texttt {else}}{tcb@cnt@codebox.6.1.3}{}}
+\newlabel{lst:sta03@cref}{{[tcb@cnt@codebox][3][6,1]6.1.3}{[1][128][]128}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Loop Back-Edges: Repeated Execution Paths Created by \texttt  {while} and \texttt  {for}}{128}{section*.169}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Exceptional Edges: Non-Local Control Transfers Created by Exceptions}{130}{section*.170}\protected@file@percent }
+\newlabel{lst:sta02}{{6.1.4}{130}{Exceptional Edges: Non-Local Control Transfers Created by Exceptions}{tcb@cnt@codebox.6.1.4}{}}
+\newlabel{lst:sta02@cref}{{[tcb@cnt@codebox][4][6,1]6.1.4}{[1][130][]130}{}{}{}}
+\newlabel{lst:sta01}{{6.1.5}{131}{Exceptional Edges: Non-Local Control Transfers Created by Exceptions}{tcb@cnt@codebox.6.1.5}{}}
+\newlabel{lst:sta01@cref}{{[tcb@cnt@codebox][5][6,1]6.1.5}{[1][131][]131}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.2}Code Block Syntax and Indentation Semantics}{132}{section.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.1}The Philosophy of Syntactic Whitespace}{132}{subsection.6.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Python’s Core Design Choice: Whitespace Semantics for Structural Block Definitions}{133}{section*.171}\protected@file@percent }
+\newlabel{lst:the06}{{6.2.1}{133}{Python’s Core Design Choice: Whitespace Semantics for Structural Block Definitions}{tcb@cnt@codebox.6.2.1}{}}
+\newlabel{lst:the06@cref}{{[tcb@cnt@codebox][1][6,2]6.2.1}{[1][133][]133}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Structural Isolation: Eliminating Explicit Block Tokens (Curly Braces \texttt  {\{\}}, \texttt  {begin}/\texttt  {end})}{134}{section*.172}\protected@file@percent }
+\newlabel{lst:the05}{{6.2.2}{134}{Structural Isolation: Eliminating Explicit Block Tokens (Curly Braces \texttt {\{\}}, \texttt {begin}/\texttt {end})}{tcb@cnt@codebox.6.2.2}{}}
+\newlabel{lst:the05@cref}{{[tcb@cnt@codebox][2][6,2]6.2.2}{[1][134][]134}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked \texttt  {INDENT} / \texttt  {DEDENT} States and Generates \texttt  {IndentationError}}{135}{section*.173}\protected@file@percent }
+\newlabel{lst:the04}{{6.2.3}{136}{Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked \texttt {INDENT} / \texttt {DEDENT} States and Generates \texttt {IndentationError}}{tcb@cnt@codebox.6.2.3}{}}
+\newlabel{lst:the04@cref}{{[tcb@cnt@codebox][3][6,2]6.2.3}{[1][135][]136}{}{}{}}
+\newlabel{lst:the03}{{6.2.4}{137}{Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked \texttt {INDENT} / \texttt {DEDENT} States and Generates \texttt {IndentationError}}{tcb@cnt@codebox.6.2.4}{}}
+\newlabel{lst:the03@cref}{{[tcb@cnt@codebox][4][6,2]6.2.4}{[1][136][]137}{}{}{}}
+\newlabel{lst:the02}{{6.2.5}{137}{Lexer Parsing Rules: How the Tokenizer Tracks Indentation via Stacked \texttt {INDENT} / \texttt {DEDENT} States and Generates \texttt {IndentationError}}{tcb@cnt@codebox.6.2.5}{}}
+\newlabel{lst:the02@cref}{{[tcb@cnt@codebox][5][6,2]6.2.5}{[1][137][]137}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Mixed Tabs and Spaces: How \texttt  {TabError} Emerges from Ambiguous Indentation}{138}{section*.174}\protected@file@percent }
+\newlabel{lst:the01}{{6.2.6}{138}{Mixed Tabs and Spaces: How \texttt {TabError} Emerges from Ambiguous Indentation}{tcb@cnt@codebox.6.2.6}{}}
+\newlabel{lst:the01@cref}{{[tcb@cnt@codebox][6][6,2]6.2.6}{[1][138][]138}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.2}Comparative Paradigm Analysis}{139}{subsection.6.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Deviations and Readability Metrics Against Curly-Brace Compiled Languages (C, C++, Java)}{139}{section*.175}\protected@file@percent }
+\newlabel{lst:com07}{{6.2.7}{139}{Deviations and Readability Metrics Against Curly-Brace Compiled Languages (C, C++, Java)}{tcb@cnt@codebox.6.2.7}{}}
+\newlabel{lst:com07@cref}{{[tcb@cnt@codebox][7][6,2]6.2.7}{[1][139][]139}{}{}{}}
+\newlabel{lst:com06}{{6.2.8}{140}{Deviations and Readability Metrics Against Curly-Brace Compiled Languages (C, C++, Java)}{tcb@cnt@codebox.6.2.8}{}}
+\newlabel{lst:com06@cref}{{[tcb@cnt@codebox][8][6,2]6.2.8}{[1][139][]140}{}{}{}}
+\newlabel{lst:com05}{{6.2.9}{140}{Deviations and Readability Metrics Against Curly-Brace Compiled Languages (C, C++, Java)}{tcb@cnt@codebox.6.2.9}{}}
+\newlabel{lst:com05@cref}{{[tcb@cnt@codebox][9][6,2]6.2.9}{[1][140][]140}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Logical Scope Bleed}{141}{section*.176}\protected@file@percent }
+\newlabel{lst:com04}{{6.2.10}{141}{Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Logical Scope Bleed}{tcb@cnt@codebox.6.2.10}{}}
+\newlabel{lst:com04@cref}{{[tcb@cnt@codebox][10][6,2]6.2.10}{[1][141][]141}{}{}{}}
+\newlabel{lst:com03}{{6.2.11}{142}{Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Logical Scope Bleed}{tcb@cnt@codebox.6.2.11}{}}
+\newlabel{lst:com03@cref}{{[tcb@cnt@codebox][11][6,2]6.2.11}{[1][142][]142}{}{}{}}
+\newlabel{lst:com02}{{6.2.12}{142}{Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Logical Scope Bleed}{tcb@cnt@codebox.6.2.12}{}}
+\newlabel{lst:com02@cref}{{[tcb@cnt@codebox][12][6,2]6.2.12}{[1][142][]142}{}{}{}}
+\newlabel{lst:com01}{{6.2.13}{143}{Visual Layout as Functional Logic: Enforcing Uniform Alignment to Prevent Logical Scope Bleed}{tcb@cnt@codebox.6.2.13}{}}
+\newlabel{lst:com01@cref}{{[tcb@cnt@codebox][13][6,2]6.2.13}{[1][143][]143}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2.3}Empty Blocks and Structural Placeholders}{143}{subsection.6.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The \texttt  {pass} Statement: Syntactically Valid Empty Control-Flow Bodies}{144}{section*.177}\protected@file@percent }
+\newlabel{lst:emp02}{{6.2.14}{144}{The \texttt {pass} Statement: Syntactically Valid Empty Control-Flow Bodies}{tcb@cnt@codebox.6.2.14}{}}
+\newlabel{lst:emp02@cref}{{[tcb@cnt@codebox][14][6,2]6.2.14}{[1][144][]144}{}{}{}}
+\newlabel{lst:emp01}{{6.2.15}{145}{The \texttt {pass} Statement: Syntactically Valid Empty Control-Flow Bodies}{tcb@cnt@codebox.6.2.15}{}}
+\newlabel{lst:emp01@cref}{{[tcb@cnt@codebox][15][6,2]6.2.15}{[1][144][]145}{}{}{}}
+\newlabel{lst:emp02}{{6.2.16}{146}{The \texttt {pass} Statement: Syntactically Valid Empty Control-Flow Bodies}{tcb@cnt@codebox.6.2.16}{}}
+\newlabel{lst:emp02@cref}{{[tcb@cnt@codebox][16][6,2]6.2.16}{[1][146][]146}{}{}{}}
+\newlabel{lst:emp01}{{6.2.17}{146}{The \texttt {pass} Statement: Syntactically Valid Empty Control-Flow Bodies}{tcb@cnt@codebox.6.2.17}{}}
+\newlabel{lst:emp01@cref}{{[tcb@cnt@codebox][17][6,2]6.2.17}{[1][146][]146}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.3}Conditional Statements and Decision Trees}{147}{section.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.1}Syntax of Branching Control Graphs}{147}{subsection.6.3.1}\protected@file@percent }
+\newlabel{lst:syn10}{{6.3.1}{148}{Syntax of Branching Control Graphs}{tcb@cnt@codebox.6.3.1}{}}
+\newlabel{lst:syn10@cref}{{[tcb@cnt@codebox][1][6,3]6.3.1}{[1][147][]148}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{148}{section*.178}\protected@file@percent }
+\newlabel{lst:syn09}{{6.3.2}{148}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.2}{}}
+\newlabel{lst:syn09@cref}{{[tcb@cnt@codebox][2][6,3]6.3.2}{[1][148][]148}{}{}{}}
+\newlabel{lst:syn08}{{6.3.3}{149}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.3}{}}
+\newlabel{lst:syn08@cref}{{[tcb@cnt@codebox][3][6,3]6.3.3}{[1][149][]149}{}{}{}}
+\newlabel{lst:syn07}{{6.3.4}{150}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.4}{}}
+\newlabel{lst:syn07@cref}{{[tcb@cnt@codebox][4][6,3]6.3.4}{[1][149][]150}{}{}{}}
+\newlabel{lst:syn06}{{6.3.5}{150}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.5}{}}
+\newlabel{lst:syn06@cref}{{[tcb@cnt@codebox][5][6,3]6.3.5}{[1][150][]150}{}{}{}}
+\newlabel{lst:syn05}{{6.3.6}{151}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.6}{}}
+\newlabel{lst:syn05@cref}{{[tcb@cnt@codebox][6][6,3]6.3.6}{[1][150][]151}{}{}{}}
+\newlabel{lst:syn04}{{6.3.7}{151}{Nested Code Blocks: Creating Complex Hierarchical Decision Trees}{tcb@cnt@codebox.6.3.7}{}}
+\newlabel{lst:syn04@cref}{{[tcb@cnt@codebox][7][6,3]6.3.7}{[1][151][]151}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Conditional Expressions: Inline Branch Selection with \texttt  {x if condition else y}}{151}{section*.179}\protected@file@percent }
+\newlabel{lst:syn03}{{6.3.8}{152}{Conditional Expressions: Inline Branch Selection with \texttt {x if condition else y}}{tcb@cnt@codebox.6.3.8}{}}
+\newlabel{lst:syn03@cref}{{[tcb@cnt@codebox][8][6,3]6.3.8}{[1][151][]152}{}{}{}}
+\newlabel{lst:syn02}{{6.3.9}{153}{Conditional Expressions: Inline Branch Selection with \texttt {x if condition else y}}{tcb@cnt@codebox.6.3.9}{}}
+\newlabel{lst:syn02@cref}{{[tcb@cnt@codebox][9][6,3]6.3.9}{[1][153][]153}{}{}{}}
+\newlabel{lst:syn01}{{6.3.10}{154}{Conditional Expressions: Inline Branch Selection with \texttt {x if condition else y}}{tcb@cnt@codebox.6.3.10}{}}
+\newlabel{lst:syn01@cref}{{[tcb@cnt@codebox][10][6,3]6.3.10}{[1][153][]154}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3.2}Logic Evaluation Architecture}{154}{subsection.6.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt  {\_\_bool\_\_} and \texttt  {\_\_len\_\_}}{155}{section*.180}\protected@file@percent }
+\newlabel{lst:log07}{{6.3.11}{155}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.11}{}}
+\newlabel{lst:log07@cref}{{[tcb@cnt@codebox][11][6,3]6.3.11}{[1][155][]155}{}{}{}}
+\newlabel{lst:log06}{{6.3.12}{156}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.12}{}}
+\newlabel{lst:log06@cref}{{[tcb@cnt@codebox][12][6,3]6.3.12}{[1][155][]156}{}{}{}}
+\newlabel{lst:log05}{{6.3.13}{156}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.13}{}}
+\newlabel{lst:log05@cref}{{[tcb@cnt@codebox][13][6,3]6.3.13}{[1][156][]156}{}{}{}}
+\newlabel{lst:log04}{{6.3.14}{157}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.14}{}}
+\newlabel{lst:log04@cref}{{[tcb@cnt@codebox][14][6,3]6.3.14}{[1][156][]157}{}{}{}}
+\newlabel{lst:log03}{{6.3.15}{157}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.15}{}}
+\newlabel{lst:log03@cref}{{[tcb@cnt@codebox][15][6,3]6.3.15}{[1][157][]157}{}{}{}}
+\newlabel{lst:log02}{{6.3.16}{158}{Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \texttt {\_\_bool\_\_} and \texttt {\_\_len\_\_}}{tcb@cnt@codebox.6.3.16}{}}
+\newlabel{lst:log02@cref}{{[tcb@cnt@codebox][16][6,3]6.3.16}{[1][158][]158}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Short-Circuit Evaluation Mechanics and Object Return Behaviors}{158}{section*.181}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Comparison Chaining: Interpreting Expressions Such as \texttt  {a < b < c}}{159}{section*.182}\protected@file@percent }
+\newlabel{lst:log01}{{6.3.17}{159}{Comparison Chaining: Interpreting Expressions Such as \texttt {a < b < c}}{tcb@cnt@codebox.6.3.17}{}}
+\newlabel{lst:log01@cref}{{[tcb@cnt@codebox][17][6,3]6.3.17}{[1][159][]159}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.4}Arithmetic Sequence Descriptors: The \texttt  {range()} Object}{161}{section.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.1}The Lazy Evaluation Invariant}{162}{subsection.6.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object Storage}{162}{section*.183}\protected@file@percent }
+\newlabel{lst:the06}{{6.4.1}{162}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object Storage}{tcb@cnt@codebox.6.4.1}{}}
+\newlabel{lst:the06@cref}{{[tcb@cnt@codebox][1][6,4]6.4.1}{[1][162][]162}{}{}{}}
+\newlabel{lst:the05}{{6.4.2}{163}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object Storage}{tcb@cnt@codebox.6.4.2}{}}
+\newlabel{lst:the05@cref}{{[tcb@cnt@codebox][2][6,4]6.4.2}{[1][163][]163}{}{}{}}
+\newlabel{lst:the04}{{6.4.3}{163}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object Storage}{tcb@cnt@codebox.6.4.3}{}}
+\newlabel{lst:the04@cref}{{[tcb@cnt@codebox][3][6,4]6.4.3}{[1][163][]163}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{The O(1) Memory Footprint: Why \texttt  {range(1000000)} Stores Only Start, Stop, and Step Parameters}{164}{section*.184}\protected@file@percent }
+\newlabel{lst:the03}{{6.4.4}{164}{The O(1) Memory Footprint: Why \texttt {range(1000000)} Stores Only Start, Stop, and Step Parameters}{tcb@cnt@codebox.6.4.4}{}}
+\newlabel{lst:the03@cref}{{[tcb@cnt@codebox][4][6,4]6.4.4}{[1][164][]164}{}{}{}}
+\newlabel{lst:the02}{{6.4.5}{165}{The O(1) Memory Footprint: Why \texttt {range(1000000)} Stores Only Start, Stop, and Step Parameters}{tcb@cnt@codebox.6.4.5}{}}
+\newlabel{lst:the02@cref}{{[tcb@cnt@codebox][5][6,4]6.4.5}{[1][165][]165}{}{}{}}
+\newlabel{lst:the01}{{6.4.6}{166}{The O(1) Memory Footprint: Why \texttt {range(1000000)} Stores Only Start, Stop, and Step Parameters}{tcb@cnt@codebox.6.4.6}{}}
+\newlabel{lst:the01@cref}{{[tcb@cnt@codebox][6][6,4]6.4.6}{[1][165][]166}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4.2}Sequence Behavior Metrics}{167}{subsection.6.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Virtual Indexing Lookups: How the \texttt  {range} Object Computes Values Arithmetically on Demand}{167}{section*.185}\protected@file@percent }
+\newlabel{lst:seq10}{{6.4.7}{167}{Virtual Indexing Lookups: How the \texttt {range} Object Computes Values Arithmetically on Demand}{tcb@cnt@codebox.6.4.7}{}}
+\newlabel{lst:seq10@cref}{{[tcb@cnt@codebox][7][6,4]6.4.7}{[1][167][]167}{}{}{}}
+\newlabel{lst:seq09}{{6.4.8}{168}{Virtual Indexing Lookups: How the \texttt {range} Object Computes Values Arithmetically on Demand}{tcb@cnt@codebox.6.4.8}{}}
+\newlabel{lst:seq09@cref}{{[tcb@cnt@codebox][8][6,4]6.4.8}{[1][168][]168}{}{}{}}
+\newlabel{lst:seq08}{{6.4.9}{169}{Virtual Indexing Lookups: How the \texttt {range} Object Computes Values Arithmetically on Demand}{tcb@cnt@codebox.6.4.9}{}}
+\newlabel{lst:seq08@cref}{{[tcb@cnt@codebox][9][6,4]6.4.9}{[1][168][]169}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Arithmetic Membership Testing: Why Integer Containment in \texttt  {range} Can Be Checked Without Linear Scanning}{169}{section*.186}\protected@file@percent }
+\newlabel{lst:seq07}{{6.4.10}{170}{Arithmetic Membership Testing: Why Integer Containment in \texttt {range} Can Be Checked Without Linear Scanning}{tcb@cnt@codebox.6.4.10}{}}
+\newlabel{lst:seq07@cref}{{[tcb@cnt@codebox][10][6,4]6.4.10}{[1][170][]170}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{171}{section*.187}\protected@file@percent }
+\newlabel{lst:seq06}{{6.4.11}{171}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.11}{}}
+\newlabel{lst:seq06@cref}{{[tcb@cnt@codebox][11][6,4]6.4.11}{[1][171][]171}{}{}{}}
+\newlabel{lst:seq05}{{6.4.12}{171}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.12}{}}
+\newlabel{lst:seq05@cref}{{[tcb@cnt@codebox][12][6,4]6.4.12}{[1][171][]171}{}{}{}}
+\newlabel{lst:seq04}{{6.4.13}{172}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.13}{}}
+\newlabel{lst:seq04@cref}{{[tcb@cnt@codebox][13][6,4]6.4.13}{[1][171][]172}{}{}{}}
+\newlabel{lst:seq03}{{6.4.14}{172}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.14}{}}
+\newlabel{lst:seq03@cref}{{[tcb@cnt@codebox][14][6,4]6.4.14}{[1][172][]172}{}{}{}}
+\newlabel{lst:seq02}{{6.4.15}{173}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.15}{}}
+\newlabel{lst:seq02@cref}{{[tcb@cnt@codebox][15][6,4]6.4.15}{[1][173][]173}{}{}{}}
+\newlabel{lst:seq01}{{6.4.16}{174}{Immutability and Reusability: Using a Single Range Descriptor Across Multiple Traversal Pipelines}{tcb@cnt@codebox.6.4.16}{}}
+\newlabel{lst:seq01@cref}{{[tcb@cnt@codebox][16][6,4]6.4.16}{[1][173][]174}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.5}Iterative Loops and the Iterator Protocol}{174}{section.6.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.1}Iterable vs. Iterator}{175}{subsection.6.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Iterator Protocol: Structural Traversal over Stateful Collections}{175}{section*.188}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Generators: Lazy Sequence Evaluation, In-Flight Stream Interfaces, and State-Preserving Suspended Subroutines}{175}{section*.189}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5.2}Loop-\texttt  {else} Completion Semantics}{176}{subsection.6.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Loop Else Semantic Paradox: Executing Blocks Beyond Iteration Boundaries}{176}{section*.190}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6.6}Lazy Traversal Objects and Iteration Helpers}{176}{section.6.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.1}Enumerated Traversal}{177}{subsection.6.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{177}{section*.191}\protected@file@percent }
+\newlabel{lst:enu05}{{6.6.1}{177}{\texttt {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{tcb@cnt@codebox.6.6.1}{}}
+\newlabel{lst:enu05@cref}{{[tcb@cnt@codebox][1][6,6]6.6.1}{[1][177][]177}{}{}{}}
+\newlabel{lst:enu04}{{6.6.2}{178}{\texttt {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{tcb@cnt@codebox.6.6.2}{}}
+\newlabel{lst:enu04@cref}{{[tcb@cnt@codebox][2][6,6]6.6.2}{[1][178][]178}{}{}{}}
+\newlabel{lst:enu03}{{6.6.3}{179}{\texttt {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{tcb@cnt@codebox.6.6.3}{}}
+\newlabel{lst:enu03@cref}{{[tcb@cnt@codebox][3][6,6]6.6.3}{[1][179][]179}{}{}{}}
+\newlabel{lst:enu02}{{6.6.4}{180}{\texttt {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{tcb@cnt@codebox.6.6.4}{}}
+\newlabel{lst:enu02@cref}{{[tcb@cnt@codebox][4][6,6]6.6.4}{[1][180][]180}{}{}{}}
+\newlabel{lst:enu01}{{6.6.5}{181}{\texttt {enumerate()} as a Lazy Pair Generator for Index-Value Iteration}{tcb@cnt@codebox.6.6.5}{}}
+\newlabel{lst:enu01@cref}{{[tcb@cnt@codebox][5][6,6]6.6.5}{[1][181][]181}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.2}Parallel Traversal}{181}{subsection.6.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{182}{section*.192}\protected@file@percent }
+\newlabel{lst:par08}{{6.6.6}{182}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.6}{}}
+\newlabel{lst:par08@cref}{{[tcb@cnt@codebox][6][6,6]6.6.6}{[1][181][]182}{}{}{}}
+\newlabel{lst:par07}{{6.6.7}{182}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.7}{}}
+\newlabel{lst:par07@cref}{{[tcb@cnt@codebox][7][6,6]6.6.7}{[1][182][]182}{}{}{}}
+\newlabel{lst:par06}{{6.6.8}{183}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.8}{}}
+\newlabel{lst:par06@cref}{{[tcb@cnt@codebox][8][6,6]6.6.8}{[1][183][]183}{}{}{}}
+\newlabel{lst:par05}{{6.6.9}{184}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.9}{}}
+\newlabel{lst:par05@cref}{{[tcb@cnt@codebox][9][6,6]6.6.9}{[1][184][]184}{}{}{}}
+\newlabel{lst:par04}{{6.6.10}{185}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.10}{}}
+\newlabel{lst:par04@cref}{{[tcb@cnt@codebox][10][6,6]6.6.10}{[1][185][]185}{}{}{}}
+\newlabel{lst:par03}{{6.6.11}{185}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.11}{}}
+\newlabel{lst:par03@cref}{{[tcb@cnt@codebox][11][6,6]6.6.11}{[1][185][]185}{}{}{}}
+\newlabel{lst:par02}{{6.6.12}{186}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.12}{}}
+\newlabel{lst:par02@cref}{{[tcb@cnt@codebox][12][6,6]6.6.12}{[1][186][]186}{}{}{}}
+\newlabel{lst:par01}{{6.6.13}{186}{\texttt {zip()} as a Lazy Synchronization Mechanism Across Multiple Iterables}{tcb@cnt@codebox.6.6.13}{}}
+\newlabel{lst:par01@cref}{{[tcb@cnt@codebox][13][6,6]6.6.13}{[1][186][]186}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.3}Transforming and Filtering Iteration Streams}{187}{subsection.6.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {map()} and \texttt  {filter()} as Lazy Iterator-Producing Transformations}{187}{section*.193}\protected@file@percent }
+\newlabel{lst:tra03}{{6.6.14}{187}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.14}{}}
+\newlabel{lst:tra03@cref}{{[tcb@cnt@codebox][14][6,6]6.6.14}{[1][187][]187}{}{}{}}
+\newlabel{lst:tra02}{{6.6.15}{188}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.15}{}}
+\newlabel{lst:tra02@cref}{{[tcb@cnt@codebox][15][6,6]6.6.15}{[1][188][]188}{}{}{}}
+\newlabel{lst:tra01}{{6.6.16}{189}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.16}{}}
+\newlabel{lst:tra01@cref}{{[tcb@cnt@codebox][16][6,6]6.6.16}{[1][189][]189}{}{}{}}
+\newlabel{lst:tra06}{{6.6.17}{190}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.17}{}}
+\newlabel{lst:tra06@cref}{{[tcb@cnt@codebox][17][6,6]6.6.17}{[1][189][]190}{}{}{}}
+\newlabel{lst:tra05}{{6.6.18}{191}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.18}{}}
+\newlabel{lst:tra05@cref}{{[tcb@cnt@codebox][18][6,6]6.6.18}{[1][191][]191}{}{}{}}
+\newlabel{lst:tra04}{{6.6.19}{192}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.19}{}}
+\newlabel{lst:tra04@cref}{{[tcb@cnt@codebox][19][6,6]6.6.19}{[1][191][]192}{}{}{}}
+\newlabel{lst:tra03}{{6.6.20}{193}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.20}{}}
+\newlabel{lst:tra03@cref}{{[tcb@cnt@codebox][20][6,6]6.6.20}{[1][192][]193}{}{}{}}
+\newlabel{lst:tra02}{{6.6.21}{193}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.21}{}}
+\newlabel{lst:tra02@cref}{{[tcb@cnt@codebox][21][6,6]6.6.21}{[1][193][]193}{}{}{}}
+\newlabel{lst:tra01}{{6.6.22}{194}{\texttt {map()} and \texttt {filter()} as Lazy Iterator-Producing Transformations}{tcb@cnt@codebox.6.6.22}{}}
+\newlabel{lst:tra01@cref}{{[tcb@cnt@codebox][22][6,6]6.6.22}{[1][194][]194}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6.4}Materialization Boundaries}{194}{subsection.6.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{195}{section*.194}\protected@file@percent }
+\newlabel{lst:mat08}{{6.6.23}{195}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.23}{}}
+\newlabel{lst:mat08@cref}{{[tcb@cnt@codebox][23][6,6]6.6.23}{[1][195][]195}{}{}{}}
+\newlabel{lst:mat07}{{6.6.24}{195}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.24}{}}
+\newlabel{lst:mat07@cref}{{[tcb@cnt@codebox][24][6,6]6.6.24}{[1][195][]195}{}{}{}}
+\newlabel{lst:mat06}{{6.6.25}{196}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.25}{}}
+\newlabel{lst:mat06@cref}{{[tcb@cnt@codebox][25][6,6]6.6.25}{[1][196][]196}{}{}{}}
+\newlabel{lst:mat05}{{6.6.26}{196}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.26}{}}
+\newlabel{lst:mat05@cref}{{[tcb@cnt@codebox][26][6,6]6.6.26}{[1][196][]196}{}{}{}}
+\newlabel{lst:mat04}{{6.6.27}{197}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.27}{}}
+\newlabel{lst:mat04@cref}{{[tcb@cnt@codebox][27][6,6]6.6.27}{[1][196][]197}{}{}{}}
+\newlabel{lst:mat03}{{6.6.28}{197}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.28}{}}
+\newlabel{lst:mat03@cref}{{[tcb@cnt@codebox][28][6,6]6.6.28}{[1][197][]197}{}{}{}}
+\newlabel{lst:mat02}{{6.6.29}{198}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.29}{}}
+\newlabel{lst:mat02@cref}{{[tcb@cnt@codebox][29][6,6]6.6.29}{[1][198][]198}{}{}{}}
+\newlabel{lst:mat05}{{6.6.30}{199}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.30}{}}
+\newlabel{lst:mat05@cref}{{[tcb@cnt@codebox][30][6,6]6.6.30}{[1][199][]199}{}{}{}}
+\newlabel{lst:mat04}{{6.6.31}{199}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.31}{}}
+\newlabel{lst:mat04@cref}{{[tcb@cnt@codebox][31][6,6]6.6.31}{[1][199][]199}{}{}{}}
+\newlabel{lst:mat03}{{6.6.32}{200}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.32}{}}
+\newlabel{lst:mat03@cref}{{[tcb@cnt@codebox][32][6,6]6.6.32}{[1][199][]200}{}{}{}}
+\newlabel{lst:mat01}{{6.6.33}{200}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.33}{}}
+\newlabel{lst:mat01@cref}{{[tcb@cnt@codebox][33][6,6]6.6.33}{[1][200][]200}{}{}{}}
+\newlabel{lst:mat02}{{6.6.34}{201}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.34}{}}
+\newlabel{lst:mat02@cref}{{[tcb@cnt@codebox][34][6,6]6.6.34}{[1][201][]201}{}{}{}}
+\newlabel{lst:mat01}{{6.6.35}{202}{Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed}{tcb@cnt@codebox.6.6.35}{}}
+\newlabel{lst:mat01@cref}{{[tcb@cnt@codebox][35][6,6]6.6.35}{[1][202][]202}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6.7}Exceptional Control Flow and Error Routing}{202}{section.6.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7.1}The Architecture of Non-Local Jumps}{203}{subsection.6.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{203}{section*.195}\protected@file@percent }
+\newlabel{lst:the11}{{6.7.1}{203}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{tcb@cnt@codebox.6.7.1}{}}
+\newlabel{lst:the11@cref}{{[tcb@cnt@codebox][1][6,7]6.7.1}{[1][203][]203}{}{}{}}
+\newlabel{lst:the10}{{6.7.2}{204}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{tcb@cnt@codebox.6.7.2}{}}
+\newlabel{lst:the10@cref}{{[tcb@cnt@codebox][2][6,7]6.7.2}{[1][203][]204}{}{}{}}
+\newlabel{lst:the09}{{6.7.3}{204}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{tcb@cnt@codebox.6.7.3}{}}
+\newlabel{lst:the09@cref}{{[tcb@cnt@codebox][3][6,7]6.7.3}{[1][204][]204}{}{}{}}
+\newlabel{lst:the08}{{6.7.4}{205}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{tcb@cnt@codebox.6.7.4}{}}
+\newlabel{lst:the08@cref}{{[tcb@cnt@codebox][4][6,7]6.7.4}{[1][205][]205}{}{}{}}
+\newlabel{lst:the07}{{6.7.5}{206}{The Paradigm Shift: Contrast with C's Manual Error Return Codes and Pointer Check Patterns}{tcb@cnt@codebox.6.7.5}{}}
+\newlabel{lst:the07@cref}{{[tcb@cnt@codebox][5][6,7]6.7.5}{[1][206][]206}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{206}{section*.196}\protected@file@percent }
+\newlabel{lst:the06}{{6.7.6}{207}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.6}{}}
+\newlabel{lst:the06@cref}{{[tcb@cnt@codebox][6][6,7]6.7.6}{[1][206][]207}{}{}{}}
+\newlabel{lst:the05}{{6.7.7}{208}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.7}{}}
+\newlabel{lst:the05@cref}{{[tcb@cnt@codebox][7][6,7]6.7.7}{[1][207][]208}{}{}{}}
+\newlabel{lst:the04}{{6.7.8}{208}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.8}{}}
+\newlabel{lst:the04@cref}{{[tcb@cnt@codebox][8][6,7]6.7.8}{[1][208][]208}{}{}{}}
+\newlabel{lst:the03}{{6.7.9}{209}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.9}{}}
+\newlabel{lst:the03@cref}{{[tcb@cnt@codebox][9][6,7]6.7.9}{[1][209][]209}{}{}{}}
+\newlabel{lst:the02}{{6.7.10}{209}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.10}{}}
+\newlabel{lst:the02@cref}{{[tcb@cnt@codebox][10][6,7]6.7.10}{[1][209][]209}{}{}{}}
+\newlabel{lst:the01}{{6.7.11}{209}{Look Before You Leap (LBYL) vs. Easier to Ask Forgiveness than Permission (EAFP) Execution Philosophies}{tcb@cnt@codebox.6.7.11}{}}
+\newlabel{lst:the01@cref}{{[tcb@cnt@codebox][11][6,7]6.7.11}{[1][209][]209}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7.2}Exception Class Hierarchies and Handler Selection}{210}{subsection.6.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Exception Classes as Runtime Types}{210}{section*.197}\protected@file@percent }
+\newlabel{lst:exc15}{{6.7.12}{210}{Exception Classes as Runtime Types}{tcb@cnt@codebox.6.7.12}{}}
+\newlabel{lst:exc15@cref}{{[tcb@cnt@codebox][12][6,7]6.7.12}{[1][210][]210}{}{}{}}
+\newlabel{lst:exc14}{{6.7.13}{211}{Exception Classes as Runtime Types}{tcb@cnt@codebox.6.7.13}{}}
+\newlabel{lst:exc14@cref}{{[tcb@cnt@codebox][13][6,7]6.7.13}{[1][211][]211}{}{}{}}
+\newlabel{lst:exc13}{{6.7.14}{211}{Exception Classes as Runtime Types}{tcb@cnt@codebox.6.7.14}{}}
+\newlabel{lst:exc13@cref}{{[tcb@cnt@codebox][14][6,7]6.7.14}{[1][211][]211}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Matching Specific Exceptions Before General Exceptions}{212}{section*.198}\protected@file@percent }
+\newlabel{lst:exc12}{{6.7.15}{212}{Matching Specific Exceptions Before General Exceptions}{tcb@cnt@codebox.6.7.15}{}}
+\newlabel{lst:exc12@cref}{{[tcb@cnt@codebox][15][6,7]6.7.15}{[1][212][]212}{}{}{}}
+\newlabel{lst:exc11}{{6.7.16}{212}{Matching Specific Exceptions Before General Exceptions}{tcb@cnt@codebox.6.7.16}{}}
+\newlabel{lst:exc11@cref}{{[tcb@cnt@codebox][16][6,7]6.7.16}{[1][212][]212}{}{}{}}
+\newlabel{lst:exc10}{{6.7.17}{213}{Matching Specific Exceptions Before General Exceptions}{tcb@cnt@codebox.6.7.17}{}}
+\newlabel{lst:exc10@cref}{{[tcb@cnt@codebox][17][6,7]6.7.17}{[1][212][]213}{}{}{}}
+\newlabel{lst:exc09}{{6.7.18}{213}{Matching Specific Exceptions Before General Exceptions}{tcb@cnt@codebox.6.7.18}{}}
+\newlabel{lst:exc09@cref}{{[tcb@cnt@codebox][18][6,7]6.7.18}{[1][213][]213}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Capturing Exception Objects with \texttt  {except SomeError as e}}{213}{section*.199}\protected@file@percent }
+\newlabel{lst:exc08}{{6.7.19}{214}{Capturing Exception Objects with \texttt {except SomeError as e}}{tcb@cnt@codebox.6.7.19}{}}
+\newlabel{lst:exc08@cref}{{[tcb@cnt@codebox][19][6,7]6.7.19}{[1][213][]214}{}{}{}}
+\newlabel{lst:exc07}{{6.7.20}{215}{Capturing Exception Objects with \texttt {except SomeError as e}}{tcb@cnt@codebox.6.7.20}{}}
+\newlabel{lst:exc07@cref}{{[tcb@cnt@codebox][20][6,7]6.7.20}{[1][214][]215}{}{}{}}
+\newlabel{lst:exc06}{{6.7.21}{215}{Capturing Exception Objects with \texttt {except SomeError as e}}{tcb@cnt@codebox.6.7.21}{}}
+\newlabel{lst:exc06@cref}{{[tcb@cnt@codebox][21][6,7]6.7.21}{[1][215][]215}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{The Risk of Bare \texttt  {except} and Over-Broad Exception Traps}{215}{section*.200}\protected@file@percent }
+\newlabel{lst:exc05}{{6.7.22}{216}{The Risk of Bare \texttt {except} and Over-Broad Exception Traps}{tcb@cnt@codebox.6.7.22}{}}
+\newlabel{lst:exc05@cref}{{[tcb@cnt@codebox][22][6,7]6.7.22}{[1][216][]216}{}{}{}}
+\newlabel{lst:exc04}{{6.7.23}{216}{The Risk of Bare \texttt {except} and Over-Broad Exception Traps}{tcb@cnt@codebox.6.7.23}{}}
+\newlabel{lst:exc04@cref}{{[tcb@cnt@codebox][23][6,7]6.7.23}{[1][216][]216}{}{}{}}
+\newlabel{lst:exc03}{{6.7.24}{217}{The Risk of Bare \texttt {except} and Over-Broad Exception Traps}{tcb@cnt@codebox.6.7.24}{}}
+\newlabel{lst:exc03@cref}{{[tcb@cnt@codebox][24][6,7]6.7.24}{[1][216][]217}{}{}{}}
+\newlabel{lst:exc02}{{6.7.25}{217}{The Risk of Bare \texttt {except} and Over-Broad Exception Traps}{tcb@cnt@codebox.6.7.25}{}}
+\newlabel{lst:exc02@cref}{{[tcb@cnt@codebox][25][6,7]6.7.25}{[1][217][]217}{}{}{}}
+\newlabel{lst:exc01}{{6.7.26}{217}{The Risk of Bare \texttt {except} and Over-Broad Exception Traps}{tcb@cnt@codebox.6.7.26}{}}
+\newlabel{lst:exc01@cref}{{[tcb@cnt@codebox][26][6,7]6.7.26}{[1][217][]217}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7.3}Exception Handling Infrastructure}{218}{subsection.6.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Exception \texttt  {else} Clause: Isolating Code Paths That Run Only When No Exceptions Occur}{218}{section*.201}\protected@file@percent }
+\newlabel{lst:exc01}{{6.7.27}{218}{The Exception \texttt {else} Clause: Isolating Code Paths That Run Only When No Exceptions Occur}{tcb@cnt@codebox.6.7.27}{}}
+\newlabel{lst:exc01@cref}{{[tcb@cnt@codebox][27][6,7]6.7.27}{[1][218][]218}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Cleansing and Post-Processing: The Unconditional Execution Invariants of the \texttt  {finally} Block}{219}{section*.202}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Context Management Boundaries: The Structural Mechanics of the \texttt  {with} Statement}{219}{section*.203}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7.4}Propagation Mechanics}{220}{subsection.6.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Exception Routing, Stack Unwinding, and the Runtime Exception Table}{220}{section*.204}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {7}Hash-Based Collections and Associative Mappings}{221}{chapter.7}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {7.1}Hash Tables as Non-Sequential Component Access Structures}{221}{section.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.1}From Positional Access to Hash-Based Access}{221}{subsection.7.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Hash-Based Collections: Why Sets and Dictionaries Locate Components by Hash-Derived Table Slots}{221}{section*.205}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1.2}The Hash and Equality Contract}{222}{subsection.7.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Key Uniqueness and Hash Invariants: The Coordination of \texttt  {\_\_hash\_\_} and \texttt  {\_\_eq\_\_}}{222}{section*.206}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Hash Collision Vulnerability and Hash Randomization}{222}{section*.207}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.2}Unordered Unique Domains: The Set Architecture (\texttt  {set})}{222}{section.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.1}Mathematical Foundations and Structural Syntax}{222}{subsection.7.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Set Architectures: The Underlying Dictionary Engine}{223}{section*.208}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.2}Constraints of Element Ingestion and Runtime Engines}{223}{subsection.7.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{CPython Open-Addressing Architecture: Hash Table Slots, Collision Probing, Empty Slots, and Deleted-Entry Markers}{223}{section*.209}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Algorithmic Efficiency Matrix: Amortized O(1) Membership Lookups vs. O(N) Sequential Traversal}{224}{section*.210}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.3}Core Set Mutation Operations}{224}{subsection.7.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Adding Elements with \texttt  {.add()}}{224}{section*.211}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Removing Elements with \texttt  {.remove()}, \texttt  {.discard()}, \texttt  {.pop()}, and \texttt  {.clear()}}{224}{section*.212}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Membership Testing with \texttt  {in}}{224}{section*.213}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2.4}Immutable Set Variants}{224}{subsection.7.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {frozenset} as an Immutable Hashable Set-Like Object}{224}{section*.214}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Using \texttt  {frozenset} as a Dictionary Key or Set Element}{224}{section*.215}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.3}Set Mathematical Operators and Mutator Methods}{224}{section.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.1}In-Place Memory Mutation}{224}{subsection.7.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Destructive Union Updates via \texttt  {.update()}}{225}{section*.216}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Destructive Intersection Updates via \texttt  {.intersection\_update()}}{225}{section*.217}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Destructive Difference Updates via \texttt  {.difference\_update()}}{225}{section*.218}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Destructive Symmetric Difference Updates via \texttt  {.symmetric\_difference\_update()}}{225}{section*.219}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3.2}Structural Relationship Evaluation}{225}{subsection.7.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Containment and Scope Testing: Identifying Subsets \texttt  {.issubset()} and Supersets \texttt  {.issuperset()}}{225}{section*.220}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Intersection Disjoint Verification via \texttt  {.isdisjoint()}}{225}{section*.221}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7.4}Dictionaries (\texttt  {dict}) --- Key-Value Associative Mappings}{225}{section.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.1}Foundations of Associative Mapping}{225}{subsection.7.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Structural Syntax: The Key-Value Paradigm and Curly-Brace \texttt  {\{\}} Literals}{225}{section*.222}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Integrity Constraints: Why Dictionary Keys Must Be Hashable and Hash-Stable}{225}{section*.223}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Value Flexibility: Storing Arbitrary, Nested Data Types and Mutable Heap Objects}{226}{section*.224}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Membership Testing: Why \texttt  {x in d} Checks Keys, Not Values}{226}{section*.225}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.2}Dictionary Construction Patterns}{226}{subsection.7.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Literal Construction with \texttt  {\{key: value\}} Pairs}{226}{section*.226}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Constructor-Based Construction with \texttt  {dict()}}{226}{section*.227}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Dictionary Comprehensions as Key-Value Generation Pipelines}{226}{section*.228}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.3}CPython Architectural Evolution}{226}{subsection.7.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Classic Dictionary Model: Sparse Hash Table Storage and Historically Unspecified Iteration Order}{226}{section*.229}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Modern Compact Dictionary: Dense Entry Storage, Sparse Indexing, Memory Reduction, and Insertion-Order Preservation}{226}{section*.230}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Algorithmic Efficiency Matrix: Amortized \texttt  {O(1)} Complexity for Key Insertion, Value Retrieval, and Structural Deletion}{227}{section*.231}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.4}Ordering Guarantees and Misconceptions}{227}{subsection.7.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Dictionary Insertion Order: Preserved Order Is Not Sorted Order}{227}{section*.232}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Set Iteration Order: Why Sets Remain Unordered Even When They Appear Stable in Small Examples}{227}{section*.233}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4.5}Querying, Manipulating, and Mutating Dictionary States}{227}{subsection.7.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Explicit Lookups and the \texttt  {KeyError} Boundary vs. Safe Access via \texttt  {.get()}}{227}{section*.234}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Default Insertion Patterns with \texttt  {.setdefault()}}{227}{section*.235}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Dynamic Views: Why Dictionary Views Reflect Later Dictionary Mutations}{228}{section*.236}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Mutation Trap: Why Mutating Dictionary Geometry During Iteration Triggers Runtime Exceptions}{228}{section*.237}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {8}Function Execution Mechanics, Lexical Scopes, and Advanced Control Architecture}{229}{chapter.8}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {8.1}Anatomy and Definition of Functions}{229}{section.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1.1}Structural Syntax and Function Object Creation}{229}{subsection.8.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\texttt  {\_\_code\_\_}, \texttt  {co\_code}, \texttt  {co\_varnames}, \texttt  {co\_consts}, \texttt  {co\_names})}{229}{section*.238}\protected@file@percent }
+\newlabel{lst:str02}{{8.1.1}{230}{The Anatomy of Function Code Objects: Inspecting Bytecode Attributes (\texttt {\_\_code\_\_}, \texttt {co\_code}, \texttt {co\_varnames}, \texttt {co\_consts}, \texttt {co\_names})}{tcb@cnt@codebox.8.1.1}{}}
+\newlabel{lst:str02@cref}{{[tcb@cnt@codebox][1][8,1]8.1.1}{[1][229][]230}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Anonymous Expressions: The Structural Equivalence of \texttt  {lambda} Functions}{230}{section*.239}\protected@file@percent }
+\newlabel{lst:str01}{{8.1.2}{231}{Anonymous Expressions: The Structural Equivalence of \texttt {lambda} Functions}{tcb@cnt@codebox.8.1.2}{}}
+\newlabel{lst:str01@cref}{{[tcb@cnt@codebox][2][8,1]8.1.2}{[1][230][]231}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1.2}Return Semantics and Frame Termination}{231}{subsection.8.1.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Execution Frames: Inside the CPython Call Stack and \texttt  {PyFrameObject} Allocation}{231}{section*.240}\protected@file@percent }
+\newlabel{lst:ret04}{{8.1.3}{231}{Execution Frames: Inside the CPython Call Stack and \texttt {PyFrameObject} Allocation}{tcb@cnt@codebox.8.1.3}{}}
+\newlabel{lst:ret04@cref}{{[tcb@cnt@codebox][3][8,1]8.1.3}{[1][231][]231}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Implicit Return Defaults: Why Functions Without \texttt  {return} Produce \texttt  {None}}{232}{section*.241}\protected@file@percent }
+\newlabel{lst:ret03}{{8.1.4}{232}{Implicit Return Defaults: Why Functions Without \texttt {return} Produce \texttt {None}}{tcb@cnt@codebox.8.1.4}{}}
+\newlabel{lst:ret03@cref}{{[tcb@cnt@codebox][4][8,1]8.1.4}{[1][231][]232}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Multiple Return Values as Tuple Packing: The Real Structure Behind \texttt  {return a, b}}{232}{section*.242}\protected@file@percent }
+\newlabel{lst:ret02}{{8.1.5}{232}{Multiple Return Values as Tuple Packing: The Real Structure Behind \texttt {return a, b}}{tcb@cnt@codebox.8.1.5}{}}
+\newlabel{lst:ret02@cref}{{[tcb@cnt@codebox][5][8,1]8.1.5}{[1][232][]232}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth Boundaries}{232}{section*.243}\protected@file@percent }
+\newlabel{lst:ret01}{{8.1.6}{233}{Recursive Calls: Repeated Frame Allocation, Base Cases, and Recursion Depth Boundaries}{tcb@cnt@codebox.8.1.6}{}}
+\newlabel{lst:ret01@cref}{{[tcb@cnt@codebox][6][8,1]8.1.6}{[1][232][]233}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8.2}Function Call Mechanics and Parameter Binding}{233}{section.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.1}Memory Semantics of Parameter Passing}{233}{subsection.8.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object References into New Local Bindings}{233}{section*.244}\protected@file@percent }
+\newlabel{lst:mem02}{{8.2.1}{234}{The Call-by-Object / Call-by-Sharing Evaluation Model: Passing Object References into New Local Bindings}{tcb@cnt@codebox.8.2.1}{}}
+\newlabel{lst:mem02@cref}{{[tcb@cnt@codebox][1][8,2]8.2.1}{[1][233][]234}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Names Bound to Shared Heap Objects}{234}{section*.245}\protected@file@percent }
+\newlabel{lst:mem01}{{8.2.2}{234}{C vs. Python Call Frames: Copied Primitive Values and Pointers vs. Python Names Bound to Shared Heap Objects}{tcb@cnt@codebox.8.2.2}{}}
+\newlabel{lst:mem01@cref}{{[tcb@cnt@codebox][2][8,2]8.2.2}{[1][234][]234}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Side Effects Matrix: Mutating Mutable Objects In Place vs. Reassigning Local Names}{234}{section*.246}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2.2}Function Signature Architecture}{235}{subsection.8.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Default Parameter Values and Definition-Time Evaluation}{235}{section*.247}\protected@file@percent }
+\newlabel{lst:fun02}{{8.2.3}{235}{Default Parameter Values and Definition-Time Evaluation}{tcb@cnt@codebox.8.2.3}{}}
+\newlabel{lst:fun02@cref}{{[tcb@cnt@codebox][3][8,2]8.2.3}{[1][235][]235}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Positional-Only Parameters Using \texttt  {/}}{235}{section*.248}\protected@file@percent }
+\newlabel{lst:fun01}{{8.2.4}{235}{Positional-Only Parameters Using \texttt {/}}{tcb@cnt@codebox.8.2.4}{}}
+\newlabel{lst:fun01@cref}{{[tcb@cnt@codebox][4][8,2]8.2.4}{[1][235][]235}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Keyword-Only Parameters Using \texttt  {*}}{236}{section*.249}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Function Annotations: Metadata for Tools, Not Automatic Runtime Type Enforcement}{236}{section*.250}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8.3}Flexible Parametrization Systems}{236}{section.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3.1}Variadic Positional Parameters}{236}{subsection.8.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Variable-Length Argument Packing: The Mechanics of \texttt  {*args} and \texttt  {**kwargs}}{236}{section*.251}\protected@file@percent }
+\newlabel{lst:var01}{{8.3.1}{237}{Variable-Length Argument Packing: The Mechanics of \texttt {*args} and \texttt {**kwargs}}{tcb@cnt@codebox.8.3.1}{}}
+\newlabel{lst:var01@cref}{{[tcb@cnt@codebox][1][8,3]8.3.1}{[1][236][]237}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Argument Unpacking Operations: Expanding Sequences Across Function Call Boundaries with \texttt  {*}}{237}{section*.252}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3.2}Variadic Keyword Parameters}{237}{subsection.8.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Argument Packing Mechanics: Collecting Keyword Overflow into \texttt  {**kwargs}}{237}{section*.253}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Argument Unpacking Operations: Expanding Mappings Across Function Call Boundaries with \texttt  {**}}{238}{section*.254}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Key-Value Parameter Extraction, Mapping Lookups, and Safe Override Patterns}{238}{section*.255}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3.3}Architectural Pitfalls of Argument Evaluation}{238}{subsection.8.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Mutable Default Arguments Trap: Why \texttt  {def func(x=[])} Reuses One Persistent Mutable Object}{238}{section*.256}\protected@file@percent }
+\newlabel{lst:arc03}{{8.3.2}{238}{The Mutable Default Arguments Trap: Why \texttt {def func(x=[])} Reuses One Persistent Mutable Object}{tcb@cnt@codebox.8.3.2}{}}
+\newlabel{lst:arc03@cref}{{[tcb@cnt@codebox][2][8,3]8.3.2}{[1][238][]238}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Static Expression Evaluation: Why Default Values Are Created at Function Definition Time}{239}{section*.257}\protected@file@percent }
+\newlabel{lst:arc02}{{8.3.3}{239}{Static Expression Evaluation: Why Default Values Are Created at Function Definition Time}{tcb@cnt@codebox.8.3.3}{}}
+\newlabel{lst:arc02@cref}{{[tcb@cnt@codebox][3][8,3]8.3.3}{[1][239][]239}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Defending Against State Contamination Using the Immutable \texttt  {None} Idiom and Sentinel Guard Clauses}{239}{section*.258}\protected@file@percent }
+\newlabel{lst:arc01}{{8.3.4}{239}{Defending Against State Contamination Using the Immutable \texttt {None} Idiom and Sentinel Guard Clauses}{tcb@cnt@codebox.8.3.4}{}}
+\newlabel{lst:arc01@cref}{{[tcb@cnt@codebox][4][8,3]8.3.4}{[1][239][]239}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8.4}Namespaces and Variable Scope Resolution}{239}{section.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4.1}The LEGB Rule Invariant}{239}{subsection.8.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Variable Scope and Lexical Boundaries: The LEGB Resolution Rules}{240}{section*.259}\protected@file@percent }
+\newlabel{lst:the01}{{8.4.1}{240}{Variable Scope and Lexical Boundaries: The LEGB Resolution Rules}{tcb@cnt@codebox.8.4.1}{}}
+\newlabel{lst:the01@cref}{{[tcb@cnt@codebox][1][8,4]8.4.1}{[1][240][]240}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4.2}Mutating External Scopes}{240}{subsection.8.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}{241}{section*.260}\protected@file@percent }
+\newlabel{lst:mut03}{{8.4.2}{241}{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}{tcb@cnt@codebox.8.4.2}{}}
+\newlabel{lst:mut03@cref}{{[tcb@cnt@codebox][2][8,4]8.4.2}{[1][240][]241}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Overriding Module Scope: The \texttt  {global} Declaration Syntax and Module Namespace Mutation}{241}{section*.261}\protected@file@percent }
+\newlabel{lst:mut02}{{8.4.3}{241}{Overriding Module Scope: The \texttt {global} Declaration Syntax and Module Namespace Mutation}{tcb@cnt@codebox.8.4.3}{}}
+\newlabel{lst:mut02@cref}{{[tcb@cnt@codebox][3][8,4]8.4.3}{[1][241][]241}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Overriding Nested Intermediary Scopes: The \texttt  {nonlocal} Declaration Syntax and Cell Reference Mutation}{241}{section*.262}\protected@file@percent }
+\newlabel{lst:mut01}{{8.4.4}{241}{Overriding Nested Intermediary Scopes: The \texttt {nonlocal} Declaration Syntax and Cell Reference Mutation}{tcb@cnt@codebox.8.4.4}{}}
+\newlabel{lst:mut01@cref}{{[tcb@cnt@codebox][4][8,4]8.4.4}{[1][241][]241}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {locals()} Caveats: Why the Displayed Local Namespace Is Not Always a Directly Writable Control Surface}{242}{section*.263}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8.5}Runtime Scope Mechanics and Variable Binding Analysis}{242}{section.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5.1}Anatomy of Scope Failures}{242}{subsection.8.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Runtime Execution Traces and Bytecode Analysis of \texttt  {UnboundLocalError}}{242}{section*.264}\protected@file@percent }
+\newlabel{lst:ana01}{{8.5.1}{242}{Runtime Execution Traces and Bytecode Analysis of \texttt {UnboundLocalError}}{tcb@cnt@codebox.8.5.1}{}}
+\newlabel{lst:ana01@cref}{{[tcb@cnt@codebox][1][8,5]8.5.1}{[1][242][]242}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Analyzing the Mechanics of Conflicting Local and Global Names}{242}{section*.265}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Name Resolution Failure: \texttt  {NameError} vs. \texttt  {UnboundLocalError}}{243}{section*.266}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5.2}Compile-Time Scope Disambiguation}{243}{subsection.8.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{How the Python Compiler Scans Syntax Trees for Assignment Targets}{243}{section*.267}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Pre-Determining Local Scope Allocation Flags via Symbol Tables Prior to Execution}{243}{section*.268}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Static Name Binding Invariants vs. Dynamic Late-Binding Value Resolution}{243}{section*.269}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Loop Variable Closure Trap: Why Nested Functions May See the Final Loop Value}{243}{section*.270}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8.6}First-Class Functions, Closures, and Function Transformation}{243}{section.8.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6.1}First-Class Citizens and Higher-Order Functions}{244}{subsection.8.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine References inside Variables}{244}{section*.271}\protected@file@percent }
+\newlabel{lst:fir03}{{8.6.1}{244}{Functions as In-Memory Objects: Passing, Returning, and Storing Subroutine References inside Variables}{tcb@cnt@codebox.8.6.1}{}}
+\newlabel{lst:fir03@cref}{{[tcb@cnt@codebox][1][8,6]8.6.1}{[1][244][]244}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Callbacks and Callback Chains: Decoupling Structural Execution Graphs}{244}{section*.272}\protected@file@percent }
+\newlabel{lst:fir02}{{8.6.2}{244}{Callbacks and Callback Chains: Decoupling Structural Execution Graphs}{tcb@cnt@codebox.8.6.2}{}}
+\newlabel{lst:fir02@cref}{{[tcb@cnt@codebox][2][8,6]8.6.2}{[1][244][]244}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Higher-Order Functions: Functions That Receive or Return Other Functions}{245}{section*.273}\protected@file@percent }
+\newlabel{lst:fir01}{{8.6.3}{245}{Higher-Order Functions: Functions That Receive or Return Other Functions}{tcb@cnt@codebox.8.6.3}{}}
+\newlabel{lst:fir01@cref}{{[tcb@cnt@codebox][3][8,6]8.6.3}{[1][244][]245}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6.2}Lexical Closures}{245}{subsection.8.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Closures, Lexical Enclosures, and Free Variable Tracking Invariants}{245}{section*.274}\protected@file@percent }
+\newlabel{lst:lex01}{{8.6.4}{245}{Closures, Lexical Enclosures, and Free Variable Tracking Invariants}{tcb@cnt@codebox.8.6.4}{}}
+\newlabel{lst:lex01@cref}{{[tcb@cnt@codebox][4][8,6]8.6.4}{[1][245][]245}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.6.3}Decorators}{246}{subsection.8.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{246}{section*.275}\protected@file@percent }
+\newlabel{lst:dec02}{{8.6.5}{246}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{tcb@cnt@codebox.8.6.5}{}}
+\newlabel{lst:dec02@cref}{{[tcb@cnt@codebox][5][8,6]8.6.5}{[1][246][]246}{}{}{}}
+\newlabel{lst:dec01}{{8.6.6}{246}{The Decorator Pattern: Syntactic Sugar for Higher-Order Function Wrappers}{tcb@cnt@codebox.8.6.6}{}}
+\newlabel{lst:dec01@cref}{{[tcb@cnt@codebox][6][8,6]8.6.6}{[1][246][]246}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8.7}Non-Preemptive Multitasking: Generators and Coroutines}{247}{section.8.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.7.1}Lazy Stream Evaluation: Generators}{247}{subsection.8.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The \texttt  {yield} Keyword Architecture: Pausing Function Execution Without Destroying Local State}{247}{section*.276}\protected@file@percent }
+\newlabel{lst:laz02}{{8.7.1}{247}{The \texttt {yield} Keyword Architecture: Pausing Function Execution Without Destroying Local State}{tcb@cnt@codebox.8.7.1}{}}
+\newlabel{lst:laz02@cref}{{[tcb@cnt@codebox][1][8,7]8.7.1}{[1][247][]247}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Execution State}{247}{section*.277}\protected@file@percent }
+\newlabel{lst:laz01}{{8.7.2}{248}{Generator Objects: Suspended Frames, Instruction Pointers, and Resumable Execution State}{tcb@cnt@codebox.8.7.2}{}}
+\newlabel{lst:laz01@cref}{{[tcb@cnt@codebox][2][8,7]8.7.2}{[1][247][]248}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Execution State Resumption: Re-Entering Suspended Function Frames Across Iteration Steps}{248}{section*.278}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Returning from Generators: \texttt  {StopIteration} and Generator Completion Values}{248}{section*.279}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.7.2}Generator Delegation}{248}{subsection.8.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {yield from} as Delegated Iteration over Subgenerators and Iterables}{248}{section*.280}\protected@file@percent }
+\newlabel{lst:gen01}{{8.7.3}{248}{\texttt {yield from} as Delegated Iteration over Subgenerators and Iterables}{tcb@cnt@codebox.8.7.3}{}}
+\newlabel{lst:gen01@cref}{{[tcb@cnt@codebox][3][8,7]8.7.3}{[1][248][]248}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Propagating Values, Exceptions, and Completion Through Delegated Generator Chains}{249}{section*.281}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.7.3}Bidirectional Data Flow Pipelines}{249}{subsection.8.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Consumers and Transformers: Feeding In-Flight Data via the \texttt  {.send()} Interface}{249}{section*.282}\protected@file@percent }
+\newlabel{lst:bid01}{{8.7.4}{249}{Consumers and Transformers: Feeding In-Flight Data via the \texttt {.send()} Interface}{tcb@cnt@codebox.8.7.4}{}}
+\newlabel{lst:bid01@cref}{{[tcb@cnt@codebox][4][8,7]8.7.4}{[1][249][]249}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Exception Injection with \texttt  {.throw()} and Controlled Shutdown with \texttt  {.close()}}{249}{section*.283}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Cooperative Multitasking: Voluntary Suspension Instead of Preemptive Scheduling}{249}{section*.284}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.7.4}Native Coroutine Bridge}{249}{subsection.8.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {async def} Functions as Native Coroutine Object Factories}{249}{section*.285}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\texttt  {await} as Structured Suspension Over Awaitable Objects}{250}{section*.286}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Event Loops as External Schedulers for Coroutine Progress}{250}{section*.287}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {9}Input/Output Architecture, File Streams, and External Data Boundaries}{251}{chapter.9}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {9.1}The I/O Boundary: From Runtime Objects to External Systems}{251}{section.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.2}The I/O Boundary: From Runtime Objects to External Systems}{251}{section.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2.1}Programs as Data Consumers and Data Producers}{251}{subsection.9.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Runtime Memory vs. Persistent Storage: Why Variables Disappear but Files Remain}{251}{section*.288}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Standard Streams: \texttt  {stdin}, \texttt  {stdout}, and \texttt  {stderr} as Process-Level Communication Channels}{251}{section*.289}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{C Comparison: \texttt  {printf()}, \texttt  {scanf()}, File Descriptors, and Python's Higher-Level Stream Objects}{252}{section*.290}\protected@file@percent }
+\newlabel{lst:pro01}{{9.2.1}{252}{C Comparison: \texttt {printf()}, \texttt {scanf()}, File Descriptors, and Python's Higher-Level Stream Objects}{tcb@cnt@codebox.9.2.1}{}}
+\newlabel{lst:pro01@cref}{{[tcb@cnt@codebox][1][9,2]9.2.1}{[1][252][]252}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.2.2}The Operating System Mediation Layer}{252}{subsection.9.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Why Python Does Not Read Disks Directly: System Calls, File Handles, and Kernel Buffers}{252}{section*.291}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{File Descriptors vs. Python File Objects: Native Resource Handles Wrapped in Managed Runtime Objects}{252}{section*.292}\protected@file@percent }
+\newlabel{lst:the01}{{9.2.2}{253}{File Descriptors vs. Python File Objects: Native Resource Handles Wrapped in Managed Runtime Objects}{tcb@cnt@codebox.9.2.2}{}}
+\newlabel{lst:the01@cref}{{[tcb@cnt@codebox][2][9,2]9.2.2}{[1][252][]253}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{The Layered \texttt  {io} Module Architecture: Understanding Text, Buffered, and Raw Subsystems}{253}{section*.293}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Buffering Layers: Reducing Expensive Kernel Transitions Through Intermediate Memory Buffers}{253}{section*.294}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.3}File Opening, Closing, and Resource Lifetime}{253}{section.9.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.3.1}Resource Management Invariants}{254}{subsection.9.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Manual Closing with \texttt  {.close()} and the Risk of Leaked File Handles}{254}{section*.295}\protected@file@percent }
+\newlabel{lst:res02}{{9.3.1}{254}{Manual Closing with \texttt {.close()} and the Risk of Leaked File Handles}{tcb@cnt@codebox.9.3.1}{}}
+\newlabel{lst:res02@cref}{{[tcb@cnt@codebox][1][9,3]9.3.1}{[1][254][]254}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Context Managers: The \texttt  {with} Statement as Structured Resource Lifetime Control}{254}{section*.296}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The \texttt  {\_\_enter\_\_()} / \texttt  {\_\_exit\_\_()} Protocol Behind \texttt  {with}}{254}{section*.297}\protected@file@percent }
+\newlabel{lst:res01}{{9.3.2}{254}{The \texttt {\_\_enter\_\_()} / \texttt {\_\_exit\_\_()} Protocol Behind \texttt {with}}{tcb@cnt@codebox.9.3.2}{}}
+\newlabel{lst:res01@cref}{{[tcb@cnt@codebox][2][9,3]9.3.2}{[1][254][]254}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Exception-Safe Cleanup: Why File Handles Close Even When Errors Occur Inside the Block}{254}{section*.298}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Buffer Flushing Invariants: Distinguishing Application Caching from Kernel Synchronization}{254}{section*.299}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.4}Text File Reading and Writing}{255}{section.9.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.4.1}Encoding and Decoding Boundaries}{255}{subsection.9.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Character Encoding Overhead: The Hidden Cost of Text Streams vs. Raw Binary Processing}{255}{section*.300}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Encoding Failure Modes: \texttt  {UnicodeDecodeError}, \texttt  {UnicodeEncodeError}, and Error Handling Strategies}{256}{section*.301}\protected@file@percent }
+\newlabel{lst:enc01}{{9.4.1}{256}{Encoding Failure Modes: \texttt {UnicodeDecodeError}, \texttt {UnicodeEncodeError}, and Error Handling Strategies}{tcb@cnt@codebox.9.4.1}{}}
+\newlabel{lst:enc01@cref}{{[tcb@cnt@codebox][1][9,4]9.4.1}{[1][256][]256}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9.5}Binary File Reading and Writing}{256}{section.9.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5.1}Byte-Oriented Data Streams}{256}{subsection.9.5.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Binary Mode as Raw Byte Transfer Without Text Decoding}{256}{section*.302}\protected@file@percent }
+\newlabel{lst:byt01}{{9.5.1}{256}{Binary Mode as Raw Byte Transfer Without Text Decoding}{tcb@cnt@codebox.9.5.1}{}}
+\newlabel{lst:byt01@cref}{{[tcb@cnt@codebox][1][9,5]9.5.1}{[1][256][]256}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{The \texttt  {bytes} Object: Immutable Byte Sequences Distinct from \texttt  {str}}{256}{section*.303}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{The \texttt  {bytearray} Object: Mutable Byte Buffers for Incremental Modification}{257}{section*.304}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.5.2}Binary Access Patterns}{257}{subsection.9.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Reading Fixed-Size Chunks for Large Files}{257}{section*.305}\protected@file@percent }
+\newlabel{lst:bin01}{{9.5.2}{257}{Reading Fixed-Size Chunks for Large Files}{tcb@cnt@codebox.9.5.2}{}}
+\newlabel{lst:bin01@cref}{{[tcb@cnt@codebox][2][9,5]9.5.2}{[1][257][]257}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Writing Byte Buffers to External Storage}{257}{section*.306}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Random Access with \texttt  {.seek()} and \texttt  {.tell()}}{257}{section*.307}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.6}Filesystem Path Architecture}{257}{section.9.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6.1}Paths as Structured Filesystem References}{257}{subsection.9.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Modern File System Manipulation: Object-Oriented Paths via \texttt  {pathlib}}{258}{section*.308}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Absolute Paths, Relative Paths, and Current Working Directory Resolution}{258}{section*.309}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Platform Separators: Windows Backslashes, POSIX Slashes, and Portable Path Construction}{258}{section*.310}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.6.2}Filesystem Inspection and Manipulation}{258}{subsection.9.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Checking Existence, File Type, and Directory Type}{258}{section*.311}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Creating Directories and Parent Directory Chains}{258}{section*.312}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Listing Directory Contents and Iterating over Filesystem Entries}{258}{section*.313}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Renaming, Moving, and Deleting Files Safely}{259}{section*.314}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.7}Structured Data Interchange}{259}{section.9.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.7.1}JSON Data Boundaries}{259}{subsection.9.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{JSON as Text-Based Tree Serialization: Objects, Arrays, Strings, Numbers, Booleans, and Null}{259}{section*.315}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Loading JSON into Python Dictionaries and Lists with \texttt  {json.load()} and \texttt  {json.loads()}}{259}{section*.316}\protected@file@percent }
+\newlabel{lst:jso01}{{9.7.1}{259}{Loading JSON into Python Dictionaries and Lists with \texttt {json.load()} and \texttt {json.loads()}}{tcb@cnt@codebox.9.7.1}{}}
+\newlabel{lst:jso01@cref}{{[tcb@cnt@codebox][1][9,7]9.7.1}{[1][259][]259}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Writing Python Structures Back to JSON with \texttt  {json.dump()} and \texttt  {json.dumps()}}{259}{section*.317}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{JSON Type Mapping Boundaries: \texttt  {None} vs. \texttt  {null}, \texttt  {dict} vs. Object, \texttt  {list} vs. Array}{259}{section*.318}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.7.2}Object Serialization Mechanics: The Internal Working of the \texttt  {pickle} Protocol}{260}{subsection.9.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.8}Error Handling in I/O Operations}{260}{section.9.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.8.1}Expected Failure Modes}{260}{subsection.9.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Missing Files and \texttt  {FileNotFoundError}}{260}{section*.319}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Permission Failures and \texttt  {PermissionError}}{260}{section*.320}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Invalid Paths, Locked Files, and Platform-Specific Filesystem Constraints}{260}{section*.321}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.8.2}Defensive I/O Patterns}{260}{subsection.9.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{EAFP File Access: Trying the Operation and Handling the Exception}{261}{section*.322}\protected@file@percent }
+\newlabel{lst:def01}{{9.8.1}{261}{EAFP File Access: Trying the Operation and Handling the Exception}{tcb@cnt@codebox.9.8.1}{}}
+\newlabel{lst:def01@cref}{{[tcb@cnt@codebox][1][9,8]9.8.1}{[1][260][]261}{}{}{}}
+\@writefile{toc}{\contentsline {subsubsection}{LBYL File Access: Checking Conditions Before Opening}{261}{section*.323}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Atomicity Concerns: Why Existence Checks Can Become Invalid Before Use}{261}{section*.324}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9.9}Practical External Data Pipelines}{261}{section.9.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.9.1}Streaming Large Inputs}{261}{subsection.9.9.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Processing Files Line by Line Without Loading Entire Contents into Memory}{261}{section*.325}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Chunked Binary Processing for Large Media or Archive Files}{261}{section*.326}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {9.9.2}Transforming External Data}{262}{subsection.9.9.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Read-Transform-Write Pipelines}{262}{section*.327}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Temporary Files and Safe Output Replacement}{262}{section*.328}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Separating Parsing, Processing, and Serialization Functions}{262}{section*.329}\protected@file@percent }
+\bibstyle{plain}
+\bibdata{full_references}
+\@writefile{toc}{\contentsline {chapter}{List of Figures}{263}{chapter*.330}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{264}{chapter*.331}\protected@file@percent }
+\xdef \mintedoldcachechecksum{\detokenize{23059FABD15133D0501AF6220CE74C8C:185}}
+\gdef \@abspage@last{264}

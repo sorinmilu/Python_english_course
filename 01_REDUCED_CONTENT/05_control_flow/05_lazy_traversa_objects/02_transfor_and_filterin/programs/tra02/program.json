@@ -4,6 +4,6 @@
   "label": "tra02",
   "linenos": true,
   "input": null,
-  "output": "[10, 20, 42]",
+  "output": "text: '42'\ntype(text): <class 'str'>\nnum: 42\ntype(num): <class 'int'>\ndir(num) sample: ['__abs__', '__add__', '__and__', '__bool__',\n'__ceil__', '__class__', '__delattr__', '__dir__', '__divmod__',\n'__doc__']\nnum.__bool__(): True\nnum.__add__(8): 50",
   "file": "main.py"
 }

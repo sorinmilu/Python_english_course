@@ -1,8 +1,10 @@
-def convert_score(score):
+score = 72
+
+if score > 90:
+    print("excellent")
+elif score > 50:
     pass
+else:
+    print("needs work")
 
-result = convert_score(42)
-
-print(f"result: {result}")
-print(f"type(result): {type(result)}")
-print(f"dir(result) sample: {dir(result)[:5]}")
+print("grading finished")

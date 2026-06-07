@@ -1,0 +1,416 @@
+\subsection{The Floating-Point Representation Architecture (\texttt{float})}
+
+Python's \texttt{float} type represents real-number approximations, not exact real numbers. This distinction is essential. An \texttt{int} can represent arbitrarily large whole numbers exactly. A \texttt{float} represents numbers using a fixed-size binary format, so many decimal fractions can only be approximated.
+
+A first inspection:
+
+\begin{verbatim}
+price = 19.99
+
+print(f"value: {price}")
+print(f"type:  {type(price)}")
+print(f"id:    {id(price)}")
+
+print()
+print("selected float methods:")
+print(f"{'as_integer_ratio':<20} {'as_integer_ratio' in dir(price)}")
+print(f"{'is_integer':<20} {'is_integer' in dir(price)}")
+print(f"{'hex':<20} {'hex' in dir(price)}")
+print(f"{'__add__':<20} {'__add__' in dir(price)}")
+print(f"{'__truediv__':<20} {'__truediv__' in dir(price)}")
+
+print()
+print(f"is_integer():       {price.is_integer()}")
+print(f"as_integer_ratio(): {price.as_integer_ratio()}")
+print(f"hex():              {price.hex()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: 19.99
+type:  <class 'float'>
+id:    2214135699408
+
+selected float methods:
+as_integer_ratio     True
+is_integer           True
+hex                  True
+__add__              True
+__truediv__          True
+
+is_integer():       False
+as_integer_ratio(): (5626684784442573, 281474976710656)
+hex():              0x1.3fd70a3d70a3dp+4
+\end{verbatim}
+
+The method \texttt{as\_integer\_ratio()} exposes the exact fraction represented by the stored floating-point value. The method \texttt{hex()} exposes a hexadecimal form of the binary floating-point value. These are useful because they show that \texttt{19.99} is not stored as the exact decimal fraction that the programmer wrote.
+
+\subsubsection{Architectural Realities: Mapping Python Floats to C Doubles via the IEEE 754 Double-Precision Binary Standard}
+
+In CPython, the ordinary Python \texttt{float} is implemented using the platform C \texttt{double}. On modern machines, that usually means IEEE 754 double-precision binary floating point.
+
+This format uses a fixed amount of storage. It does not grow like Python's \texttt{int}. A float has limited precision and limited exponent range.
+
+Python exposes the main limits through \texttt{sys.float\_info}:
+
+\begin{verbatim}
+import sys
+
+print(sys.float_info)
+
+print()
+print(f"max:      {sys.float_info.max}")
+print(f"min:      {sys.float_info.min}")
+print(f"epsilon:  {sys.float_info.epsilon}")
+print(f"mantissa digits in base 2: {sys.float_info.mant_dig}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+sys.float_info(max=1.7976931348623157e+308, min=2.2250738585072014e-308, 
+dig=15, mant_dig=53, epsilon=2.220446049250313e-16, radix=2, rounds=1)
+
+max:      1.7976931348623157e+308
+min:      2.2250738585072014e-308
+epsilon:  2.220446049250313e-16
+mantissa digits in base 2: 53
+\end{verbatim}
+
+The exact formatting may vary, but the important values are stable on normal CPython builds:
+
+\begin{itemize}
+    \item \texttt{radix = 2}: the representation is binary;
+    \item \texttt{mant\_dig = 53}: the precision is about 53 binary digits;
+    \item \texttt{dig = 15}: about 15 decimal digits can be represented reliably;
+    \item \texttt{epsilon}: the distance between \texttt{1.0} and the next representable float above it.
+\end{itemize}
+
+This means that \texttt{float} is not an arbitrary-precision decimal type. It is a fixed-precision binary approximation type.
+
+\begin{verbatim}
+small = 42.0
+large = 10.0 ** 100
+
+print(f"small: {small}")
+print(f"large: {large}")
+
+print()
+print(f"type(small): {type(small)}")
+print(f"type(large): {type(large)}")
+
+print()
+print(f"small.hex(): {small.hex()}")
+print(f"large.hex(): {large.hex()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+small: 42.0
+large: 1e+100
+
+type(small): <class 'float'>
+type(large): <class 'float'>
+
+small.hex(): 0x1.5000000000000p+5
+large.hex(): 0x1.249ad2594c37dp+332
+\end{verbatim}
+
+Both values have type \texttt{float}. The second value is much larger, but the representation is still constrained by the same fixed floating-point architecture.
+
+This also means that float arithmetic can overflow:
+
+\begin{verbatim}
+import sys
+
+big = sys.float_info.max
+
+print(f"big: {big}")
+
+too_big = big * 2
+
+print(f"too_big: {too_big}")
+print(f"type(too_big): {type(too_big)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+big: 1.7976931348623157e+308
+too_big: inf
+type(too_big): <class 'float'>
+\end{verbatim}
+
+Unlike \texttt{int}, a \texttt{float} cannot keep allocating more storage to represent a larger exact value. Once the representable range is exceeded, the result may become infinity.
+
+\subsubsection{Machine Epsilon and Precision Loss: The Pitfalls of Representing Base-10 Fractions in Base-2 Memory Buffers}
+
+The most famous floating-point surprise is this:
+
+\begin{verbatim}
+total = 0.1 + 0.2
+
+print(f"total: {total}")
+print(f"total == 0.3: {total == 0.3}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+total: 0.30000000000000004
+total == 0.3: False
+\end{verbatim}
+
+This is not a Python bug. It is a consequence of representing decimal fractions in binary floating point.
+
+Fractions such as \texttt{0.5}, \texttt{0.25}, and \texttt{0.125} are easy in binary because they are powers of two in the denominator:
+
+\begin{verbatim}
+values = [0.5, 0.25, 0.125]
+
+for value in values:
+    print(f"{value:<8} ratio={value.as_integer_ratio()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+0.5      ratio=(1, 2)
+0.25     ratio=(1, 4)
+0.125    ratio=(1, 8)
+\end{verbatim}
+
+But \texttt{0.1} does not have a finite binary expansion, just as \texttt{1/3} does not have a finite decimal expansion.
+
+\begin{verbatim}
+value = 0.1
+
+print(f"value: {value}")
+print(f"ratio: {value.as_integer_ratio()}")
+print(f"hex:   {value.hex()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value: 0.1
+ratio: (3602879701896397, 36028797018963968)
+hex:   0x1.999999999999ap-4
+\end{verbatim}
+
+The source text \texttt{0.1} is converted to the closest representable binary floating-point value. That stored value is very close to one tenth, but it is not exactly one tenth.
+
+Machine epsilon gives a scale for this limitation around \texttt{1.0}.
+
+\begin{verbatim}
+import sys
+
+eps = sys.float_info.epsilon
+
+print(f"epsilon: {eps}")
+print(f"1.0 + epsilon:     {1.0 + eps}")
+print(f"1.0 + epsilon / 2: {1.0 + eps / 2}")
+
+print()
+print(f"(1.0 + epsilon) == 1.0:     {(1.0 + eps) == 1.0}")
+print(f"(1.0 + epsilon / 2) == 1.0: {(1.0 + eps / 2) == 1.0}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+epsilon: 2.220446049250313e-16
+1.0 + epsilon:     1.0000000000000002
+1.0 + epsilon / 2: 1.0
+
+(1.0 + epsilon) == 1.0:     False
+(1.0 + epsilon / 2) == 1.0: True
+\end{verbatim}
+
+The second addition is too small to change the stored value at that scale. This is the concrete meaning of limited precision: not every tiny mathematical difference can be represented.
+
+For equality checks with floats, direct equality is often wrong for computed values:
+
+\begin{verbatim}
+total = 0.1 + 0.2
+expected = 0.3
+
+print(f"total:    {total}")
+print(f"expected: {expected}")
+print(f"direct equality: {total == expected}")
+
+print()
+print(f"difference: {abs(total - expected)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+total:    0.30000000000000004
+expected: 0.3
+direct equality: False
+
+difference: 5.551115123125783e-17
+\end{verbatim}
+
+A better test is to check whether the values are close enough for the problem being solved:
+
+\begin{verbatim}
+import math
+
+total = 0.1 + 0.2
+expected = 0.3
+
+print(f"math.isclose(total, expected): {math.isclose(total, expected)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+math.isclose(total, expected): True
+\end{verbatim}
+
+The practical rule is:
+
+\begin{quote}
+Use \texttt{float} for approximate real-number computation, not for exact decimal accounting.
+\end{quote}
+
+For money, exact decimal rules, or base-10 financial calculations, Python's standard \texttt{decimal} module is often more appropriate, but that belongs to a later discussion.
+
+\subsubsection{Special Floating-Point Values: Infinity, Negative Infinity, and NaN}
+
+Floating-point arithmetic also includes special values. The most important are:
+
+\begin{itemize}
+    \item positive infinity: \texttt{inf};
+    \item negative infinity: \texttt{-inf};
+    \item not-a-number: \texttt{nan}.
+\end{itemize}
+
+They can be created with \texttt{float()} or accessed through the \texttt{math} module.
+
+\begin{verbatim}
+import math
+
+pos_inf = float("inf")
+neg_inf = float("-inf")
+not_number = float("nan")
+
+print(f"pos_inf:    {pos_inf}")
+print(f"neg_inf:    {neg_inf}")
+print(f"not_number: {not_number}")
+
+print()
+print(f"type(pos_inf):    {type(pos_inf)}")
+print(f"type(neg_inf):    {type(neg_inf)}")
+print(f"type(not_number): {type(not_number)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pos_inf:    inf
+neg_inf:    -inf
+not_number: nan
+
+type(pos_inf):    <class 'float'>
+type(neg_inf):    <class 'float'>
+type(not_number): <class 'float'>
+\end{verbatim}
+
+These are still \texttt{float} objects. They are not separate Python types.
+
+Infinity compares larger than ordinary finite numbers:
+
+\begin{verbatim}
+pos_inf = float("inf")
+neg_inf = float("-inf")
+
+print(f"pos_inf > 10 ** 300: {pos_inf > 10 ** 300}")
+print(f"neg_inf < -10 ** 300: {neg_inf < -10 ** 300}")
+
+print()
+print(f"pos_inf + 42: {pos_inf + 42}")
+print(f"neg_inf * 2:  {neg_inf * 2}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+pos_inf > 10 ** 300: True
+neg_inf < -10 ** 300: True
+
+pos_inf + 42: inf
+neg_inf * 2:  -inf
+\end{verbatim}
+
+The value \texttt{nan} is different. It represents an undefined or unrepresentable floating-point result.
+
+\begin{verbatim}
+not_number = float("nan")
+
+print(f"not_number: {not_number}")
+print(f"not_number == not_number: {not_number == not_number}")
+print(f"not_number != not_number: {not_number != not_number}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+not_number: nan
+not_number == not_number: False
+not_number != not_number: True
+\end{verbatim}
+
+This is strange but intentional. A NaN is not considered equal even to itself. Therefore, do not test for NaN using equality.
+
+Use \texttt{math.isnan()}:
+
+\begin{verbatim}
+import math
+
+value1 = 42.0
+value2 = float("nan")
+
+print(f"value1 is NaN: {math.isnan(value1)}")
+print(f"value2 is NaN: {math.isnan(value2)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+value1 is NaN: False
+value2 is NaN: True
+\end{verbatim}
+
+Similarly, use \texttt{math.isinf()} to test for infinity:
+
+\begin{verbatim}
+import math
+
+values = [42.0, float("inf"), float("-inf"), float("nan")]
+
+for value in values:
+    print(f"{str(value):<8} "
+          f"isinf={math.isinf(value)!s:<5} "
+          f"isnan={math.isnan(value)!s:<5} "
+          f"isfinite={math.isfinite(value)!s:<5}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+42.0     isinf=False isnan=False isfinite=True 
+inf      isinf=True  isnan=False isfinite=False
+-inf     isinf=True  isnan=False isfinite=False
+nan      isinf=False isnan=True  isfinite=False
+\end{verbatim}
+
+The practical summary is:
+
+\begin{quote}
+Python's \texttt{float} is a fixed-precision binary floating-point object. It is fast and useful for approximate numerical computation, but it cannot represent all decimal fractions exactly, can overflow to infinity, and includes special values such as \texttt{inf}, \texttt{-inf}, and \texttt{nan}.
+\end{quote}

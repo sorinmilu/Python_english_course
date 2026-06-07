@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Converting Lazy Iterables into Lists or Tuples When Stored Results Are Needed",
+  "label": "mat06",
+  "linenos": true,
+  "input": null,
+  "output": "first materialization\n[(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]\nsecond materialization\n[]",
+  "file": "main.py"
+}

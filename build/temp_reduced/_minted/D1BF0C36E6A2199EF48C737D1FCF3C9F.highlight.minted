@@ -1,0 +1,11 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{text} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{forty\PYGZhy{}two}\PYG{l+s+s2}{\PYGZdq{}}
+
+\PYG{k}{try}\PYG{p}{:}
+    \PYG{n}{number} \PYG{o}{=} \PYG{n+nb}{int}\PYG{p}{(}\PYG{n}{text}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{number: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{number}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{Exception}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{general handler: catches the ValueError first}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{k}{except} \PYG{n+ne}{ValueError}\PYG{p}{:}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{specific handler: unreachable here}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\end{MintedVerbatim}

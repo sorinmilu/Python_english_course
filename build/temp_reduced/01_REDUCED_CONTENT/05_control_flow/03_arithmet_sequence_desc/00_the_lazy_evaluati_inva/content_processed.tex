@@ -1,0 +1,305 @@
+\subsection{The Lazy Evaluation Invariant}
+
+The object returned by \texttt{range()} is often introduced as if it were a list of numbers. That description is convenient, but technically wrong. A \texttt{range} object is not a stored list. It is a compact descriptor of an arithmetic sequence.
+
+The difference is fundamental. A list contains references to its elements. A \texttt{range} object contains the information needed to compute its elements when they are requested.
+
+\begin{quote}
+A \texttt{range} object stores the rule for producing numbers, not the produced numbers themselves.
+\end{quote}
+
+This is why \texttt{range()} belongs naturally in a chapter about control flow and lazy traversal. It is one of the first Python objects that clearly separates the idea of a sequence from the idea of materialized storage.
+
+\subsubsection{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object Storage}
+
+An arithmetic progression is a sequence where each value is obtained by repeatedly adding the same step. For example:
+
+\begin{verbatim}
+0, 1, 2, 3, 4
+\end{verbatim}
+
+can be described as:
+
+\begin{verbatim}
+start at 0
+stop before 5
+move by 1
+\end{verbatim}
+
+The \texttt{range()} object stores this kind of description.
+
+\begin{codebox}[]{python}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object...}{the06}
+nums = range(0, 5, 1)
+
+print(f"nums: {nums}")
+print(f"type(nums): {type(nums)}")
+print(f"dir(nums) sample: {dir(nums)[:12]}")
+
+print(f"nums.start: {nums.start}")
+print(f"nums.stop: {nums.stop}")
+print(f"nums.step: {nums.step}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{nums: range(0, 5)} \\
+\texttt{type(nums): <class 'range'>} \\
+\texttt{dir(nums) sample: ['\_\_bool\_\_', '\_\_class\_\_', '\_\_contains\_\_', '\_\_delattr\_\_', '\_\_dir\_\_',} \\
+\texttt{'\_\_doc\_\_', '\_\_eq\_\_', '\_\_format\_\_', '\_\_ge\_\_', '\_\_getattribute\_\_', '\_\_getitem\_\_',} \\
+\texttt{'\_\_gt\_\_']} \\
+\texttt{nums.start: 0} \\
+\texttt{nums.stop: 5} \\
+\texttt{nums.step: 1} \\
+\end{iobox}
+
+
+The printed representation \texttt{range(0, 5)} is already a clue. Python does not print:
+
+\begin{verbatim}
+[0, 1, 2, 3, 4]
+\end{verbatim}
+
+because the object is not a list. It is a range descriptor.
+
+The important exposed attributes are:
+
+\begin{itemize}
+    \item \texttt{start}: the first value of the arithmetic description;
+    \item \texttt{stop}: the boundary value that is not crossed;
+    \item \texttt{step}: the amount added between successive values.
+\end{itemize}
+
+The object also provides sequence-like methods through special methods. For example, \texttt{\_\_len\_\_()} gives the number of values described by the range, and \texttt{\_\_getitem\_\_()} computes an item at a requested index.
+
+\begin{codebox}[]{python}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object...}{the05}
+nums = range(10, 20, 2)
+
+print(f"nums: {nums}")
+print(f"len(nums): {len(nums)}")
+print(f"nums.__len__(): {nums.__len__()}")
+
+print(f"nums[0]: {nums[0]}")
+print(f"nums[1]: {nums[1]}")
+print(f"nums[2]: {nums[2]}")
+print(f"nums.__getitem__(3): {nums.__getitem__(3)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{nums: range(10, 20, 2)} \\
+\texttt{len(nums): 5} \\
+\texttt{nums.\_\_len\_\_(): 5} \\
+\texttt{nums[0]: 10} \\
+\texttt{nums[1]: 12} \\
+\texttt{nums[2]: 14} \\
+\texttt{nums.\_\_getitem\_\_(3): 16} \\
+\end{iobox}
+
+
+The values are obtained from the arithmetic rule:
+
+\begin{verbatim}
+index 0 -> 10 + 0 * 2 -> 10
+index 1 -> 10 + 1 * 2 -> 12
+index 2 -> 10 + 2 * 2 -> 14
+index 3 -> 10 + 3 * 2 -> 16
+\end{verbatim}
+
+No separate stored array of these integers is required for the \texttt{range} object itself.
+
+This can be compared with a list created from the same range:
+
+\begin{codebox}[]{python}{Abstracting Arithmetic Progressions: The Memory Profile of Fixed-Space Object...}{the04}
+nums_range = range(10, 20, 2)
+nums_list = list(nums_range)
+
+print(f"nums_range: {nums_range}")
+print(f"nums_list: {nums_list}")
+
+print(f"type(nums_range): {type(nums_range)}")
+print(f"type(nums_list): {type(nums_list)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{nums\_range: range(10, 20, 2)} \\
+\texttt{nums\_list: [10, 12, 14, 16, 18]} \\
+\texttt{type(nums\_range): <class 'range'>} \\
+\texttt{type(nums\_list): <class 'list'>} \\
+\end{iobox}
+
+
+The list is materialized. It contains element slots. The range is descriptive. It contains the arithmetic boundaries.
+
+This distinction matters because a loop does not need the whole list at once:
+
+\begin{verbatim}
+for n in range(1, 4):
+    print(f"n: {n}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+n: 1
+n: 2
+n: 3
+\end{verbatim}
+
+The loop asks for successive values. The \texttt{range} object can provide them without storing the entire sequence beforehand.
+
+\subsubsection{The O(1) Memory Footprint: Why \texttt{range(1000000)} Stores Only Start, Stop, and Step Parameters}
+
+The memory cost of a \texttt{range} object does not grow with the number of values it describes. Whether the range describes ten values, one million values, or one billion values, the object stores a fixed amount of descriptor information.
+
+At the conceptual Python level, that information is:
+
+\begin{verbatim}
+start
+stop
+step
+\end{verbatim}
+
+In CPython implementation terms, the object may also keep derived internal information such as the computed length, but it still does not store every produced integer. The important invariant remains the same: the memory used by the \texttt{range} descriptor is constant with respect to the number of described values.
+
+This is called \texttt{O(1)} memory use. Here, \texttt{O(1)} means that the storage size stays fixed as the logical sequence length grows.
+
+\begin{codebox}[]{python}{The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...}{the03}
+import sys
+
+small_range = range(10)
+large_range = range(1_000_000)
+huge_range = range(1_000_000_000)
+
+print(f"small_range: {small_range}")
+print(f"large_range: {large_range}")
+print(f"huge_range:  {huge_range}")
+
+print(f"size of small_range: {sys.getsizeof(small_range)} bytes")
+print(f"size of large_range: {sys.getsizeof(large_range)} bytes")
+print(f"size of huge_range:  {sys.getsizeof(huge_range)} bytes")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{small\_range: range(0, 10)} \\
+\texttt{large\_range: range(0, 1000000)} \\
+\texttt{huge\_range:  range(0, 1000000000)} \\
+\texttt{size of small\_range: 48 bytes} \\
+\texttt{size of large\_range: 48 bytes} \\
+\texttt{size of huge\_range:  48 bytes} \\
+\end{iobox}
+
+
+The exact byte count is implementation-dependent. Another Python build may report a different number. The relevant observation is that all three range objects have the same reported size on the same build.
+
+The contrast with a list is immediate:
+
+\begin{codebox}[]{python}{The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...}{the02}
+import sys
+
+nums_range = range(1_000_000)
+nums_list = list(nums_range)
+
+print(f"type(nums_range): {type(nums_range)}")
+print(f"type(nums_list): {type(nums_list)}")
+
+print(f"size of nums_range: {sys.getsizeof(nums_range)} bytes")
+print(f"size of nums_list:  {sys.getsizeof(nums_list)} bytes")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{type(nums\_range): <class 'range'>} \\
+\texttt{type(nums\_list): <class 'list'>} \\
+\texttt{size of nums\_range: 48 bytes} \\
+\texttt{size of nums\_list:  8000056 bytes} \\
+\end{iobox}
+
+
+The list size shown here is only the size of the list container's internal reference array. It does not even fully count the memory of every integer object that may be referenced. The range object avoids that problem because it does not contain one reference slot per value.
+
+This is the concrete storage difference:
+
+\begin{verbatim}
+range(1_000_000):
+    stores a compact arithmetic descriptor
+
+list(range(1_000_000)):
+    stores a list object with one million element positions
+\end{verbatim}
+
+The word \enquote{lazy} should be read literally here. A \texttt{range} delays value production until a value is demanded by indexing, iteration, membership testing, or materialization.
+
+\begin{codebox}[]{python}{The O(1) Memory Footprint: Why range(1000000) Stores Only Start, Stop, and St...}{the01}
+nums = range(0, 10)
+
+print("range object created")
+print(f"nums: {nums}")
+
+print("now asking for one value")
+print(f"nums[4]: {nums[4]}")
+
+print("now materializing all values")
+print(f"list(nums): {list(nums)}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{range object created} \\
+\texttt{nums: range(0, 10)} \\
+\texttt{now asking for one value} \\
+\texttt{nums[4]: 4} \\
+\texttt{now materializing all values} \\
+\texttt{list(nums): [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]} \\
+\end{iobox}
+
+
+The conversion with \texttt{list(nums)} is the materialization boundary. Before that line, the program has a range descriptor. After that line, the program has an actual list containing the produced values.
+
+The same rule applies to very large ranges:
+
+\begin{verbatim}
+nums = range(0, 1_000_000)
+
+print(f"nums: {nums}")
+print(f"first value: {nums[0]}")
+print(f"middle value: {nums[500_000]}")
+print(f"last value: {nums[-1]}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+nums: range(0, 1000000)
+first value: 0
+middle value: 500000
+last value: 999999
+\end{verbatim}
+
+The program can inspect selected positions without building a million-element list. Each requested value is computed from the descriptor.
+
+This makes \texttt{range()} suitable for loop control:
+
+\begin{verbatim}
+for i in range(3):
+    print(f"step {i}: And now for something completely different.")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+step 0: And now for something completely different.
+step 1: And now for something completely different.
+step 2: And now for something completely different.
+\end{verbatim}
+
+The loop receives the values one by one. The range remains a compact reusable object.
+
+The practical rule is:
+
+\begin{quote}
+Use \texttt{range()} when you need an arithmetic sequence for traversal. Convert it to \texttt{list} only when you truly need all values stored at once.
+\end{quote}
+
+For control-flow analysis, \texttt{range()} is important because it shows that a loop source does not have to be a fully materialized container. It can be a compact object that describes how traversal values should be generated.

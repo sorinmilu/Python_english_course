@@ -61,18 +61,7 @@ These tokens are forbidden not because they are poor English labels, but because
 
 The \texttt{keyword.iskeyword()} function distinguishes hard keywords from identifier-shaped words that happen to collide with built-ins:
 
-\begin{verbatim}
-import keyword
-
-for name in ("def", "class", "print", "type", "answer_42"):
-    print(f"{name:<12} keyword={keyword.iskeyword(name)}")
-# def          keyword=True
-# class        keyword=True
-# print        keyword=False   <- maskable at runtime
-# type         keyword=False   <- maskable at runtime
-# answer_42    keyword=False
-\end{verbatim}
-
+%<<<PROGRAM:programs/leg01>>>
 Hard keywords are rejected by the parser. Built-ins are not. That asymmetry is the architectural fault line between compile-time grammar and runtime namespace masking.
 
 \subsubsection{Case Sensitivity: \texttt{name}, \texttt{Name}, and \texttt{NAME} as Distinct Bindings}

@@ -6,15 +6,7 @@ Every successful \texttt{open()} acquires an external handle. Leaked handles exh
 
 \texttt{close()} shuts down the OS connection; the Python wrapper may remain inspectable with \texttt{closed == True}. Writes after close raise \texttt{ValueError}. Manual close is fragile when exceptions skip the cleanup path.
 
-\begin{verbatim}
-path = "manual_close_demo.txt"
-file_obj = open(path, "w", encoding="utf-8")
-file_obj.write("No soup for you!\n")
-print(file_obj.closed)
-file_obj.close()
-print(file_obj.closed)
-\end{verbatim}
-
+%<<<PROGRAM:programs/res02>>>
 \subsubsection{Context Managers: The \texttt{with} Statement as Structured Resource Lifetime Control}
 
 \texttt{with open(...) as f:} binds handle lifetime to a lexical block. Exit always runs cleanup, including on exceptions.
@@ -30,15 +22,7 @@ print(file_obj.closed)
 
 Context managers implement \texttt{\_\_enter\_\_()} (return bound object) and \texttt{\_\_exit\_\_()} (cleanup, including on exceptions). File objects close in \texttt{\_\_exit\_\_()}.
 
-\begin{verbatim}
-path = "protocol_demo.txt"
-file_obj = open(path, "w", encoding="utf-8")
-entered = file_obj.__enter__()
-entered.write("Protocol-driven write.\n")
-file_obj.__exit__(None, None, None)
-print(file_obj.closed)
-\end{verbatim}
-
+%<<<PROGRAM:programs/res01>>>
 Normal code should use \texttt{with}, not manual protocol calls.
 
 \subsubsection{Exception-Safe Cleanup: Why File Handles Close Even When Errors Occur Inside the Block}

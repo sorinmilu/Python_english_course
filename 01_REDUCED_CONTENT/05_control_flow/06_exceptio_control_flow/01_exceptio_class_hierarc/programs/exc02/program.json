@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "The Risk of Bare except and Over-Broad Exception Traps",
+  "label": "exc02",
+  "linenos": true,
+  "input": null,
+  "output": "total: 72",
+  "file": "main.py"
+}

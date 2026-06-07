@@ -1,0 +1,73 @@
+\subsection{Exception Handling Infrastructure}
+
+Python exception handling is structured around protected regions and guaranteed cleanup edges. The \texttt{try}/\texttt{except} trap syntax is omitted here; this subsection covers success-only continuations, unconditional cleanup, and context-manager stack guarantees.
+
+\begin{quote}
+\texttt{else} isolates success-only logic. \texttt{finally} and \texttt{with} guarantee cleanup regardless of how a region is exited.
+\end{quote}
+
+\subsubsection{The Exception \texttt{else} Clause: Isolating Code Paths That Run Only When No Exceptions Occur}
+
+The \texttt{else} clause runs only if the \texttt{try} block completes without raising. It is not an \texttt{if}-\texttt{else} branch; it is a success-only continuation compiled after the handler table.
+
+\begin{codebox}[]{python}{The Exception else Clause: Isolating Code Paths That Run Only When No Excepti...}{exc01}
+try:
+    number = int(text)
+except ValueError as err:
+    print(f"conversion failed: {err}")
+else:
+    print(f"number: {number}")   # runs only on clean try completion
+\end{codebox}
+
+
+Architecturally, \texttt{else} keeps the protected region narrow: only the risky operation sits in \texttt{try}; code that depends on success but is not itself failure-prone moves to \texttt{else}, preventing accidental handler capture of downstream exceptions.
+
+\subsubsection{Cleansing and Post-Processing: The Unconditional Execution Invariants of the \texttt{finally} Block}
+
+\texttt{finally} is an exit checkpoint in the exception table. Every route out of the protected region---normal completion, matched handler, unmatched propagation, \texttt{return}, \texttt{break}---must traverse the \texttt{finally} block before control reaches the outer graph.
+
+\begin{verbatim}
+try:
+    resource = acquire()
+    use(resource)
+finally:
+    release(resource)    # runs on success, handled failure, and propagation
+\end{verbatim}
+
+If an inner \texttt{try} has no \texttt{except} but has \texttt{finally}, propagation to an outer handler still executes the inner \texttt{finally} first. \texttt{finally} is neither success nor failure logic; it is stack unwinding hygiene wired at compile time.
+
+\subsubsection{Context Management Boundaries: The Structural Mechanics of the \texttt{with} Statement}
+
+The \texttt{with} statement is not a file-handling tutorial pattern; it is a compile-time stack contract. The compiler lowers:
+
+\begin{verbatim}
+with EXPR as VAR:
+    BODY
+\end{verbatim}
+
+to a sequence beginning with \texttt{SETUP\_WITH} (or equivalent in newer bytecode formats), which:
+
+\begin{enumerate}
+    \item evaluates \texttt{EXPR} and pushes the context manager object;
+    \item calls \texttt{\_\_enter\_\_()} via \texttt{LOAD\_METHOD}/\texttt{CALL}, binding the result to \texttt{VAR} if present;
+    \item executes \texttt{BODY};
+    \item on \emph{any} exit path---normal, \texttt{return}, handled exception, or propagation---calls \texttt{\_\_exit\_\_(exc\_type, exc, tb)} before restoring the previous stack level.
+\end{enumerate}
+
+The \texttt{SETUP\_WITH} opcode records a handler offset in the code object's exception table so that unwinding from inside \texttt{BODY} still dispatches \texttt{\_\_exit\_\_}. Even when \texttt{\_\_exit\_\_} receives active exception information, the context manager's cleanup function pointer runs before the frame is abandoned---mirroring \texttt{finally} invariants but delegated to the manager object's protocol.
+
+\begin{verbatim}
+import dis
+
+def demo():
+    with open("data.txt") as f:
+        process(f)
+
+dis.dis(demo)   # observe SETUP_WITH / WITH_EXCEPT_START / RERAISE variants
+\end{verbatim}
+
+If \texttt{\_\_exit\_\_} returns a true value, a propagated exception may be suppressed; if false, unwinding continues. The structural guarantee is independent of that policy choice: the exit hook is invoked on every route, including catastrophic frame unwinding, because the exception table maps the protected bytecode range to the \texttt{WITH} cleanup block at compile time.
+
+\begin{quote}
+\texttt{with} combines \texttt{SETUP\_WITH} stack preparation and exception-table routing to guarantee \texttt{\_\_exit\_\_} execution on every exit edge---the context-manager analogue of \texttt{finally}.
+\end{quote}

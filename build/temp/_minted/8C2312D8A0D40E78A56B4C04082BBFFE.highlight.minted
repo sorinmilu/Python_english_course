@@ -1,0 +1,22 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{k}{function} \PYG{n+nf}{accumulator}\PYG{p}{()} \PYG{p}{\PYGZob{}}
+    \PYG{n+nv}{\PYGZdl{}total} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{p}{;}
+
+    \PYG{k}{while} \PYG{p}{(}\PYG{k}{true}\PYG{p}{)} \PYG{p}{\PYGZob{}}
+        \PYG{n+nv}{\PYGZdl{}value} \PYG{o}{=} \PYG{k}{yield} \PYG{n+nv}{\PYGZdl{}total}\PYG{p}{;}
+        \PYG{n+nv}{\PYGZdl{}total} \PYG{o}{+=} \PYG{n+nv}{\PYGZdl{}value}\PYG{p}{;}
+    \PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nv}{\PYGZdl{}acc} \PYG{o}{=} \PYG{n+nx}{accumulator}\PYG{p}{();}
+
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}acc}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{current}\PYG{p}{()} \PYG{o}{.} \PYG{n+nx}{PHP\PYGZus{}EOL}\PYG{p}{;} \PYG{c+c1}{// starts, yields 0}
+
+\PYG{n+nv}{\PYGZdl{}acc}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{send}\PYG{p}{(}\PYG{l+m+mi}{5}\PYG{p}{);}
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}acc}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{current}\PYG{p}{()} \PYG{o}{.} \PYG{n+nx}{PHP\PYGZus{}EOL}\PYG{p}{;} \PYG{c+c1}{// 5}
+
+\PYG{n+nv}{\PYGZdl{}acc}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{send}\PYG{p}{(}\PYG{l+m+mi}{7}\PYG{p}{);}
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}acc}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{current}\PYG{p}{()} \PYG{o}{.} \PYG{n+nx}{PHP\PYGZus{}EOL}\PYG{p}{;} \PYG{c+c1}{// 12}
+\end{MintedVerbatim}

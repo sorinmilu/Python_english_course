@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Virtual Indexing Lookups: How the range Object Computes Values Arithmetically...",
+  "label": "seq09",
+  "linenos": true,
+  "input": null,
+  "output": "type(err): <class 'IndexError'>\nmessage: range object index out of range",
+  "file": "main.py"
+}

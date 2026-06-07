@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Immutability and Reusability: Using a Single Range Descriptor Across Multiple...",
+  "label": "seq03",
+  "linenos": true,
+  "input": null,
+  "output": "first traversal\nn: 1\nn: 2\nn: 3\nsecond traversal\nn: 1\nn: 2\nn: 3",
+  "file": "main.py"
+}

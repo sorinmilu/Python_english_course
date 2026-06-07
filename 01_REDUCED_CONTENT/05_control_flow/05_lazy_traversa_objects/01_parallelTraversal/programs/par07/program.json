@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "zip() as a Lazy Synchronization Mechanism Across Multiple Iterables",
+  "label": "par07",
+  "linenos": true,
+  "input": null,
+  "output": "pair1: ('Jerry', 72)\npair2: ('Elaine', 91)\npair3: ('Kramer', 42)\ntype(pair1): <class 'tuple'>\ndir(pair1) sample: ['__add__', '__class__', '__class_getitem__',\n'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',\n'__format__', '__ge__']",
+  "file": "main.py"
+}

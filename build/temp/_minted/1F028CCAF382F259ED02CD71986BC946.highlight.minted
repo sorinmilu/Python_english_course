@@ -1,0 +1,15 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{connection}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{fd}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{char}\PYG{+w}{ }\PYG{n}{input\PYGZus{}buffer}\PYG{p}{[}\PYG{l+m+mi}{4096}\PYG{p}{]}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{size\PYGZus{}t}\PYG{+w}{ }\PYG{n}{input\PYGZus{}used}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{*}\PYG{n}{on\PYGZus{}readable}\PYG{p}{)}\PYG{p}{(}\PYG{k}{struct}\PYG{+w}{ }\PYG{n+nc}{connection}\PYG{+w}{ }\PYG{o}{*}\PYG{p}{)}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+
+\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{wait\PYGZus{}for\PYGZus{}ready\PYGZus{}file\PYGZus{}descriptors}\PYG{p}{(}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k}{for}\PYG{+w}{ }\PYG{n}{each}\PYG{+w}{ }\PYG{n}{ready}\PYG{+w}{ }\PYG{n}{connection}\PYG{o}{:}
+\PYG{+w}{        }\PYG{n}{connection}\PYG{o}{\PYGZhy{}}\PYG{o}{\PYGZgt{}}\PYG{n}{on\PYGZus{}readable}\PYG{p}{(}\PYG{n}{connection}\PYG{p}{)}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

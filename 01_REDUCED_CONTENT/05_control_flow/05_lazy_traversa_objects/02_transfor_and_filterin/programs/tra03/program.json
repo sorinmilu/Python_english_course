@@ -4,6 +4,6 @@
   "label": "tra03",
   "linenos": true,
   "input": null,
-  "output": "first: [10, 20, 42]\nsecond: []",
+  "output": "type(texts): <class 'list'>\ntype(nums): <class 'map'>\ndir(nums) sample: ['__class__', '__delattr__', '__dir__', '__doc__',\n'__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',\n'__gt__', '__hash__', '__init__']\nhas __iter__: True\nhas __next__: True",
   "file": "main.py"
 }

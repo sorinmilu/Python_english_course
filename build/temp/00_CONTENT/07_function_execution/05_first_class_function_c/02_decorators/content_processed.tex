@@ -1,0 +1,944 @@
+\subsection{Decorators}
+
+A decorator is a function transformation mechanism. It receives a function object, builds or selects another callable object, and returns that object to be bound under the original function name.
+
+The important point is that decoration happens when the \texttt{def} statement executes, not when the decorated function is later called.
+
+A decorator is not magic syntax around a function call. It is ordinary function-object passing, returning, and rebinding.
+
+\subsubsection{Decorators as Function Transformation at Definition Time}
+
+Start without decorator syntax.
+
+\begin{verbatim}
+def shout(text):
+    return text.upper()
+
+def plain(text):
+    return text
+
+print(f"shout:       {shout}")
+print(f"type(shout): {type(shout)}")
+print(f"shout('ni!'): {shout('ni!')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+shout:       <function shout at 0x...>
+type(shout): <class 'function'>
+shout('ni!'): NI!
+\end{verbatim}
+
+Now define a function that receives another function and returns a replacement function.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__} with {text!r}")
+        result = fn(text)
+        print(f"result: {result!r}")
+        return result
+
+    return wrapper
+
+def shout(text):
+    return text.upper()
+
+shout = make_logged(shout)
+
+print(shout("no soup for you!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling shout with 'no soup for you!'
+result: 'NO SOUP FOR YOU!'
+NO SOUP FOR YOU!
+\end{verbatim}
+
+The critical line is:
+
+\begin{verbatim}
+shout = make_logged(shout)
+\end{verbatim}
+
+This line:
+
+\begin{enumerate}
+    \item reads the current function object bound to \texttt{shout};
+    \item passes that function object into \texttt{make\_logged};
+    \item receives the returned \texttt{wrapper} function object;
+    \item rebinds the name \texttt{shout} to the wrapper.
+\end{enumerate}
+
+After that assignment, the name \texttt{shout} no longer points directly to the original function object. It points to the wrapper function object.
+
+We can inspect that.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+def shout(text):
+    return text.upper()
+
+original_shout = shout
+shout = make_logged(shout)
+
+print(f"original_shout: {original_shout}")
+print(f"shout:          {shout}")
+print(f"same object:    {original_shout is shout}")
+print()
+print(f"original name:  {original_shout.__name__}")
+print(f"new name:       {shout.__name__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+original_shout: <function shout at 0x...>
+shout:          <function make_logged.<locals>.wrapper at 0x...>
+same object:    False
+
+original name:  shout
+new name:       wrapper
+\end{verbatim}
+
+The original function still exists because \texttt{original\_shout} and the wrapper closure still reference it. But the public name \texttt{shout} now refers to the wrapper.
+
+The wrapper is a function object.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+def shout(text):
+    return text.upper()
+
+shout = make_logged(shout)
+
+print(f"type(shout): {type(shout)}")
+print()
+
+selected_names = [
+    "__call__",
+    "__name__",
+    "__doc__",
+    "__defaults__",
+    "__code__",
+    "__closure__",
+]
+
+for name in selected_names:
+    print(f"{name:<16} {name in dir(shout)}")
+
+print()
+print(f"shout.__name__:    {shout.__name__!r}")
+print(f"shout.__closure__: {shout.__closure__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(shout): <class 'function'>
+
+__call__        True
+__name__        True
+__doc__         True
+__defaults__    True
+__code__        True
+__closure__     True
+
+shout.__name__:    'wrapper'
+shout.__closure__: (<cell at 0x...: function object at 0x...>,)
+\end{verbatim}
+
+The wrapper has a closure because it remembers the original function object through the name \texttt{fn}.
+
+The decorator function itself is also a normal function object.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        return fn(text)
+
+    return wrapper
+
+print(f"make_logged:       {make_logged}")
+print(f"type(make_logged): {type(make_logged)}")
+print(f"make_logged name:  {make_logged.__name__}")
+print(f"make_logged code:  {make_logged.__code__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+make_logged:       <function make_logged at 0x...>
+type(make_logged): <class 'function'>
+make_logged name:  make_logged
+make_logged code:  <code object make_logged at 0x..., file "...", line ...>
+\end{verbatim}
+
+A decorator can add behavior before the original call.
+
+\begin{verbatim}
+def announce(fn):
+    def wrapper(text):
+        print("Prepare yourself.")
+        return fn(text)
+
+    return wrapper
+
+def say_quote(text):
+    return text
+
+say_quote = announce(say_quote)
+
+print(say_quote("Nobody expects the Spanish Inquisition!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Prepare yourself.
+Nobody expects the Spanish Inquisition!
+\end{verbatim}
+
+A decorator can add behavior after the original call.
+
+\begin{verbatim}
+def add_exclamation(fn):
+    def wrapper(text):
+        result = fn(text)
+        return result + "!"
+
+    return wrapper
+
+def say_quote(text):
+    return text
+
+say_quote = add_exclamation(say_quote)
+
+print(say_quote("Ni"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Ni!
+\end{verbatim}
+
+A decorator can also block or replace the original call.
+
+\begin{verbatim}
+def block_call(fn):
+    def wrapper(text):
+        return "This function has been blocked."
+
+    return wrapper
+
+def say_quote(text):
+    return text
+
+say_quote = block_call(say_quote)
+
+print(say_quote("D'oh!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+This function has been blocked.
+\end{verbatim}
+
+The wrapper does not have to call the original function. A decorator receives the original function object, but the returned callable decides what to do with it.
+
+The structural pattern is:
+
+\begin{verbatim}
+def decorator(original_function):
+    def replacement_function(...):
+        ...
+        result = original_function(...)
+        ...
+        return result
+
+    return replacement_function
+
+target_function = decorator(target_function)
+\end{verbatim}
+
+That is the basic decorator machine.
+
+\subsubsection{The \texttt{@decorator} Syntax as Rebinding Sugar}
+
+Python provides decorator syntax to write this transformation directly above the function definition.
+
+This:
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__} with {text!r}")
+        result = fn(text)
+        print(f"result: {result!r}")
+        return result
+
+    return wrapper
+
+@make_logged
+def shout(text):
+    return text.upper()
+
+print(shout("no soup for you!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling shout with 'no soup for you!'
+result: 'NO SOUP FOR YOU!'
+NO SOUP FOR YOU!
+\end{verbatim}
+
+is equivalent to this:
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__} with {text!r}")
+        result = fn(text)
+        print(f"result: {result!r}")
+        return result
+
+    return wrapper
+
+def shout(text):
+    return text.upper()
+
+shout = make_logged(shout)
+
+print(shout("no soup for you!"))
+\end{verbatim}
+
+The decorator syntax is rebinding sugar.
+
+The execution order is:
+
+\begin{verbatim}
+1. create the original function object from def shout(...)
+2. pass that function object to make_logged
+3. receive the returned wrapper object
+4. bind the name shout to the wrapper object
+\end{verbatim}
+
+This happens when the \texttt{def} statement executes.
+
+A print trace makes definition-time decoration visible.
+
+\begin{verbatim}
+def make_logged(fn):
+    print(f"decorating {fn.__name__}")
+
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+print("before decorated def")
+
+@make_logged
+def shout(text):
+    print("inside original shout")
+    return text.upper()
+
+print("after decorated def")
+print()
+
+print(shout("d'oh!"))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+before decorated def
+decorating shout
+after decorated def
+
+calling shout
+inside original shout
+D'OH!
+\end{verbatim}
+
+The line:
+
+\begin{verbatim}
+decorating shout
+\end{verbatim}
+
+appears before the function is called. It appears while the decorated \texttt{def} statement is being executed.
+
+This proves that decorator application is a definition-time event. The wrapper's body runs later, when the decorated function name is called.
+
+Multiple decorators stack from bottom to top.
+
+\begin{verbatim}
+def deco_a(fn):
+    print("applying deco_a")
+
+    def wrapper(text):
+        print("inside deco_a wrapper")
+        return fn(text)
+
+    return wrapper
+
+def deco_b(fn):
+    print("applying deco_b")
+
+    def wrapper(text):
+        print("inside deco_b wrapper")
+        return fn(text)
+
+    return wrapper
+
+@deco_a
+@deco_b
+def say(text):
+    print("inside original say")
+    return text
+
+print()
+print(say("It is only a model."))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+applying deco_b
+applying deco_a
+
+inside deco_a wrapper
+inside deco_b wrapper
+inside original say
+It is only a model.
+\end{verbatim}
+
+This:
+
+\begin{verbatim}
+@deco_a
+@deco_b
+def say(text):
+    return text
+\end{verbatim}
+
+is equivalent to:
+
+\begin{verbatim}
+def say(text):
+    return text
+
+say = deco_a(deco_b(say))
+\end{verbatim}
+
+The decorator closest to the function is applied first. The outer decorator receives the result of the inner decoration.
+
+Decorator expressions can also be calls. This creates a decorator factory.
+
+\begin{verbatim}
+def make_prefix_decorator(prefix):
+    print(f"creating decorator for prefix={prefix!r}")
+
+    def decorator(fn):
+        print(f"decorating {fn.__name__}")
+
+        def wrapper(text):
+            result = fn(text)
+            return f"{prefix}: {result}"
+
+        return wrapper
+
+    return decorator
+
+@make_prefix_decorator("INFO")
+def say(text):
+    return text
+
+print()
+print(say("The answer is 42."))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+creating decorator for prefix='INFO'
+decorating say
+
+INFO: The answer is 42.
+\end{verbatim}
+
+This is equivalent to:
+
+\begin{verbatim}
+def say(text):
+    return text
+
+say = make_prefix_decorator("INFO")(say)
+\end{verbatim}
+
+There are two stages:
+
+\begin{enumerate}
+    \item \texttt{make\_prefix\_decorator("INFO")} returns a decorator;
+    \item that returned decorator receives \texttt{say} and returns a wrapper.
+\end{enumerate}
+
+The returned decorator and wrapper are both function objects.
+
+\begin{verbatim}
+def make_prefix_decorator(prefix):
+    def decorator(fn):
+        def wrapper(text):
+            return f"{prefix}: {fn(text)}"
+
+        return wrapper
+
+    return decorator
+
+decorator_obj = make_prefix_decorator("INFO")
+
+print(f"decorator_obj:       {decorator_obj}")
+print(f"type(decorator_obj): {type(decorator_obj)}")
+print(f"name:                {decorator_obj.__name__}")
+print(f"closure:             {decorator_obj.__closure__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+decorator_obj:       <function make_prefix_decorator.<locals>.decorator at 0x...>
+type(decorator_obj): <class 'function'>
+name:                decorator
+closure:             (<cell at 0x...: str object at 0x...>,)
+\end{verbatim}
+
+The decorator object remembers \texttt{prefix}. The wrapper object later remembers both \texttt{prefix} and \texttt{fn}.
+
+The key rule is:
+
+\begin{quote}
+The \texttt{@decorator} form is not a new kind of function. It is syntax for passing the just-created function object through another callable and rebinding the original name to the returned object.
+\end{quote}
+
+\subsubsection{Wrapper Functions, Closure State, and Metadata Preservation}
+
+A wrapper function often closes over the original function object.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+@make_logged
+def shout(text):
+    """Return uppercase text."""
+    return text.upper()
+
+print(shout("ni!"))
+print()
+print(f"shout:          {shout}")
+print(f"shout.__name__: {shout.__name__!r}")
+print(f"shout.__doc__:  {shout.__doc__!r}")
+print(f"closure:        {shout.__closure__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling shout
+NI!
+
+shout:          <function make_logged.<locals>.wrapper at 0x...>
+shout.__name__: 'wrapper'
+shout.__doc__:  None
+closure:        (<cell at 0x...: function object at 0x...>,)
+\end{verbatim}
+
+The decorated name \texttt{shout} now points to \texttt{wrapper}. That is why \texttt{shout.\_\_name\_\_} is \texttt{'wrapper'} and the original docstring is not visible through \texttt{shout.\_\_doc\_\_}.
+
+The original function object is preserved inside the wrapper's closure.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+@make_logged
+def shout(text):
+    """Return uppercase text."""
+    return text.upper()
+
+cell = shout.__closure__[0]
+original_fn = cell.cell_contents
+
+print(f"cell:             {cell}")
+print(f"type(cell):       {type(cell)}")
+print(f"original_fn:      {original_fn}")
+print(f"type(original):   {type(original_fn)}")
+print()
+print(f"original name:    {original_fn.__name__!r}")
+print(f"original doc:     {original_fn.__doc__!r}")
+print(f"original result:  {original_fn('doh')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+cell:             <cell at 0x...: function object at 0x...>
+type(cell):       <class 'cell'>
+original_fn:      <function shout at 0x...>
+type(original):   <class 'function'>
+
+original name:    'shout'
+original doc:     'Return uppercase text.'
+original result:  DOH
+\end{verbatim}
+
+The original function was not destroyed. It is just no longer directly bound to the public name \texttt{shout}. The wrapper closure still points to it.
+
+The wrapper's code object records the captured free variable.
+
+\begin{verbatim}
+def make_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+@make_logged
+def shout(text):
+    """Return uppercase text."""
+    return text.upper()
+
+print(f"freevars: {shout.__code__.co_freevars}")
+
+for name, cell in zip(shout.__code__.co_freevars, shout.__closure__):
+    print(f"{name:<8} -> {cell.cell_contents}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+freevars: ('fn',)
+fn       -> <function shout at 0x...>
+\end{verbatim}
+
+The wrapper function has a free variable named \texttt{fn}. Its closure cell contains the original function object.
+
+A wrapper should usually accept flexible arguments so it can forward the same call shape to the original function.
+
+A too-specific wrapper is fragile.
+
+\begin{verbatim}
+def bad_logged(fn):
+    def wrapper(text):
+        print(f"calling {fn.__name__}")
+        return fn(text)
+
+    return wrapper
+
+@bad_logged
+def build_line(name, score=42):
+    return f"{name:<10} score={score:04d}"
+
+print(build_line("Homer"))
+
+try:
+    print(build_line("Lisa", 100))
+except TypeError as err:
+    print(f"error type: {type(err)}")
+    print(f"message:    {err}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling build_line
+Homer      score=0042
+error type: <class 'TypeError'>
+message:    bad_logged.<locals>.wrapper() takes 1 positional argument but 2 were given
+\end{verbatim}
+
+The original function could accept two arguments, but the wrapper could accept only one.
+
+A flexible wrapper uses \texttt{*args} and \texttt{**kwargs}.
+
+\begin{verbatim}
+def logged(fn):
+    def wrapper(*args, **kwargs):
+        print(f"calling {fn.__name__}")
+        print(f"args:   {args}")
+        print(f"kwargs: {kwargs}")
+
+        result = fn(*args, **kwargs)
+
+        print(f"result: {result!r}")
+        return result
+
+    return wrapper
+
+@logged
+def build_line(name, score=42, *, mood="calm"):
+    return f"{name:<10} score={score:04d} mood={mood}"
+
+build_line("Homer")
+print()
+build_line("Lisa", 100, mood="focused")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling build_line
+args:   ('Homer',)
+kwargs: {}
+result: 'Homer      score=0042 mood=calm'
+
+calling build_line
+args:   ('Lisa', 100)
+kwargs: {'mood': 'focused'}
+result: 'Lisa       score=0100 mood=focused'
+\end{verbatim}
+
+The wrapper receives arbitrary positional and keyword arguments, then forwards them to the original function with:
+
+\begin{verbatim}
+fn(*args, **kwargs)
+\end{verbatim}
+
+This preserves the call boundary shape.
+
+The \texttt{args} object is a tuple and \texttt{kwargs} is a dictionary.
+
+\begin{verbatim}
+def inspect_call(fn):
+    def wrapper(*args, **kwargs):
+        print(f"type(args):   {type(args)}")
+        print(f"type(kwargs): {type(kwargs)}")
+
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+@inspect_call
+def say(text, *, times=1):
+    return text * times
+
+print(say("Ni!", times=2))
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(args):   <class 'tuple'>
+type(kwargs): <class 'dict'>
+Ni!Ni!
+\end{verbatim}
+
+The wrapper is still a normal function with a variadic signature.
+
+The remaining issue is metadata. After decoration, the public function name points to the wrapper, so metadata such as \texttt{\_\_name\_\_}, \texttt{\_\_doc\_\_}, and annotations may describe the wrapper rather than the original function.
+
+The standard solution is \texttt{functools.wraps}.
+
+\begin{verbatim}
+import functools
+
+def logged(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        print(f"calling {fn.__name__}")
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+@logged
+def build_line(name: str, score: int = 42) -> str:
+    """Build one formatted display line."""
+    return f"{name:<10} score={score:04d}"
+
+print(build_line("Homer"))
+print()
+print(f"build_line:                 {build_line}")
+print(f"build_line.__name__:        {build_line.__name__!r}")
+print(f"build_line.__doc__:         {build_line.__doc__!r}")
+print(f"build_line.__annotations__: {build_line.__annotations__}")
+print(f"build_line.__wrapped__:     {build_line.__wrapped__}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+calling build_line
+Homer      score=0042
+
+build_line:                 <function build_line at 0x...>
+build_line.__name__:        'build_line'
+build_line.__doc__:         'Build one formatted display line.'
+build_line.__annotations__: {'name': <class 'str'>, 'score': <class 'int'>, 'return': <class 'str'>}
+build_line.__wrapped__:     <function build_line at 0x...>
+\end{verbatim}
+
+The wrapper is still the object bound to \texttt{build\_line}, but \texttt{functools.wraps} copies useful metadata from the original function onto the wrapper. It also stores the original function under \texttt{\_\_wrapped\_\_}.
+
+The \texttt{functools.wraps} object can be inspected.
+
+\begin{verbatim}
+import functools
+
+print(f"functools.wraps:       {functools.wraps}")
+print(f"type(functools.wraps): {type(functools.wraps)}")
+print()
+
+selected_names = [
+    "__call__",
+    "__name__",
+    "__doc__",
+    "__module__",
+]
+
+for name in selected_names:
+    print(f"{name:<14} {name in dir(functools.wraps)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+functools.wraps:       <function wraps at 0x...>
+type(functools.wraps): <class 'function'>
+
+__call__      True
+__name__      True
+__doc__       True
+__module__    True
+\end{verbatim}
+
+\texttt{functools.wraps(fn)} is itself a decorator factory. It returns a decorator that modifies the wrapper function's metadata.
+
+The structure is:
+
+\begin{verbatim}
+@functools.wraps(fn)
+def wrapper(...):
+    ...
+\end{verbatim}
+
+which means:
+
+\begin{verbatim}
+def wrapper(...):
+    ...
+
+wrapper = functools.wraps(fn)(wrapper)
+\end{verbatim}
+
+So even \texttt{wraps} follows the same decorator rule: create function object, pass it through a decorator, rebind the name to the returned object.
+
+A minimal comparison:
+
+\begin{verbatim}
+import functools
+
+def logged_without_wraps(fn):
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+def logged_with_wraps(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+@logged_without_wraps
+def first():
+    """First docstring."""
+    return "D'oh!"
+
+@logged_with_wraps
+def second():
+    """Second docstring."""
+    return "No soup for you!"
+
+print(f"first.__name__:  {first.__name__!r}")
+print(f"first.__doc__:   {first.__doc__!r}")
+print()
+print(f"second.__name__: {second.__name__!r}")
+print(f"second.__doc__:  {second.__doc__!r}")
+print(f"has __wrapped__: {'__wrapped__' in dir(second)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+first.__name__:  'wrapper'
+first.__doc__:   None
+
+second.__name__: 'second'
+second.__doc__:  'Second docstring.'
+has __wrapped__: True
+\end{verbatim}
+
+The wrapper still controls execution, but the metadata now reflects the original function more accurately.
+
+This matters for documentation, debugging, stack traces, introspection, help output, decorators stacked on decorators, and tools that inspect function signatures.
+
+The final decorator model is:
+
+\begin{verbatim}
+def decorator(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        before behavior
+        result = fn(*args, **kwargs)
+        after behavior
+        return result
+
+    return wrapper
+
+@decorator
+def target(...):
+    original body
+\end{verbatim}
+
+and the runtime meaning is:
+
+\begin{verbatim}
+target = decorator(target)
+\end{verbatim}
+
+The final rule is:
+
+\begin{quote}
+A decorator is a definition-time function transformation. The \texttt{@} syntax performs function-object passing and name rebinding. A wrapper usually preserves access to the original function through a closure, and \texttt{functools.wraps} preserves the original function's public metadata on the wrapper.
+\end{quote}

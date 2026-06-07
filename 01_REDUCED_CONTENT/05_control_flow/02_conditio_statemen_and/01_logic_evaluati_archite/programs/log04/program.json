@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \\_\\_boo...",
+  "label": "log04",
+  "linenos": true,
+  "input": null,
+  "output": "quote: 'Ni!'\ntype(quote): <class 'str'>\nbool(quote): True\nlen(quote): 3\nquote.__len__(): 3\nhas __len__: True",
+  "file": "main.py"
+}

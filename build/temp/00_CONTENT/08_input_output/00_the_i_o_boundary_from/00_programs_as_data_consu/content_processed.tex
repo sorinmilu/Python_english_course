@@ -1,0 +1,185 @@
+\section{The I/O Boundary: From Runtime Objects to External Systems}
+
+Until this point, most Python objects have been treated as runtime entities: names refer to objects, objects live inside the interpreter process, and operations modify bindings or object state while the program is running. This is the internal world of the Python runtime. Input/output introduces a different boundary. A program no longer deals only with objects already present in memory; it exchanges data with something outside its own execution state.
+
+This boundary is essential because useful programs rarely exist only to compute private internal values. They read commands, receive text, consume files, print reports, write logs, serialize data, communicate with terminals, and later may communicate with networks, databases, or other processes. In every such case, Python objects must cross a boundary: internal runtime representation must be converted into some external form, or external data must be converted back into runtime objects.
+
+The important point is that Python does not directly command the disk, keyboard, screen, or terminal device. It operates through stream objects, runtime wrappers, library calls, and ultimately operating-system services. This continues the execution model already established earlier: Python code runs inside the CPython interpreter process, and the interpreter mediates between Python-level objects and lower-level process resources.
+
+\subsection{Programs as Data Consumers and Data Producers}
+
+A running program can be understood as a temporary machine for transforming data. It consumes data from somewhere, holds and reshapes that data as runtime objects, and may produce data somewhere else. Sometimes the input is typed by a user. Sometimes it is stored in a file. Sometimes it comes from another process. Sometimes the output is printed to a terminal. Sometimes it is redirected into a file or piped into another program.
+
+This means that input/output is not a decorative feature added after the language is understood. It is the mechanism through which a runtime computation becomes externally observable and externally useful.
+
+\subsubsection{Runtime Memory vs. Persistent Storage: Why Variables Disappear but Files Remain}
+
+A Python variable is not permanent storage. As explained earlier in the course, a Python name is a binding to an object inside the runtime environment. That object exists only while it remains reachable inside the process. When the process exits, its memory is reclaimed by the operating system. The names, objects, stack frames, temporary strings, lists, dictionaries, and other runtime structures disappear.
+
+A file is different. A file is not a Python object living only inside the interpreter heap. A file is an operating-system-managed persistent storage object. Python can create Python-level file objects that represent access to such external resources, but the stored bytes themselves live outside the Python runtime. That is why a variable disappears when the program ends, while a saved file can still be opened tomorrow.
+
+The following program does not write a file yet. It only shows the runtime side of the distinction.
+
+\begin{verbatim}
+msg = "Nobody expects the Spanish Inquisition!"
+answer = 42
+
+print("Runtime values currently exist inside this Python process.")
+print(f"msg    = {msg}")
+print(f"answer = {answer}")
+
+print()
+print("Object inspection:")
+print(f"type(msg)    = {type(msg)}")
+print(f"type(answer) = {type(answer)}")
+
+print()
+print("A few useful str methods visible through dir(msg):")
+str_methods = ["upper", "lower", "replace", "split", "strip", "startswith"]
+for name in str_methods:
+    print(f"{name:12} -> {name in dir(msg)}")
+
+print()
+print("A few useful int methods visible through dir(answer):")
+int_methods = ["bit_length", "to_bytes", "from_bytes", "as_integer_ratio"]
+for name in int_methods:
+    print(f"{name:18} -> {name in dir(answer)}")
+
+print()
+print("When this process ends, these bindings disappear.")
+print("Nothing here has been stored persistently yet.")
+\end{verbatim}
+
+The program creates two objects: a \texttt{str} object and an \texttt{int} object. The name \texttt{msg} is bound to the string object. The name \texttt{answer} is bound to the integer object. Both are runtime objects. They can be printed, inspected with \texttt{type()}, and queried with \texttt{dir()}, but they are still only part of the current execution.
+
+The string object exposes methods such as \texttt{upper()}, \texttt{lower()}, \texttt{replace()}, \texttt{split()}, and \texttt{strip()} because strings are textual runtime objects. The integer object exposes methods such as \texttt{bit\_length()} because integers are numeric runtime objects. These methods describe what can be done to the object while it exists in the interpreter.
+
+Persistent storage will require crossing the I/O boundary. That will be done later through file objects. For now, the invariant is simple: variables are runtime bindings; files are external storage resources.
+
+\subsubsection{Standard Streams: \texttt{stdin}, \texttt{stdout}, and \texttt{stderr} as Process-Level Communication Channels}
+
+Every ordinary command-line process begins with a small set of standard communication channels. These are usually called standard input, standard output, and standard error.
+
+\texttt{stdin} is the process-level channel from which ordinary input is read. In an interactive terminal, this usually means keyboard input. If a program is connected to a pipe, \texttt{stdin} may receive text produced by another program.
+
+\texttt{stdout} is the process-level channel used for ordinary output. When Python code calls \texttt{print()}, the resulting text normally goes to \texttt{stdout}. In a terminal, this appears on the screen. If output is redirected, the same text may go into a file or into another process.
+
+\texttt{stderr} is the process-level channel used for diagnostics, warnings, and error messages. It is separated from \texttt{stdout} so that normal program output and error reporting can be handled independently.
+
+In Python, these channels are exposed through the \texttt{sys} module as \texttt{sys.stdin}, \texttt{sys.stdout}, and \texttt{sys.stderr}.
+
+\begin{verbatim}
+import sys
+
+print("Standard stream objects exposed by Python:")
+print(f"sys.stdin  -> {sys.stdin}")
+print(f"sys.stdout -> {sys.stdout}")
+print(f"sys.stderr -> {sys.stderr}")
+
+print()
+print("Their runtime types:")
+print(f"type(sys.stdin)  = {type(sys.stdin)}")
+print(f"type(sys.stdout) = {type(sys.stdout)}")
+print(f"type(sys.stderr) = {type(sys.stderr)}")
+
+print()
+print("Selected names found through dir(sys.stdout):")
+stream_names = ["write", "flush", "read", "readline", "isatty", "encoding"]
+for name in stream_names:
+    print(f"{name:10} -> {name in dir(sys.stdout)}")
+
+print()
+print("Writing through print():")
+print("D'oh! This line goes to stdout by default.")
+
+print()
+print("Writing directly through sys.stdout.write():")
+sys.stdout.write("Chuck Norris can divide by zero, but Python still should not.\n")
+sys.stdout.flush()
+
+print()
+print("Writing directly through sys.stderr.write():")
+sys.stderr.write("This is a diagnostic message sent to stderr.\n")
+sys.stderr.flush()
+\end{verbatim}
+
+The object returned by \texttt{type(sys.stdout)} is commonly a text stream wrapper. In CPython, this is usually an object of type \texttt{\_io.TextIOWrapper}. That detail matters because \texttt{stdout} is not merely ``the screen''. At Python level, it is an object with methods.
+
+The method \texttt{write()} sends text to the stream. Unlike \texttt{print()}, it does not automatically add a newline. The method \texttt{flush()} asks the stream to push buffered output forward instead of keeping it temporarily in memory. The method \texttt{isatty()} can report whether the stream is connected to an interactive terminal-like device. The \texttt{encoding} attribute describes the text encoding used by the stream.
+
+This is already a layered architecture. The Python program calls methods on Python objects. Those Python objects belong to the interpreter runtime. Beneath them, lower-level library and operating-system mechanisms eventually transfer bytes to the terminal, pipe, or redirected destination.
+
+A small interactive example shows the input side:
+
+\begin{verbatim}
+import sys
+
+print("Before input(), Python has access to sys.stdin:")
+print(f"type(sys.stdin) = {type(sys.stdin)}")
+
+print()
+user_text = input("Write one short phrase: ")
+
+print()
+print("input() returned a Python object:")
+print(f"user_text       = {user_text}")
+print(f"type(user_text) = {type(user_text)}")
+
+print()
+print("A few names from dir(user_text):")
+for name in ["upper", "lower", "replace", "split", "strip"]:
+    print(f"{name:10} -> {name in dir(user_text)}")
+
+print()
+print(f"Uppercase version: {user_text.upper()}")
+print(f"Length: {len(user_text)}")
+\end{verbatim}
+
+The important boundary is visible here. The user's typed characters arrive through \texttt{stdin}. Python's \texttt{input()} function reads a line from that stream and returns a \texttt{str} object. From that point on, the data is no longer merely terminal input. It is a normal Python string, with normal string methods and normal runtime behavior.
+
+\subsubsection{C Comparison: \texttt{printf()}, \texttt{scanf()}, File Descriptors, and Python’s Higher-Level Stream Objects}
+
+The C programmer already knows this territory in a lower-level form. In C, ordinary terminal output is often produced with \texttt{printf()}, and ordinary input may be consumed with \texttt{scanf()}, \texttt{fgets()}, or related functions. These functions operate through C's standard I/O library, commonly using \texttt{stdin}, \texttt{stdout}, and \texttt{stderr} as \texttt{FILE *} streams.
+
+In a POSIX-style model, beneath those C streams are file descriptors: small integer handles owned by the process. Conventionally, descriptor \texttt{0} is standard input, descriptor \texttt{1} is standard output, and descriptor \texttt{2} is standard error. These integers are not the data itself. They are process-local references to open operating-system resources.
+
+Python lives above that layer. Python exposes higher-level stream objects. These objects know about text encoding, buffering, newline handling, and methods such as \texttt{write()}, \texttt{readline()}, and \texttt{flush()}. The programmer usually works with these objects instead of manually operating on raw descriptors.
+
+The following example shows the relationship without going deeply into descriptor-level programming yet.
+
+\begin{verbatim}
+import sys
+
+print("Python-level standard streams:")
+print(f"stdin object : {sys.stdin}")
+print(f"stdout object: {sys.stdout}")
+print(f"stderr object: {sys.stderr}")
+
+print()
+print("Selected stream attributes:")
+print(f"stdout encoding = {sys.stdout.encoding}")
+print(f"stdout isatty   = {sys.stdout.isatty()}")
+
+print()
+print("C-style idea:")
+print("printf(...) writes formatted text to stdout.")
+print("scanf(...) reads formatted input from stdin.")
+
+print()
+print("Python-style idea:")
+print("print(...) formats objects and writes text to sys.stdout.")
+print("input(...) reads text from sys.stdin and returns a str object.")
+
+print()
+print("Direct stream write with explicit formatting:")
+name = "Kramer"
+score = 42
+sys.stdout.write(f"{name:10} | score = {score:04d}\n")
+sys.stdout.flush()
+\end{verbatim}
+
+The expression \texttt{f"\{name:10\} | score = \{score:04d\}"} is ordinary Python string formatting. It creates a \texttt{str} object before the stream receives anything. Then \texttt{sys.stdout.write()} sends that string into the output stream. The stream is responsible for taking Python text and pushing it toward the external destination.
+
+So the comparison can be summarized precisely. In C, the programmer commonly thinks in terms of native process resources, C library streams, buffers, and format strings. In Python, the programmer usually thinks in terms of runtime objects and stream objects. The operating-system boundary still exists, but Python wraps it in managed objects that fit the rest of the object model.
+
+This is the core idea of the I/O boundary: Python code manipulates objects inside the runtime, but useful input and output require those objects to cross into process-level communication channels or external storage systems.

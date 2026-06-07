@@ -20,31 +20,7 @@ map(callable_object, iterable)
 
 A simple example uses the built-in \texttt{int} constructor to transform strings into integers:
 
-\begin{verbatim}
-texts = ["10", "20", "42"]
-
-nums = map(int, texts)
-
-print(f"type(texts): {type(texts)}")
-print(f"type(nums): {type(nums)}")
-print(f"dir(nums) sample: {dir(nums)[:12]}")
-
-print(f"has __iter__: {'__iter__' in dir(nums)}")
-print(f"has __next__: {'__next__' in dir(nums)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(texts): <class 'list'>
-type(nums): <class 'map'>
-dir(nums) sample: ['__class__', '__delattr__', '__dir__', '__doc__',
-'__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__',
-'__gt__', '__hash__', '__init__']
-has __iter__: True
-has __next__: True
-\end{verbatim}
-
+%<<<PROGRAM:programs/tra03>>>
 The \texttt{map} object is an iterator. It has \texttt{\_\_iter\_\_()} and \texttt{\_\_next\_\_()}. Therefore it is consumed as it advances.
 
 Manual traversal shows the transformation:
@@ -69,33 +45,7 @@ next(nums): 42
 
 Each original string is passed to \texttt{int}. The produced value is an integer object.
 
-\begin{verbatim}
-text = "42"
-num = int(text)
-
-print(f"text: {text!r}")
-print(f"type(text): {type(text)}")
-print(f"num: {num}")
-print(f"type(num): {type(num)}")
-print(f"dir(num) sample: {dir(num)[:10]}")
-print(f"num.__bool__(): {num.__bool__()}")
-print(f"num.__add__(8): {num.__add__(8)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-text: '42'
-type(text): <class 'str'>
-num: 42
-type(num): <class 'int'>
-dir(num) sample: ['__abs__', '__add__', '__and__', '__bool__',
-'__ceil__', '__class__', '__delattr__', '__dir__', '__divmod__',
-'__doc__']
-num.__bool__(): True
-num.__add__(8): 50
-\end{verbatim}
-
+%<<<PROGRAM:programs/tra02>>>
 The \texttt{\_\_add\_\_()} method supports integer addition. The \texttt{\_\_bool\_\_()} method supports truth-value testing.
 
 A \texttt{map} object can be used directly in a \texttt{for} loop:
@@ -139,25 +89,7 @@ The call to \texttt{list()} is the materialization boundary. Before that point, 
 
 A \texttt{map} object is consumed after traversal:
 
-\begin{verbatim}
-texts = ["10", "20", "42"]
-
-nums = map(int, texts)
-
-first = list(nums)
-second = list(nums)
-
-print(f"first: {first}")
-print(f"second: {second}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-first: [10, 20, 42]
-second: []
-\end{verbatim}
-
+%<<<PROGRAM:programs/tra01>>>
 The first \texttt{list(nums)} consumes the iterator. The second call receives no remaining values.
 
 To repeat the transformation, create a new \texttt{map} object:

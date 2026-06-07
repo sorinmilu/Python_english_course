@@ -1,0 +1,82 @@
+\subsection{Mutating External Scopes}
+
+Reading an outer name follows LEGB automatically. Assigning to an outer name requires \texttt{global} (module namespace) or \texttt{nonlocal} (enclosing function cell). Without these declarations, assignment creates a local binding and shadows the outer name.
+
+\subsubsection{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}
+
+\begin{codebox}[]{python}{Local Read Access Boundaries vs. the Shadowing Consequence of Assignment}{mut03}
+answer = 42
+
+def set_answer():
+    answer = 100
+    print(f"inside: {answer}")
+
+set_answer()
+print(f"outside: {answer}")
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{inside: 100} \\
+\texttt{outside: 42} \\
+\end{iobox}
+
+
+
+
+Assignment inside the function creates a local \texttt{answer}; it does not mutate the module binding.
+
+\subsubsection{Overriding Module Scope: The \texttt{global} Declaration Syntax and Module Namespace Mutation}
+
+\begin{codebox}[]{python}{Overriding Module Scope: The global Declaration Syntax and Module Namespace M...}{mut02}
+counter = 0
+
+def increment():
+    global counter
+    counter = counter + 1
+
+increment()
+increment()
+print(counter)
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{2} \\
+\end{iobox}
+
+
+
+
+\texttt{global} redirects \texttt{STORE\_GLOBAL} to the module namespace dictionary.
+
+\subsubsection{Overriding Nested Intermediary Scopes: The \texttt{nonlocal} Declaration Syntax and Cell Reference Mutation}
+
+\begin{codebox}[]{python}{Overriding Nested Intermediary Scopes: The nonlocal Declaration Syntax and Ce...}{mut01}
+def make_counter():
+    count = 0
+
+    def increment():
+        nonlocal count
+        count = count + 1
+        return count
+
+    return increment
+
+counter = make_counter()
+print(counter(), counter(), counter())
+\end{codebox}
+
+
+\begin{iobox}{Expected Output}
+\texttt{1 2 3} \\
+\end{iobox}
+
+
+
+
+\texttt{nonlocal} writes through the closure cell, not a new local slot. Integer rebinding creates a new \texttt{int} object and updates the cell reference.
+
+\subsubsection{\texttt{locals()} Caveats: Why the Displayed Local Namespace Is Not Always a Directly Writable Control Surface}
+
+\texttt{locals()} returns a dict-like view of the current frame's local bindings. In optimized functions, mutating the returned dict may not affect fast-local slots. Treat \texttt{locals()} as an inspection aid, not a reliable control surface for rebinding.

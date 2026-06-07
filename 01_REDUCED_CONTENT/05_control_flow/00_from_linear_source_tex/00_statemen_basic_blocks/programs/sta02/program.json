@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Exceptional Edges: Non-Local Control Transfers Created by Exceptions",
+  "label": "sta02",
+  "linenos": true,
+  "input": null,
+  "output": "before conversion\nconversion failed\nerror type: <class 'ValueError'>\nerror message: invalid literal for int() with base 10: 'forty-two'\nafter try statement",
+  "file": "main.py"
+}

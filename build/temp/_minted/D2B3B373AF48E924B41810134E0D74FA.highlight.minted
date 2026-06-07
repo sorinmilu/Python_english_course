@@ -1,0 +1,16 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZlt{}?php}
+
+\PYG{n+nv}{\PYGZdl{}fiber} \PYG{o}{=} \PYG{k}{new} \PYG{n+nx}{Fiber}\PYG{p}{(}\PYG{k}{function} \PYG{p}{()} \PYG{p}{\PYGZob{}}
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{before wait}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+
+    \PYG{n+nx}{Fiber}\PYG{o}{::}\PYG{n+na}{suspend}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{waiting}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{);}
+
+    \PYG{k}{echo} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{after wait}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{;}
+\PYG{p}{\PYGZcb{});}
+
+\PYG{n+nv}{\PYGZdl{}value} \PYG{o}{=} \PYG{n+nv}{\PYGZdl{}fiber}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{start}\PYG{p}{();}
+\PYG{k}{echo} \PYG{n+nv}{\PYGZdl{}value} \PYG{o}{.} \PYG{n+nx}{PHP\PYGZus{}EOL}\PYG{p}{;}
+
+\PYG{n+nv}{\PYGZdl{}fiber}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n+na}{resume}\PYG{p}{();}
+\end{MintedVerbatim}

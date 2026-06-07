@@ -1,0 +1,13 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{named} \PYG{n}{function}\PYG{p}{:}
+
+\PYG{k}{def}\PYG{+w}{ }\PYG{n+nf}{square}\PYG{p}{(}\PYG{n}{x}\PYG{p}{)}\PYG{p}{:}
+    \PYG{k}{return} \PYG{n}{x} \PYG{o}{*} \PYG{n}{x}
+
+\PYG{n}{use}\PYG{p}{(}\PYG{n}{square}\PYG{p}{)}
+
+
+\PYG{n}{anonymous} \PYG{n}{function}\PYG{p}{:}
+
+\PYG{n}{use}\PYG{p}{(}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x} \PYG{o}{*} \PYG{n}{x}\PYG{p}{)}
+\end{MintedVerbatim}

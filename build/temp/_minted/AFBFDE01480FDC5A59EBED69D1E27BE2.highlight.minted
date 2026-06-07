@@ -1,0 +1,14 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{co} \PYG{o}{=} \PYG{n}{coroutine}\PYG{o}{.}\PYG{n}{create}\PYG{p}{(}\PYG{n}{function} \PYG{p}{(}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{3} \PYG{n}{do}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{coroutine}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{n}{i}\PYG{p}{)}
+        \PYG{n}{coroutine}\PYG{o}{.}\PYG{k}{yield}\PYG{p}{(}\PYG{p}{)}
+    \PYG{n}{end}
+\PYG{n}{end}\PYG{p}{)}
+
+\PYG{n}{coroutine}\PYG{o}{.}\PYG{n}{resume}\PYG{p}{(}\PYG{n}{co}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{main}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{coroutine}\PYG{o}{.}\PYG{n}{resume}\PYG{p}{(}\PYG{n}{co}\PYG{p}{)}
+\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{main again}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+\PYG{n}{coroutine}\PYG{o}{.}\PYG{n}{resume}\PYG{p}{(}\PYG{n}{co}\PYG{p}{)}
+\end{MintedVerbatim}

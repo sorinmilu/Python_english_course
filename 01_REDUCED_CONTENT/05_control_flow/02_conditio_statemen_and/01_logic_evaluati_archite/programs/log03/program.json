@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "Truth Value Testing: Evaluating Implicit Truthiness and Falsiness via \\_\\_boo...",
+  "label": "log03",
+  "linenos": true,
+  "input": null,
+  "output": "result: None\ntype(result): <class 'NoneType'>\nbool(result): False\ndir(result) sample: ['__bool__', '__class__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__']\nresult is None: True",
+  "file": "main.py"
+}

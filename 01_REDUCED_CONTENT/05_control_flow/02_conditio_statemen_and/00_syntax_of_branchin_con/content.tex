@@ -4,15 +4,7 @@ A conditional statement is the first major structure where the written order of 
 
 The basic syntax is:
 
-\begin{verbatim}
-if condition:
-    statements_for_true_condition
-elif another_condition:
-    statements_for_second_condition
-else:
-    statements_for_all_previous_conditions_false
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn10>>>
 The colon announces that a block must follow. The indentation defines the block body. The \texttt{if}, \texttt{elif}, and \texttt{else} headers are decision nodes. Their indented bodies are the possible route bodies attached to those nodes.
 
 \begin{quote}
@@ -25,32 +17,7 @@ This subsection focuses on nested decision trees and inline conditional expressi
 
 A conditional body may contain another conditional statement. This creates a nested decision tree. The outer decision must be entered before the inner decision can even be reached.
 
-\begin{verbatim}
-name = "Bart"
-age = 10
-
-if name == "Bart":
-    print("character found")
-
-    if age < 18:
-        print("minor character")
-    else:
-        print("adult character")
-
-else:
-    print("different character")
-
-print("analysis complete")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-character found
-minor character
-analysis complete
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn09>>>
 The inner \texttt{if age < 18:} statement exists inside the body of the outer \texttt{if name == "Bart":} statement. Python reaches the age test only if the name test succeeds.
 
 The route shape is:
@@ -81,59 +48,10 @@ level 2: inside the inner age decision
 
 A nested decision tree is useful when one question depends on the answer to an earlier question.
 
-\begin{verbatim}
-has_ticket = True
-has_secret_word = False
-
-if has_ticket:
-    print("ticket accepted")
-
-    if has_secret_word:
-        print("Nobody expects the Spanish Inquisition!")
-    else:
-        print("ordinary entrance")
-
-else:
-    print("no ticket, no entrance")
-
-print("gate check finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-ticket accepted
-ordinary entrance
-gate check finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn08>>>
 The secret-word test is not a peer of the ticket test. It is subordinate to it. If \texttt{has\_ticket} is false, Python never evaluates the inner \texttt{if has\_secret\_word:} statement.
 
-\begin{verbatim}
-has_ticket = False
-has_secret_word = True
-
-if has_ticket:
-    print("ticket accepted")
-
-    if has_secret_word:
-        print("Nobody expects the Spanish Inquisition!")
-    else:
-        print("ordinary entrance")
-
-else:
-    print("no ticket, no entrance")
-
-print("gate check finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-no ticket, no entrance
-gate check finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn07>>>
 Even though \texttt{has\_secret\_word} is true, that fact is irrelevant because the program never enters the outer true branch.
 
 Nested conditionals should be read from the outside inward:
@@ -144,73 +62,15 @@ The outer condition decides whether the inner decision point is reachable. The i
 
 This is where indentation becomes more than neat formatting. Moving one line changes the tree.
 
-\begin{verbatim}
-has_ticket = True
-has_secret_word = False
-
-if has_ticket:
-    print("ticket accepted")
-
-if has_secret_word:
-    print("secret entrance")
-else:
-    print("not a secret entrance")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-ticket accepted
-not a secret entrance
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn06>>>
 Here the second \texttt{if} is not nested. It is aligned with the first \texttt{if}, so it is a separate decision node. The secret-word decision happens regardless of the ticket decision.
 
 By contrast:
 
-\begin{verbatim}
-has_ticket = True
-has_secret_word = False
-
-if has_ticket:
-    print("ticket accepted")
-
-    if has_secret_word:
-        print("secret entrance")
-    else:
-        print("not a secret entrance")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-ticket accepted
-not a secret entrance
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn05>>>
 The output happens to be the same for this input, but the graph is not the same. If \texttt{has\_ticket} becomes false, the difference appears.
 
-\begin{verbatim}
-has_ticket = False
-has_secret_word = False
-
-if has_ticket:
-    print("ticket accepted")
-
-    if has_secret_word:
-        print("secret entrance")
-    else:
-        print("not a secret entrance")
-
-print("finished")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-finished
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn04>>>
 The whole inner decision is unreachable because it is inside the false outer branch.
 
 This is the reason nested conditional code must be read structurally, not only line by line. Each indentation level modifies reachability.
@@ -227,26 +87,7 @@ This is called a conditional expression. It is sometimes informally called a ter
 
 The order is important. Python does not write it as \texttt{condition ? x : y}, as in C-like languages. Python writes the selected true value first, then the condition, then the false value.
 
-\begin{verbatim}
-score = 42
-
-status = "passing" if score >= 50 else "failing"
-
-print(f"score: {score}")
-print(f"status: {status}")
-print(f"type(status): {type(status)}")
-print(f"dir(status) sample: {dir(status)[:8]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-score: 42
-status: failing
-type(status): <class 'str'>
-dir(status) sample: ['__add__', '__class__', '__contains__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__']
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn03>>>
 The selected result is an ordinary object. There is no special ``conditional expression object'' left behind. In this example, the selected object is a string. The string method \texttt{\_\_contains\_\_()} supports membership tests such as \texttt{"fail" in status}. The method \texttt{\_\_add\_\_()} supports string concatenation with \texttt{+}. The method \texttt{\_\_format\_\_()} is used by formatting operations such as f-strings.
 
 \begin{verbatim}
@@ -307,23 +148,7 @@ This still works, but long expressions can become hard to read. If the logic nee
 
 The block form:
 
-\begin{verbatim}
-score = 72
-
-if score >= 50:
-    status = "passing"
-else:
-    status = "failing"
-
-print(f"status: {status}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-status: passing
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn02>>>
 The expression form:
 
 \begin{verbatim}
@@ -363,25 +188,7 @@ weather: cold
 
 It can also be used inside a list:
 
-\begin{verbatim}
-scores = [42, 88, 15]
-
-labels = [
-    "pass" if score >= 50 else "fail"
-    for score in scores
-]
-
-print(f"scores: {scores}")
-print(f"labels: {labels}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-scores: [42, 88, 15]
-labels: ['fail', 'pass', 'fail']
-\end{verbatim}
-
+%<<<PROGRAM:programs/syn01>>>
 This example also contains a list comprehension, which will be studied elsewhere. At this point, the important observation is simpler: the conditional expression contributes one selected value for each score.
 
 The conditional expression must include an \texttt{else} part. This is invalid:

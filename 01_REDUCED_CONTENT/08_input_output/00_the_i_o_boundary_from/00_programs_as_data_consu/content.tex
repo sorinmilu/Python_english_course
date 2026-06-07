@@ -36,12 +36,4 @@ print(type(user_text), user_text.upper())
 
 In C, \texttt{printf}/\texttt{scanf} operate on \texttt{FILE *} streams backed by small integer file descriptors (\texttt{0}, \texttt{1}, \texttt{2}). Python's stream objects sit above the same descriptor layer: they add encoding, buffering, and newline policy. \texttt{sys.stdout.fileno()} exposes the underlying descriptor when low-level access is required.
 
-\begin{verbatim}
-import sys
-
-fd = sys.stdout.fileno()
-print(f"stdout fileno = {fd}")
-name, score = "Kramer", 42
-sys.stdout.write(f"{name:10} | score = {score:04d}\n")
-sys.stdout.flush()
-\end{verbatim}
+%<<<PROGRAM:programs/pro01>>>

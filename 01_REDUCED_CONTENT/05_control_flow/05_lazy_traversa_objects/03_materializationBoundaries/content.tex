@@ -16,134 +16,27 @@ Before materialization, the program has a traversal process. After materializati
 
 The most common materialization functions are \texttt{list()} and \texttt{tuple()}.
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-pairs = enumerate(names)
-
-stored_list = list(pairs)
-
-print(f"stored_list: {stored_list}")
-print(f"type(stored_list): {type(stored_list)}")
-print(f"dir(stored_list) sample: {dir(stored_list)[:10]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-stored_list: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
-type(stored_list): <class 'list'>
-dir(stored_list) sample: ['__add__', '__class__', '__class_getitem__',
-'__contains__', '__delattr__', '__delitem__', '__dir__', '__doc__',
-'__eq__', '__format__']
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat08>>>
 The \texttt{enumerate} object has been consumed. The produced tuples are now stored inside a list.
 
 The resulting list is reusable:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-stored = list(enumerate(names))
-
-print("first traversal")
-for pair in stored:
-    print(pair)
-
-print("second traversal")
-for pair in stored:
-    print(pair)
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-first traversal
-(0, 'Jerry')
-(1, 'Elaine')
-(2, 'Kramer')
-second traversal
-(0, 'Jerry')
-(1, 'Elaine')
-(2, 'Kramer')
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat07>>>
 The list can be traversed repeatedly because it is a reusable iterable container. Each \texttt{for} loop creates a new iterator over the stored list.
 
 This is different from reusing the original lazy iterator:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-
-pairs = enumerate(names)
-
-print("first materialization")
-print(list(pairs))
-
-print("second materialization")
-print(list(pairs))
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-first materialization
-[(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
-second materialization
-[]
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat06>>>
 The second list is empty because the \texttt{enumerate} iterator was already exhausted by the first \texttt{list()} call.
 
 The same rule applies to \texttt{zip()}:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-scores = [72, 91, 42]
-
-pairs = zip(names, scores)
-
-stored = list(pairs)
-
-print(f"stored: {stored}")
-print(f"type(stored): {type(stored)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-stored: [('Jerry', 72), ('Elaine', 91), ('Kramer', 42)]
-type(stored): <class 'list'>
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat05>>>
 Before the \texttt{list()} call, \texttt{pairs} is a lazy \texttt{zip} iterator. After the call, \texttt{stored} is a list of tuple objects.
 
 Materializing as a tuple works similarly:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine", "Kramer"]
-scores = [72, 91, 42]
-
-pairs = zip(names, scores)
-
-stored = tuple(pairs)
-
-print(f"stored: {stored}")
-print(f"type(stored): {type(stored)}")
-print(f"dir(stored) sample: {dir(stored)[:10]}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-stored: (('Jerry', 72), ('Elaine', 91), ('Kramer', 42))
-type(stored): <class 'tuple'>
-dir(stored) sample: ['__add__', '__class__', '__class_getitem__',
-'__contains__', '__delattr__', '__dir__', '__doc__', '__eq__',
-'__format__', '__ge__']
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat04>>>
 The outer container is now a tuple. The produced pairs are also tuples. This gives a fixed stored structure.
 
 The choice between \texttt{list()} and \texttt{tuple()} should follow the intended use:
@@ -172,50 +65,12 @@ stored: [(0, 'Jerry'), (1, 'Elaine'), (2, 'Kramer')]
 
 A materialized tuple cannot be appended to:
 
-\begin{verbatim}
-names = ["Jerry", "Elaine"]
-
-stored = tuple(enumerate(names))
-
-try:
-    stored.append((2, "Kramer"))
-except AttributeError as err:
-    print(f"type(err): {type(err)}")
-    print(f"message: {err}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-type(err): <class 'AttributeError'>
-message: 'tuple' object has no attribute 'append'
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat03>>>
 The tuple stores the produced values, but its structure cannot be expanded.
 
 Materialization is also common after \texttt{map()}:
 
-\begin{verbatim}
-texts = ["10", "20", "42"]
-
-nums_iter = map(int, texts)
-nums = list(nums_iter)
-
-print(f"nums: {nums}")
-print(f"type(nums): {type(nums)}")
-print(f"nums[0]: {nums[0]}")
-print(f"sum(nums): {sum(nums)}")
-\end{verbatim}
-
-Possible output:
-
-\begin{verbatim}
-nums: [10, 20, 42]
-type(nums): <class 'list'>
-nums[0]: 10
-sum(nums): 72
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat02>>>
 The stored list can now be indexed, traversed repeatedly, and passed to operations that need all values available.
 
 Without materialization, the iterator is consumed once:
@@ -303,28 +158,7 @@ Materialization has a cost. A lazy iterator may hold only traversal state and re
 
 A simple comparison:
 
-\begin{verbatim}
-import sys
-
-nums_range = range(1_000_000)
-nums_map = map(lambda n: n * 2, nums_range)
-
-print(f"type(nums_range): {type(nums_range)}")
-print(f"type(nums_map): {type(nums_map)}")
-
-print(f"size of range: {sys.getsizeof(nums_range)} bytes")
-print(f"size of map:   {sys.getsizeof(nums_map)} bytes")
-\end{verbatim}
-
-Possible output on one CPython build:
-
-\begin{verbatim}
-type(nums_range): <class 'range'>
-type(nums_map): <class 'map'>
-size of range: 48 bytes
-size of map:   48 bytes
-\end{verbatim}
-
+%<<<PROGRAM:programs/mat01>>>
 The exact byte counts are implementation-dependent. The important point is that neither object stores one million transformed integers.
 
 Materializing the transformed values changes the storage situation:

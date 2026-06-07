@@ -1,0 +1,510 @@
+\subsection{Legal and Structural Lexer Constraints}
+
+Before a Python name can become a runtime binding, it must first survive the source-code reading phase. Python does not begin by asking what value a variable should contain. It first reads the program as text and divides that text into meaningful pieces: names, keywords, literals, operators, delimiters, indentation markers, and so on.
+
+A variable name is therefore not only a programmer's label. It is also a piece of source syntax that must be recognizable by Python's lexical rules. If the text cannot be tokenized as a valid identifier, execution never begins. No object is created, no name is bound, and no runtime type question exists yet.
+
+This matters because the previous chapter established that Python names are flexible bindings, not C-style typed boxes. That flexibility starts only after the source code has been accepted. The syntax of the name is still fixed by the language.
+
+The central rule is simple:
+
+\begin{quote}
+A Python identifier must look like a valid name before it can be used as a runtime name.
+\end{quote}
+
+A valid ordinary identifier may contain letters, digits, and underscores, but it cannot start with a digit. It also cannot be one of Python's reserved keywords.
+
+The following program uses strings to test possible names before trying to use them as real source-code identifiers. This is useful because invalid identifiers cannot be written directly as assignment targets without stopping the whole file with a syntax error.
+
+\begin{verbatim}
+import keyword
+
+candidate = "chuck_fact_42"
+
+print(f"candidate text: {candidate}")
+print(f"type(candidate): {type(candidate)}")
+
+print("selected string methods:")
+print("isidentifier" in dir(candidate))
+print("upper" in dir(candidate))
+print("replace" in dir(candidate))
+
+print(f"is valid identifier shape: {candidate.isidentifier()}")
+print(f"is reserved keyword: {keyword.iskeyword(candidate)}")
+print(f"usable ordinary variable name: "
+      f"{candidate.isidentifier() and not keyword.iskeyword(candidate)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+candidate text: chuck_fact_42
+type(candidate): <class 'str'>
+selected string methods:
+True
+True
+True
+is valid identifier shape: True
+is reserved keyword: False
+usable ordinary variable name: True
+\end{verbatim}
+
+The object being tested here is a string object. The method \texttt{isidentifier()} checks whether the string has the structural form of a Python identifier. The \texttt{keyword.iskeyword()} function checks the second part of the rule: whether the word is reserved by the language.
+
+This distinction is important. A word can have the shape of an identifier and still be forbidden as an ordinary variable name.
+
+\subsubsection{Digit Restrictions: Why Identifiers Cannot Start with a Numerical Character}
+
+A Python identifier cannot begin with a digit:
+
+\begin{verbatim}
+42answer = "Nobody expects the Spanish Inquisition!"
+\end{verbatim}
+
+This is not rejected because the value is wrong. It is rejected because the text cannot be interpreted as a valid assignment target.
+
+The reason is lexical clarity. When Python reads source code, a leading digit begins a numeric literal. If names were allowed to start with digits, the lexer would face confusing cases such as:
+
+\begin{verbatim}
+123abc
+42answer
+3value
+\end{verbatim}
+
+Should \texttt{42answer} begin as the integer literal \texttt{42}, followed by a name? Should it be one name? Should it be an invalid number? Python avoids this ambiguity by using a clean rule: digits may appear after the first character, but not as the first character.
+
+Valid examples:
+
+\begin{verbatim}
+answer42 = "The answer is 42."
+fact_7 = "Chuck Norris can divide by zero."
+room101 = "Seinfeld parking garage energy."
+\end{verbatim}
+
+Invalid examples:
+
+\begin{verbatim}
+42answer = "The answer is 42."
+7fact = "Chuck Norris counted to infinity. Twice."
+101room = "No soup for you."
+\end{verbatim}
+
+A practical test:
+
+\begin{verbatim}
+names = ["answer42", "fact_7", "room101",
+         "42answer", "7fact", "101room"]
+
+for name in names:
+    print(f"{name:<10} identifier shape: {name.isidentifier()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer42   identifier shape: True
+fact_7     identifier shape: True
+room101    identifier shape: True
+42answer   identifier shape: False
+7fact      identifier shape: False
+101room    identifier shape: False
+\end{verbatim}
+
+The method \texttt{isidentifier()} checks the form of the text. It does not create a variable. It only answers the question: ``Could this string be shaped like a Python identifier?''
+
+To see what happens when invalid source text is compiled, we can ask Python to compile small snippets:
+
+\begin{verbatim}
+source_code = '42answer = "The answer is 42."'
+
+try:
+    compile(source_code, "<student-example>", "exec")
+    print("compiled successfully")
+except SyntaxError as err:
+    print("syntax error")
+    print(f"message: {err.msg}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+syntax error
+message: invalid decimal literal
+\end{verbatim}
+
+The exact error message may vary between Python versions, but the structural rule is stable: an ordinary identifier cannot start with a digit.
+
+\subsubsection{Valid Characters: Letters, Digits, Underscore (\texttt{\_}), and Unicode Identifier Rules}
+
+The simplest safe rule for beginners is this:
+
+\begin{quote}
+Use lowercase English letters, digits after the first character, and underscores.
+\end{quote}
+
+That gives names such as:
+
+\begin{verbatim}
+user_name = "George Costanza"
+line_1 = "It is merely a flesh wound."
+answer_42 = "The answer is still 42."
+\end{verbatim}
+
+The underscore is an ordinary character inside an identifier. It is not subtraction, spacing, or decoration. It is part of the name.
+
+\begin{verbatim}
+favorite_line = "No soup for you."
+favorite_line_2 = "These pretzels are making me thirsty."
+
+print(favorite_line)
+print(favorite_line_2)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+No soup for you.
+These pretzels are making me thirsty.
+\end{verbatim}
+
+A space is not allowed inside a name:
+
+\begin{verbatim}
+favorite line = "No soup for you."
+\end{verbatim}
+
+Python reads the space as a separator between tokens. It does not treat \texttt{favorite line} as one identifier. If the programmer wants a multi-word name, the normal Python form is \texttt{snake\_case}:
+
+\begin{verbatim}
+favorite_line = "No soup for you."
+\end{verbatim}
+
+Python also supports Unicode identifiers. This means that names are not limited to ASCII letters. For example, the following names are structurally valid:
+
+\begin{verbatim}
+café = "coffee"
+π_value = 3.14
+răspuns_42 = "patruzeci și doi"
+
+print(café)
+print(π_value)
+print(răspuns_42)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+coffee
+3.14
+patruzeci și doi
+\end{verbatim}
+
+However, valid does not always mean wise. Unicode identifiers can be useful in mathematical, linguistic, or local teaching examples, but they can also make code harder to type, search, review, or share across keyboards. For ordinary programming, especially in mixed teams, simple ASCII \texttt{snake\_case} is usually the clearest choice.
+
+A small inspection program:
+
+\begin{verbatim}
+names = [
+    "snake_case",
+    "answer_42",
+    "_temporary",
+    "café",
+    "π_value",
+    "bad-name",
+    "has space",
+    "42_first"
+]
+
+for name in names:
+    print(f"{name:<12} {name.isidentifier()}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+snake_case   True
+answer_42    True
+_temporary   True
+café         True
+π_value      True
+bad-name     False
+has space    False
+42_first     False
+\end{verbatim}
+
+The invalid cases fail for different reasons:
+
+\begin{itemize}
+    \item \texttt{bad-name} contains a hyphen. Python reads the hyphen as the subtraction operator.
+    \item \texttt{has space} contains a space. Python reads it as two separate words.
+    \item \texttt{42\_first} starts with a digit. Python begins reading a number.
+\end{itemize}
+
+The string object gives us the \texttt{isidentifier()} method, but the final answer also depends on keywords. For example:
+
+\begin{verbatim}
+import keyword
+
+name = "class"
+
+print(f"name: {name}")
+print(f"type(name): {type(name)}")
+print(f"isidentifier: {name.isidentifier()}")
+print(f"is keyword: {keyword.iskeyword(name)}")
+print(f"safe ordinary name: "
+      f"{name.isidentifier() and not keyword.iskeyword(name)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+name: class
+type(name): <class 'str'>
+isidentifier: True
+is keyword: True
+safe ordinary name: False
+\end{verbatim}
+
+So \texttt{class} has the shape of an identifier, but it is not available as an ordinary variable name.
+
+\subsubsection{Reserved Keywords: Why \texttt{def}, \texttt{class}, \texttt{import}, and Similar Tokens Cannot Be Used as Names}
+
+Some words are reserved because Python uses them to express program structure. Examples include \texttt{def}, \texttt{class}, \texttt{import}, \texttt{if}, \texttt{else}, \texttt{for}, \texttt{while}, \texttt{return}, \texttt{try}, and \texttt{with}.
+
+These words are not forbidden because they are bad names in English. They are forbidden because they already have grammatical jobs.
+
+For example, \texttt{def} starts a function definition:
+
+\begin{verbatim}
+def say_line():
+    print("Nobody expects the Spanish Inquisition!")
+\end{verbatim}
+
+If Python also allowed \texttt{def} to be an ordinary variable name, then this line would become structurally unclear:
+
+\begin{verbatim}
+def = 42
+\end{verbatim}
+
+The parser must be able to rely on \texttt{def} meaning function-definition syntax, not a user-chosen name.
+
+The same applies to \texttt{class}:
+
+\begin{verbatim}
+class = "Springfield Elementary"
+\end{verbatim}
+
+This is invalid because \texttt{class} is reserved for class definitions.
+
+The same applies to \texttt{import}:
+
+\begin{verbatim}
+import = "Bring me the module."
+\end{verbatim}
+
+This is invalid because \texttt{import} is reserved for import statements.
+
+The correct approach is to choose ordinary names that do not collide with Python grammar:
+
+\begin{verbatim}
+definition_text = "Nobody expects the Spanish Inquisition!"
+class_name = "Springfield Elementary"
+import_note = "The module is loaded later."
+
+print(definition_text)
+print(class_name)
+print(import_note)
+\end{verbatim}
+
+Python provides the standard \texttt{keyword} module so that the current interpreter can report its own reserved words:
+
+\begin{verbatim}
+import keyword
+
+print(f"type(keyword.kwlist): {type(keyword.kwlist)}")
+print(f"number of keywords: {len(keyword.kwlist)}")
+
+print("selected list methods:")
+print("append" in dir(keyword.kwlist))
+print("count" in dir(keyword.kwlist))
+print("index" in dir(keyword.kwlist))
+
+print()
+print("Some keyword checks:")
+print(f"{'def':<10} {keyword.iskeyword('def')}")
+print(f"{'class':<10} {keyword.iskeyword('class')}")
+print(f"{'import':<10} {keyword.iskeyword('import')}")
+print(f"{'answer_42':<10} {keyword.iskeyword('answer_42')}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+type(keyword.kwlist): <class 'list'>
+number of keywords: 35
+selected list methods:
+True
+True
+True
+
+Some keyword checks:
+def        True
+class      True
+import     True
+answer_42  False
+\end{verbatim}
+
+The exact keyword count may change between Python versions. That is why asking the interpreter through \texttt{keyword.kwlist} is better than memorizing a number.
+
+There is also a distinction between hard keywords and soft keywords in modern Python. Hard keywords are always reserved. Soft keywords are treated specially only in specific grammatical contexts. For this introductory section, the practical rule is enough:
+
+\begin{quote}
+Before using a word as a normal variable name, it must be identifier-shaped and not a hard keyword.
+\end{quote}
+
+The following program checks several candidates:
+
+\begin{verbatim}
+import keyword
+
+candidates = ["def", "class", "import",
+              "match", "case", "answer_42",
+              "chuck_norris"]
+
+for name in candidates:
+    identifier_shape = name.isidentifier()
+    hard_keyword = keyword.iskeyword(name)
+
+    print(f"{name:<13} "
+          f"identifier={identifier_shape!s:<5} "
+          f"keyword={hard_keyword!s:<5} "
+          f"usable={identifier_shape and not hard_keyword}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+def           identifier=True  keyword=True  usable=False
+class         identifier=True  keyword=True  usable=False
+import        identifier=True  keyword=True  usable=False
+match         identifier=True  keyword=False usable=True
+case          identifier=True  keyword=False usable=True
+answer_42     identifier=True  keyword=False usable=True
+chuck_norris  identifier=True  keyword=False usable=True
+\end{verbatim}
+
+This output demonstrates the important difference. \texttt{def}, \texttt{class}, and \texttt{import} are structurally shaped like identifiers, but they are reserved. A name must pass both tests.
+
+\subsubsection{Case Sensitivity: \texttt{name}, \texttt{Name}, and \texttt{NAME} as Distinct Bindings}
+
+Python identifiers are case-sensitive. This means that uppercase and lowercase letters are not interchangeable.
+
+The following three names are different:
+
+\begin{verbatim}
+name = "Jerry"
+Name = "George"
+NAME = "Elaine"
+
+print(name)
+print(Name)
+print(NAME)
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+Jerry
+George
+Elaine
+\end{verbatim}
+
+Python does not see these as three spellings of the same name. It sees three distinct identifiers. Therefore, it creates three distinct bindings.
+
+Conceptually:
+
+\begin{verbatim}
+name -> "Jerry"
+Name -> "George"
+NAME -> "Elaine"
+\end{verbatim}
+
+This follows directly from the earlier binding model. The source spelling determines the name. If the spelling changes by case, the name changes.
+
+A small runtime inspection:
+
+\begin{verbatim}
+name = "Jerry"
+Name = "George"
+NAME = "Elaine"
+
+print(f"{'source name':<12} {'value':<10} {'type'}")
+print(f"{'name':<12} {name:<10} {type(name)}")
+print(f"{'Name':<12} {Name:<10} {type(Name)}")
+print(f"{'NAME':<12} {NAME:<10} {type(NAME)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+source name  value      type
+name         Jerry      <class 'str'>
+Name         George     <class 'str'>
+NAME         Elaine     <class 'str'>
+\end{verbatim}
+
+The three objects happen to be strings here, but the names are independent. They can even point to objects of different types:
+
+\begin{verbatim}
+answer = 42
+Answer = "forty-two"
+ANSWER = True
+
+print(f"{'answer':<8} value={answer!r:<12} type={type(answer)}")
+print(f"{'Answer':<8} value={Answer!r:<12} type={type(Answer)}")
+print(f"{'ANSWER':<8} value={ANSWER!r:<12} type={type(ANSWER)}")
+\end{verbatim}
+
+Possible output:
+
+\begin{verbatim}
+answer   value=42           type=<class 'int'>
+Answer   value='forty-two'  type=<class 'str'>
+ANSWER   value=True         type=<class 'bool'>
+\end{verbatim}
+
+This is legal, but it is usually a bad style choice. It makes code harder to read because the reader must notice a small visual difference that carries a real runtime consequence.
+
+For ordinary variables, the practical convention is:
+
+\begin{quote}
+Use lowercase \texttt{snake\_case} names, and do not create different variables whose only difference is letter case.
+\end{quote}
+
+So instead of this:
+
+\begin{verbatim}
+score = 42
+Score = 99
+SCORE = 100
+\end{verbatim}
+
+prefer names that state the difference explicitly:
+
+\begin{verbatim}
+current_score = 42
+bonus_score = 99
+max_score = 100
+
+print(current_score)
+print(bonus_score)
+print(max_score)
+\end{verbatim}
+
+This is not only prettier. It prevents a common reading error. Python will obey case-sensitive spelling exactly, but human readers often miss case-only distinctions when scanning code quickly.
+
+At this level, the complete rule for ordinary variable names can be summarized as follows:
+
+\begin{quote}
+A Python variable name must be a valid identifier, must not be a reserved keyword, and is matched by exact spelling, including letter case.
+\end{quote}

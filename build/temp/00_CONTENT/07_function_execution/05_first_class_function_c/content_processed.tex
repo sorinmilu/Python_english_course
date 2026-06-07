@@ -1,0 +1,7 @@
+\section{First-Class Functions, Closures, and Function Transformation}
+
+Once functions are understood as runtime objects, they can no longer be treated as mere named blocks of code. A function object can be stored, passed, returned, wrapped, replaced, and inspected. This turns executable behavior into data that can move through the program.
+
+This section studies that shift in three stages. First, it explains first-class functions and higher-order functions: functions that receive or return other functions. Then it explains closures, where returned inner functions preserve selected state from enclosing scopes after the outer function call has ended. Finally, it explains decorators as definition-time function transformations built from the same mechanisms.
+
+The central idea is that Python does not need a separate special system for callbacks, closures, or decorators. They all follow from the same object model: a function is an object, a name is a binding, and rebinding a name can replace one executable object with another.

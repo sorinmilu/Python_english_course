@@ -1,0 +1,9 @@
+{
+  "language": "python",
+  "title": "enumerate() as a Lazy Pair Generator for Index-Value Iteration",
+  "label": "enu03",
+  "linenos": true,
+  "input": null,
+  "output": "pairs: <enumerate object at 0x...>\nnothing has been printed from the names yet\nnext(pairs): (1, 'Jerry')\nnext(pairs): (2, 'Elaine')",
+  "file": "main.py"
+}

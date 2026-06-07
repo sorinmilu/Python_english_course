@@ -4,16 +4,7 @@ Binary mode (\texttt{"rb"}, \texttt{"wb"}, \texttt{"r+b"}) expects and returns \
 
 \subsubsection{Binary Mode as Raw Byte Transfer Without Text Decoding}
 
-\begin{verbatim}
-path = "binary_mode_demo.bin"
-data = b"Binary mode does not decode text. 42.\n"
-with open(path, "wb") as f:
-    f.write(data)
-with open(path, "rb") as f:
-    restored = f.read()
-print(data == restored, type(restored))
-\end{verbatim}
-
+%<<<PROGRAM:programs/byt01>>>
 \subsubsection{The \texttt{bytes} Object: Immutable Byte Sequences Distinct from \texttt{str}}
 
 \texttt{bytes} elements are integers \texttt{0}--\texttt{255}; \texttt{str} elements are Unicode codepoints. Indexing \texttt{bytes} yields \texttt{int}; slicing yields \texttt{bytes}.

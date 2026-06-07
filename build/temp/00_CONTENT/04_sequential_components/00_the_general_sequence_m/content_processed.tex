@@ -1,0 +1,7 @@
+\section{The General Sequence Model in Python}
+
+Python uses the word \emph{sequence} for objects whose components are arranged in a definite order. A sequence is not just ``several values together''. It is several values placed in positions, so that each component can be reached by its location.
+
+This section introduces the shared access model used by strings, lists, and tuples. Before studying the internal memory behavior of each object separately, we first need the common surface rules: indexing, slicing, length checking, membership testing, traversal, concatenation, repetition, comparison, and the basic split between mutable and immutable sequences.
+
+The goal is practical. A programmer must be able to look at a sequence and know how Python reads it, cuts it, walks through it, compares it, and combines it with another sequence. Later sections will explain why strings, lists, and tuples behave differently internally, but their common positional behavior starts here.
