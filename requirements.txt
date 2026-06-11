@@ -1,0 +1,11 @@
+# Python >=3.12,<3.14
+# Generated from conda env `python312` (Python 3.12.12).
+# Third-party deps for project tooling in 03_Scripts/ (Flask web UI).
+
+Flask==3.1.2
+blinker==1.9.0
+click==8.3.1
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+Werkzeug==3.1.5
