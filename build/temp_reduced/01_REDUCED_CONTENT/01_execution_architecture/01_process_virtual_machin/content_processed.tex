@@ -1,7 +1,0 @@
-\section{Process Virtual Machines and Interpreted Runtimes}
-
-Native C execution ends in machine code owned by the process image. Python execution adds a \textbf{process virtual machine}: a software instruction set, object model, and frame machinery hosted inside a native interpreter binary. The operating system schedules \texttt{python}; CPython schedules bytecode.
-
-This section compares CPython with other hosted runtimes so ``interpreted'' is not treated as a single vague label. The useful axes are: \textbf{VM topology} (stack- vs register-oriented bytecode), \textbf{execution strategy} (pure interpreter loop vs tiered JIT), and \textbf{host constraints} (stable C extension ABI vs browser startup latency).
-
-The user's \texttt{.py} file is not loaded as an ELF/PE executable. It is parsed, compiled to CPython bytecode, bound into code objects, and executed through an evaluation loop that manipulates \texttt{PyObject*} references on a virtual stack. Later chapters depend on this layering: names are bindings, functions create heap frames, exceptions unwind through bytecode tables, and generators preserve frames across yields.

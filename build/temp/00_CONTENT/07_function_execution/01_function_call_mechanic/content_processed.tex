@@ -1,7 +1,0 @@
-\section{Function Call Mechanics and Parameter Binding}
-
-A function definition creates a callable object, but the real execution machinery begins when that object is called. A call is not only a jump to another block of code. It is a structured operation: argument expressions are evaluated, object references are collected, a new frame is created, and parameter names inside that frame are bound according to the function signature.
-
-This section studies that entrance mechanism in detail. First, it explains what is actually passed across the call boundary: not C-style variable boxes, not copied Python objects, but references to already existing objects bound to new local names. This is why reassignment inside a function stays local, while mutation of a shared mutable object can be visible to the caller.
-
-After that, the section turns to signatures: positional arguments, keyword arguments, default values, positional-only parameters, keyword-only parameters, and annotations. These features are not decorative syntax. They are the rules by which Python constructs the initial local namespace of a function call.

@@ -1,7 +1,0 @@
-\section{The I/O Boundary: From Runtime Objects to External Systems}
-
-A Python program does not live alone inside memory. While it runs, it creates names, objects, frames, strings, numbers, lists, and dictionaries, but useful programs must also communicate with the outside world. They receive input, produce output, read stored data, write new data, and exchange information with resources controlled by the operating system.
-
-This section introduces that boundary. The central distinction is between runtime objects, which exist inside the interpreter process, and external data channels, which exist outside it. Variables disappear when the process ends, but files, terminal output, redirected streams, and operating-system resources belong to a larger execution environment.
-
-For a C programmer, this is familiar territory under different names: standard streams, file descriptors, buffers, handles, and system calls. Python does not remove those layers. It wraps them in higher-level objects so that input and output can be handled through the same object-oriented runtime model used everywhere else in the language.

@@ -1,9 +1,0 @@
-\section{Singular Data Domains and Operator Precedence}
-
-After names and assignment, the next question is what kind of objects those names can reach. This section introduces Python's singular built-in data domains: integers, floats, booleans, and \texttt{None}. These are not containers; each represents one direct value-domain at a time.
-
-The section also connects these objects to operators. In Python, arithmetic expressions are not performed on raw C-style storage cells. Operators dispatch to object behavior through special methods (\texttt{\_\_add\_\_}, \texttt{\_\_pow\_\_}, etc.), and the result is another heap-allocated object with its own runtime type. This is why \texttt{10 / 2} produces a \texttt{float}, why \texttt{2 ** 100} remains an exact \texttt{int}, and why \texttt{-2 ** 2} evaluates to \texttt{-4} rather than \texttt{4}.
-
-Finally, the section explains operator precedence. Python must decide how an expression is grouped before dispatching operations. Parentheses are the programmer's explicit control over the expression tree---not visual decoration, but an architectural override of default binding strength.
-
-The goal is predictable numeric behavior: what object is created, what type it has, what operation is dispatched, and how Python decides the order of evaluation.

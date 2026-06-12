@@ -1,7 +1,0 @@
-\section{Lazy Traversal Objects and Iteration Helpers}
-
-Python provides several built-in helpers that modify traversal without immediately building new containers. Functions such as \texttt{enumerate()}, \texttt{zip()}, \texttt{map()}, and \texttt{filter()} return lazy traversal objects. They produce values only when a loop, \texttt{next()}, or a materializing function asks for them.
-
-This section studies those helpers as parts of the iterator protocol, not as list-building shortcuts. \texttt{enumerate()} attaches counters to values. \texttt{zip()} synchronizes several iterables. \texttt{map()} transforms each value. \texttt{filter()} allows only selected values through.
-
-The central distinction is between traversal and storage. These helper objects describe or manage a stream of values in progress. They become stored data only when explicitly materialized with tools such as \texttt{list()} or \texttt{tuple()}.

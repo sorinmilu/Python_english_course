@@ -1,7 +1,0 @@
-\section{Dynamic Pointer Arrays: The Python List Architecture (\texttt{list})}
-
-A Python list is an ordered and mutable sequence. It can grow, shrink, replace elements, reorder elements, and hold objects of different types in the same structure. This makes it feel like a flexible array, but its internal model is different from a C array of direct primitive values.
-
-In CPython, a list is best understood as a dynamic array of references. The list owns a contiguous sequence of pointer slots, and each slot points to a Python object stored elsewhere. This explains why lists can contain mixed types, why appending at the end is usually efficient, why insertion near the front is expensive, and why copying lists requires careful attention.
-
-This section studies lists from that concrete runtime perspective: first the memory layout contrast with C arrays, then CPython's resizing behavior, then the ordinary mutation operations, and finally the difference between assignment, shallow copying, and deep copying.

@@ -1,7 +1,0 @@
-\chapter{Function Execution Mechanics, Lexical Scopes, and Advanced Control Architecture}
-
-Functions are the point where Python programs stop being only linear sequences of statements and become structured networks of calls, frames, bindings, returns, suspensions, and transformations. A function definition creates a runtime object. A function call creates a new frame. Arguments are bound to local names. Returned objects cross back to the caller. These mechanics form the base layer for almost every advanced control structure in Python.
-
-This chapter follows that machinery from the ordinary to the advanced. It begins with function objects and call frames, then moves into parameter binding, flexible signatures, namespaces, scope resolution, closures, decorators, generators, and native coroutines. Each topic is treated as a continuation of the same runtime model rather than as an isolated syntax feature.
-
-The central purpose is to make Python's control architecture explicit. Closures are not mysterious memory leaks, decorators are not special magic above functions, and generators are not merely unusual loops. They are all consequences of the same core system: objects referenced by names, frames that hold local execution state, compiled code objects that guide execution, and controlled transitions between active, suspended, and terminated computations.

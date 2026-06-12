@@ -1,3 +1,0 @@
-\section{Iterative Loops and the Iterator Protocol}
-
-Python's loop model is protocol-driven traversal, not C-style counter arithmetic. A \texttt{for} loop asks an iterable for an iterator, repeatedly probes that iterator's C-level function pointers for the next value, and terminates when the iterator signals exhaustion. This section concentrates on the iterable/iterator split, generator suspension mechanics, and the loop-\texttt{else} fall-through edge that survives only when no \texttt{break} rewires the control-flow graph.

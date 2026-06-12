@@ -1,7 +1,0 @@
-\section{Exceptional Control Flow and Error Routing}
-
-Not every execution route fails locally. Some operations fail in a way that cannot be handled by simply moving to the next statement or checking a returned value. Python uses exceptions for this kind of route change. An exception interrupts the ordinary path and sends execution toward a matching handler, possibly outside the current block or even outside the current function call.
-
-This section studies exceptions as control-flow structures, not merely as error messages. A raised exception is a non-local jump through the active execution graph. The exception object carries a runtime type, the handler selection mechanism matches that type against exception classes, and the traceback records the route through active frames.
-
-The goal is to make exception handling precise rather than magical: \texttt{try} marks a protected region, \texttt{except} catches selected failure routes, \texttt{else} isolates success-only logic, \texttt{finally} guarantees cleanup, and \texttt{raise} deliberately creates or continues an exceptional edge.

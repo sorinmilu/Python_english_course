@@ -1,3 +1,0 @@
-\section{Fixed Structural Contiguity: The Tuple Architecture (\texttt{tuple})}
-
-A \texttt{tuple} is a fixed-length immutable sequence of \texttt{PyObject*} references---structurally a list frozen at construction time. It supports read-only sequence access (index, slice, iterate) but exposes no mutators. Typical roles: multi-return bundles, dictionary keys (when all elements are hashable), and small records whose arity is part of the type meaning. Commas build tuples; parentheses are grouping sugar except where syntax demands them.

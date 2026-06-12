@@ -1,7 +1,0 @@
-\section{Anatomy and Definition of Functions}
-
-Functions are the first major point where Python execution stops being a simple top-to-bottom sequence of statements and becomes a controlled movement between execution frames. A function definition creates an executable object. A function call creates a temporary frame. A \texttt{return} statement terminates that frame and transfers one object reference back to the caller.
-
-This section therefore does not treat functions as a convenient syntax shortcut for repeated code. That view is incomplete. In Python, a function is a runtime object with a name, metadata, defaults, annotations, and a compiled code object behind it. When the program reaches a \texttt{def} statement, Python builds such an object and binds it to a name, just as it binds names to strings, lists, dictionaries, or class instances.
-
-The goal of this section is to make that machinery visible before moving into parameter binding, scope resolution, closures, decorators, generators, and coroutines. Those later mechanisms all depend on the same foundation: function objects, call frames, local names, returned object references, and frame termination. Without that model, advanced function behavior looks like special syntax. With it, most of Python's control architecture becomes a direct consequence of ordinary runtime object handling.

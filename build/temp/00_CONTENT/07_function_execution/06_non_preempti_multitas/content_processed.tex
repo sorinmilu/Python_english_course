@@ -1,7 +1,0 @@
-\section{Non-Preemptive Multitasking: Generators and Coroutines}
-
-Ordinary functions run until they return, raise an exception, or reach the end of their body. Generators and coroutines introduce a different execution shape: a computation can pause, keep its local state alive, return control to an outside driver, and later resume from the same point.
-
-This section studies that suspended-frame model step by step. Generators begin the discussion because \texttt{yield} makes suspension visible: a generator can produce one value, stop without losing its frame, and continue later when the caller asks for the next value. From there, \texttt{yield from} shows how suspended execution can be delegated through chains of generators.
-
-The section then moves to generator-based coroutines, where control is no longer only outward. Through \texttt{send()}, \texttt{throw()}, and \texttt{close()}, the caller can feed values, inject exceptions, and request shutdown. Finally, native \texttt{async def} coroutines and \texttt{await} show the modern structured form of the same general idea: execution advances cooperatively under an external scheduler, not through hidden preemptive interruption.

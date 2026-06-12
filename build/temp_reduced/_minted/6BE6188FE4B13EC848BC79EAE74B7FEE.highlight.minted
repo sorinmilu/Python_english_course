@@ -1,9 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\}]
-\PYG{k+kn}{import}\PYG{+w}{ }\PYG{n+nn}{sys}
-
-\PYG{n}{fd} \PYG{o}{=} \PYG{n}{sys}\PYG{o}{.}\PYG{n}{stdout}\PYG{o}{.}\PYG{n}{fileno}\PYG{p}{(}\PYG{p}{)}
-\PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{stdout fileno = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{fd}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{name}\PYG{p}{,} \PYG{n}{score} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{Kramer}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{,} \PYG{l+m+mi}{42}
-\PYG{n}{sys}\PYG{o}{.}\PYG{n}{stdout}\PYG{o}{.}\PYG{n}{write}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{name}\PYG{l+s+si}{:}\PYG{l+s+s2}{10}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ | score = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{score}\PYG{l+s+si}{:}\PYG{l+s+s2}{04d}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\PYG{n}{sys}\PYG{o}{.}\PYG{n}{stdout}\PYG{o}{.}\PYG{n}{flush}\PYG{p}{(}\PYG{p}{)}
-\end{MintedVerbatim}

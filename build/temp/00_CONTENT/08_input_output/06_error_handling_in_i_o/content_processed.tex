@@ -1,7 +1,0 @@
-\section{Error Handling in I/O Operations}
-
-I/O operations are less predictable than ordinary in-memory operations because they depend on external state controlled by the operating system. A variable lookup either finds a runtime binding or it does not, but a file operation may fail for many outside reasons: the file may be missing, access may be denied, the path may be invalid, or another process may change the filesystem at the same time.
-
-This section explains the expected failure modes of file access and the defensive patterns used to handle them. The goal is not to prevent every failure in advance, because that is impossible at the I/O boundary. The goal is to write code that expects failure, catches the right exceptions, and keeps filesystem operations explicit and safe.
-
-The central rule is simple: external resources are not under full program control, so serious I/O code must protect the operation itself, not only the assumptions made before the operation.

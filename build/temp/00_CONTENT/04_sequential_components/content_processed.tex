@@ -1,9 +1,0 @@
-\chapter{Sequential Component Data Architectures (Strings, Lists, and Tuples)}
-
-A single value is useful, but most real programs do not work with isolated values for very long. They work with ordered groups: characters in a text, rows of values, coordinates, records, command-line arguments, tokens, names, paths, and many other structures whose components must be stored and accessed in sequence.
-
-This chapter studies Python's core sequential data architectures: \texttt{str}, \texttt{list}, and \texttt{tuple}. All three support positional access, slicing, length testing, membership testing, and iteration. They share the general sequence model, but they do not share the same internal meaning. A string is immutable Unicode text. A list is a mutable dynamic array of object references. A tuple is a fixed-size immutable sequence of object references.
-
-The goal is practical and structural at the same time. We will write code that indexes, slices, searches, formats, mutates, copies, sorts, and unpacks these objects. But we will also keep the runtime model visible: Python variables refer to objects, lists and tuples store references, strings store text rather than raw bytes, and every operation must be understood through the object that receives it.
-
-This is the point where the course becomes more directly programmatic. The earlier chapters established the execution and object model. Here that model is used repeatedly in ordinary code, because sequence handling is one of the basic daily activities of Python programming.

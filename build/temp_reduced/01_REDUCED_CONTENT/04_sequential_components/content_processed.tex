@@ -1,5 +1,0 @@
-\chapter{Sequential Component Data Architectures (Strings, Lists, and Tuples)}
-
-Most programs operate on ordered groups: text, argument vectors, coordinate records, and token streams. Python's core sequential architectures---\texttt{str}, \texttt{list}, and \texttt{tuple}---share positional access semantics but diverge sharply at the C level. A string is immutable Unicode text backed by a width-adaptive character buffer. A list is a mutable dynamic array of \texttt{PyObject*} references. A tuple is a fixed-size immutable reference sequence, often used as a hashable record.
-
-This chapter treats sequence handling through the runtime object model: variables bind to objects, lists and tuples store references rather than embedded values, and every apparent mutation on an immutable type is actually rebinding or fresh allocation. The focus is structural: how CPython lays out memory, when allocation thrashes, and where pointer identity diverges from value equality.

@@ -1,9 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\}]
-\PYG{n}{nums} \PYG{o}{=} \PYG{n+nb}{range}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{l+m+mi}{5}\PYG{p}{)}
-
-\PYG{k}{try}\PYG{p}{:}
-    \PYG{n}{nums}\PYG{o}{.}\PYG{n}{start} \PYG{o}{=} \PYG{l+m+mi}{100}
-\PYG{k}{except} \PYG{n+ne}{AttributeError} \PYG{k}{as} \PYG{n}{err}\PYG{p}{:}
-    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{type(err): }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{type}\PYG{p}{(}\PYG{n}{err}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{message: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{err}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
-\end{MintedVerbatim}

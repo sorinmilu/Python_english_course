@@ -1,7 +1,0 @@
-\section{Arithmetic Sequence Descriptors: The \texttt{range()} Object}
-
-Loops often need a controlled sequence of integer values: positions, counters, repeated step numbers, or numeric boundaries. In Python, this role is usually handled by \texttt{range()}. However, \texttt{range()} should not be understood as a function that builds a list of numbers. It builds a compact object that describes how those numbers can be produced.
-
-This distinction is central to Python's traversal model. A \texttt{range} object stores an arithmetic rule: where to start, where to stop, and how far to move at each step. The actual values are computed only when they are requested by indexing, iteration, membership testing, or explicit materialization.
-
-This section studies \texttt{range()} as a lazy arithmetic sequence descriptor. It explains why it uses fixed memory, how it behaves like a sequence without storing all elements, why membership testing can be arithmetic rather than linear, and why the same range object can be reused safely across multiple loops.

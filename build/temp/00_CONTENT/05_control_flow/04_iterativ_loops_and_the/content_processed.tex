@@ -1,7 +1,0 @@
-\section{Iterative Loops and the Iterator Protocol}
-
-Loops are the control-flow structures that make repeated execution possible. A conditional statement chooses one route once. A loop creates a route that can return to an earlier point and execute a block again. This repeated route may be controlled by a condition, as in \texttt{while}, or by a traversal source, as in \texttt{for}.
-
-Python's loop model is closely connected to its object model. A \texttt{for} loop is not merely a counter mechanism. It is a protocol-driven traversal system: Python asks an iterable object for an iterator, repeatedly asks that iterator for the next value, and stops when the iterator reports completion.
-
-This section separates the two major loop families. The \texttt{while} loop is studied as condition-controlled indefinite iteration. The \texttt{for} loop is studied as object-driven definite traversal. From there, the section explains the difference between iterable objects and iterator objects, why iterators can become exhausted, how \texttt{break} and \texttt{continue} alter loop routes, and why Python's loop-\texttt{else} clause means normal completion rather than ordinary conditional failure.

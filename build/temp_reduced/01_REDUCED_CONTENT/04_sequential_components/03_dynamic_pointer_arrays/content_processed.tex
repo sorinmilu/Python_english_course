@@ -1,3 +1,0 @@
-\section{Dynamic Pointer Arrays: The Python List Architecture (\texttt{list})}
-
-A Python \texttt{list} is a mutable ordered sequence implemented in CPython as a dynamic array of \texttt{PyObject*} references. The list object owns a contiguous pointer buffer; referenced payloads live elsewhere on the heap. Growth uses over-allocated capacity for amortized constant-time appends; insertion or deletion away from the tail shifts pointer slots and costs $O(n)$. Copy semantics must distinguish assignment (shared reference), shallow copy (duplicated pointer array, shared elements), and deep copy (recursive graph duplication).

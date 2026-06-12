@@ -1,3 +1,0 @@
-\section{CPython String Memory Realities (\texttt{str})}
-
-Programmer-facing rule: \texttt{str} holds ordered Unicode text and rejects in-place mutation. Implementation reality: CPython selects a compact internal character width (PEP 393), allocates fresh objects for every apparent edit, and may intern or reuse immutable instances. Indexing returns one-character \texttt{str} objects; slicing and formatting allocate new buffers. Understanding these rules prevents quadratic concatenation loops and mistaken identity tests on dynamically built strings.

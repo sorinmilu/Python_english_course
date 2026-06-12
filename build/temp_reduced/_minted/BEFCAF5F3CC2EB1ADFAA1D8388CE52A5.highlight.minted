@@ -1,8 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\}]
-\PYG{k}{if} \PYG{n}{condition}\PYG{p}{:}
-    \PYG{n}{statements\PYGZus{}for\PYGZus{}true\PYGZus{}condition}
-\PYG{k}{elif} \PYG{n}{another\PYGZus{}condition}\PYG{p}{:}
-    \PYG{n}{statements\PYGZus{}for\PYGZus{}second\PYGZus{}condition}
-\PYG{k}{else}\PYG{p}{:}
-    \PYG{n}{statements\PYGZus{}for\PYGZus{}all\PYGZus{}previous\PYGZus{}conditions\PYGZus{}false}
-\end{MintedVerbatim}

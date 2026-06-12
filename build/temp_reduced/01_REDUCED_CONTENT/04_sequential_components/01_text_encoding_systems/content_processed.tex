@@ -1,3 +1,0 @@
-\section{Text Encoding Systems, Lexical Escape Maps, and Character Representation}
-
-Visible characters, Unicode codepoints, lexical escape spellings, and on-the-wire byte serializations are four distinct layers. Python's \texttt{str} operates at the codepoint layer; \texttt{bytes} holds raw octets; escape sequences in source literals are resolved by the lexer before a \texttt{str} object exists. Conflating these layers produces the classic failure modes: treating \texttt{len(text)} as byte count, decoding UTF-8 bytes with the wrong codec, or assuming \texttt{\textbackslash xhh} inserts UTF-8 rather than a single Latin-1-range codepoint.

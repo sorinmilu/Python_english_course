@@ -1,7 +1,0 @@
-\section{Text File Reading and Writing}
-
-Text files are the most common external data form a beginner encounters, but they are not merely large strings stored somewhere else. A text file is stored as bytes outside the Python process, while Python code works with \texttt{str} objects inside the runtime. Reading and writing text therefore means crossing a translation boundary.
-
-This section explains the practical mechanics of that boundary. It shows how complete files, individual lines, and batches of lines are read into runtime objects; how strings are written back to external storage; and why newline handling and character encoding are not minor details but part of the file format itself.
-
-The central rule is simple: text-mode file operations let Python programs treat external textual data as \texttt{str} objects, while the file object manages the conversion between runtime text and stored byte sequences.
